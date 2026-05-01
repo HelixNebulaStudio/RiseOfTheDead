@@ -76,8 +76,26 @@ function Objective:Tick()
 		
 	end
 
-	if self.SpawnCount >= self.EliminateCount and #self.Controller.EnemyNpcClasses <= 0 then
-		return true;
+	if self.SpawnCount >= self.EliminateCount then
+		local enemiesLeft = #self.Controller.EnemyNpcClasses;
+		if enemiesLeft <= 0 then
+			return true;
+		else
+			if self.InformTick == nil or tick()-self.InformTick > 10 then
+				self.InformTick = tick();
+				shared.Notify(game.Players:GetPlayers(), `{enemiesLeft} enemies remaining..`, "Inform");
+
+				if tick()-self.LastSpawnTick > 120 then
+					local counts = {};
+					for _, npcClass in pairs(self.Controller.EnemyNpcClasses) do
+						counts[npcClass.Name] = (counts[npcClass.Name] or 0) +1;
+					end
+					for name, count in pairs(counts) do
+						shared.Notify(game.Players:GetPlayers(), `{count} {name} remaining..`, "Inform");
+					end
+				end
+			end
+		end
 	end
 	
 	return false;

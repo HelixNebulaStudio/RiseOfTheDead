@@ -1,5 +1,4 @@
 local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
-local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 --==
 local attirePackage = {
 	ItemId=script.Name;
@@ -18,7 +17,11 @@ local attirePackage = {
 function attirePackage.newClass()
 	local equipmentClass = modEquipmentClass.new(attirePackage);
 
-	equipmentClass:AddBaseModifier("CultistHood");
+	equipmentClass:AddBaseModifier("HoodsPact", {
+		ArrayValues = {
+			PassiveModifiers = "Hoods Pact";
+		};
+	});
 
 	return equipmentClass;
 end

@@ -185,7 +185,7 @@ function modItemsLibrary.onRequire()
     new(clothingBase, {Id="cowboyhat"; Name="Cowboy Hat"; Icon="rbxassetid://4994923375"; Tags={"Head"}; Description="I will be the one yeeee-haw-ing around here.";});
     new(clothingBase, {Id="gasmask"; Name="Gas Mask"; Icon="rbxassetid://6971981402"; Tags={"Head"}; Description="Hudda hudda huuh! Reduce effects and damage from gas clouds and toxic damages.";});
     new(clothingBase, {Id="nekronmask"; Name="Nekron Mask"; Icon="rbxassetid://5419783427"; Tags={"Head"}; Description="Once you put it on, the mask will start consuming itself and some zombies will start looking like you.. (It will continue to consume even if you take the mask off.)"; Sources={"Obtained in <b>Mission: Vindictive Treasure</b>";};  });
-    new(clothingBase, {Id="cultisthood"; Name="Cultist Hood"; Icon="rbxassetid://5550425398"; Tags={"Head"}; Description="Live in the shadows and pull the strings..\n<b>[Passive] Hoods Pact:</b> When damaged by a zombie, a Cultist will spawn to help you kill the zombie. (Cooldown: 10s)"; Sources={"Obtained in <b>Mission: Vindictive Treasure</b>";};  });
+    new(clothingBase, {Id="cultisthood"; Name="Cultist Hood"; Icon="rbxassetid://5550425398"; Tags={"Head"}; Description="Live in the shadows and pull the strings..\n<b>[Passive] Hoods Pact:</b> When damaged by a zombie, a Cultist will spawn to help you kill the zombie. (Cooldown: 5s)"; Sources={"Obtained in <b>Mission: Vindictive Treasure</b>";};  });
     new(clothingBase, {Id="onyxhoodiehood"; Name="OnyxHound Hoodie's Hood"; Icon="rbxassetid://71050005269381"; Tags={"Head"}; Description="Ultra Rare OnyxHound Hood.";});
     new(clothingBase, {Id="disguisekit"; Name="Disguise Kit"; Icon="rbxassetid://5783987908"; Tags={"Head"}; Usable="Disguise"; Description="Disguise yourself as anything available. Right-click to open disguse menu. To unlock new disguises, get kills in order to unlock. Unlock progress only saves on this item, so deleting this item will lose your disguise progression. Trading this item will also lose all kills saved in this item.";});
     new(clothingBase, {Id="nvg"; Name="Night Vision Goggles"; Icon="rbxassetid://108723648769674"; Tags={"Head"}; Description="Night vision goggles.\n<b>[Passive] Nights Light:</b> Enhances visibility in the dark.";});
@@ -441,7 +441,7 @@ function modItemsLibrary.onRequire()
     }
 
     new(foodBase, {Id="cannedbeans"; Name="Canned Beans"; Icon="rbxassetid://4466508636"; Description="Gives you 2 health per second for 30 seconds.";});
-    new(foodBase, {Id="bloxycola"; Name="Bloxy Cola"; Icon="rbxassetid://5094119246"; Description="Increases sprinting speed and melee stamina regen by 20% and reduce regen delay from 5 to 2 seconds.";});
+    new(foodBase, {Id="bloxycola"; Name="Bloxy Cola"; Icon="rbxassetid://5094119246"; Description="Gives you a <b>Bloxy Rush</b> buff for 120 seconds. Increases sprint speed, melee stamina regen and reduce regen delay.";});
     new(foodBase, {Id="energydrink"; Name="Xp Energy Drink"; Icon="rbxassetid://5627435285"; TradingTax=20; NonPremiumTax=80; Tradable=modItemsLibrary.Tradable.PremiumOnly; Description="Enaaargy! The energy drink to double your experience gain for the next hour.";});
     new(foodBase, {Id="chocobar"; Name="Chocolate Bar"; Icon="rbxassetid://5795159539"; Description="Edible happiess.";});
     new(foodBase, {Id="gumball"; Name="Gumball"; Icon="rbxassetid://6122669744"; Description="Chewy Gumball from the gumball machine. Gives you a random buff.";});

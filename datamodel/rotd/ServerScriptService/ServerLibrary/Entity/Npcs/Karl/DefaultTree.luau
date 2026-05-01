@@ -42,38 +42,8 @@ function treePackage.PlantExplosive(npcClass: NpcClass)
 
     local destructibleConfig = modDestructibles.createDestructible();
     destructibleConfig:SetAttribute("DebrisName", "GenericBarrel");
+    destructibleConfig:SetAttribute("Enabled", false);
     destructibleConfig.Parent = newExplosive;
-
-    local destructible: DestructibleInstance = modDestructibles.getOrNew(destructibleConfig);
-    destructible.HealthComp:SetMaxHealth(1);
-    destructible:SetEnabled(false);
-    destructible.NetworkOwners = {};
-
-    destructible.OnDestroy:Connect(function()
-        newExplosive:SetAttribute("HostileDestructible", nil);
-        local explosionPoint = newExplosive:GetPivot().Position;
-
-        local hitLayers = modExplosionHandler:Cast(explosionPoint, {
-            Radius = 16;
-        });
-
-        modExplosionHandler:Process(explosionPoint, hitLayers, {
-            ExplosionBy = npcClass;
-            TargetableTags = npcClass.WieldComp.TargetableTags;
-
-            Damage = 25;
-            MinDamage = 5;
-            ExplosionStun = 1;
-
-            DamageOrigin = explosionPoint;
-            OnPartHit = modExplosionHandler.GenericOnPartHit;
-        });
-
-        local dbPoint = Debugger:Point(explosionPoint);
-        Debugger.Expire(dbPoint, 2);
-        modAudio.Play("VechicleExplosion", dbPoint);
-        modAudio.Play("Explosion4", dbPoint);
-    end)
 
     npcClass.Move:SetMoveSpeed("set", "placingstop", 0, npcClass.Move.MoveSpeedPriority.Action, 2);
     
@@ -106,7 +76,38 @@ function treePackage.PlantExplosive(npcClass: NpcClass)
 
     task.wait(0.6);
     if npcClass.HealthComp.IsDead then return end;
+    
+    local destructible: DestructibleInstance = modDestructibles.getOrNew(destructibleConfig);
+    destructible.HealthComp:SetMaxHealth(100);
+
+    destructible.OnDestroy:Connect(function()
+        newExplosive:SetAttribute("HostileDestructible", nil);
+        local explosionPoint = newExplosive:GetPivot().Position;
+
+        local hitLayers = modExplosionHandler:Cast(explosionPoint, {
+            Radius = 16;
+        });
+
+        modExplosionHandler:Process(explosionPoint, hitLayers, {
+            ExplosionBy = npcClass;
+            TargetableTags = npcClass.WieldComp.TargetableTags;
+
+            Damage = 25;
+            MinDamage = 5;
+            ExplosionStun = 1;
+
+            DamageOrigin = explosionPoint;
+            OnPartHit = modExplosionHandler.GenericOnPartHit;
+        });
+
+        local dbPoint = Debugger:Point(explosionPoint);
+        Debugger.Expire(dbPoint, 2);
+        modAudio.Play("VechicleExplosion", dbPoint);
+        modAudio.Play("Explosion4", dbPoint);
+    end)
+
     destructible:SetEnabled(true);
+    
     newExplosive:SetAttribute("HostileDestructible", true);
 
     return true;

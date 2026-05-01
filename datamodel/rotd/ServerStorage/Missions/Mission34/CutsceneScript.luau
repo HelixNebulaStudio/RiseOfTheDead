@@ -96,6 +96,7 @@ return function(CutsceneSequence)
 
 							strangerNpcClass.HealthComp.OnIsDeadChanged:Connect(function(isDead)
 								if not isDead then return end;
+								if mission.ProgressionPoint ~= 2 then return end;
 								
 								modMission:FailMission(player, MISSION_ID, `The stranger was killed.`);
 							end)

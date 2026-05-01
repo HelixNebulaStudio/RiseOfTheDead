@@ -2,7 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local treePackage = {
     LogicString = {
-        SprintTree = "HasEnemy & !InMeleeRange & [Sprint]";
+        SprintTree = "HasEnemy & !InMeleeRange & Sprint";
         ShackleTree = "HasEnemy & InMeleeRange & CanShackle & [Shackle]";
         Default = "ShackleTree | SprintTree | ZombieBossDefaultTree";
     };

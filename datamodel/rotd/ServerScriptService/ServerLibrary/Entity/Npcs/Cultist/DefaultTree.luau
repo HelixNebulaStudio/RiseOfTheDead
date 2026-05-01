@@ -15,12 +15,19 @@ function treePackage.HasEnemy(npcClass: NpcClass)
 
     local enemyTargetData: NpcTargetData? = targetHandlerComp:MatchFirstTarget(function(targetData: NpcTargetData)
         if targetData.HealthComp == nil then return end;
-        local targetNpcClass: NpcClass = targetData.HealthComp.CompOwner;
+        local targetEntityClass: EntityClass = targetData.HealthComp.CompOwner :: EntityClass;
+        if targetEntityClass.ClassName == "Destructible" then return false; end;
 
-        local isAlive = targetNpcClass.HealthComp.IsDead ~= true;
+        local targetCharacterClass: CharacterClass = targetData.HealthComp.CompOwner :: CharacterClass;
+
+        local isAlive = targetCharacterClass.HealthComp.IsDead ~= true;
         if not isAlive then return false; end;
 
-		local canDamage = targetNpcClass.HealthComp:CanTakeDamageFrom(npcClass);
+        if npcClass.Player and targetCharacterClass.ClassName == "PlayerClass" then
+            return false;
+        end
+
+		local canDamage = targetCharacterClass.HealthComp:CanTakeDamageFrom(npcClass);
 		if not canDamage then return false; end;
 
         return true;
@@ -32,7 +39,7 @@ end
 
 function treePackage.InMeleeRange(npcClass: NpcClass)
     local enemyTargetData = npcClass.Properties.EnemyTargetData;
-    return enemyTargetData.Distance <= 10;
+    return enemyTargetData.Distance <= 6;
 end
 
 function treePackage.RunToMeleeRange(npcClass: NpcClass)

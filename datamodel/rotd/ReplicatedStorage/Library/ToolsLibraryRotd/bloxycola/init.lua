@@ -15,7 +15,7 @@ local toolPackage = {
 	Audio={};
 	
 	Configurations={
-		EffectDuration = 33;
+		EffectDuration = 120;
 		EffectType = "Status";
 
 		StatusId = "BloxyRush";

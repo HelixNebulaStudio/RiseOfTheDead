@@ -24,8 +24,10 @@ local npcPackage = {
     AddComponents = {
         "TargetHandler";
         "Chat";
+        "AttractNpcs";
         "RandomClothing";
         "FollowPlayer";
+        "DynamicLevel";
     };
 
     Voice = {
@@ -34,27 +36,20 @@ local npcPackage = {
         Speed = 1;
         PlaybackSpeed = 1;
     };
+
+    DynamicLevelScaling = {
+        WalkSpeed = 15;
+        MaxHealth = function(lvl) return 400+(math.max(200*lvl, 400)); end;
+        AttackDamage = function(lvl) return math.min(10+(lvl/2), 100); end;
+    };
+
+    ThinkCycle = 1;
 };
 
 function npcPackage.Spawning(npcClass: NpcClass)
     local properties = npcClass.Properties;
     local configurations: ConfigVariable = npcClass.Configurations;
     local healthComp: HealthComp = npcClass.HealthComp;
-
-    local level = math.max(properties.Level, 0);
-
-    local lvlMoveSpeed = 15;
-    configurations.BaseValues.WalkSpeed = lvlMoveSpeed;
-
-    local lvlHealth = math.max(400 + 200*level, 400)-1;
-    configurations.BaseValues.MaxHealth = lvlHealth;
-
-    local lvlAttackDamage = 25 + 2*level;
-    configurations.BaseValues.AttackDamage = lvlAttackDamage;
-    
-    if healthComp.LastDamagedBy == nil then
-        healthComp:Reset();
-    end
 end
 
 function npcPackage.Spawned(npcClass: NpcClass)
@@ -65,6 +60,7 @@ function npcPackage.Spawned(npcClass: NpcClass)
 
     npcClass.WieldComp:Equip{
         ItemId = "survivalknife";
+
         OnSuccessFunc = function(toolHandler: ToolHandlerInstance)
             local equipmentClass: EquipmentClass? = toolHandler.EquipmentClass;
             if equipmentClass == nil then return end;
