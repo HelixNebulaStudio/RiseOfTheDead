@@ -25,7 +25,7 @@ end
 
 if RunService:IsServer() then
 
-	function modifierPackage.Binds.OnPrimaryFire(modifier: ItemModifierInstance, packet)
+	function modifierPackage.Binds.GunPullTrigger(modifier: ItemModifierInstance, packet)
 		packet.RawRpm = packet.RawRpm + modifier.Properties.SkullBurst;
 	end
 
@@ -51,8 +51,12 @@ elseif RunService:IsClient() then
 		if modifierValues.SkullBurstStacks == nil then
 			modifierValues.SkullBurstStacks = 0;
 		end
-		if modifierValues.SkullBurstCooldownTick == nil or tick()-modifierValues.SkullBurstCooldownTick >= 10 then
-			if modifierValues.SkullBurstDepleteTick == nil or (tick()-modifierValues.SkullBurstDepleteTick >= 0.5) then
+
+		local sbCooldownTick = modifier.Properties.SkullBurstCooldownTick;
+		if sbCooldownTick == nil or tick()-sbCooldownTick >= 10 then
+
+			local sbDepleteTick = modifierValues.SkullBurstDepleteTick;
+			if sbDepleteTick == nil or (tick()-sbDepleteTick >= 0.5) then
 				modifierValues.SkullBurstDepleteTick = tick();
 				modifierValues.SkullBurstStacks = math.clamp(modifierValues.SkullBurstStacks -0.04, 0, 1);
 			end
@@ -68,13 +72,15 @@ elseif RunService:IsClient() then
 		local targetPart = packet.HitInfo.Part;
 		if targetPart == nil then return end;
 		if targetPart.Name ~= "Head" and targetPart:GetAttribute("IsHead") ~= true then return end;
-		if tick()-modifier.Properties.SkullBurstCooldownTick <= 0.1 then return end;
+
+		local sbCooldownTick = modifier.Properties.SkullBurstCooldownTick;
+		if sbCooldownTick and tick()-sbCooldownTick <= 0.1 then return end;
 
 		modifier.Properties.SkullBurstCooldownTick = tick();
 		modifier.Properties.SkullBurstStacks = math.clamp(modifier.Properties.SkullBurstStacks +0.05, 0, 1);
 	end
 
-	function modifierPackage.Binds.OnPrimaryFire(modifier: ItemModifierInstance, packet)
+	function modifierPackage.Binds.GunPullTrigger(modifier: ItemModifierInstance, changeRef)
 		if modifier.Properties.SkullBurstStacks <= 0 then return end;
 		
 		local equipmentClass: EquipmentClass? = modifier.EquipmentClass;
@@ -83,9 +89,10 @@ elseif RunService:IsClient() then
 		local configurations = equipmentClass.Configurations;
 
 		local baseRpm = configurations.Rpm;
-		local skullBurstRpm = baseRpm * (configurations.SkullBurst * modifier.Properties.SkullBurstStacks/1);
-	
-		packet.RawRpm = packet.RawRpm + skullBurstRpm;
+		local alpha = modifier.Properties.SkullBurstStacks/1
+		local skullBurstRpm = baseRpm * (modifier.Properties.SkullBurst * alpha);
+
+		changeRef.RawRpm = changeRef.RawRpm + skullBurstRpm;
 	end
 	
 end

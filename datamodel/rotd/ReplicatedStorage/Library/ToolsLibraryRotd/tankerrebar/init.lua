@@ -35,8 +35,6 @@ local toolPackage = {
 
 		StaminaCost = 18;
 		StaminaDeficiencyPenalty = 0.8;
-
-		DamageBlock = 20;
 	};
 	Properties={};
 };
@@ -86,7 +84,15 @@ function toolPackage.OnMarkerEvent(handler: ToolHandlerInstance, animId: string,
 end
 
 function toolPackage.newClass()
-	return modEquipmentClass.new(toolPackage);
+	local equipmentClass = modEquipmentClass.new(toolPackage);
+
+	equipmentClass:AddBaseModifier("BluntBlock", {
+		SumValues = {
+			DamageBlock = 20;
+		};
+	});
+
+	return equipmentClass;
 end
 
 return toolPackage;

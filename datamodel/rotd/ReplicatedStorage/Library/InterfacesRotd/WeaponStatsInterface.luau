@@ -373,7 +373,7 @@ local mouseOverDescription = {
         Desc="The chance for the passive <b>Melee Dampening</b> to activate.\n\n(Higher is better)";
     };
     DamageBlock={
-        Desc="The amount of damage additionally blocked for <b>Melee Dampening</b>.\n\n(Higher is better)";
+        Desc="The amount of additional damage blocked by <b>Melee Dampening</b>.\n\n(Higher is better)";
     };
 };
 
@@ -992,7 +992,14 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 modifierName = modifier.ModLibrary.Name;
             end
             if modifier.Tags.Base then
-                modifierName = `{modifierName} (Base)`;
+                if modifier.EquipmentClass and modifier.EquipmentClass == configOwner then
+                    modifierName = `{modifierName} (Base)`;
+                elseif modifier.EquipmentClass then
+                    local itemLib = modItemLibrary:Find(modifier.EquipmentClass.ItemId);
+                    modifierName = `{modifierName} ({itemLib and itemLib.Name or "Unknown"})`;
+                else
+                    modifierName = `{modifierName}`;
+                end
             end
 
             local modColor = nil;

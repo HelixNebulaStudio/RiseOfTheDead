@@ -575,6 +575,7 @@ function modItemsLibrary.onRequire()
         Tags = {"Offerings"};
         SigilType = "Greek";
         Description = "Use this to get special skins for a calibrated gold offer. This offering will be not tradable and expires in 3 days after use.";
+        Sources = {"Obtained as a random drop from doing anything. Drop cooldown depends on account statistics.";};
     };
     new(offerings, {
         Id = "crimsonofferings";

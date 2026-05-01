@@ -58,8 +58,6 @@ local toolPackage = {
 
 		BleedDamagePercent=0.2;
 		BleedSlowPercent=0.2;
-
-		DamageBlock = 10;
 	};
 	Properties={
 		ActiveCategory = "Edged";
@@ -126,7 +124,19 @@ function toolPackage.InputEvent(toolHandler: ToolHandlerInstance, inputData)
 end
 
 function toolPackage.newClass()
-	return modEquipmentClass.new(toolPackage);
+	local equipmentClass = modEquipmentClass.new(toolPackage);
+
+	equipmentClass:AddBaseModifier("BluntBlock", {
+		Name = "Blunt Block";
+		SumValues = {
+			DamageBlock = 10;
+		};
+		Tags = {
+			ClothingModifier = true;
+		};
+	});
+
+	return equipmentClass;
 end
 
 return toolPackage;

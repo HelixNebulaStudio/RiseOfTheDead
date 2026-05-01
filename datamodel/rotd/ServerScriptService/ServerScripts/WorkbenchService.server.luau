@@ -683,7 +683,7 @@ remoteSetAppearance.OnServerEvent:Connect(function(player, interactPart, action,
 				local itemSkin = storageItem.Values.Colors or {};
 				itemSkin[partKey] = appearId;
 				storageItem:SetValues("Colors", itemSkin);
-				profile:AddPlayPoints(2, "Gameplay:Workbench");
+				profile:AddPlayPoints(5, "Gameplay:Workbench");
 
 			else
 				Debugger:Warn("Color does not exist or color pack is locked.");
@@ -704,7 +704,7 @@ remoteSetAppearance.OnServerEvent:Connect(function(player, interactPart, action,
 				local itemSkin = storageItem.Values.Textures or {};
 				itemSkin[partKey] = appearId;
 				storageItem:SetValues("Textures", itemSkin);
-				profile:AddPlayPoints(2, "Gameplay:Workbench");
+				profile:AddPlayPoints(5, "Gameplay:Workbench");
 				
 			else
 				Debugger:Warn("Texture does not exist or color pack is locked.",textureLibrary == nil," Unlocked:",profile.SkinsPacks[textureLibrary.Pack]);
@@ -720,19 +720,19 @@ remoteSetAppearance.OnServerEvent:Connect(function(player, interactPart, action,
 		end
 		
 		storageItem:SetValues("PartAlpha", partAlpha);
-		profile:AddPlayPoints(2, "Gameplay:Workbench");
+		profile:AddPlayPoints(5, "Gameplay:Workbench");
 		
 	elseif action == 3 then --== Clear Color;
 		local itemSkin = storageItem.Values.Colors or {};
 		itemSkin[partKey] = nil;
 		storageItem:SetValues("Colors", itemSkin);
-		profile:AddPlayPoints(2, "Gameplay:Workbench");
+		profile:AddPlayPoints(5, "Gameplay:Workbench");
 		
 	elseif action == 4 then --== Clear Texture;
 		local itemSkin = storageItem.Values.Textures or {};
 		itemSkin[partKey] = nil;
 		storageItem:SetValues("Textures", itemSkin);
-		profile:AddPlayPoints(2, "Gameplay:Workbench");
+		profile:AddPlayPoints(5, "Gameplay:Workbench");
 
 	elseif action == 5 then --== Clear All;
 		local itemColors = storageItem.Values.Colors or {};
@@ -747,7 +747,7 @@ remoteSetAppearance.OnServerEvent:Connect(function(player, interactPart, action,
 		storageItem:SetValues("Colors", itemColors);
 		storageItem:SetValues("Textures", itemTextures);
 		storageItem:SetValues("PartAlpha", partAlpha);
-		profile:AddPlayPoints(2, "Gameplay:Workbench");
+		profile:AddPlayPoints(5, "Gameplay:Workbench");
 		
 		
 	elseif action == 9 then --== UnlockableSet;

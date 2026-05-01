@@ -35,15 +35,21 @@ local toolPackage = {
 
 		StaminaCost = 10;
 		StaminaDeficiencyPenalty = 0.5;
-
-		DamageBlock = 15;
 	};
 	Properties={};
 
 };
 
 function toolPackage.newClass()
-	return modEquipmentClass.new(toolPackage);
+	local equipmentClass = modEquipmentClass.new(toolPackage);
+
+	equipmentClass:AddBaseModifier("BluntBlock", {
+		SumValues = {
+			DamageBlock = 15;
+		};
+	});
+
+	return equipmentClass;
 end
 
 return toolPackage;
