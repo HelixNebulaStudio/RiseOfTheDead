@@ -159,7 +159,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local inventoryWindow: InterfaceWindow = interface:NewWindow("Inventory", inventoryFrame);
 	inventoryWindow.CompactFullscreen = true;
 	inventoryWindow.CloseWithInteract = true;
-	interface:BindConfigKey("DisableInventory", {inventoryWindow});
 	
 	if modConfigurations.CompactInterface then
 		inventoryWindow.BoolStringWhenActive = {String="!CharacterHud | CurrencyStats"; Priority=5;};
@@ -208,6 +207,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     hotbarWindow.Layers = {"CharacterHud"; "CompactHidden"; "Hotbar"};
 	hotbarWindow.IgnoreHideAll = true;
 	hotbarWindow.ReleaseMouse = false;
+	
+	interface:BindConfigKey("DisableInventory", {inventoryWindow});
 	interface:BindConfigKey("DisableHotbar", {hotbarWindow});
 
 	if modConfigurations.CompactInterface and UserInputService.TouchEnabled then
@@ -894,6 +895,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 		modStorageInterface.RefreshSiid(siid);
 	end))
+	
 end
 
 return interfacePackage;

@@ -112,7 +112,8 @@ if RunService:IsServer() then
 	
 		local list = modStorage.ListItemIdFromStorages("wantedposter", player);
 	
-		if #list > 0 and shared.modSafehomeService and shared.modSafehomeService.FactionTag == nil then
+		local safehomeClass = shared.WorldCore.SafehomeClass;
+		if #list > 0 and safehomeClass and safehomeClass.FactionTag == nil then
 	
 			local dialogPacket = {
 				Face="Happy";

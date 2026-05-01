@@ -30,13 +30,38 @@ function interactablePackage.init(super) -- Server/Client
 		local label = config:GetAttribute("Label") :: string;
 
         interactable.CanInteract = true;
-        interactable.Label = label or `Enter {mode}: {stage}`;
 
         interactable.Values.Mode = mode;
 		interactable.Values.Stage = stage;
 		
-		if stage == "Random" then
-			interactable.Values.Random = true;
+		if RunService:IsServer() then
+			if config:GetAttribute("_CycleRandom") == true then
+				interactable.Values.Random = true;
+
+				task.spawn(function()
+					task.wait(1);
+					local list = {};
+					for k, v in pairs(modGameModeLibrary.GameModes.Boss.Stages) do
+						if v.IsExtreme ~= true then
+							table.insert(list, {Index=(v.Index or 999); Key=k;});
+						end
+					end
+					table.sort(list, function(a, b) return a.Index < b.Index; end);
+
+					local index = 0;
+					while true do
+						index = index +1;
+						if index > #list then index = 1; end;
+
+						local stage = list[index].Key;
+						interactable.Values.Stage = stage;
+
+						interactable:Sync();
+
+						task.wait(5);
+					end
+				end)
+			end
 		end
     end
 
@@ -45,7 +70,6 @@ function interactablePackage.init(super) -- Server/Client
         if info.Player == nil then return end;
         if info.Action ~= info.ActionSource.Client then return end;
 		
-		local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 		task.delay(1, function()
 			modClientGuis.toggleGameBlinds(true, 0.5);
 		end)
@@ -66,34 +90,6 @@ function interactablePackage.init(super) -- Server/Client
     end
     
     -- When interactable pops up on screen.
-	local function shuffleRandom(interactable: InteractableInstance)
-		if interactable.Values.LastRandom and tick()-interactable.Values.LastRandom <= 1 then return end;
-		interactable.Values.LastRandom = tick();
-
-		
-		local list = {};
-		for k, v in pairs(modGameModeLibrary.GameModes.Boss.Stages) do
-			if v.IsExtreme ~= true then
-				table.insert(list, {Index=(v.Index or 999); Key=k;});
-			end
-		end
-		table.sort(list, function(a, b) return a.Index < b.Index; end);
-	
-		if interactable.Values.SelectIndex == nil or interactable.Values.SelectIndex >= #list then
-			interactable.Values.SelectIndex = 1;
-			
-		else
-			interactable.Values.SelectIndex = interactable.Values.SelectIndex +1;
-			
-		end
-		
-		local stage = list[interactable.Values.SelectIndex].Key;
-		interactable.Values.Stage = stage;
-		interactable.Label = `Enter {interactable.Values.Mode}: {interactable.Values.Stage}`;
-		
-	end
-
-
     function GameModeEnter.BindPrompt(interactable: InteractableInstance, info: InteractInfo)
 		if RunService:IsServer() then return end;
 
@@ -102,11 +98,6 @@ function interactablePackage.init(super) -- Server/Client
 
 		interactable.CanInteract = true;
 
-		if interactable.Values.Random == true then
-			shuffleRandom(interactable);
-			return;
-		end
-		
 		local mode = interactable.Values.Mode;
 		local stage = interactable.Values.Stage;
 
@@ -125,6 +116,8 @@ function interactablePackage.init(super) -- Server/Client
 		else
 			if stageLib.IsExtreme then
 				interactable.Label = `Enter Extreme Boss: {stage}`;
+			else
+        		interactable.Label = `Enter {mode}: {stage}`;
 			end
 			
 		end

@@ -25,7 +25,10 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	if not modBranchConfigurations.IsWorld("Safehome") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
+	if shared.WorldName ~= "Safehome" then
+		Debugger:Warn(`Invalid place for cutscene ({script.Name})`);
+		return;
+	end;
 
 	local spawnCf = CFrame.new(109.12, 2.55, -79.31) * CFrame.Angles(0, math.pi/2, 0);
 	CutsceneSequence:Initialize(function()
@@ -38,7 +41,10 @@ return function(CutsceneSequence)
 		local safehomeData = profile.Safehome;
 
 		local safehomeClass = safehomeData.SafehomeClass;
-		if safehomeClass == nil then Debugger:Warn("Missing safehomeClass"); return end;
+		while safehomeClass == nil and game.Players:IsAncestorOf(player) do
+			task.wait(1);
+		end
+		if safehomeClass.FactionTag then return end;
 		
 		local function OnChanged(firstRun)
 			if mission.Type == 2 then -- OnAvailable
@@ -85,7 +91,7 @@ return function(CutsceneSequence)
 					end
 					mission.SaveData.NpcName = newNpcName;
 
-					Debugger:Warn("Chosen NPC:", newNpcName, " mission.SaveData.NpcName", mission.SaveData.NpcName);
+					Debugger:StudioLog("Chosen NPC:", newNpcName, " mission.SaveData.NpcName", mission.SaveData.NpcName);
 					local survivorNpcClass: NpcClass = modNpcs.getPlayerNpc(player, newNpcName);
 
 					if survivorNpcClass == nil then
@@ -97,6 +103,7 @@ return function(CutsceneSequence)
 					end
 
 					survivorNpcClass:SetCFrame(spawnCf);
+					shared.Notify(player, `A stranger arrives at your safehome..`, "Inform");
 
 					task.spawn(function()
 						local remotes = game.ReplicatedStorage.Remotes;

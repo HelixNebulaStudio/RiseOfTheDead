@@ -66,7 +66,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     local window: InterfaceWindow = interface:NewWindow("MasteryMenu", masteryFrame);
 	window.CompactFullscreen = true;
     window.CloseWithInteract = true;
-    interface:BindConfigKey("DisableMasteryMenu", {window});
 	
 	if modConfigurations.CompactInterface then
         masterUIGridLayout.CellSize = UDim2.new(0, 100, 0, 80);
@@ -770,6 +769,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local quickButton = interface:NewQuickButton("MasteryMenu", "Masteries", "rbxassetid://2938848546");
 	quickButton.LayoutOrder = 7;
 	interface:ConnectQuickButton(quickButton, "KeyWindowMasteryMenu");
+    interface:BindConfigKey("DisableMasteryMenu", {window});
 
     --MARK: OnUpdate
     window.OnUpdate:Connect(function()

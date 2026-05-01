@@ -3,8 +3,8 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
-local modNpcs = shared.require(game.ServerScriptService.ServerLibrary.Entity.Npcs);
 
+local MISSION_ID = 55;
 --==
 return function(player, dialog, data, mission)
 	if not modBranchConfigurations.IsWorld("Safehome") then return end;
@@ -19,15 +19,15 @@ return function(player, dialog, data, mission)
 		return;
 	end
 
-	Debugger:Warn("mission", mission);
+	Debugger:StudioLog("mission", mission);
 	
 	if mission.SaveData and mission.SaveData.NpcName ~= survivorNpcClass.Name then return end;
 	
 	if mission.Type == 1 then -- Active
 		if mission.ProgressionPoint == 1 then
 			dialog:SetInitiateTag("shelter_init");
-			dialog:AddChoice("shelter_accept", function(dialog)
 
+			dialog:AddChoice("shelter_accept", function(dialog)
 				local profile = shared.modProfile:Get(player);
 				local safehomeData = profile.Safehome;
 
@@ -35,16 +35,26 @@ return function(player, dialog, data, mission)
 				local npcData = safehomeData:GetNpc(dialog.Name);
 				if npcData then
 					npcData.Active = os.time();
+
+					task.spawn(function()
+						local npcClass: NpcClass = dialog:GetNpcClass();
+						local worldSafehomeClass = shared.WorldCore.SafehomeClass;
+						
+						local standSpotAtt = worldSafehomeClass:GetNpcSpot(npcClass.Name);
+						
+						npcClass.Move:SetMoveSpeed("set", "walk", 8, npcClass.Move.MoveSpeedPriority.Movement, 10);
+						npcClass.Move:MoveTo(standSpotAtt.Position);
+					end)
 				end
 
-				modMission:CompleteMission(player, 55);
+				modMission:CompleteMission(player, MISSION_ID);
 				modEvents:NewEvent(player, {Id="acceptedFirstSurvivor";});
 			end)
 
 			local acceptedFirstSurvivor = modEvents:GetEvent(player, "acceptedFirstSurvivor");
 			if acceptedFirstSurvivor then
 				dialog:AddChoice("shelter_decline", function(dialog)
-					modMission:CompleteMission(player, 55);
+					modMission:CompleteMission(player, MISSION_ID);
 
 					if dialog.Character then
 						if dialog.Character:FindFirstChild("Interactable") then
@@ -62,6 +72,7 @@ return function(player, dialog, data, mission)
 					end
 				end)
 			end
+
 		end
 	end
 end

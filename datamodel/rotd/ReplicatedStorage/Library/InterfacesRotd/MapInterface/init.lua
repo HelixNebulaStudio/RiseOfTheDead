@@ -82,11 +82,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
     
 	local window: InterfaceWindow = interface:NewWindow("MapMenu", mapMenu);
-    interface:BindConfigKey("DisableMapMenu", {window});
 	
 	local quickButton = interface:NewQuickButton("MapMenu", "Map", "rbxassetid://4615489625");
 	quickButton.LayoutOrder = 9;
 	interface:ConnectQuickButton(quickButton, "KeyWindowMapMenu");
+    interface:BindConfigKey("DisableMapMenu", {window});
 
 	if modConfigurations.CompactInterface then
 		window:SetClosePosition(UDim2.new(0.5, 0, -2, 0), UDim2.new(0.5, 0, 0.5, 0));

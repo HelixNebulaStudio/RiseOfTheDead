@@ -10,6 +10,7 @@ local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configur
 local modKeyBindsHandler = shared.require(game.ReplicatedStorage.Library.KeyBindsHandler);
 local modSafehomesLibrary = shared.require(game.ReplicatedStorage.Library.SafehomesLibrary);
 local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumber);
+local modColorPicker = shared.require(game.ReplicatedStorage.Library.UI.ColorPicker);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 
@@ -32,8 +33,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     local templateNpcCapacity = script:WaitForChild("NpcCapacity");
     local templateAppearanceListing = script:WaitForChild("AppearanceListing");
 
-    local colorPickerObj = interface.ColorPicker;
-
 	local windowFrame = script:WaitForChild("Safehome"):Clone();
 	windowFrame.Parent = interface.ScreenGui;
 
@@ -41,11 +40,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     window.CloseWithInteract = true;
     window.DisableInteractables = true;
 	window:SetClosePosition(UDim2.new(0.5, 0, -1.5, 0), UDim2.new(0.5, 0, 0.5, 0));
-    interface:BindConfigKey("DisableSafehomeMenu", {window});
 
 	local quickButton = interface:NewQuickButton("Safehome", "Safehome", "rbxassetid://7045405631");
 	quickButton.LayoutOrder = 10;
 	interface:ConnectQuickButton(quickButton, "KeyWindowSafehome");
+    interface:BindConfigKey("DisableSafehomeMenu", {window});
 
 	windowFrame:WaitForChild("TitleFrame"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
 		window:Close();
@@ -53,6 +52,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
     local binds = window.Binds;
     binds.Page = "Safehome Stats";
+
+	local colorPickerObj;
 
     --MARK: OnToggle
 	window.OnToggle:Connect(function(visible)
@@ -63,7 +64,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             window:Update();
 
 		else
-			colorPickerObj.Frame.Visible = false;
+			if colorPickerObj then
+				colorPickerObj.Frame.Visible = false;
+			end
 
 		end
 	end)
@@ -270,6 +273,15 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						
 						colorButton.MouseButton1Click:Connect(function()
 							interface:PlayButtonClick();
+								
+							if colorPickerObj == nil then
+								colorPickerObj = modColorPicker.new(interface);
+								colorPickerObj.Parent = windowFrame;
+							end
+
+							local customColors = modData:GetFlag("CustomColors");
+							colorPickerObj:SetUnlocked(customColors and customColors.Unlocked);
+
 							interface.setPositionWithPadding(colorPickerObj.Frame);
 							colorPickerObj.Frame.Visible = true;
 
@@ -321,7 +333,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			end
 			local newPage = templateStatsPage:Clone();
 
-			spawn(function()
+			task.spawn(function()
 				fetchSafehomeData();
 
 				local foodbar = newPage:WaitForChild("FoodStat"):WaitForChild("Foodbar");
@@ -372,7 +384,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						camera.Parent = viewportFrame;
 						viewportFrame.CurrentCamera = camera;
 
-						local rCframe = npcPrefab:GetPrimaryPartCFrame();
+						local rCframe = npcPrefab:GetPivot();
 						local origin = rCframe.p + Vector3.new(0, 2, 0);
 						camera.CFrame = CFrame.lookAt(origin + rCframe.LookVector*3.5, origin);
 					end

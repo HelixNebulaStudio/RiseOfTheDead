@@ -75,7 +75,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 	local window: InterfaceWindow = interface:NewWindow("FactionsMenu", windowFrame);
 	window.CompactFullscreen = true;
-    interface:BindConfigKey("DisableFactionsMenu", {window});
 	
 	if modConfigurations.CompactInterface then
 		window:SetClosePosition(UDim2.new(0.5, 0, -1, 0), UDim2.new(0.5, 0, 0, 0));
@@ -86,6 +85,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local quickButton = interface:NewQuickButton("FactionsMenu", "Factions", "rbxassetid://9890634236");
 	quickButton.LayoutOrder = 8;
 	interface:ConnectQuickButton(quickButton, "KeyWindowFactionsMenu");
+    interface:BindConfigKey("DisableFactionsMenu", {window});
 
     local binds = window.Binds;
 	binds.ActivePage = "";

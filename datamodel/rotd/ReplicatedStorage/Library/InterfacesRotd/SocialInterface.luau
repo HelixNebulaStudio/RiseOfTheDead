@@ -104,15 +104,17 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local window: InterfaceWindow = interface:NewWindow("SocialMenu", menuFrame);
 	window.CompactFullscreen = true;
     window.CloseWithInteract = true;
-    interface:BindConfigKey("DisableSocialMenu", {window});
+
 	if modConfigurations.CompactInterface then
 		window:SetClosePosition(UDim2.new(0.5, 0, -1, 0), UDim2.new(0.5, 0, 0.5, 0));
 	else
 		window:SetClosePosition(UDim2.new(0.5, 0, -1, 0), UDim2.new(0.5, 0, 0.5, -35));
 	end
+    
 	local quickButton = interface:NewQuickButton("SocialMenu", "Social", "rbxassetid://3256270238");
 	quickButton.LayoutOrder = 100;
 	interface:ConnectQuickButton(quickButton, "KeyWindowSocialMenu");
+    interface:BindConfigKey("DisableSocialMenu", {window});
 
     local binds = window.Binds;
     binds.FriendsList = {};

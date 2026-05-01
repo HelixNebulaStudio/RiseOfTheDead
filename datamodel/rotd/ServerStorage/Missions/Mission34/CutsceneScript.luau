@@ -93,6 +93,12 @@ return function(CutsceneSequence)
 								attractNpcsComp.AttractHumanoidType = {"Zombie";};
 								attractNpcsComp:Activate();
 							end
+
+							strangerNpcClass.HealthComp.OnIsDeadChanged:Connect(function(isDead)
+								if not isDead then return end;
+								
+								modMission:FailMission(player, MISSION_ID, `The stranger was killed.`);
+							end)
 						end
 					end
 					
