@@ -55,9 +55,9 @@ return function(player, dialog, data, mission)
 							face.Texture = "rbxassetid://141728515";
 						end
 
-						local npcModule = modNpcs.GetNpcModule(dialog.Character);
-						delay(3, function()
-							npcModule:TeleportHide();
+						local npcClass: NpcClass = dialog:GetNpcClass();
+						task.delay(3, function() 
+							npcClass:TeleportHide();
 						end)
 					end
 				end)

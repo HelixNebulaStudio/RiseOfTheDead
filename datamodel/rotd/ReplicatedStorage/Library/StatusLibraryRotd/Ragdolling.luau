@@ -3,9 +3,9 @@ local modStatusClass = shared.require(game.ReplicatedStorage.Library.StatusLibra
 local localPlayer = game.Players.LocalPlayer;
 --==
 local statusPackage = {
-    Id="Ragdolling";
-    Description="Character is ragdolling";
-    ShowOnHud=false;
+    Id = "Ragdolling";
+    Description = "Character is ragdolling";
+    ShowOnHud = false;
 };
 
 function statusPackage.BindApply(statusClass: StatusClassInstance)

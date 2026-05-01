@@ -8,6 +8,7 @@ local npcPackage = {
     
 	Configurations = {};
     Properties = {
+        AllyTypes = {"Rat"};
         PrimaryGunItemId = "p250";
         MeleeItemId = "fireaxe";
         MeleeRange = 12;

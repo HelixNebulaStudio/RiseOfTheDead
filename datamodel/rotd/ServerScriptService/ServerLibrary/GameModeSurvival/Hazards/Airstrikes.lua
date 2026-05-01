@@ -56,8 +56,8 @@ function Hazard:Tick()
 		local randomChar = self.Controller.Characters[math.random(1, #self.Controller.Characters)];
 		randomCFrame = randomChar:GetPivot();
 		if math.random(1, 3) == 1 and #self.Controller.EnemyNpcClasses > 0 then
-			local randomNpcModule = self.Controller.EnemyNpcClasses[math.random(1, #self.Controller.EnemyNpcClasses)];
-			randomCFrame = randomNpcModule.RootPart.CFrame;
+			local randomNpcClass: NpcClass = self.Controller.EnemyNpcClasses[math.random(1, #self.Controller.EnemyNpcClasses)];
+			randomCFrame = randomNpcClass.RootPart.CFrame;
 		end
 		groundCframe = modAoeHighlight:Ray(randomCFrame.Position + Vector3.new(0, 128, 0), Vector3.new(0, -256, 0));
 	until groundCframe ~= nil;
@@ -110,7 +110,6 @@ function Hazard:Tick()
 			local projectile: ProjectileInstance = modProjectile.fire("rpgrocket", {
 				OriginCFrame = self.JetPrimary.CFrame;
 			});
-			projectile.Properties.TargetableTags = {Humanoid=1; Zombie=1; Bandit=1; Rat=1;};
 
 			local dmgRatio = 0.5;
 			if self.Controller.Wave >= 10 then

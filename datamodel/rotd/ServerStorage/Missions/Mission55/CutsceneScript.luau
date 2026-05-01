@@ -105,7 +105,6 @@ return function(CutsceneSequence)
 						remoteSetHeadIcon:FireAllClients(1, newNpcName, "Mission");
 					end)
 					
-					
 				elseif mission.ProgressionPoint == 2 then
 					
 				end

@@ -6,6 +6,7 @@ local npcPackage = {
     
 	Configurations = {};
     Properties = {
+        AllyTypes = {"Rat"};
         Immortal = 1;
     };
 

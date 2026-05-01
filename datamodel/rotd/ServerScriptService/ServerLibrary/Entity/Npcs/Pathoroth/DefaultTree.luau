@@ -1,25 +1,30 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
+local RunService = game:GetService("RunService");
 local TweenService = game:GetService("TweenService");
 
 local modHealthComponent = shared.require(game.ReplicatedStorage.Components.HealthComponent);
+local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modVector = shared.require(game.ReplicatedStorage.Library.Util.Vector);
 
 local treePackage = {
     LogicString = {
-        MorphTree = "HasEnemy & ShouldMorph & [Morph]";
+        MorphTree = "HasEnemy & ShouldMorph & [MimicMorph]";
 
-        InMorphTree = "IsInMorph & (EquipWeapon & HasAlly & AlertTree | IdleTree)";
+        IsMimicTree = "IsMimic & (EquipWeapon & PickActiveTarget & AlertTree | IdleTree)";
         AlertTree = "IsUsingMelee & MeleeTree | RangeTree";
         MeleeTree = "InMeleeRange & [SwingMelee] | [RunToMeleeRange]";
         RangeTree = "CanFireGun & (RunToFireRange & [FireGun]) | (RunToCover & [ReloadGun])";
+
         IdleTree = "SelfHealTree | [RandomFollow]";
         SelfHealTree = "IsHurt & [SelfHeal]";
 
         TransformLargeTree = "ShouldTransformLarge & [TransformLarge]";
-        InLargeTree = "IsLargePathoroth & ZombieDefaultTree";
+        InLargeTree = "IsLargePathoroth & (ChargeTree | ZombieDefaultTree)";
 
-        Default = "MorphTree | TransformLargeTree | InMorphTree | InLargeTree";
+        ChargeTree = "HasEnemy & CanCharge & [Charge]";
+
+        Default = "MorphTree | TransformLargeTree | IsMimicTree | InLargeTree";
     };
 };
 
@@ -40,7 +45,6 @@ function treePackage.HasEnemy(npcClass: NpcClass)
     return enemyTargetData ~= nil;
 end
 
-
 --MARK: MorphTree
 function treePackage.ShouldMorph(npcClass: NpcClass)
     local properties = npcClass.Properties;
@@ -52,7 +56,7 @@ function treePackage.ShouldMorph(npcClass: NpcClass)
 end
 
 
-function treePackage.Morph(npcClass: NpcClass)
+function treePackage.MimicMorph(npcClass: NpcClass)
     local properties = npcClass.Properties;
     local character = npcClass.Character;
     local rootPart = npcClass.RootPart;
@@ -73,6 +77,7 @@ function treePackage.Morph(npcClass: NpcClass)
     npcClass.Move:Stop();
     npcClass.Move:SetMoveSpeed("set", "morphstop", 0, npcClass.Move.MoveSpeedPriority.Action, 6.5);
     task.wait(0.2);
+    if npcClass.HealthComp.IsDead then return end;
 
     local pos = rootPart.Position + Vector3.new(0, -2.2, 0);
     local new = GOOP:Clone();
@@ -97,7 +102,7 @@ function treePackage.Morph(npcClass: NpcClass)
     task.wait(1.66);
     TweenService:Create(goop3, GOOP_TWEENINFO, {Position = rootPos3}):Play();
     task.wait(1.66);
-    
+    if npcClass.HealthComp.IsDead then return end;
 
     for _, obj in pairs(character:GetChildren()) do
         if obj:IsA("BasePart") then
@@ -111,13 +116,14 @@ function treePackage.Morph(npcClass: NpcClass)
     end
     table.clear(morphAccessories);
     task.wait(0.1);
+    if npcClass.HealthComp.IsDead then return end;
 
     for _, obj in pairs(morphTarget:GetChildren()) do
         if obj:IsA("Accessory") or obj:IsA("Shirt") or obj:IsA("Pants") then
             
             local clone = obj:Clone();
             for _, obj in pairs(clone:GetDescendants()) do
-                if obj:IsA("JointInstance") then
+                if obj:IsA("JointInstance") or obj:IsA("LuaSourceContainer") then
                     obj:Destroy();
                 end
             end
@@ -131,12 +137,6 @@ function treePackage.Morph(npcClass: NpcClass)
             
         end
     end
-
-    local face = morphTarget:FindFirstChild("face", true);
-    if face then 
-        table.insert(morphAccessories , face:Clone());
-        properties.FaceDecal.Transparency = 1;
-    end;
 
     for _, obj in pairs(character:GetChildren()) do
         if not obj:IsA("BasePart") then continue end;
@@ -160,6 +160,7 @@ function treePackage.Morph(npcClass: NpcClass)
     end
     
     task.wait(1);
+    if npcClass.HealthComp.IsDead then return end;
     
     npcClass.Move:SetMoveSpeed("set", "default", 16, 0);
     
@@ -187,9 +188,11 @@ function treePackage.TransformLarge(npcClass: NpcClass)
     local rootPart = npcClass.RootPart;
 
     properties.Immortal = 1;
+    task.delay(5, function()
+        properties.Immunity = 0.5;
+        properties.Immortal = nil;
+    end)
     properties.IsLargePathoroth = true;
-
-    properties.FaceDecal.Transparency = 0;
 
     npcClass.AnimationController:Stop("Running")
     npcClass.AnimationController:Play("Transform", {Speed=0.25;});
@@ -223,7 +226,6 @@ function treePackage.TransformLarge(npcClass: NpcClass)
     
     npcClass.Humanoid.AutomaticScalingEnabled = true;
     
-    local accessoryHandles = {};
     local sBodyParts = {};
     for _, obj in pairs(character:GetChildren()) do
         if obj:IsA("BasePart") then
@@ -234,79 +236,69 @@ function treePackage.TransformLarge(npcClass: NpcClass)
         end
     end
 
+    local scaleAccessories = {};
+    local morphAccessories = properties.MorphAccessories;
+    for a=1, #morphAccessories do
+        if morphAccessories[a]:IsA("Accessory") and morphAccessories[a]:FindFirstChild("Handle") then
+            table.insert(scaleAccessories, morphAccessories[a]);
+        end
+    end
+
     TweenService:Create(scaling1, TRANSFORM_TWEENINFO, {Value = 2}):Play();
     TweenService:Create(scaling2, TRANSFORM_TWEENINFO, {Value = 2}):Play();
     TweenService:Create(scaling3, TRANSFORM_TWEENINFO, {Value = 2}):Play();
+    for a=1, #scaleAccessories do
+        local accessory = scaleAccessories[a];
+        local handle = accessory:FindFirstChild("Handle");
+        local weld = handle and handle:FindFirstChild("AccessoryWeld");
+        if weld and weld.Part1 == npcClass.Head then
+            game.Debris:AddItem(accessory, 0);
+            continue;
+        end
 
-    local headMesh = npcClass.Head:FindFirstChild("Mesh");
+        local accessoryScaler = Instance.new("NumberValue");
+        accessoryScaler.Name = accessory.Name;
+        accessoryScaler.Value = 1;
+        accessoryScaler.Parent = npcClass.Humanoid;
+
+        local defaultSize = handle.Size;
+        accessoryScaler:GetPropertyChangedSignal("Value"):Connect(function()
+            handle.Size = defaultSize * accessoryScaler.Value;
+        end)
+
+        TweenService:Create(accessoryScaler, TRANSFORM_TWEENINFO, {Value = 2}):Play();
+    end
+
+    local head = npcClass.Head;
+    local headMesh = head:FindFirstChild("Mesh");
     if headMesh then
-        TweenService:Create(headMesh, TRANSFORM_TWEENINFO, {Scale = headMesh.Scale *2}):Play();
+        local tween: Tween = TweenService:Create(headMesh, TRANSFORM_TWEENINFO, {Scale = headMesh.Scale *2});
+        tween.Completed:Connect(function(playbackState)
+            if playbackState ~= Enum.PlaybackState.Completed then return end;
+            local newHead = script.Parent.Head:Clone();
+            newHead.Parent = npcClass.Character;
+
+            head.Transparency = 1;
+            newHead.Color = head.Color;
+            newHead.CFrame = head.CFrame;
+
+            local motor = Instance.new("Motor6D");
+            motor.Name = "Neck";
+            motor.Parent = newHead;
+            motor.Part0 = newHead;
+            motor.Part1 = head;
+            motor.C0 = CFrame.new(0, -0.1, 0.3);
+
+            properties.FaceDecal:Destroy();
+        end)
+        tween:Play();
     end
 
     task.wait(4);
+    if npcClass.HealthComp.IsDead then return end;
 
-    properties.Immortal = nil;
     npcClass.AnimationController:Stop("Transform");
-    
-    local new = LARGE_PATHOROTH:Clone();
-    local ltLarge = nil;
-    local motor = {};
-    local parts = {};
-    
-    for _, obj in pairs(new:GetDescendants()) do
-        if obj:IsA("Motor") then
-            table.insert(motor, obj);
-            obj.Enabled = false;
-            
-        elseif obj:IsA("BasePart") then
-            table.insert(parts, obj);
-            
-            if obj.Name == "LowerTorsoLargeL" then
-                ltLarge = obj;
-            end
-        end
-    end
-    
-    scaling1.Value = 1;
-    scaling2.Value = 1;
-    scaling3.Value = 1;
 
-    humanoid.HipHeight = 1.35;
-    humanoid.AutomaticScalingEnabled = false;
-    
-    for _, obj in pairs(parts) do
-        obj.Parent = character;
-    end
-    
-    local newJoint = LARGE_ROOT_JOINT:Clone();
-    newJoint.Parent = rootPart;
-    newJoint.Part0 = rootPart;
-    newJoint.Part1 = ltLarge;
-    
-    for _, obj in pairs(parts) do
-        obj.Parent = character;
-    end
-    for _, obj in pairs(motor) do
-        obj.Enabled = true;
-    end
-    for _, obj in pairs(sBodyParts) do
-        obj.Transparency = 1;
-        
-        if obj.Name == "Head" then
-            if obj:FindFirstChild("face") then
-                obj.face.Transparency = 1;
-            end
-        end
-    end
-
-    local morphAccessories = properties.MorphAccessories;
-    for a=1, #morphAccessories do
-        game.Debris:AddItem(morphAccessories[a], 0);
-    end
-    npcClass.SetAnimation("Core", {script.Parent:WaitForChild("Core")});
-    npcClass.SetAnimation("Running", {script.Parent:WaitForChild("Running")});
-    npcClass.PlayAnimation("Core");
-    
     horrorParticle.Transparency = NumberSequence.new{
         NumberSequenceKeypoint.new(0, 0.75),
         NumberSequenceKeypoint.new(1, 1)
@@ -315,13 +307,13 @@ function treePackage.TransformLarge(npcClass: NpcClass)
     npcClass.Move:SetMoveSpeed("set", "default", 10, 0);
 end
 
---MARK: InMorphTree
-function treePackage.IsInMorph(npcClass: NpcClass)
+--MARK: IsMimicTree
+function treePackage.IsMimic(npcClass: NpcClass)
     local properties = npcClass.Properties;
     return properties.MorphTarget ~= nil and properties.IsLargePathoroth == false;
 end
 
-function treePackage.HasAlly(npcClass: NpcClass)
+function treePackage.PickActiveTarget(npcClass: NpcClass)
     local properties = npcClass.Properties;
     local targetHandlerComp = npcClass:GetComponent("TargetHandler");
 
@@ -337,14 +329,29 @@ function treePackage.HasAlly(npcClass: NpcClass)
         return true;
     end)
 
-    local oldAllyTargetData = properties.AllyTargetData;
-    if oldAllyTargetData then
-        if oldAllyTargetData ~= allyTargetData or oldAllyTargetData.HealthComp.IsDead then
+    local newActiveTargetData = allyTargetData;
+    
+    local enemyTargetData: NpcTargetData = npcClass.Properties.EnemyTargetData;
+    local recentlyDamaged = (workspace:GetServerTimeNow()-npcClass.HealthComp.LastDamageTaken) <= 5
+    if enemyTargetData 
+    and enemyTargetData.HealthComp.CompOwner.ClassName == "PlayerClass" 
+    and (enemyTargetData.Distance <= 32 or recentlyDamaged) then
+        newActiveTargetData = enemyTargetData;
+    end
+    
+    local oldActiveTargetData = properties.ActiveTargetData;
+    if oldActiveTargetData then
+        if oldActiveTargetData ~= newActiveTargetData or oldActiveTargetData.HealthComp.IsDead then
             npcClass.WieldComp.Controls.Mouse1Down = false;
         end
     end
-    properties.AllyTargetData = allyTargetData;
-    return allyTargetData ~= nil;
+    properties.ActiveTargetData = newActiveTargetData
+
+    if properties.ActiveTargetData == nil then
+        npcClass.Move:Follow();
+    end
+
+    return properties.ActiveTargetData ~= nil;
 end
 
 function treePackage.EquipWeapon(npcClass: NpcClass)
@@ -361,8 +368,7 @@ function treePackage.EquipWeapon(npcClass: NpcClass)
     local targetEntityClass: EntityClass = targetHealthComp.CompOwner;
     
     local targetPlayerClass: PlayerClass = (targetEntityClass :: PlayerClass);
-    local primaryWeaponItemId = targetPlayerClass and targetPlayerClass.WieldComp.ItemId or nil;
-    if primaryWeaponItemId == nil then return false end;
+    local primaryWeaponItemId = targetPlayerClass and targetPlayerClass.WieldComp.ItemId or "p250";
 
     wieldComp:Equip{
         ItemId = primaryWeaponItemId;
@@ -379,27 +385,28 @@ function treePackage.IsUsingMelee(npcClass: NpcClass)
 end
 
 function treePackage.InMeleeRange(npcClass: NpcClass)
-    local allyTargetData = npcClass.Properties.AllyTargetData;
-    return allyTargetData.Distance <= 10;
+    local targetData = npcClass.Properties.ActiveTargetData;
+    return targetData.Distance <= (npcClass.Properties.IsLargePathoroth and 20 or 10);
 end
 
 function treePackage.RunToMeleeRange(npcClass: NpcClass)
     local properties = npcClass.Properties;
-    local allyTargetData = npcClass.Properties.EnemyTargetData;
-    local allyNpcClass: NpcClass = allyTargetData.HealthComp.CompOwner;
+
+    local targetData = properties.ActiveTargetData;
+    local targetCharacterClass: CharacterClass = targetData.HealthComp.CompOwner;
 
     npcClass.Move:SetMoveSpeed("set", "sprint", properties.SprintSpeed or 18, 2, 5);
-    npcClass.Move:Follow(allyNpcClass.RootPart, 2);
+    npcClass.Move:Follow(targetCharacterClass.RootPart, 2);
 end
 
 
 function treePackage.SwingMelee(npcClass: NpcClass)
     local wieldComp: WieldComp = npcClass.WieldComp;
 
-    local allyTargetData = npcClass.Properties.EnemyTargetData;
-    local allyNpcClass: NpcClass = allyTargetData.HealthComp.CompOwner;
+    local targetData = npcClass.Properties.ActiveTargetData;
+    local targetCharacterClass: CharacterClass = targetData.HealthComp.CompOwner;
 
-    npcClass.Move:HeadTrack(allyNpcClass.RootPart, 2);
+    npcClass.Move:HeadTrack(targetCharacterClass.RootPart, 2);
 
     wieldComp:InvokeToolAction("PrimarySwingRequest");
 end
@@ -414,11 +421,11 @@ end
 
 function treePackage.RunToFireRange(npcClass: NpcClass)
     local properties = npcClass.Properties;
-    local allyTargetData = npcClass.Properties.EnemyTargetData;
-    local allyNpcClass: NpcClass = allyTargetData.HealthComp.CompOwner;
+    local targetData = npcClass.Properties.ActiveTargetData;
+    local targetCharacterClass: CharacterClass = targetData.HealthComp.CompOwner;
 
     npcClass.Move:SetMoveSpeed("set", "sprint", properties.SprintSpeed or 14, 2, 5);
-    npcClass.Move:Follow(allyNpcClass.RootPart, 16, 24);
+    npcClass.Move:Follow(targetCharacterClass.RootPart, 16, 24);
 
     return true;
 end
@@ -426,30 +433,31 @@ end
 function treePackage.FireGun(npcClass: NpcClass)
     local wieldComp: WieldComp = npcClass.WieldComp;
     
-    local allyTargetData = npcClass.Properties.EnemyTargetData;
+    local tagetData = npcClass.Properties.ActiveTargetData;
 
-    local allyHealthComp: HealthComp = allyTargetData.HealthComp;
-    local allyNpcClass: NpcClass = allyHealthComp.CompOwner :: NpcClass;
+    local targetHealthComp: HealthComp = tagetData.HealthComp;
+    local targetCharacterClass: CharacterClass = targetHealthComp.CompOwner :: NpcClass;
 
-    npcClass.Move:Face(allyNpcClass.RootPart, nil, 0.5);
-    npcClass.Move:HeadTrack(allyNpcClass.Head, 2);
+    npcClass.Move:Face(targetCharacterClass.RootPart, nil, 0.5);
+    npcClass.Move:HeadTrack(targetCharacterClass.Head, 2);
 
-    local shootDirection = (allyNpcClass.RootPart.Position - npcClass.RootPart.Position).Unit;
+    local shootDirection = (targetCharacterClass:GetCFrame().Position - npcClass:GetCFrame().Position).Unit;
     
     wieldComp:InvokeToolAction(
         "PrimaryFireRequest", 
         shootDirection, 
-        allyNpcClass.Humanoid
+        targetCharacterClass.Humanoid
     );
 end
 
 function treePackage.RunToCover(npcClass: NpcClass)
     local properties = npcClass.Properties;
-    local allyTargetData = npcClass.Properties.EnemyTargetData;
-    local allyNpcClass: NpcClass = allyTargetData.HealthComp.CompOwner;
+
+    local tagetData = npcClass.Properties.ActiveTargetData;
+    local targetCharacterClass: CharacterClass = tagetData.HealthComp.CompOwner;
 
     npcClass.Move:SetMoveSpeed("set", "sprint", properties.SprintSpeed or 18, 2, 5);
-    npcClass.Move:Follow(allyNpcClass.RootPart, 24, 32);
+    npcClass.Move:Follow(targetCharacterClass.RootPart, 24, 32);
 
     return true;
 end
@@ -542,6 +550,89 @@ function treePackage.ZombieDefaultTree(npcClass: NpcClass)
         npcClass.WieldComp:Unequip();
     end
     return npcClass.BehaviorTree:RunTree("ZombieDefaultTree", false);
+end
+
+--MARK: ChargeTree
+function treePackage.CanCharge(npcClass: NpcClass)
+    local properties = npcClass.Properties;
+    if properties.ChargeCooldown and tick() <= properties.ChargeCooldown then return false; end;
+    
+    return true;
+end
+
+function treePackage.Charge(npcClass: NpcClass)
+    local properties = npcClass.Properties;
+
+    properties.ChargeCooldown = tick()+15;
+    npcClass.Move:Stop();
+
+    task.wait(0.1);
+    local enemyTargetData: NpcTargetData = npcClass.Properties.EnemyTargetData;
+    local enemyNpcClass: CharacterClass = enemyTargetData.HealthComp.CompOwner :: CharacterClass;
+
+    npcClass.Move:Face(enemyNpcClass.RootPart, nil, 2);
+    npcClass.PlayAnimation("ChargeBegin", nil, nil, 2);
+    task.wait(2);
+
+    local targetPosition = enemyNpcClass.RootPart.Position + Vector3.new(0, 0.3, 0);
+    local targetDir = (targetPosition-npcClass.RootPart.Position).Unit;
+    targetPosition = targetPosition + targetDir * 6;
+
+    local targetDistance = math.max(npcClass:DistanceFrom(targetPosition), 16);
+    local speed = 200;
+    local duration = math.clamp(targetDistance/speed, 0.01, 3);
+
+    npcClass.PlayAnimation("Charging");
+
+    local targetCharClasses = {};
+    npcClass:GetComponent("TargetHandler"):MatchTargets(function(targetCharNpc: EntityClass)
+        local targetHealthComp: HealthComp = targetCharNpc.HealthComp;
+        if targetHealthComp == nil or targetHealthComp.IsDead then return end;
+        if targetCharNpc.ClassName == "Destructible" then return end;
+
+        local isTargettable = targetHealthComp:CanTakeDamageFrom(npcClass);
+        if not isTargettable then return end;
+
+        table.insert(targetCharClasses, targetHealthComp.CompOwner :: CharacterClass);
+    end)
+
+    local hitNpcClassDebounce = {};
+
+    npcClass.Move:MoveTo(targetPosition);
+    npcClass.Move:Face(targetPosition);
+
+    local throwTargetComp = npcClass:GetComponent("ThrowTarget");
+    
+    modAudio.Play("ChargeRoar", npcClass.RootPart);
+    
+    npcClass.Move:Fly({
+        Velocity = targetDir * speed;
+        Direction = targetDir;
+    }, duration, function(index, trajPoint)
+        task.spawn(function()
+            while npcClass.Move.IsFlying do
+                RunService.PostSimulation:Wait();
+                for a=1, #targetCharClasses do
+                    local targetCharClass: CharacterClass = targetCharClasses[a];
+                    local targetRootPart = targetCharClass.RootPart;
+
+                    local distance = npcClass:DistanceFrom(targetRootPart.Position);
+                    local relativeCframe = npcClass.RootPart.CFrame:ToObjectSpace(targetRootPart.CFrame);
+                    local absAngle = math.abs(math.deg(math.atan2(relativeCframe.X, -relativeCframe.Z)));
+
+                    if absAngle <= 35 and distance <= 7 then
+                        if hitNpcClassDebounce[targetCharClass] then continue end;
+                        hitNpcClassDebounce[targetCharClass] = true;
+                        throwTargetComp(targetCharClass, 100, 20);
+                    end
+                end
+            end
+        end)
+    end)
+    table.clear(hitNpcClassDebounce);
+
+    task.wait(1);
+    npcClass.StopAnimation("Charging");
 end
 
 return treePackage;

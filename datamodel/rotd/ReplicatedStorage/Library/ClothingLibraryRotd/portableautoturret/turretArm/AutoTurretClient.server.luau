@@ -1,4 +1,5 @@
 if not workspace:IsAncestorOf(script) then return end;
+if workspace.Entity:IsAncestorOf(script) then return end;
 
 local RunService = game:GetService("RunService");
 local UserInputService = game:GetService("UserInputService");

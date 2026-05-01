@@ -56,7 +56,7 @@ function toolPackage.BuildStructure(prefab: Model, optionalPacket)
 	destructibleConfig.Parent = prefab;
 
 	local destructible: DestructibleInstance = modDestructibles.getOrNew(destructibleConfig);
-	destructible.HealthComp:SetCanBeHurtBy("!PlayerClass");
+	destructible.HealthComp:SetCanBeHurtBy("!Player");
 	destructible.HealthComp.OnIsDeadChanged:Connect(function(isDead)
 		if not isDead then return end;
 		Debugger.Expire(hitbox, 0);

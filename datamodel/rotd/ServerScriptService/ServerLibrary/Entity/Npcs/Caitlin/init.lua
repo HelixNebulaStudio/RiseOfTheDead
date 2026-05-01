@@ -8,6 +8,7 @@ local npcPackage = {
         WalkSpeed = 19;
     };
     Properties = {
+        AllyTypes = {"Rat"};
         PrimaryGunItemId = "mp7";
         MeleeItemId = "survivalknife";
         MeleeRange = 8;

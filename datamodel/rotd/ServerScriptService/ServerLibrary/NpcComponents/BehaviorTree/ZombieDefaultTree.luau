@@ -48,6 +48,14 @@ function treePackage.HasEnemy(npcClass: NpcClass)
                     return false;
                 end
             end
+
+        elseif targetEntityClass.ClassName == "NpcClass" then
+            local targetCharacterClass: CharacterClass = targetEntityClass :: CharacterClass;
+            if targetCharacterClass.Properties.AllyTypes then
+                local isAlly = table.find(targetCharacterClass.Properties.AllyTypes, npcClass.HumanoidType);
+                if isAlly then return false; end;
+            end
+            
         end
 
         local isTargettable = targetHealthComp:CanTakeDamageFrom(npcClass);

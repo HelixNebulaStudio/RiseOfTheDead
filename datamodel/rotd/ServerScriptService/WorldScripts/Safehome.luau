@@ -141,6 +141,7 @@ function WorldCore.onRequire()
 
         end, 999);
 
+        workspace:WaitForChild("SpawnLocation").Transparency = 1;
     end
 end
 

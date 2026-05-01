@@ -20,21 +20,23 @@ function modStatusEffects.onRequire()
 			local statusComp: StatusComp, statusId: string, statusApplyParam: StatusCompApplyParam = ...;
 			local characterClass: CharacterClass = statusComp.CompOwner :: CharacterClass;
 			if characterClass.Configurations == nil then return end;
-
-			local duration = statusApplyParam.Duration;
-
-			local conMoveImpairReduction = characterClass.Configurations.MoveImpairReduction;
-			if conMoveImpairReduction == nil then return end;
+			if statusApplyParam == nil then return end;
 
 			local statusLib = modStatusLibrary:Find(statusId);
 			if statusLib == nil then return end;
 
+			local duration = statusApplyParam.Duration;
+
 			if statusLib.Buff ~= false 
-			or statusApplyParam.Duration == nil 
+			or duration == nil 
 			or statusApplyParam.Expires == nil 
 			or statusLib.Tags == nil then 
 				return;
 			end;
+
+			local conMoveImpairReduction = characterClass.Configurations.MoveImpairReduction;
+			if conMoveImpairReduction == nil then return end;
+
 			if modTables.ContainsList(statusLib.Tags, MOBILITY_TAGS) == false then 
 				return;
 			end;

@@ -224,7 +224,7 @@ return function(CutsceneSequence)
 
 
 			local playerClass: PlayerClass = shared.modPlayers.get(player);
-			playerClass.HealthComp:SetCanBeHurtBy("Zombie|Bandit|Rat|Cultist|Jason");
+			playerClass.HealthComp:SetCanBeHurtBy(`{playerClass.HealthComp.DefaultCanBeHurtByBoolString}|Jason`);
 			playerClass.OnIsDeadChanged:Connect(function(isDead)
 				if not isDead then return end;
 				modMission:Progress(player, MISSION_ID, function(mission)

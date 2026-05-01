@@ -1161,10 +1161,10 @@ return function(CutsceneSequence)
 
 						if closedGates then
 							missionChoice.Rats = true;
-							playerClass.HealthComp:SetCanBeHurtBy("Zombie|Bandit|Cultist");
+							playerClass.HealthComp:SetCanBeHurtBy("Game|Zombie|Bandit|Cultist");
 						else
 							missionChoice.Bandits = true;
-							playerClass.HealthComp:SetCanBeHurtBy("Zombie|Rat|Cultist");
+							playerClass.HealthComp:SetCanBeHurtBy("Game|Zombie|Rat|Cultist");
 						end
 
 						Debugger:Warn("missionChoice", missionChoice);

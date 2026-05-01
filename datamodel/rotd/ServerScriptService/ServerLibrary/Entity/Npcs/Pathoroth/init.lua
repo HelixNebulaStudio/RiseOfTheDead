@@ -18,6 +18,7 @@ local npcPackage = {
     Properties = {
         BasicEnemy = false;
         IsHostile = true;
+        AllyTypes = {"Zombie"};
 
         TargetableDistance = 128;
 
@@ -34,6 +35,9 @@ local npcPackage = {
         "TargetHandler";
         "BodyDestructibles";
         "ZombieBasicMeleeAttack";
+        "RandomClothing";
+        "DynamicLevel";
+        "ThrowTarget";
     };
     AddBehaviorTrees = {
         "HasEnemy";
@@ -41,6 +45,12 @@ local npcPackage = {
     };
 
     ThinkCycle = 1;
+
+    DynamicLevelScaling = {
+        WalkSpeed = function(lvl) return math.clamp(18 + math.floor(lvl/10), 1, 35); end;
+        MaxHealth = function(lvl) return 500+(math.max(2000*lvl, 500)); end;
+        AttackDamage = function(lvl) return math.min(25+(lvl/2), 100); end;
+    };
 };
 --==
 
@@ -51,19 +61,12 @@ end
 function npcPackage.Spawning(npcClass: NpcClass)
     local character = npcClass.Character;
     local configurations: ConfigVariable = npcClass.Configurations;
-    local properties: PropertiesVariable<{}> = npcClass.Properties;
+    local properties: PropertiesVariable<anydict> = npcClass.Properties;
     local healthComp: HealthComp = npcClass.HealthComp;
 
     character:SetAttribute("EntityHudHealth", true);
 
-    local isHard = properties.HardMode;
-    local level = math.max(properties.Level, 0);
-
-    if isHard then
-        configurations.BaseValues.MaxHealth = math.max(10000 + 500*level, 10000);
-    else
-        configurations.BaseValues.MaxHealth = math.max(10000 + 500*level, 10000);
-    end
+    npcClass.WieldComp.TargetableTags.Zombie = true;
 
     local horrorParticle = HORROR_PARTICLE:Clone();
     horrorParticle.Parent = npcClass.RootPart;
@@ -77,15 +80,21 @@ function npcPackage.Spawning(npcClass: NpcClass)
     properties.MorphCooldown = 20;
     properties.MorphTarget = nil;
     properties.MorphAccessories = {};
+    
+    if properties.Seed == nil then 
+        properties.Seed = math.random(1, 100000);
+    end;
+
+    npcClass:GetComponent("RandomClothing"){
+        Name = "Stranger";
+        AddHair = false;
+        AddFace = false;
+    };
 end
 
 function npcPackage.Spawned(npcClass: NpcClass)
     local properties = npcClass.Properties;
     local healthComp = npcClass.HealthComp;
-
-    npcClass.WieldComp.TargetableTags = {
-        Zombie = true;
-    }
 
     local binds = npcClass.Binds;
     function binds.EquipSuccessFunc(toolHandler: ToolHandlerInstance)
@@ -95,17 +104,23 @@ function npcPackage.Spawned(npcClass: NpcClass)
         if equipmentClass.Class == "Gun" then
             equipmentClass:AddBaseModifier("PathorothGun", {
                 SetValues = {
-                    DamageType = "Heal";
+                    Damage = 2;
+                    PreModDamage = 2;
+                    NpcDamageType = "Heal";
                     NpcPercentHealthDamage = 0.05;
                 };
+                Priority = 9;
             });
 
         elseif equipmentClass.Class == "Melee" then
             equipmentClass:AddBaseModifier("PathorothMelee", {
                 SetValues = {
-                    DamageType = "Heal";
+                    Damage = 10;
+                    PreModDamage = 10;
+                    NpcDamageType = "Heal";
                     NpcPercentHealthDamage = 0.1;
                 };
+                Priority = 9;
             });
         end
     end
@@ -139,8 +154,20 @@ function npcPackage.Spawned(npcClass: NpcClass)
         damageBy.HealthComp:TakeDamage(newDmgData);
     end)
 
+    local lastEntityScan = tick();
     local targetHandlerComp = npcClass:GetComponent("TargetHandler");
     npcClass.Garbage:Tag(npcClass.OnThink:Connect(function()
+        if npcClass.Head then
+            npcClass.Head.CanCollide = false;
+        end
+        local character = npcClass.Character;
+        if character:FindFirstChild("UpperTorso") then
+            character.UpperTorso.CanCollide = false;
+        end
+
+        if tick() < lastEntityScan then return end;
+        lastEntityScan = tick() + math.random(2, 5);
+
         local scanEntities = shared.modNpcs.listInRange(npcClass:GetCFrame().Position, 25);
         
         for a=1, #scanEntities do

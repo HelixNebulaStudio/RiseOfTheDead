@@ -74,10 +74,16 @@ function Objective:Begin()
 
 		local destructible: DestructibleInstance = modDestructibles.getOrNew(destructibleConfig);
 		destructible.BroadcastHealth = true;
-		destructible.HealthComp:SetCanBeHurtBy("!Player&!Human");
+		destructible.HealthComp:SetCanBeHurtBy("Zombie|Bandit|Rat");
 		destructible.HealthComp:SetMaxHealth(1000 * (self.Controller.IsHard and 10 or 1));
-		destructible.HealthComp:SetMaxArmor(100);
+		destructible.HealthComp:SetMaxArmor(100 * (self.Controller.IsHard and 10 or 1));
 		destructible.HealthComp:Reset();
+
+		destructible.StatusComp:Apply("RegenerativeShield", {
+			Values = {
+				Rate = 10 * (self.Controller.IsHard and 5 or 1);
+			}
+		});
 
 		destructible:SetupHealthbar{
 			Size = UDim2.new(4, 0, 1, 0);

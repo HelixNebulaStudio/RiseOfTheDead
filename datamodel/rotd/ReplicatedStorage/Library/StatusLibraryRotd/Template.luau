@@ -1,11 +1,13 @@
 local modStatusClass = shared.require(game.ReplicatedStorage.Library.StatusLibrary.StatusClass);
 --==
+local RunService = game:GetService("RunService");
+
 local statusPackage = {
-    Id="Template";
-    Icon="rbxassetid://10368377851";
-    Name="Template";
-    Description="";
-    Buff=true;
+    Id = "Template";
+    Icon = shared.Const.PlaceholderIcon;
+    Name = "Template";
+    Description = "";
+    Buff = true;
 };
 
 function statusPackage.init()

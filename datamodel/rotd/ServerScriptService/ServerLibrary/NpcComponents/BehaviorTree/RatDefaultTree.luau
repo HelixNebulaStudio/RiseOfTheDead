@@ -49,6 +49,11 @@ function treePackage.HasEnemy(npcClass: NpcClass)
             local woundedStatus = targetCharacterClass.StatusComp:GetOrDefault("Wounded");
             if woundedStatus then return false; end;
 
+            if targetCharacterClass.Properties.AllyTypes then
+                local isAlly = table.find(targetCharacterClass.Properties.AllyTypes, npcClass.HumanoidType);
+                if isAlly then return false; end;
+            end
+
             if npcClass.HealthComp.LastDamagedBy == targetCharacterClass then
                 targetData.IsInVision = true;
                 return true;
