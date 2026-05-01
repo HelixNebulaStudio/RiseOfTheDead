@@ -1,7 +1,9 @@
 local RunService = game:GetService("RunService");
+
 local modStatusClass = shared.require(game.ReplicatedStorage.Library.StatusLibrary.StatusClass);
 local modStatusLibrary = shared.require(game.ReplicatedStorage.Library.StatusLibrary);
 local modTables = shared.require(game.ReplicatedStorage.Library.Util.Tables);
+
 --==
 local statusPackage = {
     Id = "StatusResistance";

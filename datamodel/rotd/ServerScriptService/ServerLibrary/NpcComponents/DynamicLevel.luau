@@ -82,29 +82,47 @@ function Component:__call(callerCharacterClass: CharacterClass)
 	end
 
 	local level = properties.Level;
+	local maxLevel = math.round(modGlobalVars.MaxLevels/10);
 
 	local lvlMoveSpeed = dynamicLevelScaling.WalkSpeed;
 	if type(lvlMoveSpeed) == "function" then
-		lvlMoveSpeed = lvlMoveSpeed(level);
+		lvlMoveSpeed = lvlMoveSpeed(level, maxLevel);
 	end
 	configurations.BaseValues.WalkSpeed = lvlMoveSpeed;
 	npcClass.Move:SetMoveSpeed("set", "default", lvlMoveSpeed);
 	
 	local lvlHealth = dynamicLevelScaling.MaxHealth;
 	if type(lvlHealth) == "function" then
-		lvlHealth = lvlHealth(level);
+		lvlHealth = lvlHealth(level, maxLevel);
 	end
 	configurations.BaseValues.MaxHealth = lvlHealth;
 
 	local lvlAttackDamage = dynamicLevelScaling.AttackDamage;
 	if type(lvlAttackDamage) == "function" then
-		lvlAttackDamage = lvlAttackDamage(level);
+		lvlAttackDamage = lvlAttackDamage(level, maxLevel);
 	end
 	configurations.BaseValues.AttackDamage = lvlAttackDamage;
+
+	local lvlImmunity = dynamicLevelScaling.Immunity;
+	if type(lvlImmunity) == "function" then
+		lvlImmunity = lvlImmunity(level, maxLevel);
+	end
+	configurations.BaseValues.Immunity = lvlImmunity;
+
+	local lvlCripplingHit = dynamicLevelScaling.CripplingHit;
+	if type(lvlCripplingHit) == "function" then
+		lvlCripplingHit = lvlCripplingHit(level, maxLevel);
+	end
+	configurations.BaseValues.CripplingHit = lvlCripplingHit;
+
 
 	if healthComp.LastDamagedBy == nil then
 		healthComp:SetMaxHealth(configurations.MaxHealth);
 		healthComp:Reset();
+	end
+
+	if configurations.Immunity then
+		properties.Immunity = configurations.Immunity;
 	end
 end
 

@@ -1,20 +1,21 @@
 local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
 --==
 local attirePackage = {
-	ItemId=script.Name;
-	Class="Clothing";
+	ItemId = script.Name;
+	Class = "Clothing";
 	
-	GroupName="FootGroup";
+	GroupName = "FootGroup";
 	
-	Configurations={
+	Configurations = {
 		MoveImpairReduction = 0.2;
 		Warmth = 4;
 	};
-	Properties={};
+	Properties = {};
 };
 
 function attirePackage.newClass()
-	return modEquipmentClass.new(attirePackage);
+	local equipmentClass = modEquipmentClass.new(attirePackage);
+	return equipmentClass;
 end
 
 return attirePackage;

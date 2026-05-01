@@ -6,11 +6,46 @@ local localPlayer = game.Players.LocalPlayer;
 
 local modInfoBubbles = shared.require(game.ReplicatedStorage.Library.InfoBubbles);
 local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
+local modStatusLibrary = shared.require(game.ReplicatedStorage.Library.StatusLibrary);
+
+local modTables = shared.require(game.ReplicatedStorage.Library.Util.Tables);
 --==
 
 function modStatusEffects.onRequire()
     if RunService:IsServer() then
 		modSkillTree = shared.require(game.ServerScriptService.ServerLibrary.SkillTree);
+
+		local MOBILITY_TAGS = {"Mobility"};
+		shared.modEventService:OnInvoked("Players_BindStatusApply", function(event: EventPacket, ...) 
+			local statusComp: StatusComp, statusId: string, statusApplyParam: StatusCompApplyParam = ...;
+			local characterClass: CharacterClass = statusComp.CompOwner :: CharacterClass;
+			if characterClass.Configurations == nil then return end;
+
+			local duration = statusApplyParam.Duration;
+
+			local conMoveImpairReduction = characterClass.Configurations.MoveImpairReduction;
+			if conMoveImpairReduction == nil then return end;
+
+			local statusLib = modStatusLibrary:Find(statusId);
+			if statusLib == nil then return end;
+
+			if statusLib.Buff ~= false 
+			or statusApplyParam.Duration == nil 
+			or statusApplyParam.Expires == nil 
+			or statusLib.Tags == nil then 
+				return;
+			end;
+			if modTables.ContainsList(statusLib.Tags, MOBILITY_TAGS) == false then 
+				return;
+			end;
+
+			if conMoveImpairReduction then
+				duration = duration * (1-math.clamp(conMoveImpairReduction, 0, 1));
+			end
+
+			statusApplyParam.Duration = duration;
+			statusApplyParam.Expires = workspace:GetServerTimeNow() + duration;
+		end)
 
     elseif RunService:IsClient() then
 		modCameraGraphics = shared.require(game.ReplicatedStorage.PlayerScripts.CameraGraphics);
@@ -26,26 +61,19 @@ function modStatusEffects.Slowness(player: Player, amount: number, duration: num
 	local playerClass: PlayerClass = shared.modPlayers.get(player);
 	local statusComp: StatusComp = playerClass.StatusComp;
 
-	local applyParams: StatusCompApplyParam = {
+    statusComp:Apply("Slowness", {
+		Expires = workspace:GetServerTimeNow() + duration;
 		Duration = duration;
 		Values = {
 			Amount = amount;
 		};
-	};
-
-	local cMoveImpairReduction = playerClass.Configurations.MoveImpairReduction;
-	if cMoveImpairReduction then
-		applyParams.Duration = duration * (1-math.clamp(cMoveImpairReduction, 0, 1));
-	end
-
-	applyParams.Expires = workspace:GetServerTimeNow() + applyParams.Duration;
-    statusComp:Apply("Slowness", applyParams)
+	});
 
 	modInfoBubbles.Create{
-		Players={player};
-		Position=(playerClass.Head and playerClass.Head.Position);
-		Type="Status";
-		ValueString="Slowed!";
+		Players = {player};
+		Position = (playerClass.Head and playerClass.Head.Position);
+		Type = "Status";
+		ValueString = "Slowed!";
 	};
 end
 
@@ -61,11 +89,6 @@ function modStatusEffects.Stun(player: Player, duration: number)
 		Duration = duration;
 		ExpiresOnDeath = true;
 	};
-
-	local cMoveImpairReduction = playerClass.Configurations.MoveImpairReduction;
-	if cMoveImpairReduction then
-		applyParams.Duration = duration * (1-math.clamp(cMoveImpairReduction, 0, 1));
-	end
 
 	applyParams.Expires = workspace:GetServerTimeNow() + applyParams.Duration;
     statusComp:Apply("Stun", applyParams);
@@ -246,11 +269,6 @@ function modStatusEffects.TiedUp(player: Player, duration: number)
         Duration = duration;
     };
 
-	local cMoveImpairReduction = playerClass.Configurations.MoveImpairReduction;
-	if cMoveImpairReduction then
-		applyParams.Duration = duration * (1-math.clamp(cMoveImpairReduction, 0, 1));
-	end
-	
     applyParams.Expires = workspace:GetServerTimeNow() + applyParams.Duration;
     statusComp:Apply("TiedUp", applyParams);
 end

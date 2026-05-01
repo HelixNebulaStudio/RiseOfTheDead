@@ -12,6 +12,8 @@ local npcPackage = {
         MaxHealth = 100;
         
         ThrowCooldown = 7;
+        
+        CripplingHit = 0.5;
     };
     
     Properties = {
@@ -43,6 +45,8 @@ local npcPackage = {
         WalkSpeed = function(lvl) return math.clamp(8 + math.floor(lvl/20), 1, 25); end;
         MaxHealth = function(lvl) return 99+(math.max(100*lvl, 100)); end;
         AttackDamage = function(lvl) return math.min(30+(lvl*3), 150); end;
+        Immunity = function(lvl, maxLvl) return math.clamp(lvl/maxLvl, 0.1, 0.65); end;
+        CripplingHit = function(lvl, maxLvl) return math.clamp(lvl/(maxLvl/2), 0.5, 1); end;
     };
 };
 --==

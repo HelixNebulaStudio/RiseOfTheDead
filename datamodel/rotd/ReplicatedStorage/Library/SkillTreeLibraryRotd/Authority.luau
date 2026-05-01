@@ -52,7 +52,7 @@ library:Add{
 	Name="Agile Recovery";
 	Link="nigowl";
 	
-	Description="Movement impairment(E.g. Slows, Stuns) debuff's duration reduced by $Percent%.";
+	Description="Movement impairment(E.g. Slows, Stuns)'s duration reduced by $Percent%.";
 	Stats={
 		Percent={Base=15; Max=40};
 	};

@@ -5,21 +5,26 @@ local modStatusClass = shared.require(game.ReplicatedStorage.Library.StatusLibra
 local localPlayer = game.Players.LocalPlayer;
 --==
 local statusPackage = {
-    Id="Slowness";
-    Icon="rbxassetid://4467439574";
-    Name="Slowness";
-    Description="Slowed by $Amount walk speed.";
-    Buff=false;
+    Id = "Slowness";
+    Icon = "rbxassetid://4467439574";
+    Name = "Slowness";
+    Description = "Slowed by $Amount walk speed.";
+    Buff = false;
     Tags = {"Mobility"; "Slow";};
-    Cleansable=true;
+    Cleansable = true;
     ExpiresOnDeath = true;
 };
 
 function statusPackage.BindApply(statusClass: StatusClassInstance)
     if RunService:IsServer() then return end;
+    statusPackage.BindUpdate(statusClass);
+end
 
-    local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
-    local modCharacter = modData:GetModCharacter();
+function statusPackage.BindUpdate(statusClass: StatusClassInstance)
+    if RunService:IsServer() then return end;
+
+    local characterClass: CharacterClass = statusClass.StatusOwner :: CharacterClass;
+    local modCharacter = (characterClass :: PlayerClass).CharacterVars;
 
     local amount = statusClass.Values.Amount or 10;
     local newWalkSpeed = modCharacter.CharacterProperties.DefaultWalkSpeed-amount;

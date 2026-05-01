@@ -70,7 +70,7 @@ function NpcComponent.new(npcClass: NpcClass)
 			modAudio.Play("ZombieAttack"..math.random(1, 3), npcClass.RootPart).PlaybackSpeed = (math.random(100, 120)/100);
 		end
 
-		local configurations = npcClass.Configurations;
+		local configurations: ConfigVariable = npcClass.Configurations;
 
 		npcClass.PlayAnimation("Attack", 0.05, nil, 2);
 
@@ -97,7 +97,20 @@ function NpcComponent.new(npcClass: NpcClass)
 			TargetPart = targetPart;
 		};
 		enemyHealthComp:TakeDamage(dmgData);
+
+		if targetEntityClass.ClassName == "Destructible" then return end;
 		
+		if configurations.CripplingHit and configurations.CripplingHit >= math.random(0, 100)/100 then
+			local targetCharacterClass: CharacterClass = targetEntityClass :: CharacterClass;
+
+			targetCharacterClass.StatusComp:Apply("Slowness", {
+				Expires = workspace:GetServerTimeNow() + 5;
+				Duration = 5;
+				Values = {
+					Amount = 10;
+				};
+			});
+		end
     end
 end
 
