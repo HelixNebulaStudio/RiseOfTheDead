@@ -28,7 +28,9 @@ if RunService:IsServer() then
         local wieldComp: WieldComp? = modifier.WieldComp;
         if wieldComp == nil then return end;
         if wieldComp.EquipmentClass == nil then return end;
+        
         local preModDamage = wieldComp.EquipmentClass.Configurations.PreModDamage;
+        if preModDamage == nil then return end;
 
         local damageBy: PlayerClass = wieldComp.CompOwner :: PlayerClass;
         if damageBy == nil then return end;

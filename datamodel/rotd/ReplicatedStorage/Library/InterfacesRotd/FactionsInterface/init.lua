@@ -360,10 +360,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 			if newLeaderboard == nil then
 				newLeaderboard = modLeaderboardInterface.new({
-					StatName="Faction Score";
-					SeasonlyTableKey="Seasonly".. modLeaderboardService.FactionBoardKey;
-					MonthlyTableKey="Monthly".. modLeaderboardService.FactionBoardKey;
-					WeeklyTableKey="Weekly".. modLeaderboardService.FactionBoardKey;
+					StatName = "Faction Score";
+					SeasonlyTableKey = "Seasonly".. modLeaderboardService.FactionBoardKey;
+					MonthlyTableKey = "Monthly".. modLeaderboardService.FactionBoardKey;
+					WeeklyTableKey = "Weekly".. modLeaderboardService.FactionBoardKey;
 				});
 				newLeaderboard.Frame.BackgroundTransparency = 1;
 				newLeaderboard.Frame.Parent = centerFrame;
@@ -388,7 +388,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 
 			local serverChatRoom = chatRoomInterface:GetRoom("Server");
-			serverChatRoom:SetActive();
+			if serverChatRoom == nil then
+				serverChatRoom:SetActive();
+			end
 		end
 	end)
 	

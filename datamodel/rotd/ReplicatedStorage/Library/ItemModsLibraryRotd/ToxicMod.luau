@@ -38,6 +38,10 @@ if RunService:IsServer() then
 		local damageTo: EntityClass? = damageData.DamageTo;
 		if damageTo == nil then return end;
 
+		if damageData.ToolHandler == nil or modifier.EquipmentClass ~= damageData.ToolHandler.EquipmentClass then
+			return;
+		end
+
 		local characterClass: CharacterClass = (modifier.WieldComp and modifier.WieldComp.CompOwner or nil) :: CharacterClass;
 		if characterClass == nil then return end;
 

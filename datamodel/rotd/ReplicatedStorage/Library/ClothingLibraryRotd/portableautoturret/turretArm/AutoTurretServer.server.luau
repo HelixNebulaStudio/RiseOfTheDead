@@ -117,9 +117,12 @@ function TurretRuntime(weaponStorageItem)
 		
 	end
 	
-	hydraulicRod.JointHRA.CFrame  = jointHarCf * CFrame.Angles(hydraulicPitch, 0, 0);
-	arm1.JointAA2.CFrame = jointAa2Cf * CFrame.Angles(armPitch, 0, 0);
-	
+	local cfs, cfe = pcall(function()
+		hydraulicRod.JointHRA.CFrame  = jointHarCf * CFrame.Angles(hydraulicPitch, 0, 0);
+		arm1.JointAA2.CFrame = jointAa2Cf * CFrame.Angles(armPitch, 0, 0);
+	end) 
+	if not cfs then Debugger:Warn(cfe); end;
+
 	--==
 	local configValues = patStorage.Properties.Config or {};
 	

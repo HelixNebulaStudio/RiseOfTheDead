@@ -272,13 +272,12 @@ function treePackage.TransformLarge(npcClass: NpcClass)
     local head = npcClass.Head;
     local headMesh = head:FindFirstChild("Mesh");
     if headMesh then
-        local tween: Tween = TweenService:Create(headMesh, TRANSFORM_TWEENINFO, {Scale = headMesh.Scale *2});
+        local tween: Tween = TweenService:Create(headMesh, TRANSFORM_TWEENINFO, {Scale = headMesh.Scale *1.75});
         tween.Completed:Connect(function(playbackState)
             if playbackState ~= Enum.PlaybackState.Completed then return end;
             local newHead = script.Parent.Head:Clone();
             newHead.Parent = npcClass.Character;
 
-            head.Transparency = 1;
             newHead.Color = head.Color;
             newHead.CFrame = head.CFrame;
 
@@ -288,6 +287,9 @@ function treePackage.TransformLarge(npcClass: NpcClass)
             motor.Part0 = newHead;
             motor.Part1 = head;
             motor.C0 = CFrame.new(0, -0.1, 0.3);
+            
+            head.Transparency = 1;
+            head.Size = Vector3.zero;
 
             properties.FaceDecal:Destroy();
         end)
@@ -364,7 +366,9 @@ function treePackage.EquipWeapon(npcClass: NpcClass)
         return true;
     end;
 
-    local targetHealthComp: HealthComp = modHealthComponent.getByModel(properties.MorphTarget);
+    local targetHealthComp: HealthComp? = modHealthComponent.getByModel(properties.MorphTarget);
+    if targetHealthComp == nil then return false; end;
+    
     local targetEntityClass: EntityClass = targetHealthComp.CompOwner;
     
     local targetPlayerClass: PlayerClass = (targetEntityClass :: PlayerClass);
