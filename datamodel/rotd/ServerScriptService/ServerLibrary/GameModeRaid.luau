@@ -568,21 +568,26 @@ function Raid:DropReward(spawnCf)
 	end
 	
 	local rewardDropsList = {self.StageLib.RewardsId;};
+	if self.IsHard then
+		rewardDropsList = {self.StageLib.HardRewardId;};
+	end
+	
+	if #rewardDropsList > 0 then
+		local lootPrefab = modItemDrops.spawn{
+			ItemId = rewardDropsList[math.random(1, #rewardDropsList)];
+			SpawnCFrame = spawnCf * CFrame.new(0, 1, 0);
+			Players = self.Players;
+			DespawnDuration = false;
+			Anchored = true;
+			DisableTouchPickup = true;
+			SharedDrop = true;
+		};
+		self.LootPrefab = lootPrefab;
 
-	local lootPrefab = modItemDrops.spawn{
-		ItemId = rewardDropsList[math.random(1, #rewardDropsList)];
-		SpawnCFrame = spawnCf * CFrame.new(0, 1, 0);
-		Players = self.Players;
-		DespawnDuration = false;
-		Anchored = true;
-		DisableTouchPickup = true;
-		SharedDrop = true;
-	};
-	self.LootPrefab = lootPrefab;
-
-	self:Hud{
-		Status="A reward package has dropped!";
-	};
+		self:Hud{
+			Status="A reward package has dropped!";
+		};
+	end
 end
 
 function Raid:PickEnemy(paramPacket)
@@ -698,21 +703,26 @@ function Raid:SpawnEnemy(npcName, paramPacket)
 		if self.EliminateCount >= self.EliminateGoal then return end;
 	end
 
+	local level = math.max((self.Difficulty + (self.Wave-1)) + math.random(-2, 0), 1);
 	local npcClass: NpcClass = modNpcs.spawn2{
 		Name = npcName;
 		CFrame = spawnCf;
+		Properties = {
+			Level = level;
+			HardMode = self.IsHard == true;
+			CanForgetTargets = false;
+			IsHostile = true;
+			TargetableDistance = 1024;
 
+			HordeAggression = paramPacket.HordeAggression == true;
+			LockEnemyOnDuration = NumberRange.new(0.3, 0.8);
+		};
 		BindSetup = function(npcClass: NpcClass)
 			npcClass.SpawnCFrame = spawnCf;
 			self.EnemiesSpawned = self.EnemiesSpawned + 1;
 
 			local properties: PropertiesVariable<anydict> = npcClass.Properties;
-			properties.Level = math.max(npcClass.Properties.Level + (self.Difficulty + (self.Wave-1)) + math.random(-2, 0), 1);
-			properties.TargetableDistance = 1024;
 			properties.NetworkOwners = self.Players;
-			
-			properties.HordeAggression = paramPacket.HordeAggression == true;
-			properties.LockEnemyOnDuration = NumberRange.new(0.3, 0.8);
 
 			if paramPacket.InfTargeting then
 				local targetHandlerComp = npcClass:GetComponent("TargetHandler");
@@ -1058,6 +1068,10 @@ function Raid:Initialize(roomData)
 	self.RoomData = roomData;
 	self.Players = {};
 	self.IsHard = roomData.IsHard == true;
+	if RunService:IsStudio() and workspace:GetAttribute("HardMode") == true then
+		roomData.IsHard = true;
+		self.IsHard = true;
+	end
 	
 	local function clearCharacter(character)
 		for a=#self.Characters, 1, -1 do

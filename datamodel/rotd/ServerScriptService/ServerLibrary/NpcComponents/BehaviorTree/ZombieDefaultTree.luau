@@ -9,7 +9,7 @@ local modRaycastUtil = shared.require(game.ReplicatedStorage.Library.Util.Raycas
 local treePackage = {
     LogicString = {
         Default = "PreLogic | HasEnemy & (AlertTree | AggroTree) | IdleTree";
-        AlertTree = "!WasDamaged & LookAtEnemy";
+        AlertTree = "!IsHardMode & !WasDamaged & LookAtEnemy";
         AggroTree = "InMeleeRange & CanAttack & [Attack] | [FollowEnemy]";
         IdleTree = "[Idle]";
     };
@@ -111,6 +111,11 @@ function treePackage.HasEnemy(npcClass: NpcClass)
     return properties.EnemyTargetData ~= nil;
 end
 
+function treePackage.IsHardMode(npcClass: NpcClass)
+    local properties = npcClass.Properties;
+    return properties.HardMode == true;
+end
+
 function treePackage.WasDamaged(npcClass: NpcClass)
     local properties = npcClass.Properties;
 
@@ -203,7 +208,7 @@ function treePackage.FollowEnemy(npcClass: NpcClass)
 
     local targetPart = targetData.TargetPart or targetData.Model.PrimaryPart;
 
-    npcClass.Move:Follow(targetPart);
+    npcClass.Move:Follow(targetPart, 2.5, 1);
 
     if targetData.Distance > 67 
     and (properties.NextFollowSprintTick == nil or tick()>properties.NextFollowSprintTick) then

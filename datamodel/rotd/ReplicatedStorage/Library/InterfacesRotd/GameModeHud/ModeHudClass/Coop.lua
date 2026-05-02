@@ -32,7 +32,7 @@ return function(interface: InterfaceInstance, window, frame)
 		local gameLib = modGameModeLibrary.GetGameMode(gameType);
 		local stageLib = gameLib and modGameModeLibrary.GetStage(gameType, gameStage);
 
-		local titleText = `{gameType}: {gameStage}`;
+		local titleText = `{gameType}: {data.IsHard == true and "Hard " or ""}{gameStage}`;
 		local headerText = data.Header or ``;
 		local descLabel = data.Status or ``;
 
@@ -83,6 +83,9 @@ return function(interface: InterfaceInstance, window, frame)
 			
 			local frame = coopHudTask.Frame;
 			coopHudTask.Properties.TitleText = titleText;
+			if data.IsHard == true then
+				coopHudTask.Properties.TitleColor = Color3.fromRGB(255, 79, 10);
+			end
 			coopHudTask.Properties.HeaderText = headerText;
 			coopHudTask.Properties.DescText = descLabel;
 

@@ -250,7 +250,7 @@ return function(CutsceneSequence)
 			CFrame=CFrame.new(380.397034, 96.1059113, -210.394272, -1, 0, 0, 0, 1, 0, 0, 0, -1);
 		}):Play();
 		
-		wait(0.5);
+		task.wait(0.5);
 		Cache.Jet.PrimaryPart.Swoosh:Play();
 		
 		if Cache.MilitaryZombie then
@@ -262,8 +262,8 @@ return function(CutsceneSequence)
 			CFrame = CFrame.new(-0.959411621, 42.6933365, -292.28183, -3.7252903e-09, 0, 1, 0, 1, 0, -1.00000012, 0, 3.7252903e-09);
 			BindSetup = function(npcClass: NpcClass)
 
-				npcClass.PresetShirt = {Id="rbxassetid://267032596"};
-				npcClass.PresetPants = {Id="rbxassetid://197707345"};
+				npcClass.Properties.PresetShirt = {Id="rbxassetid://267032596"};
+				npcClass.Properties.PresetPants = {Id="rbxassetid://197707345"};
 				cutsceneAssets:WaitForChild("Desert Soldier"):Clone().Parent = npcClass.Character;
 			end;
 		};
@@ -281,7 +281,7 @@ return function(CutsceneSequence)
 		modAudio.Play("HordeGrowl", workspace);
 		TweenService:Create(gameController.Soundtrack, TweenInfo.new(5), {Volume=0.75}):Play();
 		gameController.HordeTimer = tick();
-		wait(25);
+		task.wait(25);
 		if checkGameIndex() then return; end;
 
 		gameController.Soundtrack.TimePosition = 85;
@@ -292,7 +292,7 @@ return function(CutsceneSequence)
 			CFrame=CFrame.new(380.397034, 96.1059113, -210.394272, -1, 0, 0, 0, 1, 0, 0, 0, -1);
 		}):Play();
 		
-		wait(1);
+		task.wait(1);
 		if checkGameIndex() then return; end;
 		Cache.Jet.PrimaryPart.Swoosh:Play();
 		
@@ -312,7 +312,7 @@ return function(CutsceneSequence)
 				modProjectile.serverSimulate(projectile, {
 					Velocity = velocity;
 				});
-				wait(0.5);
+				task.wait(0.5);
 			end
 		end)
 
@@ -351,17 +351,17 @@ return function(CutsceneSequence)
 		particlePacket.Color = Color3.fromRGB(91, 81, 68);
 		modParticleSprinkler:Emit(particlePacket);
 		modAudio.Play("Explosion2", Cache.CarRig.PrimaryPart).RollOffMaxDistance = 4096;
-		wait(0.5);
+		task.wait(0.5);
 		modParticleSprinkler:Emit(particlePacket);
 		modAudio.Play("Explosion4", Cache.CarRig.PrimaryPart).RollOffMaxDistance = 4096;
 		task.spawn(CutsceneSequence.NextScene, CutsceneSequence, "camShake");
-		wait(0.5);
+		task.wait(0.5);
 		modParticleSprinkler:Emit(particlePacket);
 		modAudio.Play("Explosion3", Cache.CarRig.PrimaryPart).RollOffMaxDistance = 4096;
 		
 		gameController:SetStatus("Find a way through th sewers");
 		stageIndex = 7;
-		wait(5);
+		task.wait(5);
 		Cache.Jet:Destroy();
 		Cache.Jet = nil;
 		
@@ -388,7 +388,7 @@ return function(CutsceneSequence)
 		--== Boss sequence
 		Debugger:Warn("Boss door wait");
 		local bossInteractConfig = doorObjects.BossMetalDoor.Interactable;
-		local bossDoorInteractable = modInteractables.getOrNew(bossInteractConfig);
+		local _bossDoorInteractable = modInteractables.getOrNew(bossInteractConfig);
 
 		local bossDoorConfig = doorObjects.BossMetalDoor.Door;
 		bossDoorConfig:GetAttributeChangedSignal("DoorOpen"):Wait();
@@ -402,7 +402,7 @@ return function(CutsceneSequence)
 
 		for _, player in pairs(gameController.Players) do
 			local mission56 = modMission:GetMission(player, MISSION_ID);
-			if mission56 and mission56.ProgressionPoint >= 3 then
+			if mission56 and mission56.ProgressionPoint >= 3 and mission56.Type == 1 then
 				hasMission56 = true;
 			end
 		end
@@ -461,7 +461,7 @@ return function(CutsceneSequence)
 			modAudio.Play("ZombieDeath3", infectorNpcClass.RootPart.Position).PlaybackSpeed = 0.5;
 
 		else
-			local randomBossList = {"The Prisoner";}; -- "Tanker"; "Fumes"; "Corrosive"
+			local randomBossList = {"The Prisoner"; "Tanker"; "Corrosive";};
 			local selectedBossName = randomBossList[math.random(1, #randomBossList)];
 			
 			local bossNpcClass: NpcClass = modNpcs.spawn2{

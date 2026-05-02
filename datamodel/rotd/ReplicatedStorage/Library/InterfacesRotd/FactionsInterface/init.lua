@@ -388,7 +388,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 
 			local serverChatRoom = chatRoomInterface:GetRoom("Server");
-			if serverChatRoom == nil then
+			if serverChatRoom ~= nil then
 				serverChatRoom:SetActive();
 			end
 		end

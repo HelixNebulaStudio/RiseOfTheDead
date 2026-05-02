@@ -85,11 +85,13 @@ function Component:__call(callerCharacterClass: CharacterClass)
 	local maxLevel = math.round(modGlobalVars.MaxLevels/10);
 
 	local lvlMoveSpeed = dynamicLevelScaling.WalkSpeed;
-	if type(lvlMoveSpeed) == "function" then
-		lvlMoveSpeed = lvlMoveSpeed(level, maxLevel);
+	if lvlMoveSpeed then
+		if type(lvlMoveSpeed) == "function" then
+			lvlMoveSpeed = lvlMoveSpeed(level, maxLevel);
+		end
+		configurations.BaseValues.WalkSpeed = lvlMoveSpeed;
+		npcClass.Move:SetMoveSpeed("set", "default", lvlMoveSpeed);
 	end
-	configurations.BaseValues.WalkSpeed = lvlMoveSpeed;
-	npcClass.Move:SetMoveSpeed("set", "default", lvlMoveSpeed);
 	
 	local lvlHealth = dynamicLevelScaling.MaxHealth;
 	if type(lvlHealth) == "function" then

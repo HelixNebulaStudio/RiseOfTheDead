@@ -460,7 +460,7 @@ function modItemsLibrary.onRequire()
     };
 
     new(missionBase, {Id="oddbluebook"; Name="Odd-looking Blue Book"; MissionIds={3}; Icon="rbxassetid://289066042"; Description="An odd looking blue book, I wonder what's it about."; Sources={"Obtained in <b>Mission: Stephanie's Book</b>";};  });
-    new(missionBase, {Id="zombiearm"; Name="Zombie Arm"; MissionIds={4}; Icon="rbxassetid://2751766625"; Description="Dr. Deniski needs it."; Sources={"Obtained in <b>Mission: Stephanie's Book</b>";};  });
+    new(missionBase, {Id="zombiearm"; Name="Zombie Arm"; MissionIds={4}; Icon="rbxassetid://2751766625"; Description="Dr. Deniski needs it."; Sources={"Obtained in <b>Mission: Lend A Hand</b> when killing zombies";};  });
     new(missionBase, {Id="antibiotics"; Name="Antibiotics"; MissionIds={10}; Icon="rbxassetid://1551829670"; Description="Jefferson needs it."; Sources={"Obtained from a secret mission";};  });
     new(missionBase, {Id="sewerskey1"; Name="Sewers Maintenance Key"; MissionIds={22}; Icon="rbxassetid://4366400646"; Description="Maintenance key used to unlock the maintenance room in the sewers."; Sources={"Obtained from <b>Carlson in Mission: The Backup Plan</b>";};  });
     new(missionBase, {Id="cultistnote1"; Name="Cultist Note"; MissionIds={40}; Icon="rbxassetid://5538983878"; Description="\"A hireling of the venator has stolen the mask. They do not have any clue what they are messing with. Eradicate and retrieve the mask immediately before they unleash hellfire upon everyone.\" ~S.F."; Sources={"Obtained in <b>Mission: Vindictive Treasure</b>";};  });

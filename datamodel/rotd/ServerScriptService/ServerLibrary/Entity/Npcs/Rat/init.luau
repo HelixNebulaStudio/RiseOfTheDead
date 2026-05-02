@@ -73,6 +73,7 @@ local npcPackage = {
         "AttractNpcs";
         "Chat";
         "RandomClothing";
+        "DynamicLevel";
     };
 
     Voice = {
@@ -83,14 +84,14 @@ local npcPackage = {
     };
     
     ThinkCycle = 1;
+
+    DynamicLevelScaling = {
+        MaxHealth = function(lvl) return 200+(math.max(200*lvl, 200)); end;
+    };
 };
 
 function npcPackage.Spawning(npcClass: NpcClass)
     local properties = npcClass.Properties;
-
-    local maxHealth = 400 + 200*(properties.Level-1);
-    npcClass.HealthComp.MaxHealth = maxHealth;
-    npcClass.HealthComp.CurHealth = maxHealth;
     
     local level = math.max(properties.Level, 0);
     

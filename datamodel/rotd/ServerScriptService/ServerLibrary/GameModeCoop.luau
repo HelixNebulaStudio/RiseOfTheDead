@@ -232,6 +232,13 @@ function Coop:Initialize(roomData)
 	self.RoomData = roomData;
 	self.Players = {};
 
+	self.IsHard = roomData.IsHard == true;
+
+	if RunService:IsStudio() and workspace:GetAttribute("HardMode") == true then
+		roomData.IsHard = true;
+		self.IsHard = true;
+	end
+
 	local function clearAlive(playerClass: PlayerClass?)
 		for a=#self.AlivePlayers, 1, -1 do
             local alivePlayerClass: PlayerClass = self.AlivePlayers[a];
@@ -600,23 +607,32 @@ function Coop:SpawnEnemy(npcName, paramPacket)
 
 	local spawnCf = paramPacket.SpawnCFrame;
 
+	local rngLevel = self.Difficulty + math.random(-1,1);
+	local level = math.max(rngLevel, 1);
+	
 	return modNpcs.spawn2{
 		Name = npcName;
 		CFrame = spawnCf;
-
+		Properties = {
+			Level = level;
+			HardMode = self.IsHard == true;
+			CanForgetTargets = false;
+			IsHostile = true;
+			TargetableDistance = 4096;
+		};
 		BindSetup = function(npcClass: NpcClass)
 			self.EnemiesSpawned = self.EnemiesSpawned + 1;
 
 			local properties = npcClass.Properties;
-			properties.TargetableDistance = 4096;
-			properties.CanForgetTargets = false;
-			properties.IsHostile = true;
-
-			properties.Level = properties.Level + self.Difficulty + math.random(-1,1);
 
 			npcClass.HealthComp.OnIsDeadChanged:Connect(function()
 				if not npcClass.HealthComp.IsDead then return end;
 			end)
+
+			if not properties.HardMode then return end;
+			if npcClass.HumanoidType == "Zombie" and math.random(1, 4) == 1 then
+				npcClass:AddComponent("PotArmor")(npcClass);
+			end
 		end
 	};
 end
@@ -706,27 +722,28 @@ function Coop:DropReward()
 		spawnCf = closestExtractDoorModel.PrimaryPart.LootSpawn.WorldCFrame;
 
 	end
-	
 
 	local rewardDropsList = {self.StageLib.RewardsId;};
 	if self.IsHard then
 		rewardDropsList = {self.StageLib.HardRewardId;};
 	end
 	
-	local lootPrefab = modItemDrops.spawn{
-		ItemId = rewardDropsList[math.random(1, #rewardDropsList)];
-		SpawnCFrame = spawnCf;
-		Players = self.Players;
-		DespawnDuration = false;
-		Anchored = true;
-		DisableTouchPickup = true;
-		SharedDrop = true;
-	};
-	self.LootPrefab = lootPrefab;
+	if #rewardDropsList > 0 then
+		local lootPrefab = modItemDrops.spawn{
+			ItemId = rewardDropsList[math.random(1, #rewardDropsList)];
+			SpawnCFrame = spawnCf;
+			Players = self.Players;
+			DespawnDuration = false;
+			Anchored = true;
+			DisableTouchPickup = true;
+			SharedDrop = true;
+		};
+		self.LootPrefab = lootPrefab;
 
-	self:Hud{
-		Status="A reward package has dropped!";
-	};
+		self:Hud{
+			Status="A reward package has dropped!";
+		};
+	end
 end
 
 --MARK: Start

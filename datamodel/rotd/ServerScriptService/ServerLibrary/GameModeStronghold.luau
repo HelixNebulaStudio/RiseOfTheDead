@@ -173,6 +173,12 @@ function Stronghold:Initialize(roomData)
 	Debugger:StudioLog(`Initialize gameController`, self);
 	self.RoomData = roomData;
 	self.Players = {};
+	self.IsHard = roomData.IsHard == true;
+
+	if RunService:IsStudio() and workspace:GetAttribute("HardMode") == true then
+		roomData.IsHard = true;
+		self.IsHard = true;
+	end
 
 	local function clearAlive(playerClass: PlayerClass?)
 		for a=#self.AlivePlayers, 1, -1 do
@@ -415,17 +421,22 @@ function Stronghold:SpawnEnemy(npcName, paramPacket)
 
 	local spawnCf = paramPacket.SpawnCFrame;
 
+	local rngLevel = (self.Difficulty + (self.Wave-1)) + math.random(-2, 0);
+	local level = math.max(rngLevel, 1);
+
 	return modNpcs.spawn2{
 		Name = npcName;
 		CFrame = spawnCf;
-
+		Properties = {
+			Level = level;
+			HardMode = self.IsHard == true;
+			CanForgetTargets = false;
+			IsHostile = true;
+		};
 		BindSetup = function(npcClass: NpcClass)
 			self.EnemiesSpawned = self.EnemiesSpawned + 1;
 
-			local properties: PropertiesVariable<{}> = npcClass.Properties;
-			properties.Level = math.max(npcClass.Properties.Level + (self.Difficulty + (self.Wave-1)) + math.random(-2, 0), 1);
-			properties.CanForgetTargets = false;
-			properties.IsHostile = true;
+			local properties: PropertiesVariable<anydict> = npcClass.Properties;
 
 			if paramPacket.InfTargeting then
 				local targetHandlerComp = npcClass:GetComponent("TargetHandler");
@@ -539,22 +550,27 @@ function Stronghold:DropReward()
 
 	end
 	
-	
 	local rewardDropsList = {self.StageLib.RewardsId;};
-	local lootPrefab = modItemDrops.spawn{
-		ItemId = rewardDropsList[math.random(1, #rewardDropsList)];
-		SpawnCFrame = spawnCf;
-		Players = self.Players;
-		DespawnDuration = false;
-		Anchored = true;
-		DisableTouchPickup = true;
-		SharedDrop = true;
-	};
-	self.LootPrefab = lootPrefab;
+	if self.IsHard then
+		rewardDropsList = {self.StageLib.HardRewardId;};
+	end
+	
+	if #rewardDropsList > 0 then
+		local lootPrefab = modItemDrops.spawn{
+			ItemId = rewardDropsList[math.random(1, #rewardDropsList)];
+			SpawnCFrame = spawnCf;
+			Players = self.Players;
+			DespawnDuration = false;
+			Anchored = true;
+			DisableTouchPickup = true;
+			SharedDrop = true;
+		};
+		self.LootPrefab = lootPrefab;
 
-	self:Hud{
-		Status="A reward package has dropped!";
-	};
+		self:Hud{
+			Status="A reward package has dropped!";
+		};
+	end
 end
 
 function Stronghold:Start()
@@ -716,12 +732,12 @@ function Stronghold:Hud(data)
 	end
 	
 	remoteGameModeHud:FireAllClients({
-		Action="Open";
-		Type=self.ModeType;
-		Stage=self.ModeStage;
-		Header=data.Header or `Elimination`;
-		Status=data.Status or "";
-		IsHard=self.IsHard;
+		Action = "Open";
+		Type = self.ModeType;
+		Stage = self.ModeStage;
+		Header = data.Header or `Elimination`;
+		Status = data.Status or "";
+		IsHard = self.IsHard == true;
 		
 		HookEntity=data.HookEntity or false;
 		
@@ -758,7 +774,7 @@ function Stronghold:LoadSpawnPlatform(spawnPart: BasePart)
         local loopCount = 0;
         local newSpawnCFrame;
 
-        maxSpawns = math.ceil((worldSpaceSize.X * worldSpaceSize.Z)/512)+8;
+        maxSpawns = math.ceil((worldSpaceSize.X * worldSpaceSize.Z)/512)+10;
 
 		local forceBreak = 0;
         while newSpawnCFrame == nil do
@@ -770,7 +786,7 @@ function Stronghold:LoadSpawnPlatform(spawnPart: BasePart)
 			
     		local isFreeSpace = modVector.IsFreeSpace(
 							newSpawnCFrame, 
-							Vector3.new(3, 6, 3)
+							Vector3.new(2, 6, 2)
 						);
 			if debugSpawnFlag then
 				local debugSpawnFolder = workspace.CurrentCamera:FindFirstChild("DebugSpawns");
@@ -833,4 +849,5 @@ function Stronghold:LoadSpawnPlatform(spawnPart: BasePart)
 
     spawnPlatformInfo.LoadState = 2;
 end
+
 return Stronghold;

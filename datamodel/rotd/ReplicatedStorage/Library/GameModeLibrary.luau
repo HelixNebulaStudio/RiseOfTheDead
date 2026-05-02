@@ -459,13 +459,14 @@ GameModeLibrary.GameModes={
 			};
 			
 			["BanditOutpost"]={
-				WorldId="BanditOutpost";
-				ExitSpawn="patrick";
-				MaxPlayers=6;
-				TitleImage="rbxassetid://4930132199";
-				RewardsId="banditcrate";
-				RewardsIds={"banditcrate"; "hbanditcrate"};
-				Soundtrack="Soundtrack:Born With It";
+				WorldId = "BanditOutpost";
+				ExitSpawn = "patrick";
+				MaxPlayers = 6;
+				TitleImage = "rbxassetid://4930132199";
+				RewardsId = "banditcrate";
+				HardRewardId = "hbanditcrate";
+				RewardsIds = {"banditcrate"; "hbanditcrate"};
+				Soundtrack = "Soundtrack:Born With It";
 				
 				HardModeEnabled=true;
 			};

@@ -183,6 +183,7 @@ local npcPackage = {
         "AttractNpcs";
         "Chat";
         "RandomClothing";
+        "DynamicLevel";
     };
 
     Voice = {
@@ -193,6 +194,10 @@ local npcPackage = {
     };
 
     ThinkCycle = 1;
+
+    DynamicLevelScaling = {
+        MaxHealth = function(lvl) return 200+(math.max(200*lvl, 200)); end;
+    };
 };
 
 function npcPackage.Spawning(npcClass: NpcClass)
@@ -204,9 +209,6 @@ function npcPackage.Spawning(npcClass: NpcClass)
     properties.LastSeenMemDuration = 5 + (level/20) * math.random(0, 100)/100;
     properties.LastPosMemDuration = 40 + (level/3) * math.random(0, 100)/100;
 
-    local maxHealth = 400 + 200*(level-1);
-    configurations.BaseValues.MaxHealth = maxHealth;
-    
     local weaponChoices = {"machete"; "tec9"; "xm1014";};
     if properties.Level > 5 then
         table.insert(weaponChoices, "ak47");
@@ -255,6 +257,13 @@ function npcPackage.Spawning(npcClass: NpcClass)
     end
 
     npcClass:GetComponent("RandomClothing")();
+end
+
+function npcPackage.Spawned(npcClass: NpcClass)
+    local properties = npcClass.Properties;
+    if properties.HardMode then
+        npcClass:AddComponent("BanditArmor")(npcClass.HealthComp.MaxHealth);
+    end
 end
 
 function npcPackage.Despawning(npcClass: NpcClass)

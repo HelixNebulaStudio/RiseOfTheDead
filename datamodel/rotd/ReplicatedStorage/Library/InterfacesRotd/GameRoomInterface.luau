@@ -552,7 +552,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             titleImageLabel.ImageColor3 = Color3.fromRGB(255,255,255);
         end	
         hardTitleImageLabel.Visible = viewingRoom.IsHard == true;
-	    titleImageLabel.ImageColor3 = viewingRoom.IsHard == true and Color3.fromRGB(255, 0, 0) or Color3.fromRGB(255, 255, 255);
+	    titleImageLabel.ImageColor3 = viewingRoom.IsHard == true and Color3.fromRGB(255, 79, 10) or Color3.fromRGB(255, 255, 255);
 
         --MARK: Rewards render
         
@@ -654,12 +654,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                     rewardsHintLabel.TextColor3 = playerLevel >= rewardsLib.Level and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(197, 103, 103);
                 end
                 
-                local isHardMode = false;
-                if stageLib.SingleArena then
-                    isHardMode = viewingRoom and viewingRoom.IsHard == true;
-                else
-                    isHardMode = hardModeCreate;
-                end
+                local isHardMode = viewingRoom.IsHard == true;
+                -- if stageLib.SingleArena then
+                --     isHardMode = viewingRoom and viewingRoom.IsHard == true;
+                -- else
+                --     isHardMode = hardModeCreate;
+                -- end
 
                 local vpSize = workspace.CurrentCamera.ViewportSize;
                 

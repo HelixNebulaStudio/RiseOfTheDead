@@ -72,7 +72,7 @@ return function(interface, window, frame)
 		local gameLib = modGameModeLibrary.GetGameMode(gameType);
 		local stageLib = gameLib and modGameModeLibrary.GetStage(gameType, gameStage);
 
-		local titleText = `{gameType}: {gameStage}`;
+		local titleText = `{gameType}: {data.IsHard == true and "Corrupted " or ""}{gameStage}`;
 		local headerText = data.Header or ``;
 		local descLabel = data.Status or ``;
 
@@ -85,6 +85,9 @@ return function(interface, window, frame)
 			
 			local frame = hudTask.Frame;
 			hudTask.Properties.TitleText = titleText;
+			if data.IsHard == true then
+				hudTask.Properties.TitleColor = Color3.fromRGB(255, 79, 10);
+			end
 			hudTask.Properties.HeaderText = `<font color="rgb(180, 94, 94)">{headerText}</font>`;
 			hudTask.Properties.DescText = descLabel;
 
