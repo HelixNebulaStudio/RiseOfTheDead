@@ -58,7 +58,7 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
     };
     healthComp:TakeDamage(dmgData);
 
-    modAudio.Play("BurnTick"..math.random(1, 3), targetPart).PlaybackSpeed = math.random(90,110)/100;
+    modAudio.Play(`BurnTick{math.random(1, 3)}`, targetPart).PlaybackSpeed = math.random(90,110)/100;
 end
 
 

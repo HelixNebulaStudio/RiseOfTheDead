@@ -42,6 +42,10 @@ if RunService:IsServer() then
 		local damageTo: EntityClass? = damageData.DamageTo;
 		if damageTo == nil then return end;
 
+		if damageData.ToolHandler == nil or modifier.EquipmentClass ~= damageData.ToolHandler.EquipmentClass then
+			return;
+		end
+
 		if modifier.WieldComp == nil or modifier.WieldComp.CompOwner == nil then return end;
 		local characterClass: CharacterClass = modifier.WieldComp.CompOwner :: CharacterClass;
 
@@ -72,7 +76,7 @@ if RunService:IsServer() then
 		if statusClass then
 			statusClass.Expires = workspace:GetServerTimeNow() + duration;
 			statusClass.Values.Stacks = statusClass.Values.Stacks +1;
-
+			
 			return;
 		end
 
@@ -85,7 +89,6 @@ if RunService:IsServer() then
 				StorageItemBy = modifier.EquipmentClass and modifier.EquipmentClass.StorageItem;
 				TargetPart = targetPart;
 				Stacks = 0;
-				UseCurrHpDmg = true;
 			};
 		});
 	end

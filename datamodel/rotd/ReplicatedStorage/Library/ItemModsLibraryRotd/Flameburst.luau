@@ -24,6 +24,7 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 	modifier.SetValues.Inaccuracy = 16;
 	modifier.SetValues.ProjectileId = "gasflame";
 	modifier.SetValues.KnockbackForce = (value or 5);
+	modifier.ProductValues.Damage = 5;
 end
 
 return modifierPackage;

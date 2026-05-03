@@ -52,6 +52,10 @@ if RunService:IsServer() then
 		local damageTo: EntityClass? = damageData.DamageTo;
 		if damageTo == nil then return end;
 
+		if damageData.ToolHandler == nil or modifier.EquipmentClass ~= damageData.ToolHandler.EquipmentClass then
+			return;
+		end
+		
 		if not modifier.Properties.Active then return end;
 		modifier.Properties.Active = false;
 		modifier:Sync({"CooldownTick"});

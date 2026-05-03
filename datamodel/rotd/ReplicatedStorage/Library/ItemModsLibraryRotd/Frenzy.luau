@@ -57,6 +57,11 @@ if RunService:IsServer() then
 
 	function modifierPackage.Binds.WeaponShotDamageDataNew(modifier: ItemModifierInstance, damageData: DamageData)
         if modifier.EquipmentClass == nil then return end;
+		
+		if damageData.ToolHandler == nil or modifier.EquipmentClass ~= damageData.ToolHandler.EquipmentClass then
+			return;
+		end
+		
 		local configurations = modifier.EquipmentClass.Configurations;
 		local preModDmg = configurations.PreModDamage;
 		local frenzyDmg = modifier.Properties.FrenzyDamage;

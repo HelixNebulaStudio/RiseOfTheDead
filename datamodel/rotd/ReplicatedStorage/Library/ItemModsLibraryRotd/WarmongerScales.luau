@@ -12,6 +12,7 @@ local modifierPackage = {
 	Binds = {};
 };
 --==
+
 if RunService:IsServer() then
 	function modifierPackage.Binds.WeaponShotDamageDataNew(modifier: ItemModifierInstance, damageData: DamageData)
 		if modBranchConfigurations.IsWorld("Slaughterfest") then return end;
@@ -21,7 +22,7 @@ if RunService:IsServer() then
 			if damageData.DamageType == "Heal" then return end;
 			if damage <= 0 then return end;
 
-			local characterClass: CharacterClass? = modifier.WieldComp and modifier.WieldComp.CompOwner or nil;
+			local characterClass: CharacterClass? = (modifier.WieldComp and modifier.WieldComp.CompOwner or nil) :: CharacterClass?;
 			if characterClass == nil then return end;
 
 			local statusComp = characterClass.StatusComp;

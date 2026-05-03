@@ -6,11 +6,11 @@ local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 
 --==
 local statusPackage = {
-    Id="Burn";
-    Icon="rbxassetid://5105787895";
-    Name="Burning";
-    Description="You are on fire, you will lose $Amount Health per second.";
-    Buff=false;
+    Id = "Burn";
+    Icon = "rbxassetid://5105787895";
+    Name = "Burning";
+    Description = "You are on fire, you will lose $Amount Health per second.";
+    Buff = false;
     Tags = {"DOT"; "Fire"};
     Cleansable = true;
 };
@@ -18,7 +18,7 @@ local statusPackage = {
 function statusPackage.BindApply(statusClass: StatusClassInstance)
     if RunService:IsClient() then return end;
 
-    local characterClass: CharacterClass = statusClass.StatusOwner;
+    local characterClass: CharacterClass = statusClass.StatusOwner :: CharacterClass;
     if characterClass == nil or characterClass.Character == nil then return end;
 
     local setFireOnParts = {};
@@ -45,7 +45,7 @@ end
 function statusPackage.BindExpire(statusClass: StatusClassInstance)
     if RunService:IsClient() then return end;
 
-    local characterClass: CharacterClass = statusClass.StatusOwner;
+    local characterClass: CharacterClass = statusClass.StatusOwner :: CharacterClass;
     if characterClass == nil or characterClass.Character == nil then return end;
 
     for _, obj in pairs(characterClass.Character:GetChildren()) do
@@ -66,6 +66,7 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
     if healthComp == nil then return end;
 
     local dmgData = DamageData.new{
+        DamageBy = statusClass.ApplyBy;
         Damage = statusClass.Values.Amount;
         DamageType = "Fire";
     };

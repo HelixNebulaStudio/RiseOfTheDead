@@ -154,7 +154,9 @@ end
 
 
 function toolPackage.newClass()
-	return modEquipmentClass.new(toolPackage);
+	local equipmentClass = modEquipmentClass.new(toolPackage);
+	
+	return equipmentClass;
 end
 
 return toolPackage;

@@ -4,10 +4,10 @@ local RunService = game:GetService("RunService");
 local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 
 local statusPackage = {
-    Id="LiquidFlame";
-    Icon="";
-    Name="Liquid Flame";
-    Description="Burning from liquid flame.";
+    Id = "LiquidFlame";
+    Icon = "";
+    Name = "Liquid Flame";
+    Description = "Burning from liquid flame.";
     Buff = true;
     ExpiresOnDeath = true;
 };
@@ -35,6 +35,7 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
     damage = damage + (damage*math.clamp(statusClass.Values.Stacks or 0, 0, 100));
     
     local dmgData = DamageData.new{
+        DamageBy = statusClass.ApplyBy;
         Damage = damage;
         DamageType = "Fire";
     };
