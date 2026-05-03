@@ -66,7 +66,6 @@ function Survival.onRequire()
 		local npcClass: NpcClass = ...;
 		if npcClass == nil then return end;
 	
-		Survival.OnSurvivalNpcDeath:Fire(npcClass);
 	end)
 
 	remoteGameModeHud.OnServerEvent:Connect(function(player: Player, action, ...)
@@ -391,27 +390,38 @@ function Survival:SpawnEnemy(npcName, paramPacket)
 	paramPacket = paramPacket or {};
 	
 	local spawnCf = paramPacket.SpawnCFrame or self.BasicEnemySpawns[math.random(1, #self.BasicEnemySpawns)].CFrame;
-	local level = paramPacket.Level or 1;
+	local level = math.max((paramPacket.Level or 1) + math.random(-2, 0), 1);
 	
-	if self.OnNpcSpawnHooked == nil then
-		self.OnNpcSpawnHooked = modNpcs.OnNpcSpawn:Connect(function(npcClass: NpcClass)
-			local humanoidType = npcClass.HumanoidType;
-			if humanoidType ~= "Zombie" then return end;
-			
-			table.insert(self.EnemyNpcClasses, npcClass);
-			
-			npcClass.Garbage:Tag(function()
-				for a=#self.EnemyNpcClasses, 1, -1 do
-					if self.EnemyNpcClasses[a] == npcClass then
-						table.remove(self.EnemyNpcClasses, a);
-						break;
-					end
+	local currWave = self.Wave;
+	local _hardMode = paramPacket.HardChance and math.random(0, 1000)/1000 <= paramPacket.HardChance or false;
+	if paramPacket.HardChance then
+		Debugger:StudioWarn("Hardmode chance:",paramPacket.HardChance);
+	end
+
+	local newNpcClass: NpcClass = modNpcs.spawn2{
+		Name = npcName;
+		CFrame = spawnCf;
+		NetworkOwners = game.Players:GetPlayers();
+		Properties = {
+			Level = level;
+			HordeAggression = true;
+			TargetableDistance = 4096;
+		};
+		BindSetup = function(npcClass: NpcClass)
+			task.spawn(function()
+				while currWave == self.Wave do
+					task.wait(1);
 				end
+				if npcClass.HealthComp.IsDead then return end;
+				npcClass:Destroy();
 			end)
-			
+			table.insert(self.EnemyNpcClasses, npcClass);
+
+			self.EnemiesSpawned = self.EnemiesSpawned + 1;
+
 			npcClass.HealthComp.OnIsDeadChanged:Connect(function(isDead)
 				if not isDead then return end;
-
+				
 				self.LastKilled = tick();
 				for a=#self.EnemyNpcClasses, 1, -1 do
 					if self.EnemyNpcClasses[a] == npcClass then
@@ -421,46 +431,8 @@ function Survival:SpawnEnemy(npcName, paramPacket)
 				end
 				
 				self.LastEnemyDeathPos = npcClass:GetCFrame().Position;
+				Survival.OnSurvivalNpcDeath:Fire(npcClass);
 			end)
-
-			Survival.OnSurvivalNpcSpawn:Fire(npcClass);
-		end)
-	end
-	
-	local _hardMode = paramPacket.HardChance and math.random(0, 1000)/1000 <= paramPacket.HardChance or false;
-	if paramPacket.HardChance then
-		Debugger:StudioWarn("Hardmode chance:",paramPacket.HardChance);
-	end
-
-	local currWave = self.Wave;
-
-	local newNpcClass: NpcClass = modNpcs.spawn2{
-		Name = npcName;
-		CFrame = spawnCf;
-		NetworkOwners = game.Players:GetPlayers();
-		BindSetup = function(npcClass: NpcClass)
-			task.spawn(function()
-				while currWave == self.Wave do
-					task.wait(1);
-				end
-				if npcClass.HealthComp.IsDead then return end;
-				npcClass:Destroy();
-			end)
-			self.EnemiesSpawned = self.EnemiesSpawned + 1;
-			
-			local properties = npcClass.Properties;
-			properties.HordeAggression = true;
-			
-			local levelRng = properties.BasicEnemy == true and math.random(-2, 0) or 0;
-			properties.Level = math.max(properties.Level + level + levelRng, 1);
-			properties.TargetableDistance = 4096;
-			
-			if npcName == "Pathoroth" then
-				local newHealth = 4000 * math.max(math.ceil(level/2), 1);
-				local newMaxHealth = math.clamp(newHealth, 1000, math.huge);
-				npcClass.HealthComp:SetMaxHealth(newMaxHealth);
-				npcClass.HealthComp:SetHealth(newMaxHealth);
-			end
 			
 			local targetHandlerComp = npcClass:GetComponent("TargetHandler");
 			if targetHandlerComp then
@@ -475,6 +447,8 @@ function Survival:SpawnEnemy(npcName, paramPacket)
 			if self.BindWorldCoreEnemySpawn then
 				self:BindWorldCoreEnemySpawn(npcClass);
 			end
+			
+			Survival.OnSurvivalNpcSpawn:Fire(npcClass);
 		end
 	};
 	

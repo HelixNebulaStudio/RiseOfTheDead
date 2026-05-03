@@ -739,9 +739,8 @@ function Raid:SpawnEnemy(npcName, paramPacket)
 			end
 
 			local healthComp: HealthComp = npcClass.HealthComp;
-			healthComp.OnIsDeadChanged:Connect(function()
-				if not healthComp.IsDead then return end;
-
+			healthComp.OnIsDeadChanged:Connect(function(isDead)
+				if not isDead then return end;
 
 				self.LastKilled = tick();
 				for a=#self.EnemyClassInstances, 1, -1 do

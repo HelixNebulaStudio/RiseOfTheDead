@@ -287,7 +287,6 @@ function Stronghold:Initialize(roomData)
 							end
 							
 							if not tooClose then
-								chosenNpcClass.Target = nil;
 								chosenNpcClass.RootPart.CFrame = spawnCf;
 							end
 						end
@@ -435,32 +434,26 @@ function Stronghold:SpawnEnemy(npcName, paramPacket)
 		};
 		BindSetup = function(npcClass: NpcClass)
 			self.EnemiesSpawned = self.EnemiesSpawned + 1;
-
 			local properties: PropertiesVariable<anydict> = npcClass.Properties;
-
-			if paramPacket.InfTargeting then
-				local targetHandlerComp = npcClass:GetComponent("TargetHandler");
-				if targetHandlerComp then
-					for a=1, #self.Players do
-						targetHandlerComp:AddTarget(self.Players[a].Character);
-					end
-				end
-			end
-
+			
 			table.insert(self.EnemyClassInstances, npcClass);
 
 			local healthComp: HealthComp = npcClass.HealthComp;
-			healthComp.OnIsDeadChanged:Connect(function()
-				if not healthComp.IsDead then return end;
+			healthComp.OnIsDeadChanged:Connect(function(isDead)
+				if not isDead then return end;
 
 				self.LastKilled = tick();
+
+				local removedFromTable = false;
 				for a=#self.EnemyClassInstances, 1, -1 do
 					if self.EnemyClassInstances[a] == npcClass then
 						table.remove(self.EnemyClassInstances, a);
+						removedFromTable = true;
 						break;
 					end
 				end
 
+				Debugger:WarnClient(game.Players:GetPlayers(), `Stronghold>>  Killed enemy. Alive: {#self.EnemyClassInstances}, Eliminated: {self.EliminateCount}, Removed: {removedFromTable}`);
 				self.EliminateCount = self.EliminateCount +1;
 				self.LastEnemyDeathPos = npcClass.RootPart.CFrame.Position;
 				
@@ -478,6 +471,15 @@ function Stronghold:SpawnEnemy(npcName, paramPacket)
 					
 				end
 			end)
+
+			if paramPacket.InfTargeting then
+				local targetHandlerComp = npcClass:GetComponent("TargetHandler");
+				if targetHandlerComp then
+					for a=1, #self.Players do
+						targetHandlerComp:AddTarget(self.Players[a].Character);
+					end
+				end
+			end
 		end
 	};
 end

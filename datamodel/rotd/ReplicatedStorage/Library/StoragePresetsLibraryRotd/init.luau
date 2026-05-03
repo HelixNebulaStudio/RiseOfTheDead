@@ -66,25 +66,6 @@ modStoragePresetsLibrary:Add{
 };
 
 modStoragePresetsLibrary:Add{
-	Id = "RatStorage";
-    Name = "Rat Storage";
-    Configuration = {
-        Persistent=true; 
-        Settings={ScaleByContent=1; Rental=5;};
-        Size=50; 
-        MaxSize=50; 
-        MaxPages=9;
-    };
-    MissionRequired = {
-        Id = 62; 
-        Type = {3};
-    };
-    Permissions = {
-        CanInteract = true;
-    };
-};
-
-modStoragePresetsLibrary:Add{
 	Id = "Freezer";
     Name = "Food Storage";
     Configuration = {

@@ -221,7 +221,9 @@ function GameMode:Start(room)
 				end
 
 				local healthComp: HealthComp = npcClass.HealthComp;
-				healthComp.OnIsDeadChanged:Connect(function()
+				healthComp.OnIsDeadChanged:Connect(function(isDead)
+					if not isDead then return end;
+					
 					players = room:GetInstancePlayers();
 
 					Debugger:Warn("Boss IsDeadChanged", #players);

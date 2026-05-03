@@ -39,12 +39,16 @@ return function(CutsceneSequence)
 			
 		local profile = shared.modProfile:Get(player);
 		local safehomeData = profile.Safehome;
+		Debugger:WarnClient(player, `AnotherSurvivor>>  Loading Cutscene..`);
 
-		local safehomeClass = safehomeData.SafehomeClass;
+		local safehomeClass = shared.WorldCore.SafehomeClass;
 		while safehomeClass == nil and game.Players:IsAncestorOf(player) do
 			task.wait(1);
 		end
-		if safehomeClass.FactionTag then return end;
+		if safehomeClass.FactionTag then 
+			Debugger:WarnClient(player, "AnotherSurvivor>>  Mission skipped in faction hq.");
+			return
+		end;
 		
 		local function OnChanged(firstRun)
 			if mission.Type == 2 then -- OnAvailable
@@ -56,7 +60,7 @@ return function(CutsceneSequence)
 					local newNpcName;
 
 					local wantedPoster = modEvents:GetEvent(player, "wantedPoster");
-					Debugger:WarnClient(player, "wantedPoster", wantedPoster);
+					Debugger:WarnClient(player, "AnotherSurvivor>>  wantedPoster", wantedPoster);
 
 					if wantedPoster then
 						newNpcName = wantedPoster.Name;
@@ -78,10 +82,15 @@ return function(CutsceneSequence)
 							local rewardsList = modRewardsLibrary:Find("safehomeNpcs");
 							local rewards;
 
+							local rCount = 0;
 							repeat
 								rewards = modDropRateCalculator.RollDrop(rewardsList, player);
 								newNpcName = rewards[1].Name;
 								task.wait();
+								rCount += 1;
+								if (rCount)%1000 then
+									Debugger:WarnClient(player, "AnotherSurvivor>>  Rolling a survivor NpcName...");
+								end
 							until safehomeData.Npc[newNpcName] == nil or safehomeData.Npc[newNpcName].Active == nil;
 						end
 					end
@@ -91,19 +100,23 @@ return function(CutsceneSequence)
 					end
 					mission.SaveData.NpcName = newNpcName;
 
-					Debugger:StudioLog("Chosen NPC:", newNpcName, " mission.SaveData.NpcName", mission.SaveData.NpcName);
+					local arriveStr = `AnotherSurvivor>>  A survivor, {newNpcName}, has arrived to your safehome..`;
+					shared.Notify(player, arriveStr, "Inform");
+					Debugger:WarnClient(player, arriveStr);
+					
 					local survivorNpcClass: NpcClass = modNpcs.getPlayerNpc(player, newNpcName);
 
-					if survivorNpcClass == nil then
+					if survivorNpcClass == nil or survivorNpcClass.HealthComp.IsDead then
 						survivorNpcClass = modNpcs.spawn2{
 							Name = newNpcName;
 							CFrame = spawnCf;
 							Player = player;
 						};
+							
+						Debugger:WarnClient(player, `AnotherSurvivor>>  Spawning survivor.`);
 					end
 
 					survivorNpcClass:SetCFrame(spawnCf);
-					shared.Notify(player, `A stranger arrives at your safehome..`, "Inform");
 
 					task.spawn(function()
 						local remotes = game.ReplicatedStorage.Remotes;

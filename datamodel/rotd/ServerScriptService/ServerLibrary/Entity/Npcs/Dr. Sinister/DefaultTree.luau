@@ -55,7 +55,7 @@ function treePackage.HasZombies(npcClass: NpcClass)
         if table.find(properties.LinkedUnits, zCharacter) == nil then
             table.insert(sortedNpcClasses, {
                 NpcClass = zNpcClass;
-                Distance = npcClass:DistanceFromCharacter(zPosition);
+                Distance = npcClass:DistanceFrom(zPosition);
             });
         end
     end

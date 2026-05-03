@@ -314,7 +314,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 local pageStorage = modData.GetStorage(pageStorageId);
                 if storage.Settings and storage.Settings.Rental > 0 then
                     if pageStorage then
-                        local timeLeft = pageStorage.RentalUnlockTime - modSyncTime.GetTime();
+                        local timeLeft = (pageStorage.Values.RentalUnlockTime or 0) - workspace:GetServerTimeNow();
                         local isLocked = timeLeft <= 0;
                         
                         if a == (storage.Page or 1) then
@@ -383,9 +383,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                         end
                         local rentCost = itemCount * rentalPrice;
                         
-                        local timeLeft = storage.RentalUnlockTime - modSyncTime.GetTime();
+                        local timeLeft = (storage.Values.RentalUnlockTime or 0) - workspace:GetServerTimeNow();
                         if timeLeft > 0 then
-                            storageTitleTag.Text = storageName..` (Unlock Time Left: {modSyncTime.ToString(timeLeft)})`;
+                            storageTitleTag.Text = `{storageName} (Unlock Time Left: {modSyncTime.ToString(timeLeft)})`;
                         end
 
                         local goldSuffix = modConfigurations.CompactInterface and "G" or " Gold";
@@ -441,7 +441,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                                         local statusLabel = dialogWindow.Binds.StatusLabel;
                                         statusLabel.Text = "Unlocking<...>";
                                         
-                                        local returnPacket = remoteStorageService:InvokeServer({Action="Rental"; StorageId=storage.Id; Request=true;});
+                                        local returnPacket = remoteStorageService:InvokeServer({
+                                            Action = "Rental"; 
+                                            StorageId = storage.Id; 
+                                            Request = true;
+                                        });
                                         if returnPacket.Success then
                                             if returnPacket.Storages then
                                                 for sId, _ in pairs(returnPacket.Storages) do
@@ -455,6 +459,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                                             window:Update(true);
                                             
                                         else
+                                            Debugger:Warn(`Unlock Rat Storage> FailMsg: {returnPacket.FailMsg}`);
                                             statusLabel.Text = "Insufficient Gold.";
 
                                             task.wait(2);

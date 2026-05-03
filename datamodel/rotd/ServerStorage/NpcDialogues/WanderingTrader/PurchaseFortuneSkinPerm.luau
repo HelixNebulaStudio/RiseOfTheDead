@@ -47,10 +47,6 @@ return function(player, dialog, data)
 							EndBalance=traderProfile.Gold;
 							ItemSKU=`Purchase:fortunepatternperm`;
 						};
-
-						task.spawn(function()
-							modAnalytics.RecordResource(player.UserId, fortuneSkinCost, "Sink", "Gold", "Purchase", "fortunepatternperm");
-						end)
 					end);
 
 				else

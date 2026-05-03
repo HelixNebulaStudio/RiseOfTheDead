@@ -32,25 +32,17 @@ function Hazard:Begin()
 
 		self.Counter = self.Counter+1;
 
-		if self.Counter >= 5 then
+		if self.Counter >= 10 then
 			self.Counter = 0;
 			if math.random(1, 2) ~= 1 then return end;
 
 			shared.modNpcs.spawn2{
 				Name = "Vex Spitter";
 				CFrame = CFrame.new(deathPosition);
+				Properties = {
+					Level = rawProperties.Level;
+				};
 				BindSetup = function(npcClass: NpcClass)
-					npcClass.Properties.Level = rawProperties.Level;
-
-					local healthComp: HealthComp = npcClass.HealthComp;
-					task.spawn(function()
-						while not healthComp.IsDead do
-							task.wait(1);
-							healthComp:TakeDamage(DamageData.new{
-								Damage = healthComp.MaxHealth * 0.05;
-							})
-						end
-					end)
 				end;
 			};
 		end

@@ -32,14 +32,17 @@ function Hazard:Begin()
 
 		self.Counter = self.Counter+1;
 
-		if self.Counter >= 20 then
+		if self.Counter >= 10 then
 			self.Counter = 0;
+			if math.random(1, 2) ~= 1 then return end;
 
 			shared.modNpcs.spawn2{
 				Name = "Witherer";
 				CFrame = CFrame.new(deathPosition);
+				Properties = {
+					Level = rawProperties.Level;
+				};
 				BindSetup = function(npcClass: NpcClass)
-					npcClass.Properties.Level = rawProperties.Level;
 				end;
 			};
 		end

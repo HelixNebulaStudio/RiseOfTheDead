@@ -326,6 +326,7 @@ function treePackage.PickActiveTarget(npcClass: NpcClass)
         if targetCharacterClass == npcClass then return false; end;
         if targetCharacterClass.ClassName == "PlayerClass" then return false; end;
         if targetCharacterClass.HumanoidType ~= "Zombie" then return false; end;
+        if targetCharacterClass.Properties.BasicEnemy ~= true then return false; end;
         if targetData.HealthComp.CurHealth >= targetData.HealthComp.MaxHealth then return false; end;
 
         return true;

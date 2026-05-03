@@ -6,6 +6,7 @@ local npcPackage = {
 
 	Configurations = {};
     Properties = {
+        BasicEnemy = true;
         Level = 1;
         ResourceDropId = "rat";
         MoneyReward = NumberRange.new(2, 4);

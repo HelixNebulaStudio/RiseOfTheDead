@@ -85,7 +85,7 @@ function Objective:Tick()
 				self.InformTick = tick();
 				shared.Notify(game.Players:GetPlayers(), `{enemiesLeft} enemies remaining..`, "Inform");
 
-				if tick()-self.LastSpawnTick > 120 then
+				if tick()-self.LastSpawnTick > 150 then
 					local counts = {};
 					for _, npcClass in pairs(self.Controller.EnemyNpcClasses) do
 						counts[npcClass.Name] = (counts[npcClass.Name] or 0) +1;
