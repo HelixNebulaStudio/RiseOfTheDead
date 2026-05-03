@@ -19,6 +19,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
     local branchColor = modBranchConfigurations.BranchColor;
 
+    local templateNoMailLabel = script:WaitForChild("NoMailLabel");
+
     local mailboxFrame = script:WaitForChild("MailboxFrame"):Clone();
     mailboxFrame.Parent = interface.ScreenGui;
     local mailboxList = mailboxFrame:WaitForChild("MainFrame"):WaitForChild("MailList");
@@ -28,6 +30,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     window.CloseWithInteract = true;
 	window:SetClosePosition(UDim2.new(0.5, 0, -1, 0));
 
+	mailboxFrame:WaitForChild("TitleFrame"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
+        interface:PlayButtonClick();
+        window:Close();
+	end)
+    
     local MailTemplates;
     
     local isLazyLoaded = false;
@@ -124,15 +131,19 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
         clearListChildrens();
 
-        local mailboxQuickButton = socialMenuWindow.Frame:WaitForChild("Nav"):WaitForChild("Mailbox");
-        local amtLabel = mailboxQuickButton:WaitForChild("AmtFrame"):WaitForChild("AmtLabel");
-        amtLabel.Text = #modData.GameSave.Mailbox > 0 and #modData.GameSave.Mailbox or "";
+        if #modData.GameSave.Mailbox <= 0 then
+            local newNoMailLabel = templateNoMailLabel:Clone();
+            newNoMailLabel.Parent = mailboxList;
+        end
+
         for a=1, #modData.GameSave.Mailbox do
             local index = a;
             local mailData = modData.GameSave.Mailbox[index];
             local template = MailTemplates[tostring(mailData.Type)];
-            local newMailFrame = script:FindFirstChild(template.FrameType);
-            newMailFrame = newMailFrame and newMailFrame:Clone() or nil;
+
+            local templateMailFrame = script:FindFirstChild(template.FrameType);
+            local newMailFrame = templateMailFrame and templateMailFrame:Clone() or nil;
+
             if newMailFrame then
                 local descendants = newMailFrame:GetDescendants();
                 for _, obj in pairs(descendants) do

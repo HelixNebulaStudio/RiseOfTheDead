@@ -280,6 +280,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 		windowFrame:WaitForChild("closeButton").Visible = true;
 		windowFrame:WaitForChild("closeButton").MouseButton1Click:Connect(function()
+			interface:PlayButtonClick();
             window:Close();
 		end)
 		windowFrame:WaitForChild("hintLabel").Visible = false;

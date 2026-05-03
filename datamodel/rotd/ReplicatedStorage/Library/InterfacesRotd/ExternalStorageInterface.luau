@@ -70,6 +70,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		storageTitleTag = storageFrame:WaitForChild("TitleFrame"):WaitForChild("Title");
 		
 		storageFrame.TitleFrame:WaitForChild("closeButton").MouseButton1Click:Connect(function()
+            interface:PlayButtonClick();
             window:Close();
 		end)
 		

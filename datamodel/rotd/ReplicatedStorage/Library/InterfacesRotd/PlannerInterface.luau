@@ -66,7 +66,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	end)
 
 	windowFrame:WaitForChild("TitleFrame"):WaitForChild("touchCloseButton"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
-        window:Close();
+        interface:PlayButtonClick();
+		window:Close();
 	end)
 	
 

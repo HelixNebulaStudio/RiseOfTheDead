@@ -75,9 +75,12 @@ function modifierPackage.Binds.WeaponShotDamageDataNew(modifier: ItemModifierIns
 	end
 
 	local curAmmo = storageItem:GetValues("A");
-	local newMaxAmmo = (storageItem:GetValues("MA") or toolHandler.EquipmentClass.Configurations.MaxAmmoLimit) +1;
-	if newMaxAmmo > equipmentClass.Configurations.MaxAmmoLimit then
-		newMaxAmmo = equipmentClass.Configurations.MaxAmmoLimit;
+	
+	local maxAmmoLimit = toolHandler.EquipmentClass.Configurations.MaxAmmoLimit;
+
+	local newMaxAmmo = (storageItem:GetValues("MA") or maxAmmoLimit) +1;
+	if newMaxAmmo > maxAmmoLimit then
+		newMaxAmmo = maxAmmoLimit;
 	end
 
 	equipmentClass.Properties.MaxAmmo = newMaxAmmo;

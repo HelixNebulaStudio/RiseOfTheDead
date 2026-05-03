@@ -264,11 +264,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 
             new.Parent = listFrame;
         end
-        wait(1/60);
+        task.wait(1/60);
         listFrame.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y+10);
     end)
 
     gpsFrame:WaitForChild("TitleFrame"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
+        interface:PlayButtonClick();
         window:Close();
     end)
 

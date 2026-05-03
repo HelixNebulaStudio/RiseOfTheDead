@@ -68,6 +68,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		window.CompactFullscreen = true;
 		window:SetClosePosition(UDim2.new(0.5, 0, 1, 0), UDim2.new(0.5, 0, 0, 0));
 		shopTitleLabel.Parent:WaitForChild("closeButton").MouseButton1Click:Connect(function()
+			interface:PlayButtonClick();
 			window:Close();
 		end)
 		

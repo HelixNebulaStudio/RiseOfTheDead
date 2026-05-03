@@ -740,6 +740,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         
         masteryFrame:WaitForChild("touchCloseButton").Visible = true;
         masteryFrame:WaitForChild("touchCloseButton"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
+            interface:PlayButtonClick();
             window:Close();
         end)
         masteryFrame:WaitForChild("HelpButton").Visible = false;

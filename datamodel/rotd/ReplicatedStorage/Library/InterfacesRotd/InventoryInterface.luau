@@ -180,6 +180,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 		inventoryFrame:WaitForChild("TitleFrame"):WaitForChild("closeButton").Visible = true;
 		inventoryFrame:WaitForChild("TitleFrame"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
+			interface:PlayButtonClick();
 			inventoryWindow:Close();
 		end)
 		inventoryWindow:SetClosePosition(UDim2.new(0, 0, 1, 0), UDim2.new(0, 0, 0, 0));

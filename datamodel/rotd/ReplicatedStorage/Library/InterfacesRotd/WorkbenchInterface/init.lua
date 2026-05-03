@@ -74,6 +74,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		workbenchWindow:SetClosePosition(UDim2.new(1, 0, 1, 0), UDim2.new(1, 0, 0, 0));
 		
 		workbenchFrame.TitleFrame:WaitForChild("closeButton").MouseButton1Click:Connect(function()
+			interface:PlayButtonClick();
 			workbenchWindow:Close();
 		end)
 		workbenchFrame.TitleFrame:WaitForChild("clearSelectionButton").MouseButton1Click:Connect(function()

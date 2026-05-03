@@ -29,6 +29,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     binds.InteractConfig = nil;
 
     mainFrame:WaitForChild("TitleFrame"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
+		interface:PlayButtonClick();
         window:Close();
     end)
 

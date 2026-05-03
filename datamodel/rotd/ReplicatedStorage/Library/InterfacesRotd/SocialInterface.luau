@@ -172,6 +172,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         
         menuFrame:WaitForChild("touchCloseButton").Visible = true;
         menuFrame:WaitForChild("touchCloseButton"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
+            interface:PlayButtonClick();
             window:Close();
         end)
     end
@@ -1199,6 +1200,22 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         if not window.Visible then return end;
         window:Update();
     end)
+
+
+    --MARK: Mailbox
+    local navBar = menuFrame:WaitForChild("Nav");
+    
+    local mailBoxButton = navBar:WaitForChild("Mailbox");
+    mailBoxButton.MouseButton1Click:Connect(function()
+        interface:ToggleWindow("Mailbox", true);
+    end)
+    window.OnToggle:Connect(function()
+        local amtFrame = mailBoxButton:WaitForChild("AmtFrame");
+        local amtLabel = amtFrame:WaitForChild("AmtLabel");
+        amtLabel.Text = #modData.GameSave.Mailbox > 0 and #modData.GameSave.Mailbox or "";
+        amtFrame.Visible = #modData.GameSave.Mailbox > 0;
+    end)
+
 end
 
 return interfacePackage;

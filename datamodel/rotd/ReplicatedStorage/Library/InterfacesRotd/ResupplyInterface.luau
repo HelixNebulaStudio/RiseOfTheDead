@@ -10,6 +10,7 @@ local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.Br
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modShopLibrary = shared.require(game.ReplicatedStorage.Library.GeneralShopLibrary);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
+local modStorageInterface = shared.require(game.ReplicatedStorage.Library.UI.StorageInterface);
 
 local interfacePackage = {
     Type = "Character";
@@ -40,6 +41,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	window:SetClosePosition(UDim2.new(0.5, 0, -1, 0), UDim2.new(0.5, 0, 0.5, 0));
 
     mainFrame:WaitForChild("Title"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
+        interface:PlayButtonClick();
         window:Close();
     end)
 
@@ -130,6 +132,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                     if serverReply == modShopLibrary.PurchaseReplies.Success then
                         equipmentClass.ClassSelf:RefillAmmo(equipmentClass, selectedItem);
                         resupplyButton.Visible = false;
+                        task.spawn(function()
+                            modStorageInterface.RefreshSlotOfItemId("ammopouch");
+                        end)
 
                     elseif serverReply == modShopLibrary.PurchaseReplies.ExhaustedUses then
                         if selectedItem then
@@ -176,6 +181,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
                         if serverReply == modShopLibrary.PurchaseReplies.Success then
                             resupplyButton.Visible = false;
+                            task.spawn(function()
+                                modStorageInterface.RefreshSlotOfItemId("ammopouch");
+                            end)
             
                         else
                             Debugger:Warn("Ammunition Purchase>> Error Code:"..serverReply);
@@ -236,6 +244,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         params = params or {};
         if interactable then
             binds.Interactable = interactable;
+			binds.InteractPart = interactable.Part;
         end
         if params.SupplierSiid then
             binds.SupplierSiid = params.SupplierSiid;
