@@ -2191,7 +2191,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				end
 
 				local serverChatRoom = chatRoomInterface:GetRoom("Server");
-				serverChatRoom:SetActive();
+				if serverChatRoom then
+					serverChatRoom:SetActive();
+				end
 
 			end
 

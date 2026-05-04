@@ -38,8 +38,11 @@ runLoop = RunService.Heartbeat:Connect(function()
 	if tick()-lastGrowl > nextGrowl then
 		lastGrowl = tick();
 		nextGrowl = math.random(5, 15);
-		modAudio.Preload("VexeronGrowl", 5);
-		modAudio.Play("VexeronGrowl", rootPart).PlaybackSpeed = math.random(55, 100)/100;
+
+		if rootPart.Position.Y > 0 then
+			modAudio.Preload("VexeronGrowl", 5);
+			modAudio.Play("VexeronGrowl", rootPart).PlaybackSpeed = math.random(55, 100)/100;
+		end
 	end
 end)
 

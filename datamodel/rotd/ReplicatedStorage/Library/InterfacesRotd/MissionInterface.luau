@@ -2386,11 +2386,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		end
 
 		if pinnedMission and pinnedMissionLib and pinnedMissionLib.Checkpoint then
-			-- local checkpointInfo = pinnedMissionLib.Checkpoint[pinnedMission.ProgressionPoint];
-
-			-- if checkpointInfo.AutoComplete then
-			-- 	local r = remoteMissionRemote:InvokeServer("AutoComplete", pinnedMission.Id);
-			-- end
+			
 		end
 	end)
 

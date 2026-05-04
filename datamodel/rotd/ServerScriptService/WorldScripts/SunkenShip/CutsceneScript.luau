@@ -33,150 +33,154 @@ if RunService:IsServer() then
 	local mysteriousEngineerAvatar = mysteriousEngineerNpcLib.Avatar;
 
 	shared.modEventService:OnInvoked("Destructibles_BindDestroyed", function(eventPacket: EventPacket, ...)
-		local regionMission = modRegionMission:GetById("CoopMission");
-
 		local players = eventPacket.Players;
 		local destructible: DestructibleInstance = ...;
 		if destructible == nil then return end;
 
-		local modelCf = destructible.Model:GetPivot();
+		task.spawn(function()
+			local regionMission = modRegionMission:GetById("CoopMission");
+			local modelCf = destructible.Model:GetPivot();
 
-		if destructible.Id == "SleepingElderVex" then
-			regionMission:Progress(function(coopMission)
-				if coopMission.CheckPoint <= 1 then
-					coopMission.CheckPoint = 2;
+			if destructible.Id == "SleepingElderVex" then
+				regionMission:Progress(function(coopMission)
+					if coopMission.CheckPoint <= 1 then
+						coopMission.CheckPoint = 2;
+					end
+				end)
+
+			elseif destructible.Id == "NekronChunk1" then
+				modAudio.Play("NekronHurt", modelCf.Position).PlaybackSpeed = math.random(50, 60)/100;
+
+				local freeDivingSuit = false;
+				for _, player in pairs(game.Players:GetPlayers()) do
+					if modEvents:GetEvent(player, "freeDivingSuit") == nil then
+						freeDivingSuit = true;
+						break;
+					end
 				end
-			end)
 
-		elseif destructible.Id == "NekronChunk1" then
-			modAudio.Play("NekronHurt", modelCf.Position).PlaybackSpeed = math.random(50, 60)/100;
-
-			local freeDivingSuit = false;
-			for _, player in pairs(game.Players:GetPlayers()) do
-				if modEvents:GetEvent(player, "freeDivingSuit") == nil then
-					freeDivingSuit = true;
-					break;
+				local text = "Good luck! I'll be waiting for the Nekron Particulate tubes..";
+				if freeDivingSuit then
+					text = "Come back with 4 tubes of Nekron Particulate and I'll give you a diving suit.";
 				end
-			end
-
-			local text = "Good luck! I'll be waiting for the Nekron Particulate tubes..";
-			if freeDivingSuit then
-				text = "Come back with 4 tubes of Nekron Particulate and I'll give you a diving suit.";
-			end
-			regionMission:Progress(function(coopMission)
-				if coopMission.CheckPoint <= 4 then
-					coopMission.SaveData.Dialogues = {
-						Dialogue1 = {
-							AvatarId = mysteriousEngineerAvatar;
-							Text = text;
+				regionMission:Progress(function(coopMission)
+					if coopMission.CheckPoint <= 4 then
+						coopMission.SaveData.Dialogues = {
+							Dialogue1 = {
+								AvatarId = mysteriousEngineerAvatar;
+								Text = text;
+							};
 						};
-					};
-				end
-			end)
+					end
+				end)
 
-		elseif destructible.Id == "NekronChunk2" then
-			modAudio.Play("NekronHurt", modelCf.Position).PlaybackSpeed = math.random(50, 60)/100;
+			elseif destructible.Id == "NekronChunk2" then
+				modAudio.Play("NekronHurt", modelCf.Position).PlaybackSpeed = math.random(50, 60)/100;
 
-		end
+			end
+		end)
 	end)
 
 	shared.modEventService:OnInvoked("Generic_BindItemPickup", function(eventPacket: EventPacket, ...)
-		local regionMission = modRegionMission:GetById("CoopMission");
-
 		local player: Player? = eventPacket.Player;
 		if player == nil then return end;
 
 		local interactable: InteractableInstance = ...;
 		if interactable.Values.ItemId ~= "nekronparticulate" then return end;
-		regionMission:Progress(function(coopMission)
-			if coopMission.SaveData.PickupCount == nil then
-				coopMission.SaveData.PickupCount = 8;
-			end
-			coopMission.SaveData.PickupCount -= 1;
-			Debugger:StudioLog(`coopMission.SaveData.PickupCount`, coopMission.SaveData.PickupCount);
 
-			if coopMission.SaveData.PickupCount <= 0 then
-				coopMission.SaveData.Dialogues = {
-					Dialogue1 = {
-						AvatarId = mysteriousEngineerAvatar;
-						Text = "Nice! You got it all, c'mon back up. Whether you want to exchange them with me, that's up to you.";
+		task.spawn(function() 
+			local regionMission = modRegionMission:GetById("CoopMission");
+
+			regionMission:Progress(function(coopMission)
+				if coopMission.SaveData.PickupCount == nil then
+					coopMission.SaveData.PickupCount = 8;
+				end
+				coopMission.SaveData.PickupCount -= 1;
+				Debugger:StudioLog(`coopMission.SaveData.PickupCount`, coopMission.SaveData.PickupCount);
+
+				if coopMission.SaveData.PickupCount <= 0 then
+					coopMission.SaveData.Dialogues = {
+						Dialogue1 = {
+							AvatarId = mysteriousEngineerAvatar;
+							Text = "Nice! You got it all, c'mon back up. Whether you want to exchange them with me, that's up to you.";
+						};
 					};
-				};
-				coopMission.Checkpoint = 7;
-			end
+					coopMission.Checkpoint = 7;
+				end
+			end)
 		end)
 	end)
 
     shared.modEventService:OnInvoked("Generic_BindTrigger", function(eventPacket: EventPacket, ...)
-		local regionMission = modRegionMission:GetById("CoopMission");
-
         local triggerId: string, interactable: InteractableInstance = ...;
 
-        Debugger:StudioLog("Interactables_BindButtonInteract", eventPacket, interactable);
+		task.spawn(function()
+			local regionMission = modRegionMission:GetById("CoopMission");
+			Debugger:StudioLog("Interactables_BindButtonInteract", eventPacket, interactable);
 
-		if triggerId == "LeverA" or triggerId == "LeverB" or triggerId == "LeverC" then
-			local leverAInteractable = modInteractables.getById("LeverA");
-			local leverBInteractable = modInteractables.getById("LeverB");
-			local leverCInteractable = modInteractables.getById("LeverC");
-			local isLightOn = {
-				SystemLight1 = leverAInteractable.Values.IsActive == true;
-				SystemLight2 = leverBInteractable.Values.IsActive == true;
-				SystemLight3 = leverCInteractable.Values.IsActive == true;
-			};
-			Debugger:StudioLog(`LeverActivation`, isLightOn);
-			for _, model in ipairs(interactablesFolder.Levers:GetChildren()) do
+			if triggerId == "LeverA" or triggerId == "LeverB" or triggerId == "LeverC" then
+				local leverAInteractable = modInteractables.getById("LeverA");
+				local leverBInteractable = modInteractables.getById("LeverB");
+				local leverCInteractable = modInteractables.getById("LeverC");
+				local isLightOn = {
+					SystemLight1 = leverAInteractable.Values.IsActive == true;
+					SystemLight2 = leverBInteractable.Values.IsActive == true;
+					SystemLight3 = leverCInteractable.Values.IsActive == true;
+				};
+				Debugger:StudioLog(`LeverActivation`, isLightOn);
+				for _, model in ipairs(interactablesFolder.Levers:GetChildren()) do
+					for partName, isOn in pairs(isLightOn) do
+						local lightPart = model:FindFirstChild(partName);
+						if lightPart then
+							lightPart.Material = isOn and Enum.Material.Neon or Enum.Material.SmoothPlastic;
+						end
+					end
+				end
+
+				local count = 0;
 				for partName, isOn in pairs(isLightOn) do
-					local lightPart = model:FindFirstChild(partName);
-					if lightPart then
-						lightPart.Material = isOn and Enum.Material.Neon or Enum.Material.SmoothPlastic;
+					if not isOn then continue end;
+					count += 1;
+				end
+
+				regionMission:Progress(function(coopMission)
+					coopMission.SaveData.Count = count;
+					coopMission.SaveData.Total = 3;
+
+					if coopMission.CheckPoint <= 3 then
+						coopMission.CheckPoint = 4;
 					end
-				end
-			end
-
-			local count = 0;
-			for partName, isOn in pairs(isLightOn) do
-				if not isOn then continue end;
-				count += 1;
-			end
-
-			regionMission:Progress(function(coopMission)
-				coopMission.SaveData.Count = count;
-				coopMission.SaveData.Total = 3;
-
-				if coopMission.CheckPoint == 3 then
-					coopMission.CheckPoint = 4;
-				end
-				
-				if count == 1 then
-					coopMission.SaveData.Dialogues = {
-						Dialogue1 = {
-							AvatarId = mysteriousEngineerAvatar;
-							Text = "Oh hey! You found a lever. There should be 2 more lever somewhere.";
+					
+					if count == 1 then
+						coopMission.SaveData.Dialogues = {
+							Dialogue1 = {
+								AvatarId = mysteriousEngineerAvatar;
+								Text = "Oh hey! You found a lever. There should be 2 more lever somewhere.";
+							};
 						};
-					};
-				elseif count == 2 then
-					coopMission.SaveData.Dialogues = {
-						Dialogue1 = {
-							AvatarId = mysteriousEngineerAvatar;
-							Text = "Nice! 1 more lever to go.";
+					elseif count == 2 then
+						coopMission.SaveData.Dialogues = {
+							Dialogue1 = {
+								AvatarId = mysteriousEngineerAvatar;
+								Text = "Nice! 1 more lever to go.";
+							};
 						};
-					};
-				elseif count == 3 then
-					coopMission.SaveData.Dialogues = {
-						Dialogue1 = {
-							AvatarId = mysteriousEngineerAvatar;
-							Text = "Awesome, the cargo hold should be open. You'll find tubes there.";
+					elseif count == 3 then
+						coopMission.SaveData.Dialogues = {
+							Dialogue1 = {
+								AvatarId = mysteriousEngineerAvatar;
+								Text = "Awesome, the cargo hold should be open. You'll find tubes there.";
+							};
 						};
-					};
 
-					if coopMission.CheckPoint == 5 then
-						coopMission.CheckPoint = 6;
+						if coopMission.CheckPoint == 5 then
+							coopMission.CheckPoint = 6;
+						end
 					end
-				end
 
-			end)
-		end
-
+				end)
+			end
+		end)
     end)
 
 else

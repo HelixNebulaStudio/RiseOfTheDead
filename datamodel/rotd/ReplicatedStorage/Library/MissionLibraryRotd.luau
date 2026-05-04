@@ -5,8 +5,8 @@ local RunService = game:GetService("RunService");
 local modMarkers = shared.require(game.ReplicatedStorage.Library.Markers);
 local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
 
-local BoardTimeLimit = 3600;
-local factionMissionExpireTime = 3600*20;
+local BOARD_TIME_LIMIT = 3600;
+local FACTION_MISSION_EXPIRE_TIME = 3600*20;
 
 local PerksReward = {
 	Core=5;
@@ -551,7 +551,7 @@ MissionLibrary.New{
 	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="Restock";
 	Description="Jesse needs to restock some components in the shop.";
-	Timer=BoardTimeLimit; 
+	Timer=BOARD_TIME_LIMIT; 
 	Persistent=true;
 	World="TheWarehouse";
 	Objectives={
@@ -682,7 +682,7 @@ MissionLibrary.New{
 	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="Spring Killing";
 	Description="Jane wants you to clear out all the bosses in W.D. Warehouse.";
-	Timer=BoardTimeLimit;
+	Timer=BOARD_TIME_LIMIT;
 	Persistent=true;
 	World="TheWarehouse";
 	Objectives={
@@ -842,7 +842,7 @@ MissionLibrary.New{
 	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="Blueprint Demands";
 	Description="Diana is almost out of blueprints in the shop and needs you to get some more.";
-	Timer=BoardTimeLimit;
+	Timer=BOARD_TIME_LIMIT;
 	Persistent=true;
 	World="TheUnderground";
 	Objectives={
@@ -1104,7 +1104,7 @@ MissionLibrary.New{
 	MissionType = MissionLibrary.MissionTypes.Board;
 	Name = "Escort";
 	Description = "Molly wants you to escort a stranger to a location. Protect them at all costs.";
-	Timer = BoardTimeLimit;
+	Timer = BOARD_TIME_LIMIT;
 	Persistent = true;
 	SaveData = {
 		Location=(function()
@@ -1140,7 +1140,7 @@ MissionLibrary.New{
 MissionLibrary.New{
 	MissionId = 35;
 	MissionType = MissionLibrary.MissionTypes.Faction;
-	ExpireTime = factionMissionExpireTime;
+	ExpireTime = FACTION_MISSION_EXPIRE_TIME;
 	Name = "Food Airdrop";
 	From = "Faction";
 	Description = "Collect food airdrop to increase to your faction's Food supply.";
@@ -1611,7 +1611,7 @@ MissionLibrary.New{
 	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="Coming To The Rescue";
 	Description="A stranger is trapped somewhere in W.D. Mall and needs your help.";
-	Timer=BoardTimeLimit;
+	Timer=BOARD_TIME_LIMIT;
 	Persistent=true;
 	SaveData={
 		Id=(function()
@@ -1883,7 +1883,7 @@ MissionLibrary.New{
 	Name="Another Survivor";
 	Description="A survivor has arrive at your safehome.";
 	World={"Safehome";};
-	Timer=BoardTimeLimit;
+	Timer=BOARD_TIME_LIMIT;
 	Persistent=true;
 	Progression={
 		"Talk to the survivor";
@@ -2032,32 +2032,32 @@ MissionLibrary.New{
 
 -- MARK: 59 - Horde Clearance
 MissionLibrary.New{
-	MissionId=59;
+	MissionId = 59;
 	MissionType = MissionLibrary.MissionTypes.Faction;
-	ExpireTime=factionMissionExpireTime;
-	Timer=300;
-	Name="Horde Clearance";
-	From="Faction";
-	Description="A horde appears to be heading towards our compound, clear them out and increase your faction's Material supply.";
-	Persistent=true;
-	SaveData={Kills=function() return 300; end;};
-	Checkpoint={
+	ExpireTime = FACTION_MISSION_EXPIRE_TIME;
+	Timer = 300;
+	Name = "Horde Clearance";
+	From = "Faction";
+	Description = "A horde appears to be heading towards our compound, clear them out and increase your faction's Material supply.";
+	Persistent = true;
+	SaveData = {Kills=function() return 300; end;};
+	Checkpoint = {
 		{Text="Kill $Kills zombies";};
 	};
-	GuideText="Start by faction";
-	FactionCosts={
+	GuideText = "Start by faction";
+	FactionCosts = {
 		{Type="Resource"; Per="Player"; Id="Food"; Value=0.4;};
 		{Type="Resource"; Per="Player"; Id="Comfort"; Value=0.375;};
 		{Type="Resource"; Per="Player"; Id="Ammo"; Value=0.1;};
 	};
-	FactionRewards={
+	FactionRewards = {
 		{Type="Resource"; Id="Material"; Value=30;};
 		{Type="Score"; Value=1;};
 	};
-	FactionSuccessCriteria={
+	FactionSuccessCriteria = {
 		SuccessfulAgents=1;
 	};
-	QuotaLimit=16;
+	QuotaLimit = 16;
 	
 };
 
@@ -2066,7 +2066,7 @@ MissionLibrary.New{
 MissionLibrary.New{
 	MissionId = 60;
 	MissionType = MissionLibrary.MissionTypes.Faction;
-	ExpireTime = factionMissionExpireTime;
+	ExpireTime = FACTION_MISSION_EXPIRE_TIME;
 	Name = "Reconnaissance Duty";
 	From = "Faction";
 	Description = "Keep your faction informed as to the on goings around and promote your faction to increase faction's Comfort level.";
@@ -2123,31 +2123,31 @@ MissionLibrary.New{
 
 -- MARK: 61 - Ammo Manufacturing
 MissionLibrary.New{
-	MissionId=61;
+	MissionId = 61;
 	MissionType = MissionLibrary.MissionTypes.Faction;
-	ExpireTime=factionMissionExpireTime;
-	Timer=600;
-	Name="Ammo Manufacturing";
-	From="Faction";
-	Description="Use some material to manufacture ammunition to increase faction's Ammo supply.";
-	Persistent=true;
-	Checkpoint={
+	ExpireTime = FACTION_MISSION_EXPIRE_TIME;
+	Timer = 600;
+	Name = "Ammo Manufacturing";
+	From = "Faction";
+	Description = "Use some material to manufacture ammunition to increase faction's Ammo supply.";
+	Persistent = true;
+	Checkpoint = {
 		{Text="Craft Patrick an Ammo Box. Check Bandit's Market for Ammo Box Blueprint.";};
 	};
-	SaveData={};
-	GuideText="Start by faction";
-	FactionCosts={
+	SaveData = {};
+	GuideText = "Start by faction";
+	FactionCosts = {
 		{Type="Resource"; Per="Player"; Id="Food"; Value=0.1;};
 		{Type="Resource"; Per="Player"; Id="Material"; Value=0.2;};
 	};
-	FactionRewards={
+	FactionRewards = {
 		{Type="Resource"; Id="Ammo"; Value=60;};
 		{Type="Score"; Value=1;};
 	};
-	FactionSuccessCriteria={
+	FactionSuccessCriteria = {
 		SuccessfulAgents=1;
 	};
-	QuotaLimit=16;
+	QuotaLimit = 16;
 	
 };
 
@@ -2306,7 +2306,7 @@ MissionLibrary.New{
 	MissionType = MissionLibrary.MissionTypes.Board;
 	Name = "Eternal Inferno";
 	Description = "Joseph wants to see the effects of killing zombies with fire.";
-	Timer = BoardTimeLimit;
+	Timer = BOARD_TIME_LIMIT;
 	Persistent = true;
 	World = "TheResidentials";
 	Checkpoint = {
@@ -2331,7 +2331,7 @@ MissionLibrary.New{
 	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="Monorail";
 	Description="Nate has been going to Sector D but he needs help with the monorail inside.";
-	Timer=BoardTimeLimit;
+	Timer=BOARD_TIME_LIMIT;
 	Persistent=true;
 	Checkpoint={
 		{Text="Objectives"; CompleteText="Well done"; Objectives={"CompleteSurvival", "ActivateMonorail"};};
@@ -2361,7 +2361,7 @@ MissionLibrary.New{
 	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="Capital Gains";
 	Description="Help Lewis stabilize the economy by selling some things.";
-	Timer=BoardTimeLimit;
+	Timer=BOARD_TIME_LIMIT;
 	Persistent=true;
 	World="TheResidentials";
 	Checkpoint={
@@ -2386,7 +2386,7 @@ MissionLibrary.New{
 	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="Sunken Salvages";
 	Description="Some cargo has been loss during the shipping, Cooper needs you to look for them in the sea.";
-	Timer=BoardTimeLimit;
+	Timer=BOARD_TIME_LIMIT;
 	Persistent=true;
 	World="TheHarbor";
 	Checkpoint={
@@ -2411,7 +2411,7 @@ MissionLibrary.New{
 	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="Reserved Weapons";
 	Description="Get an amount of zombie kills with a type of weapon";
-	Timer=BoardTimeLimit;
+	Timer=BOARD_TIME_LIMIT;
 	Persistent=true;
 	Checkpoint={
 		{Text="Kill $Kills zombies with a $WeaponType";};
@@ -2441,7 +2441,7 @@ MissionLibrary.New{
 	MissionType = MissionLibrary.MissionTypes.Board;
 	Name = "Anti Immunity";
 	Description = "Kill zombies that have immunity with a melee weapon";
-	Timer = BoardTimeLimit;
+	Timer = BOARD_TIME_LIMIT;
 	Persistent = true;
 	Checkpoint = {
 		{Text="Kill $Kills immune zombies with melee";};
@@ -2466,7 +2466,7 @@ MissionLibrary.New{
 	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="High Value Package";
 	Description="Help deliver a high value package.";
-	Timer=BoardTimeLimit;
+	Timer=BOARD_TIME_LIMIT;
 	Persistent=true;
 	Checkpoint={
 		{Text="Pick up the package from Greg near the Harbor Docks.";};
@@ -2521,7 +2521,7 @@ MissionLibrary.New{
 MissionLibrary.New{
 	MissionId=73;
 	MissionType = MissionLibrary.MissionTypes.Faction;
-	ExpireTime = factionMissionExpireTime;
+	ExpireTime = FACTION_MISSION_EXPIRE_TIME;
 	Name="Deadly Zeniths Strike";
 	From="Faction";
 	Description="A zenith boss is approaching your faction headquarters. Call up faction members to take down the boss together.";
@@ -2559,7 +2559,7 @@ MissionLibrary.New{
 	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="Breach by the Dead";
 	Description="Help defend a safehouse from a breach.";
-	Timer=BoardTimeLimit;
+	Timer=BOARD_TIME_LIMIT;
 	Persistent=true;
 	Checkpoint={
 		{Text="Look for a safehouse which is getting breached right now, there may or may not be one right now.";};
@@ -2626,7 +2626,7 @@ MissionLibrary.New{
 	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="Ziphoning Serum";
 	Description="Rachel requires some items to create some Ziphoning Serum.";
-	Timer=BoardTimeLimit; 
+	Timer=BOARD_TIME_LIMIT; 
 	Persistent=true;
 	Checkpoint={
 		{Text="Objectives"; CompleteText="Trade the items with Rachel"; Objectives={"Item1"; "Item2"};};
@@ -2716,7 +2716,7 @@ MissionLibrary.New{
 	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="Javelineer Prodigy"; 
 	Description="Kill enemies with throwing weapons.";
-	Timer=BoardTimeLimit; 
+	Timer=BOARD_TIME_LIMIT; 
 	Persistent=true;
 	Checkpoint={
 		{Text="Get $Kills Kills with a throwing weapon excluding explosives and flammables";};
@@ -2809,7 +2809,7 @@ MissionLibrary.New{
 	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="Candy Hoarder";
 	Description="Complete a Slaughterfest round with at least 500 candies.";
-	Timer=BoardTimeLimit;
+	Timer=BOARD_TIME_LIMIT;
 	Persistent=true;
 	Checkpoint={
 		{Text="Complete a Slaughterfest round with at least 500 candies";};
@@ -2835,7 +2835,7 @@ MissionLibrary.New{
 	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="Mass Slaughterer";
 	Description="Complete a Slaughterfest round and get 10 player kills.";
-	Timer=BoardTimeLimit;
+	Timer=BOARD_TIME_LIMIT;
 	Persistent=true;
 	Checkpoint={
 		{Text="Objectives"; CompleteText="Complete a Slaughterfest round"; Objectives={"Objective1";};};
@@ -2865,7 +2865,7 @@ MissionLibrary.New{
 	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="Jack of all Slaughter";
 	Description="Complete a Slaughterfest round with different weapon kills.";
-	Timer=BoardTimeLimit;
+	Timer=BOARD_TIME_LIMIT;
 	Persistent=true;
 	Checkpoint={
 		{Text="Objectives"; CompleteText="Complete a Slaughterfest round"; Objectives={"ItemA"; "ItemB"; "ItemC";};};
@@ -2908,7 +2908,7 @@ MissionLibrary.New{
 	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="Whos that Survivor";
 	Description="Figure out which survivor to talk to.";
-	Timer=BoardTimeLimit; 
+	Timer=BOARD_TIME_LIMIT; 
 	Persistent=true;
 	Checkpoint={
 		{Text="Talk to $NpcDesc";};
@@ -2990,7 +2990,7 @@ MissionLibrary.New{
 	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="Candy Devourer";
 	Description="Complete a Slaughterfest round after eating different candies.";
-	Timer=BoardTimeLimit;
+	Timer=BOARD_TIME_LIMIT;
 	Persistent=true;
 	Checkpoint={
 		{Text="Objectives"; CompleteText="Complete a Slaughterfest round"; Objectives={"ItemA"; "ItemB"; "ItemC";};};

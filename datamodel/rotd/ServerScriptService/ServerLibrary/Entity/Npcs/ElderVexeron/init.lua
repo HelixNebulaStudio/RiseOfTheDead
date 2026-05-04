@@ -4,9 +4,7 @@ local RunService = game:GetService("RunService")
 
 local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
-local modParticleSprinkler = shared.require(game.ReplicatedStorage.Particles.ParticleSprinkler);
 local modMath = shared.require(game.ReplicatedStorage.Library.Util.Math);
-local modVector = shared.require(game.ReplicatedStorage.Library.Util.Vector);
 
 local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 
@@ -24,7 +22,7 @@ local npcPackage = {
         Immortal = 1;
 
         TargetableDistance = 1024;
-        LockOnExpireDuration = NumberRange.new(100, 120);
+        LockOnExpireDuration = NumberRange.new(99998, 99999);
 
         Level = 1;
         ExperiencePool = 1000;
@@ -55,14 +53,12 @@ local npcPackage = {
 function npcPackage.Spawning(npcClass: NpcClass)
     local character = npcClass.Character;
     local configurations: ConfigVariable = npcClass.Configurations;
-    local properties: PropertiesVariable<{}> = npcClass.Properties;
-    local healthComp: HealthComp = npcClass.HealthComp;
+    local properties: PropertiesVariable<anydict> = npcClass.Properties;
 
     properties.SpitterKilled = 0;
     properties.SnoozeTimer = tick();
 
     local isHard = properties.HardMode;
-    local level = math.max(properties.Level, 0);
 
     local bodyVelocity = Instance.new("BodyVelocity");
     bodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge);
@@ -211,14 +207,8 @@ function npcPackage.Spawned(npcClass: NpcClass)
     local properties = npcClass.Properties;
     local healthComp = npcClass.HealthComp;
     local rootPart = npcClass.RootPart;
-    local character = npcClass.Character;
 
-    local isHard = properties.HardMode;
-    local bodyVelocity = properties.BodyVelocity;
     local bodyGyro = properties.BodyGyro;
-
-
-    local bodyDestructiblesComp = npcClass:GetComponent("BodyDestructibles");
 
     function properties.PointTo(point: Vector3, lerpIntensity: number?)
 		local newFrontCf = CFrame.new(rootPart.Position, point) * CFrame.Angles(-math.pi/2, 0, 0);
@@ -264,7 +254,7 @@ function npcPackage.Spawned(npcClass: NpcClass)
             end
 
             if targetPoint then
-                local dist = npcClass:DistanceFromCharacter(targetPoint);
+                local dist = npcClass:DistanceFrom(targetPoint);
                 local lerpIntensity = modMath.MapNum(dist, 0, 400, 0, 1, true);
                 properties.PointTo(targetPoint, lerpIntensity);
             end
@@ -299,8 +289,6 @@ function npcPackage.Spawned(npcClass: NpcClass)
         if #activeVexSpitters >= 5 then return end;
 
         local vexBody: BasePart = properties.VexBodies[math.random(1, #properties.VexBodies)];
-
-        local rngDir = modVector.RandomUnitVector(2);
 
         local vexSpitterNpcClass: NpcClass = shared.modNpcs.spawn2{
             Name = "Vex Spitter";
@@ -341,6 +329,12 @@ function npcPackage.Spawned(npcClass: NpcClass)
         weld.C0 = CFrame.new(0, -15, 0) * CFrame.Angles(math.rad(90), math.rad(math.random(1, 360)), 0);
 
         vexSpitterNpcClass:SetNetworkOwner(nil);
+
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player == nil or player.Character == nil then continue end;
+
+            targetHandlerComp:AddTarget(player.Character);
+        end
     end)
 end
 

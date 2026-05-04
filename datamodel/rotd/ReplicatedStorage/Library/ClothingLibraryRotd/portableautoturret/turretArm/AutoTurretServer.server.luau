@@ -705,6 +705,7 @@ function Update()
 					task.wait();
 				end
 				while onlineLoop do
+					if not workspace:IsAncestorOf(accessory) then return end;
 					TurretRuntime(weaponStorageItem);
 					canReactivate = tick();
 				end
