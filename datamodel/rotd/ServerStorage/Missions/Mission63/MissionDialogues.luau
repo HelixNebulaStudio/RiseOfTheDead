@@ -5,9 +5,9 @@ local RunService = game:GetService("RunService");
 --=
 local Dialogues = {
 	Patrick={};
-	Bandit={};
 	Loran={};
 	Zark={};
+	Jason={};
 };
 
 local missionId = 63;
@@ -32,8 +32,8 @@ Dialogues.Patrick.DialogueStrings = {
 	};
 };
 
--- MARK: Bandit Dialogues
-Dialogues.Bandit.DialogueStrings = {
+-- MARK: Jason Dialogues
+Dialogues.Jason.DialogueStrings = {
 	["banditRecruit_banditCampGate"]={
 		Face="Serious"; 
 		Reply="Halt right here! What do you want?";
@@ -147,8 +147,8 @@ if RunService:IsServer() then
 	end
 	
 
-	-- MARK: Bandit Handler
-	Dialogues.Bandit.DialogueHandler = function(player, dialog, data, mission)
+	-- MARK: Jason Handler
+	Dialogues.Jason.DialogueHandler = function(player, dialog, data, mission)
 		local modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
 
 		if mission.Type == 2 then -- Available
