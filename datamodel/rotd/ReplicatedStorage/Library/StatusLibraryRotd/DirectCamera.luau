@@ -1,11 +1,13 @@
-local RunService = game:GetService("RunService");
 local modStatusClass = shared.require(game.ReplicatedStorage.Library.StatusLibrary.StatusClass);
+
+local RunService = game:GetService("RunService");
+
 local localPlayer = game.Players.LocalPlayer;
 --==
 local statusPackage = {
-    Id="SetWalkspeed";
-    Description="Set Walkspeed = $Amount.";
-    ShowOnHud=false;
+    Id = "DirectCamera";
+    Description = "Set DirectCameraPosition = $Position.";
+    ShowOnHud = false;
 };
 
 function statusPackage.BindApply(statusClass: StatusClassInstance)
@@ -17,13 +19,10 @@ function statusPackage.BindApply(statusClass: StatusClassInstance)
     local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
     local modCharacter = modData:GetModCharacter();
 
-    local walkSpeed = statusClass.Values.Amount;
+    local duration = statusClass.Duration;
 
-    characterClass.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, walkSpeed > 0);
-    modCharacter.CharacterProperties.CanSprint = false;
-
-    modCharacter.CharacterProperties.WalkSpeed:Set("forceWalkspeed", walkSpeed, 10);
-    modCharacter.UpdateWalkSpeed();
+    modCharacter.CharacterProperties.DirectCameraPosition = statusClass.Values.Position;
+    modCharacter.CharacterProperties.DirectCameraTick = tick() + duration;
 end
 
 function statusPackage.BindUpdate(statusClass: StatusClassInstance)
@@ -34,13 +33,10 @@ function statusPackage.BindUpdate(statusClass: StatusClassInstance)
     local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
     local modCharacter = modData:GetModCharacter();
     
-    local walkSpeed = statusClass.Values.Amount;
+    local duration = statusClass.Duration;
 
-    characterClass.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, walkSpeed > 0);
-    modCharacter.CharacterProperties.CanSprint = false;
-
-    modCharacter.CharacterProperties.WalkSpeed:Set("forceWalkspeed", walkSpeed, 10);
-    modCharacter.UpdateWalkSpeed();
+    modCharacter.CharacterProperties.DirectCameraPosition = statusClass.Values.Position;
+    modCharacter.CharacterProperties.DirectCameraTick = tick() + duration;
 end
 
 function statusPackage.BindExpire(statusClass: StatusClassInstance)
@@ -51,11 +47,8 @@ function statusPackage.BindExpire(statusClass: StatusClassInstance)
     local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
     local modCharacter = modData:GetModCharacter();
 
-    characterClass.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, true);
-    modCharacter.CharacterProperties.CanSprint = true;
-
-    modCharacter.CharacterProperties.WalkSpeed:Remove("forceWalkspeed");
-    modCharacter.UpdateWalkSpeed();
+    modCharacter.CharacterProperties.DirectCameraPosition = nil;
+    modCharacter.CharacterProperties.DirectCameraTick = nil;
 end
 
 return modStatusClass.new(statusPackage);

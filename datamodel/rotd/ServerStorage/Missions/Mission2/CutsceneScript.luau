@@ -7,7 +7,6 @@ local localPlayer = game.Players.LocalPlayer;
 
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 --== Variables;
@@ -80,14 +79,11 @@ if RunService:IsServer() then
 		end)
 		
 		shared.modEventService:OnInvoked("Shop_BindActionEvent", function(event: EventPacket, ...)
-			local action: string, packet: anydict = ...;
+			local action: string, _packet: anydict = ...;
 			local player = event.Player;
 			if player == nil then return end;
 			
 			if action == "BuyAmmo" then
-				local storageItem = packet.StorageItem;
-				local cost = packet.Cost;
-
 				if not modMission:Progress(player, MISSION_ID) then return end;
 
 				modMission:Progress(player, MISSION_ID, function(mission)
@@ -108,7 +104,7 @@ if RunService:IsServer() then
 		end)
 		
 		shared.modEventService:OnInvoked("Dialogue_BindMedicHeal", function(event: EventPacket, ...)
-			local player: Player, dialog = ...;
+			local player: Player, _dialog = ...;
 			if not modMission:Progress(player, MISSION_ID) then return end;
 
 			task.spawn(function()
@@ -224,23 +220,23 @@ return function(CutsceneSequence)
 					masonNpcClass.Chat(masonNpcClass.Player, "Follow me...");
 					masonNpcClass.Move:Face(Vector3.new(-0.619997144, 57.6597404, -25.171896));
 			
-					wait(0.1);
+					task.wait(0.1);
 
 					if mission.ProgressionPoint >= 4 then return end;
 							
 					masonNpcClass.Move:MoveTo(Vector3.new(-5.81999636, 57.6597404, -24.2718925));
 					masonNpcClass.Move.OnMoveToEnded:Wait(2);
-					wait(0.2);
+					task.wait(0.2);
 
 					if mission.ProgressionPoint >= 4 then return end;
 
 					masonNpcClass.Move:Face(Vector3.new(-5.81999636, 57.6597404, -20.3718967));
-					wait(0.5);
+					task.wait(0.5);
 
 					if mission.ProgressionPoint >= 4 then return end;
 
 					masonNpcClass:UseInteractable("bedroomdoorMain");
-					wait(0.5);
+					task.wait(0.5);
 					
 					masonNpcClass.Move:MoveTo(Vector3.new(16.5800056, 57.6597404, -32.6719055));
 					masonNpcClass.Move.OnMoveToEnded:Wait(3);
@@ -348,14 +344,14 @@ return function(CutsceneSequence)
 		modClientGuis.toggleGameBlinds(true, 10);
 		
 		TweenService:Create(blurEffect, TweenInfo.new(10), {Size = 10;}):Play();
-		wait(5);
+		task.wait(5);
 		local smoothValueTag = Instance.new("NumberValue");
 		smoothValueTag:GetPropertyChangedSignal("Value"):Connect(function()
 			RunService.Heartbeat:Wait();
 			modCharacter.MouseProperties.CameraSmoothing = smoothValueTag.Value;
 		end)
 		TweenService:Create(smoothValueTag, TweenInfo.new(10), {Value = 1;}):Play();
-		wait(3);
+		task.wait(3);
 		modCharacter.MouseProperties.CameraSmoothing = 0;
 	end);
 
@@ -382,7 +378,7 @@ return function(CutsceneSequence)
 		wakeAnimation:AdjustSpeed(0);
 		modClientGuis.toggleGameBlinds(true, 2);
 		
-		wait(0.25);
+		task.wait(0.25);
 		wakeAnimation:AdjustSpeed(0.8);
 		modCharacter.CharacterProperties.FirstPersonCamCFrame = nil;
 		blurEffect:Destroy();
@@ -391,14 +387,14 @@ return function(CutsceneSequence)
 				obj:Destroy();
 			end
 		end
-		wait(5);
+		task.wait(5);
 		modConfigurations.Set("DisableWaypointers", false);
 		modCharacter.CharacterProperties.CanMove = true;
 		modCharacter.CharacterProperties.CanInteract = true;
 		rootPart.Anchored = false;
 		wakeAnimation:Stop();
 
-		spawn(function()
+		task.spawn(function()
 			local unconsciousAnimation = nil;
 			for a=1, 10 do
 				unconsciousAnimation = modCharacter:GetAnimation("Unconscious");

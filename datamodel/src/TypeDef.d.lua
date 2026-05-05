@@ -61,6 +61,7 @@ export type DAMAGE_TYPE<U> = U
 export type HUMANOID_TYPE<U> = U
     | "Human"
     | "Player"
+    | "Destructible"
     ;
 
 export type MODIFIER_BIND_KEY<U> = U 
@@ -296,6 +297,7 @@ export type Profile = {
     ActiveGameSave: GameSave;
     ActiveInventory: Storage;
     SkillTree: anydict;
+    Flags: anydict;
 
     Premium: boolean;
     GamePass: anydict;
@@ -627,7 +629,6 @@ export type CharacterClass = {
     Name: string;
     Character: Model;
     Humanoid: Humanoid;
-    HumanoidType: HUMANOID_TYPE<string>;
     RootPart: BasePart;
     Head: BasePart;
     PositionalOctreeNode: OctreeNode<NpcClass>;
@@ -648,6 +649,8 @@ export type CharacterClass = {
     Kill: (CharacterClass) -> nil;
 
     Initialize: () -> nil;
+
+    GetMapLocation: (CharacterClass) -> string;
 
     FireAllModifiersBind: (CharacterClass, bindName: string, ...any) -> nil;
 } & EntityClass;
@@ -719,6 +722,7 @@ export type StatusClassInstance = {
 
 --MARK: AnimationController
 export type AnimationController = {
+    Animator: Animator;
     Update: (AnimationController) -> nil;
 };
 
@@ -847,7 +851,6 @@ export type NpcClass = CharacterClass & {
     ToggleInteractable: (NpcClass, v: boolean) -> nil;
     UseInteractable: (NpcClass, interactableIdorConfig: string | Configuration, ...any) -> ...any;
     IsRagdolling: (NpcClass) -> boolean;
-    GetMapLocation: (NpcClass) -> string;
     Sit: (NpcClass, Seat?) -> nil;
     UpdateClothing: (NpcClass) -> nil;
     SendActorMessage: (NpcClass, ...any) -> nil;
@@ -858,6 +861,7 @@ export type NpcClass = CharacterClass & {
     -- @components
     SetAnimation: (animName: string, animList: {Animation}) -> nil;
     GetAnimation: (animName: string) -> AnimationTrack?;
+    LoadCustomAnimation: (NpcClass, animTrack: Animation) -> AnimationTrack;
     PlayAnimation: (animName: string, ...any) -> AnimationTrack; 
     StopAnimation: (animName: string, ...any) -> nil;
     SetAnimationTimescale: (timescale: number) -> nil;
@@ -1432,6 +1436,9 @@ export type CommandsLibrary = {
         ClientFunction: ((speaker: Player, args: {any}) -> boolean)?;
     }) -> nil;
     bind: (cmdDict: {[string]: anydict}) -> nil;
+
+    GenericOutputs: anydict;
+    CommandHandler: anydict;
 };
 
 --MARK: ItemModifier
@@ -1721,13 +1728,18 @@ export type RadialImage = {
 --
 --MARK: EntityClass
 export type EntityClass = {
+    Name: string;
+    HumanoidType: HUMANOID_TYPE<string>;
     ClassName: "PlayerClass" | "NpcClass" | "Destructible";
+    
     Config: Configuration?;
 
     RootPart: BasePart;
 
     HealthComp: HealthComp;
     StatusComp: StatusComp?;
+
+    Properties: PropertiesVariable<anydict>?;
     
     Character: Model?;
     Model: Model?;
@@ -1892,7 +1904,7 @@ export type HealthComp = {
     -- @methods
     Reset: (HealthComp) -> nil;
     GetModel: (HealthComp) -> Model?;
-    CanTakeDamageFrom: (HealthComp, characterClass: CharacterClass?) -> boolean;    
+    CanTakeDamageFrom: (HealthComp, characterClass: EntityClass?) -> boolean;    
     TakeDamage: (HealthComp, DamageData: DamageData) -> nil;
     
     SetIsDead: (HealthComp, boolean, reason: anydict?) -> nil;

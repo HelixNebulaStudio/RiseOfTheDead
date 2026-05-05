@@ -20,7 +20,7 @@ function Objective:Load()
 end
 
 function Objective:Begin()
-	self.RoundDuration = math.clamp(self.Controller.Wave * 2.5, 20, 60);
+	self.RoundDuration = math.clamp(self.Controller.Wave * 2.5, 15, 60);
 	self.EndTime = tick()+self.RoundDuration;
 	self.LastSpawn = tick();
 	self.StartLevel = self.Controller.Wave;
@@ -33,9 +33,9 @@ end
 
 function Objective:Tick()
 	local timeRemain = math.max(self.EndTime-tick(), 0);
-	local maxSpawnRate = math.max(timeRemain*0.05, 2/(math.max(self.Controller.Wave/5, 1)), 0.1);
+	local maxSpawnRate = math.min(math.max(timeRemain*0.05, 1/(math.max(self.Controller.Wave/5, 1)), 0.1), 1);
 	
-	local canSpawn = timeRemain > 1 and tick()-self.LastSpawn > maxSpawnRate and #self.Controller.EnemyNpcClasses <= 100;
+	local canSpawn = timeRemain > 1 and tick()-self.LastSpawn > maxSpawnRate and #self.Controller.EnemyNpcClasses <= 80;
 	if self.PauseTick and tick() < self.PauseTick then
 		canSpawn = false;
 	end
@@ -54,16 +54,6 @@ function Objective:Tick()
 	end
 	
 	if self.SpawnPattern == 1 then
-		
-	elseif self.SpawnPattern == 2 then
-		if math.fmod(self.SpawnCount, 10) == 0 and self.PauseTick == nil then
-			self.PauseTick = tick()+2;
-		end
-
-	elseif self.SpawnPattern == 3 then
-		if math.fmod(self.SpawnCount, 20) == 0 and self.PauseTick == nil then
-			self.PauseTick = tick()+4;
-		end
 		
 	end
 

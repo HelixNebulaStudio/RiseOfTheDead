@@ -74,6 +74,10 @@ Dialogues.Patrick.DialogueStrings = {
 		Say="Here you go.. *give medkit*";
 		Reply="Thanks.. Heh, guess getting into the Rats wasn't that easy.. Revas is more calculated than I thought.";
 	};
+	["doubleCross_gaveMedkit"]={
+		Face="Serious";
+		Reply="Thanks.. Heh, guess getting into the Rats wasn't that easy.. Revas is more calculated than I thought.";
+	};
 	["doubleCross_18"]={
 		Face="Skeptical";
 		Say="Just another tyrant I guess.. You're better off here.";
@@ -241,6 +245,14 @@ if RunService:IsServer() then
 						end)
 					end)
 				end
+
+			elseif mission.ProgressionPoint == 19 then
+				dialog:SetInitiateTag("doubleCross_gaveMedkit");
+				dialog:AddChoice("doubleCross_18", function(dialog)
+					modMission:CompleteMission(player, MISSION_ID);
+					shared.Notify(player, "You have unlocked factions! Open your faction menu to join or create a faction.", "Inform");
+				end)
+				
 			end
 
 		elseif mission.Type == 2 then -- Available

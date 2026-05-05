@@ -186,7 +186,6 @@ function toolPackage.InputEvent(toolHandler: ToolHandlerInstance, inputData)
 					end
 					
 					if placementHighlight then placementHighlight:Destroy(); placementHighlight = nil; end;
-					Debugger:Log("ladder loop killed");
 				end)
 				
 			else

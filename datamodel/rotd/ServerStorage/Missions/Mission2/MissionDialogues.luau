@@ -2,6 +2,8 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
+local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
+
 --=
 local Dialogues = {
 	Mason={};
@@ -214,7 +216,11 @@ if RunService:IsServer() then
 						dialog:AddChoice("whereAmI_firstTask", taskOffer);
 						
 					else
-						dialog:AddChoice("whereAmI_howToRefill");
+						dialog:AddChoice("whereAmI_howToRefill", function()
+							task.spawn(function()
+								modStatusEffects.DirectCamera(player, Vector3.new(-9.7, 61.0, 18.5), 3.5);
+							end)
+						end);
 						
 					end
 					

@@ -42,47 +42,47 @@ end
 
 -- MARK: 1 - Unconscious
 MissionLibrary.New{
-	MissionId=1;
+	MissionId = 1;
 	MissionType = MissionLibrary.MissionTypes.Core;
-	Name="Unconscious";
-	From="Mason";
-	Description="Mason found you unconscious in the middle of the Wrighton Dale bridge.";
-	Persistent=true;
-	World="TheBeginning";
-	Checkpoint={
+	Name = "Unconscious";
+	From = "Mason";
+	Description = "Mason found you unconscious in the middle of the Wrighton Dale bridge.";
+	Persistent = true;
+	World = "TheBeginning";
+	Checkpoint = {
 		{Text="Wake up"; Notify=false;};
 		{Text="Follow Mason"; Notify=true;};
 		{Text="Take the pistol by pressing [E] while pointing at it with your mouse"; Notify=true;};
 		{Text="Equip the P250 by clicking the pistol OR pressing [1]"; Notify=true;};
 		{Text="Defend off the zombies"; Notify=true;};
 	};
-	GuideText="";
-	Rewards={
+	GuideText = "";
+	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=MoneyReward.Core};
 	};
-	Markers={
+	Markers = {
 		[2]={World="TheBeginning"; Label="Mason"; Target="Mason"; Type=modMarkers.MarkerTypes.Npc;};
 		[4]={Label="Careful, Zombies"; Target=Vector3.new(4.307, 53.68, -150.452); Type=modMarkers.MarkerTypes.Waypoint;};
 	};
-	CanRedo={
+	CanRedo = {
 		Travel="TheBeginning";
 	};
-	LinkNextMission=2;
+	LinkNextMission = 2;
 	
 };
 
 
 -- MARK: 2 - Where am I
 MissionLibrary.New{
-	MissionId=2;
+	MissionId = 2;
 	MissionType = MissionLibrary.MissionTypes.Core;
-	Name="Where am I";
-	From="Mason";
-	Description="You woke up in a warehouse after the explosion on the Wrighton Dale bridge.";
-	Persistent=true;
-	World="TheWarehouse";
-	Checkpoint={
+	Name = "Where am I";
+	From = "Mason";
+	Description = "You woke up in a warehouse after the explosion on the Wrighton Dale bridge.";
+	Persistent = true;
+	World = "TheWarehouse";
+	Checkpoint = {
 		{Text="Talk to Mason";};
 		{Text="Exit the bedroom";};
 		{Text="Talk to Dr. Deniski to ask him to heal you";};
@@ -95,14 +95,14 @@ MissionLibrary.New{
 		{Text="Kill $Kills zombies";};
 		{Text="Return to Nick"; Notify=true;};
 	};
-	SaveData={Kills=10;};
-	GuideText="";
-	Rewards={
+	SaveData = {Kills=10;};
+	GuideText = "";
+	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Mission"; Id=5};
 	};
-	Markers={
+	Markers = {
 		[1]={World="TheWarehouse"; Label="Mason"; Target="Mason"; Type=modMarkers.MarkerTypes.Npc;};
 		[2]={World="TheWarehouse"; Label="Exit"; Target=Vector3.new(-5.8, 60.2, -23); Type=modMarkers.MarkerTypes.Waypoint;};
 		[3]={World="TheWarehouse"; Label="Dr. Deniski"; Target="Dr. Deniski"; Type=modMarkers.MarkerTypes.Npc;};
@@ -113,7 +113,7 @@ MissionLibrary.New{
 		[8]={World="TheWarehouse"; Label="Exit"; Target=Vector3.new(61.5, 60.2, -28.7); Type=modMarkers.MarkerTypes.Waypoint;};
 		[10]={World="TheWarehouse"; Label="Nick"; Target="Nick"; Type=modMarkers.MarkerTypes.Npc;};
 	};
-	CanRedo={};
+	CanRedo = {};
 	
 };
 
@@ -2002,7 +2002,8 @@ MissionLibrary.New{
 
 		{Text="Find the escape boat";};
 		{Text="Talk to Patrick";};	--World Safehome
-		{Text="Get Patrick a medkit";};
+		{Text="Give or heal Patrick with a medkit";};
+		{Text="Talk to Patrick";};
 	};
 	StartRequirements={
 		MissionCompleted={56};
@@ -2216,20 +2217,20 @@ MissionLibrary.New{
 
 -- MARK: 63 - Bandits Recruitment
 MissionLibrary.New{
-	MissionId=63;
+	MissionId = 63;
 	MissionType = MissionLibrary.MissionTypes.Core;
-	Name="Bandits Recruitment";
-	Storyline=StoryLineEnum.Bandit;
-	From="Patrick";
-	Description="After the cargo ship disaster, you check up on Patrick to see what's up.";
-	Persistent=true;
-	World={"TheMall"; "BanditsRecruitment"; };
-	Checkpoint={
+	Name = "Bandits Recruitment";
+	Storyline = StoryLineEnum.Bandit;
+	From = "Patrick";
+	Description = "After the cargo ship disaster, you check up on Patrick to see what's up.";
+	Persistent = true;
+	World = {"TheMall"; "BanditsRecruitment"; };
+	Checkpoint = {
 		{Text="Head to the Bandit Camp";};
 		{Text="Talk to the bandit again when you are ready to travel";};
 		{Text="Follow the bandit's orders";};
 		{Text="Wait";};
-		{Text="De-escalate";};
+		{Text="Talk to Loran to de-escalate";};
 
 		{Text="Wait";};
 		{Text="Get off the helicopter";};
@@ -2240,24 +2241,24 @@ MissionLibrary.New{
 		{Text="Talk to Zark";};
 		{Text="Bandits needs these items"; CompleteText="Give the cache to Loran in Mall Bandit Camp"; Objectives={"Objective1"};};
 	};
-	Objectives={
+	Objectives = {
 		["Objective1"]={Index=1; Description="$Amount Nekron Particulate Cache"; Type="RequireItem"; ItemId="nekronparticulatecache"; Amount=2;};
 	};
-	StartRequirements={
+	StartRequirements = {
 		MissionCompleted={58};
 	};
-	GuideText="Talk to Patrick";
-	Rewards={
+	GuideText = "Talk to Patrick";
+	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=MoneyReward.Core};
 	};
-	Markers={
+	Markers = {
 		[1]={World="TheMall"; Label="Bandit"; Target=Vector3.new(798.55481, 162.668854, -728.297119); Type=modMarkers.MarkerTypes.Waypoint;};
 		[2]={World="TheMall"; Label="Bandit"; Target=Vector3.new(798.55481, 162.668854, -728.297119); Type=modMarkers.MarkerTypes.Waypoint;};
 		[12]={World="TheMall"; Label="Loran"; Target="Loran"; Type=modMarkers.MarkerTypes.Npc;};
 	};
-	SkipDestroyIfAddRequirementsNotMet=true;
-	AddRequirements={
+	SkipDestroyIfAddRequirementsNotMet = true;
+	AddRequirements = {
 		{Type="MissionCompleted"; Value={58;}};
 		{Type="EventFlag"; Key="mission58choice"; 
 			Value=function(eventObj)
@@ -2266,8 +2267,8 @@ MissionLibrary.New{
 			FailMsg="You needed to helped the bandits during Mission: Double Cross."
 		};
 	};
-	CanRedo={};
-	AddCache={
+	CanRedo = {};
+	AddCache = {
 		BanditsAllied=true;
 	};
 	

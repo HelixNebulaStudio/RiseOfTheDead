@@ -6,10 +6,8 @@ local RunService = game:GetService("RunService");
 local TweenService = game:GetService("TweenService");
 
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
-local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 
 --== Variables;
@@ -116,21 +114,26 @@ return function(CutsceneSequence)
 			
 			for name, info in pairs(StrangerNpcs) do
 				local strangerNpcClass: NpcClass = modNpcs.spawn2{
-					Name = "Stranger";
+					Name = name == "NameB" and "Conway" or "Stranger";
 					CFrame = info.SpawnCFrame;
 					Player = player;
+					Properties = {
+						Seed = player.UserId + info.Index;
+					};
 					BindSetup = function(npcClass: NpcClass)
 						local properties = npcClass.Properties;
-						properties.Seed = player.UserId + info.Index;
-					
-						if name == "NameB" then
-							properties.Seed = 16170945;
-						end
-
 						npcClass.Character:SetAttribute("LookAtClient", false);
+
+						if name == "NameB" then
+							npcClass.Humanoid.NameDisplayDistance = 0;
+						end
 					end;
 				};
 				info.NpcClass = strangerNpcClass;
+
+				if strangerNpcClass.Name == "Conway" then
+					strangerNpcClass:ToggleInteractable(false);
+				end
 
 				if math.fmod(strangerNpcClass.Properties.Seed, 2) == 0 then
 					strangerNpcClass:GetComponent("AvatarFace"):Set("Serious", game.Players:GetPlayers());
@@ -159,16 +162,15 @@ return function(CutsceneSequence)
 					Name = "Bandit";
 					CFrame = info.SpawnCFrame;
 					Player = player;
+					Properties = {
+						Seed = name == "Name1" and 16170945 or player.UserId + info.Index;
+					};
 					BindSetup = function(npcClass: NpcClass)
 						local properties = npcClass.Properties;
 						properties.Seed = player.UserId + info.Index;
 						properties.Immortal = 1;
 						properties.CutsceneActive = true;
 					
-						if name == "NameB" then
-							properties.Seed = 16170945;
-						end
-
 						npcClass.Character:SetAttribute("LookAtClient", false);
 					end;
 				};
@@ -206,7 +208,7 @@ return function(CutsceneSequence)
 			HeliAnim.OpenDoors:Play();
 			
 
-			local sound = modAudio.Play("HelicopterCore", extractionHelicopter.PrimaryPart);
+			local _sound = modAudio.Play("HelicopterCore", extractionHelicopter.PrimaryPart);
 			
 			local rampClip = cutsceneAssets:WaitForChild("RampClip");
 
@@ -229,10 +231,12 @@ return function(CutsceneSequence)
 					Name = "Bandit";
 					CFrame = CFrame.new(-2193.129, 123.118, 2147.966);
 					Player = player;
+					Properties = {
+						Seed = player.UserId +10 +a;
+					};
 					BindSetup = function(npcClass: NpcClass)
 						npcClass.Properties.CutsceneActive = true;
 						npcClass.Properties.Immortal = 1;
-						npcClass.Properties.Seed = player.UserId +10 + a;
 					end
 				};
 
@@ -270,7 +274,7 @@ return function(CutsceneSequence)
 			local heliBanditBNpcClass: NpcClass = HeliBandits.BNpcClass;
 
 			local strangerANpcClass: NpcClass = StrangerNpcs.NameA.NpcClass;
-			local strangerBNpcClass: NpcClass = StrangerNpcs.NameB.NpcClass;
+			local conwayNpcClass: NpcClass = StrangerNpcs.NameB.NpcClass;
 			local strangerCNpcClass: NpcClass = StrangerNpcs.NameC.NpcClass;
 
 			local banditANpcClass: NpcClass = BanditNpcs.Name1.NpcClass;
@@ -294,11 +298,12 @@ return function(CutsceneSequence)
 						Debugger:Warn("mission.ProgressionPoint", mission.ProgressionPoint);
 						local playerSpawnA = CFrame.new(-2195.11426, 110.573784, 2200.39697, 0.707106829, 0, 0.70710665, 0, 1, 0, -0.70710665, 0, 0.707106829);
 						
-						repeat task.wait() until playerClass.Character ~= nil; task.wait(0.1);
+						repeat task.wait() until playerClass.Character ~= nil;
+						task.wait(1);
 						
+						CutsceneSequence:NextScene("readyPlayer");
 						modStatusEffects.SetWalkspeed(player, 0);
-						CutsceneSequence:NextScene("freezePlayer");
-						modStatusEffects.SetWalkspeed(player, 0);
+
 						playerClass:SetCFrame(playerSpawnA);
 						CutsceneSequence:Pause(60);
 						
@@ -322,11 +327,11 @@ return function(CutsceneSequence)
 						end)
 						task.wait(1);
 
-						strangerBNpcClass.Move:SetMoveSpeed("set", "walk", 6, 2);
-						strangerBNpcClass.Move:MoveTo(Vector3.new(-2189.084, 122.808, 2141.123));
-						strangerBNpcClass.Move.OnMoveToEnded:Once(function()
+						conwayNpcClass.Move:SetMoveSpeed("set", "walk", 6, 2);
+						conwayNpcClass.Move:MoveTo(Vector3.new(-2189.084, 122.808, 2141.123));
+						conwayNpcClass.Move.OnMoveToEnded:Once(function()
 							task.wait();
-							strangerBNpcClass:Sit(extractionHelicopter["SeatModelB"].Seat);
+							conwayNpcClass:Sit(extractionHelicopter["SeatModelB"].Seat);
 						end)
 						task.wait(1);
 						
@@ -392,8 +397,8 @@ return function(CutsceneSequence)
 									if strangerANpcClass.Humanoid.Sit == false then
 										strangerANpcClass:Sit(extractionHelicopter["SeatModelA"].Seat);
 									end
-									if strangerBNpcClass.Humanoid.Sit == false then
-										strangerBNpcClass:Sit(extractionHelicopter["SeatModelB"].Seat);
+									if conwayNpcClass.Humanoid.Sit == false then
+										conwayNpcClass:Sit(extractionHelicopter["SeatModelB"].Seat);
 									end
 									if strangerCNpcClass.Humanoid.Sit == false then
 										strangerCNpcClass:Sit(extractionHelicopter["SeatModelC"].Seat);
@@ -510,7 +515,8 @@ return function(CutsceneSequence)
 						jointB.Part1 = strangerANpcClass.RootPart;
 						strangerANpcClass.Humanoid.PlatformStand = true;
 						
-						loranNpcClass.Chat(player, "Listen up recruits! We know one of you is an intelligence officer.. Reveal yourselves or you will be kicked off the helicopter!");
+						modStatusEffects.DirectCamera(player, loranNpcClass.Head.Position, 3.5);
+						loranNpcClass.Chat(player, "Listen up recruits! We know one of you is a spy.. Reveal yourselves or you will be kicked off the helicopter!");
 						loranNpcClass:GetComponent("AvatarFace"):Set("Frustrated", game.Players:GetPlayers());
 
 						loranNpcClass.Move:HeadTrack(playerClass.Head);
@@ -519,8 +525,8 @@ return function(CutsceneSequence)
 						strangerANpcClass.Move:HeadTrack(loranNpcClass.Head);
 						strangerANpcClass.Character:SetAttribute("LookAtClient", nil);
 
-						strangerBNpcClass.Move:HeadTrack(loranNpcClass.Head);
-						strangerBNpcClass.Character:SetAttribute("LookAtClient", nil);
+						conwayNpcClass.Move:HeadTrack(loranNpcClass.Head);
+						conwayNpcClass.Character:SetAttribute("LookAtClient", nil);
 						
 						strangerCNpcClass.Move:HeadTrack(loranNpcClass.Head);
 						strangerCNpcClass.Character:SetAttribute("LookAtClient", nil);
@@ -529,15 +535,15 @@ return function(CutsceneSequence)
 						
 						loranNpcClass.Chat(player, "You have 3 seconds to reveal yourself!");
 						
-						strangerBNpcClass.Chat(player, "Wait wha...");
-						strangerBNpcClass:GetComponent("AvatarFace"):Set("Skeptical", game.Players:GetPlayers());
+						conwayNpcClass.Chat(player, "Wait wha...");
+						conwayNpcClass:GetComponent("AvatarFace"):Set("Skeptical", game.Players:GetPlayers());
 						
 						task.wait(3);
 						loranNpcClass.Chat(player, "2!..");
 						
 						task.wait(0.5);
 
-						strangerCNpcClass.Chat(player, "I'm not a spy!");
+						strangerCNpcClass.Chat(player, "It's not me!!");
 						strangerCNpcClass:GetComponent("AvatarFace"):Set("Scared", game.Players:GetPlayers());
 
 						task.wait(1.5);
@@ -545,12 +551,12 @@ return function(CutsceneSequence)
 						task.wait(1.5);
 						loranNpcClass.Chat(player, "Okay, one of you is getting toss out!");
 						
-						local animationL1: AnimationTrack = loranNpcClass.Humanoid:LoadAnimation(cutsceneAssets.L1);
+						local animationL1: AnimationTrack = loranNpcClass:LoadCustomAnimation(cutsceneAssets.L1);
 						animationL1:SetAttribute("CustomAnimate", true);
-						local animationS1: AnimationTrack = strangerANpcClass.Humanoid:LoadAnimation(cutsceneAssets.S1);
+						local animationS1: AnimationTrack = strangerANpcClass:LoadCustomAnimation(cutsceneAssets.S1);
 						animationS1:SetAttribute("CustomAnimate", true);
 						
-						strangerANpcClass:Sit();
+						modStatusEffects.DirectCamera(player, strangerANpcClass.Head.Position, 3.5);
 						loranNpcClass.Move:HeadTrack(strangerANpcClass.Head);
 						
 						strangerANpcClass:GetComponent("AvatarFace"):Set("Worried", game.Players:GetPlayers());
@@ -574,7 +580,7 @@ return function(CutsceneSequence)
 						
 						strangerANpcClass.Chat(player, "Help!!!");
 
-						modMission:Progress(player, 63, function(mission)
+						modMission:Progress(player, MISSION_ID, function(mission)
 							mission.ProgressionPoint = 5;
 						end)
 						
@@ -593,37 +599,43 @@ return function(CutsceneSequence)
 						Debugger:Log("ProgressionPoint 6");
 						loranNpcClass:ToggleInteractable(false);
 
-						strangerBNpcClass:GetComponent("AvatarFace"):Set("Frustrated", game.Players:GetPlayers());
+						conwayNpcClass:GetComponent("AvatarFace"):Set("Frustrated", game.Players:GetPlayers());
 						
+						modStatusEffects.DirectCamera(player, conwayNpcClass.Head.Position, 3.5);
+
 						cutsceneTracks.L1.TimePosition = 4.1;
-						strangerBNpcClass.Chat(player, "Stop!");
-						strangerBNpcClass.Move:HeadTrack(loranNpcClass.Head);
-						strangerBNpcClass.Character:SetAttribute("LookAtClient", nil);
-						
+						conwayNpcClass.Chat(player, "Stop!");
+						conwayNpcClass.Move:HeadTrack(loranNpcClass.Head);
+						conwayNpcClass.Character:SetAttribute("LookAtClient", nil);
+
 						task.wait(0.5);
-						loranNpcClass.Move:HeadTrack(strangerBNpcClass.Head);
+						loranNpcClass.Move:HeadTrack(conwayNpcClass.Head);
+						loranNpcClass.Character:SetAttribute("LookAtClient", nil);
 						
 						task.wait(3);
-						strangerBNpcClass.Chat(player, "I'm the informant! You can spare them..");
+						conwayNpcClass.Chat(player, "I'm the informant! You can spare them..");
 						
 						task.wait(3.5);
 						strangerANpcClass.Chat(player, "Ahhhhhh!");
 						task.wait(0.5);
 						
+						modStatusEffects.DirectCamera(player, loranNpcClass.Head.Position, 3);
 						loranNpcClass.Chat(player, "Took you a while to show yourself.");
 						task.wait(3.5);
 						
 						loranNpcClass.Chat(player, "Is getting caught part of the plan?!");
 						task.wait(4);
 
-						strangerBNpcClass.Chat(player, "...");
+						modStatusEffects.DirectCamera(player, conwayNpcClass.Head.Position, 3);
+						conwayNpcClass.Chat(player, "...");
 						
 						task.wait(3.5);
+						modStatusEffects.DirectCamera(player, loranNpcClass.Head.Position, 3);
 						loranNpcClass.Chat(player, "Well, you're going to see the insides of a cell.");
 						
-						local animationL2: AnimationTrack = loranNpcClass.Humanoid:LoadAnimation(cutsceneAssets.L2);
+						local animationL2: AnimationTrack = loranNpcClass:LoadCustomAnimation(cutsceneAssets.L2);
 						animationL2:SetAttribute("CustomAnimate", true);
-						local animationS2: AnimationTrack = strangerANpcClass.Humanoid:LoadAnimation(cutsceneAssets.S2);
+						local animationS2: AnimationTrack = strangerANpcClass:LoadCustomAnimation(cutsceneAssets.S2);
 						animationS2:SetAttribute("CustomAnimate", true);
 
 						animationL2:Play();
@@ -641,7 +653,7 @@ return function(CutsceneSequence)
 						loranNpcClass.Chat(player, "Get back to your seat! We are landing..");
 
 						strangerANpcClass.Move:HeadTrack(nil);
-						strangerBNpcClass.Move:HeadTrack(nil);
+						conwayNpcClass.Move:HeadTrack(nil);
 						strangerCNpcClass.Move:HeadTrack(nil);
 						
 						task.wait(2);
@@ -707,13 +719,13 @@ return function(CutsceneSequence)
 						strangerANpcClass:GetComponent("AvatarFace"):Set("Worried", game.Players:GetPlayers());
 						task.wait(0.5);
 						
-						strangerBNpcClass:Sit();
+						conwayNpcClass:Sit();
 						task.wait(0.4);
 
-						strangerBNpcClass.Move:MoveTo(Vector3.new(13.944, 2.481, 128.767));
-						strangerBNpcClass.Move.OnMoveToEnded:Once(function()
+						conwayNpcClass.Move:MoveTo(Vector3.new(13.944, 2.481, 128.767));
+						conwayNpcClass.Move.OnMoveToEnded:Once(function()
 							task.wait();
-							strangerBNpcClass:SetCFrame(CFrame.new(13.9440002, 2.48099995, 128.766998, 0.999998808, 3.15544813e-29, 2.11757894e-21, -4.41762348e-29, 0.999999404, 0, -2.9646135e-21, 0, 0.999998212));
+							conwayNpcClass:SetCFrame(CFrame.new(13.9440002, 2.48099995, 128.766998, 0.999998808, 3.15544813e-29, 2.11757894e-21, -4.41762348e-29, 0.999999404, 0, -2.9646135e-21, 0, 0.999998212));
 
 							loranNpcClass.Move:MoveTo(Vector3.new(17.107, 2.611, 82.917));
 							loranNpcClass.Move.OnMoveToEnded:Once(function()
@@ -722,12 +734,12 @@ return function(CutsceneSequence)
 							end)
 							
 							task.wait(1);
-							strangerBNpcClass.Move:MoveTo(Vector3.new(13.9440041, 2.54997015, 95.2484207));
-							strangerBNpcClass.Move.OnMoveToEnded:Wait();
+							conwayNpcClass.Move:MoveTo(Vector3.new(13.9440041, 2.54997015, 95.2484207));
+							conwayNpcClass.Move.OnMoveToEnded:Wait();
 							movementCompleteSB = true;
 						end)
 
-						strangerBNpcClass:GetComponent("AvatarFace"):Set("Skeptical", game.Players:GetPlayers());
+						conwayNpcClass:GetComponent("AvatarFace"):Set("Skeptical", game.Players:GetPlayers());
 						task.wait(0.5);
 						
 						strangerCNpcClass:Sit();
@@ -761,7 +773,7 @@ return function(CutsceneSequence)
 						repeat task.wait() until movementCompleteSB;
 						Debugger:Log("wait for dist");
 						
-						modMission:Progress(player, 63, function(mission)
+						modMission:Progress(player, MISSION_ID, function(mission)
 							mission.ProgressionPoint = 8;
 						end)
 						
@@ -775,8 +787,34 @@ return function(CutsceneSequence)
 							task.wait(1);
 						until distFromC <= 15;
 						
+						task.spawn(function()
+							while true do
+								task.wait(0.1);
+
+								local standPos = Vector3.new(16.48, 2.55, 89.70);
+								local distFromPos = playerClass:DistanceFrom(standPos);
+
+								Debugger:StudioLog(`Distance from safe pos: {distFromPos}`);
+								if distFromPos > 20 then
+									break;
+								end
+							end
+
+							for _, banditInfo in pairs(BanditNpcs) do
+								local banditNpcClass: NpcClass = banditInfo.NpcClass;
+								if banditNpcClass == nil or banditNpcClass.HealthComp.IsDead then continue end;
+
+								banditNpcClass.Properties.CutsceneActive = false;
+								banditNpcClass.Properties.IsHostile = true;
+
+								local targetHandlerComp = banditNpcClass:GetComponent("TargetHandler");
+								targetHandlerComp:AddTarget(playerClass.Character);
+							end
+						end)
+
 						task.wait(4);
 						
+						modStatusEffects.DirectCamera(player, zarkNpcClass.Head.Position, 5.5);
 						zarkNpcClass.Chat(player, "Welcome, recruits!");
 						task.wait(4);
 						zarkNpcClass.Chat(player, "We bandits are like bears.. Where there are fishes in the streams, we will catch and bring them back to me. It is just the new natural cycle. Isn't that right, Loran?");
@@ -828,11 +866,12 @@ return function(CutsceneSequence)
 						end);
 						
 						
-						modMission:Progress(player, 63, function(mission)
+						modMission:Progress(player, MISSION_ID, function(mission)
 							mission.ProgressionPoint = 9;
 						end)
 						
 					elseif mission.ProgressionPoint == 9 then
+						modStatusEffects.DirectCamera(player, zarkNpcClass.Head.Position, 2.5);
 						zarkNpcClass:ToggleInteractable(true);
 						
 					elseif mission.ProgressionPoint == 10 then
@@ -852,19 +891,19 @@ return function(CutsceneSequence)
 						
 						task.wait(3);
 						
-						heliBanditANpcClass.Move:HeadTrack(strangerBNpcClass.Head);
+						heliBanditANpcClass.Move:HeadTrack(conwayNpcClass.Head);
 						heliBanditANpcClass.Move:MoveTo(Vector3.new(11.036, 2.601, 100.253));
 						heliBanditANpcClass.Move.OnMoveToEnded:Once(function()
 							heliBanditANpcClass.Chat(player, "Get moving..");
 
 							heliBanditANpcClass.Move:SetMoveSpeed("set", "default", 8);
-							strangerBNpcClass.Move:SetMoveSpeed("set", "default", 8);
+							conwayNpcClass.Move:SetMoveSpeed("set", "default", 8);
 
 							task.wait(0.5);
-							strangerBNpcClass.Move:MoveTo(Vector3.new(-20.405, 2.581, 34.629));
-							strangerBNpcClass.Move.OnMoveToEnded:Once(function()
+							conwayNpcClass.Move:MoveTo(Vector3.new(-20.405, 2.581, 34.629));
+							conwayNpcClass.Move.OnMoveToEnded:Once(function()
 								task.wait(0.2);
-								game.Debris:AddItem(strangerBNpcClass.Character, 0);
+								game.Debris:AddItem(conwayNpcClass.Character, 0);
 							end)
 							heliBanditANpcClass.Move:MoveTo(Vector3.new(-20.405, 2.581, 34.629));
 							heliBanditANpcClass.Move.OnMoveToEnded:Once(function()
@@ -896,7 +935,7 @@ return function(CutsceneSequence)
 						task.wait(0.5);
 						zarkNpcClass.Chat(player, "Anyways..");
 
-						modMission:Progress(player, 63, function(mission)
+						modMission:Progress(player, MISSION_ID, function(mission)
 							mission.ProgressionPoint = 11;
 						end)
 
@@ -922,7 +961,7 @@ return function(CutsceneSequence)
 			OnChanged(true);
 		end)
 
-		CutsceneSequence:NewScene("freezePlayer", function()
+		CutsceneSequence:NewScene("readyPlayer", function()
 			modConfigurations.Set("DisableMissions", false);
 			modConfigurations.Set("DisableMajorNotifications", false);
 			modConfigurations.Set("DisablePinnedMission", false);

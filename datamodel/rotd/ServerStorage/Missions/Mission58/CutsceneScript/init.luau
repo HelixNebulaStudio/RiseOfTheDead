@@ -36,7 +36,7 @@ if RunService:IsServer() then
 	modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
 	modSafehomeService = shared.require(game.ServerScriptService.ServerLibrary.SafehomeService);
 
-	if modBranchConfigurations.IsWorld("TheHarbor") then
+	if shared.WorldName == "TheHarbor" then --MARK: TheHarbor
 		shared.modEventService:OnInvoked("Interactables_BindButtonInteract", function(eventPacket: EventPacket, ...)
 			local player: Player? = eventPacket.Player;
 			if player == nil then return end;
@@ -54,8 +54,7 @@ if RunService:IsServer() then
 			end
 		end)
 
-	elseif modBranchConfigurations.IsWorld("DoubleCross") then
-
+	elseif shared.WorldName == "DoubleCross" then --MARK: DoubleCross
 		shared.modEventService:OnInvoked("Character_BindDismount", function(eventPacket: EventPacket, ...)
 			local packet = ...;
 			local mountChar = packet.MountCharacter;
@@ -201,6 +200,27 @@ if RunService:IsServer() then
 			end)
 		end)
 
+	elseif shared.WorldName == "Safehome" then --MARK: Safehome
+
+		shared.modEventService:OnInvoked("Tools_BindHealTool", function(event: EventPacket, ...)
+			local action: string, handler: ToolHandler, toCharacterClass: CharacterClass = ...;
+			
+			local player: Player? = event.Player;
+			if player == nil then return end;
+			if action ~= "UseComplete" then return end;
+
+			task.spawn(function()
+				if toCharacterClass.Name ~= "Patrick" then return end;
+
+				modMission:Progress(player, MISSION_ID, function(mission)
+					if mission.ProgressionPoint == 18 then
+						mission.ProgressionPoint = 19;
+					end
+				end)
+			end)
+
+		end)
+
 	end
 	
 else
@@ -218,7 +238,7 @@ return function(CutsceneSequence)
 	end
 
 	--MARK: TheHarbor
-	if modBranchConfigurations.IsWorld("TheHarbor") then
+	if shared.WorldName == "TheHarbor" then
 
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
@@ -370,7 +390,7 @@ return function(CutsceneSequence)
 		
 		
 	--MARK: DoubleCross
-	elseif modBranchConfigurations.IsWorld("DoubleCross") then
+	elseif shared.WorldName == "DoubleCross" then
 		
 		local stanChamber = workspace.Environment:WaitForChild("StansRejuvenation"):WaitForChild("RejuvenationChamber");
 		local chamberBodyGyro = stanChamber.Base.BodyGyro
@@ -1494,7 +1514,7 @@ return function(CutsceneSequence)
 		
 
 	--MARK: Safehome
-	elseif modBranchConfigurations.IsWorld("Safehome") then
+	elseif shared.WorldName == "Safehome" then
 		
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
@@ -1514,7 +1534,6 @@ return function(CutsceneSequence)
 			local patrickNpcClass: NpcClass;
 			local function OnChanged(firstRun)
 				local spawnPatrick = 0;
-				local spawnAtt = safehomeClass:GetNpcSpot("Patrick");
 
 				if mission.Type == 1 then -- Active
 					if mission.ProgressionPoint > 16 then
@@ -1530,8 +1549,9 @@ return function(CutsceneSequence)
 
 				elseif mission.Type == 3 then -- OnComplete
 					spawnPatrick = 2;
-
+					
 					if patrickNpcClass then
+						local spawnAtt = safehomeClass:GetNpcSpot("Patrick");
 						patrickNpcClass.Move:MoveTo(spawnAtt.WorldPosition);
 						task.spawn(function()
 							task.wait(0.1);
@@ -1545,10 +1565,14 @@ return function(CutsceneSequence)
 					patrickNpcClass = modNpcs.getPlayerNpc(player, "Patrick");
 
 					if patrickNpcClass == nil then
+						local spawnAtt = safehomeClass:GetNpcSpot("Patrick");
 						modNpcs.spawn2{
 							Name = "Patrick";
 							CFrame = spawnPatrick == 2 and spawnAtt.WorldCFrame or playerClass:GetCFrame();
 							Player = player;
+							BindSetup = function(npcClass: NpcClass)
+								npcClass.HealthComp:SetHealth(10);
+							end;
 						};
 
 					end
