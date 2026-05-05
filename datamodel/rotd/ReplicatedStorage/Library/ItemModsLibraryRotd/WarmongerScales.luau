@@ -15,23 +15,32 @@ local modifierPackage = {
 
 if RunService:IsServer() then
 	function modifierPackage.Binds.WeaponShotDamageDataNew(modifier: ItemModifierInstance, damageData: DamageData)
-		if modBranchConfigurations.IsWorld("Slaughterfest") then return end;
+		if shared.WorldName == "Slaughterfest" then return end;
+		if damageData == nil then return end;
+
+		local damageTo: CharacterClass? = damageData.DamageTo :: CharacterClass;
+		if damageTo == nil or (damageTo.ClassName ~= "PlayerClass" and damageTo.ClassName ~= "NpcClass") then return end;
 		
+		local characterClassTo: CharacterClass? = (modifier.WieldComp and modifier.WieldComp.CompOwner or nil) :: CharacterClass?;
+		if characterClassTo == nil then return end;
+
+		local targetHealthComp = damageTo.HealthComp;
+		if targetHealthComp == nil or targetHealthComp.IsDead or not targetHealthComp:CanTakeDamageFrom(characterClassTo) then return end;
+
+		local targetCurHealth = targetHealthComp.CurHealth or nil;
+		if targetCurHealth == nil then return end;
+
+		local targetMaxHealth = targetHealthComp.MaxHealth;
+
 		task.spawn(function()
 			local damage = damageData.Damage;
 			if damageData.DamageType == "Heal" then return end;
+
+			damage = math.max(targetCurHealth, damage);
 			if damage <= 0 then return end;
 
-			local characterClass: CharacterClass? = (modifier.WieldComp and modifier.WieldComp.CompOwner or nil) :: CharacterClass?;
-			if characterClass == nil then return end;
-
-			local statusComp = characterClass.StatusComp;
+			local statusComp = characterClassTo.StatusComp;
 			if statusComp == nil then return end;
-
-			local targetModel = damageData.TargetModel;
-			local targetHealthComp: HealthComp? = targetModel and modHealthComponent.getByModel(targetModel) or nil;
-			if targetHealthComp == nil or targetHealthComp.IsDead then return end;
-			if targetHealthComp:CanTakeDamageFrom(characterClass) == false then return end;
 
 			local statusClass = statusComp:GetOrDefault("WarmongerScales");
 			if statusClass == nil then 
@@ -46,9 +55,7 @@ if RunService:IsServer() then
 				});
 			end;
 
-			local maxHealth = targetHealthComp.MaxHealth;
-
-			local ratio = math.clamp(damage/maxHealth, 0.1, 1);
+			local ratio = math.clamp(damage/targetMaxHealth, 0.1, 1);
 			local add = ratio * statusClass.Values.HealthPerKill;
 
 			local oldPool = (statusClass.Values.Pool or 0);

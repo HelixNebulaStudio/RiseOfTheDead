@@ -185,6 +185,9 @@ if RunService:IsServer() then
 				dialog:SetInitiateTag("whereAmI_hello");
 				dialog:AddChoice("whereAmI_welcome", function(dialog)
 					dialog:AddChoice("whereAmI_neededHelp", function()
+						task.spawn(function()
+							modStatusEffects.DirectCamera(player, Vector3.new(-9.7, 61.0, 18.5), 3.5);
+						end)
 						modMission:Progress(player, missionId, function(mission)
 							if mission.ProgressionPoint < 6 then
 								mission.SaveData.Kills = 10;
