@@ -7,7 +7,6 @@ local attirePackage = {
 	GroupName="ChestGroup";
 	
 	Configurations={
-		SplashReflection = 2;
 		TickRepellent = 20;
 		
 		ArmorPoints = 10;
@@ -17,7 +16,19 @@ local attirePackage = {
 };
 
 function attirePackage.newClass()
-	return modEquipmentClass.new(attirePackage);
+	local equipmentClass = modEquipmentClass.new(attirePackage);
+
+	equipmentClass:AddBaseModifier("SplashReflect", {
+		SetValues = {
+			SplashReflection = 2;
+		};
+		ArrayValues = {
+			PassiveModifiers = "Splash Reflect";
+		};
+	}); 
+	
+
+	return equipmentClass;
 end
 
 return attirePackage;

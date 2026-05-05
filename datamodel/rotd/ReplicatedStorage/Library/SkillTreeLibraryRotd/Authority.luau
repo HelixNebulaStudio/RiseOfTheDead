@@ -91,19 +91,19 @@ library:Add{
 };
 
 library:Add{
-	Id="ovehea";
-	Icon="rbxassetid://4752500248";
-	Name="Over Heal";
-	Link="trinar";
+	Id = "ovehea";
+	Icon = "rbxassetid://4752500248";
+	Name = "Over Heal";
+	Link = "trinar";
 	
-	Description="<b>Passive:</b> Heal over max health by $Default health with medkits.\nUpgrading adds $Amount over heal.";
-	Stats={
-		Amount={Default=15; Base=30; Max=70};
+	Description = "<b>Passive:</b> Heal over max health by $Default health with medkits.\nUpgrading adds $Amount over heal.";
+	Stats = {
+		Amount = {Default=15; Base=30; Max=70};
 	};
 	
-	Level=20;
-	UpgradeCost=10;
-	MaxLevel=5;
+	Level = 20;
+	UpgradeCost = 10;
+	MaxLevel = 5;
 };
 
 library:Add{

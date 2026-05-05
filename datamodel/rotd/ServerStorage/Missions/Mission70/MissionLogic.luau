@@ -9,27 +9,27 @@ if RunService:IsServer() then
 	local modWorkbenchLibrary = shared.require(game.ReplicatedStorage.Library.WorkbenchLibrary);
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
-	shared.modEventService:OnInvoked("Npcs_BindDamaged", function(event: EventPacket, damageData: DamageData)
+	shared.modEventService:OnInvoked("Npcs_BindDeath", function(event: EventPacket, ...)
+		local npcClass: NpcClass, damageData: DamageData = ...;
+
 		task.spawn(function()
 			local storageItem: StorageItem? = damageData.StorageItem;
 			if storageItem == nil then return end;
 
 			local damageBy: PlayerClass? = damageData.DamageBy :: PlayerClass;
 			if damageBy == nil or damageBy.ClassName ~= "PlayerClass" then return end;
-
+			
 			local player: Player = damageBy:GetInstance();
 			if modMission:IsComplete(player, MISSION_ID) then return end;
 			
-			local damageTo: CharacterClass? = damageData.DamageTo :: CharacterClass;
-			if damageTo == nil
-			or damageTo.ClassName ~= "NpcClass" 
-			or damageTo.HumanoidType ~= "Zombie" 
-			or damageTo.HealthComp.IsDead then 
+			if npcClass == nil
+			or npcClass.ClassName ~= "NpcClass" 
+			or npcClass.HumanoidType ~= "Zombie" then
 				return;
 			end;
 
-			if damageTo.Properties.Immunity == nil 
-			or damageTo.Properties.Immunity <= 0 then return end;
+			if npcClass.Properties.Immunity == nil 
+			or npcClass.Properties.Immunity <= 0 then return end;
 
 			local toolWorkbenchLib = storageItem and modWorkbenchLibrary.ItemUpgrades[storageItem.ItemId] or nil;
 

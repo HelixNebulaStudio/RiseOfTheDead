@@ -158,7 +158,7 @@ function Component:__call(damage, range, isLethal)
                     damage = explodeHealthComp.MaxHealth * 0.2;
 
                     if splashReflectedValue then
-                        damage = damage*splashReflectedValue;
+                        damage = damage * splashReflectedValue;
                     end
                     task.spawn(function()
                         if explodeHealthComp.IsDead then return end;
@@ -181,7 +181,7 @@ function Component:__call(damage, range, isLethal)
                     end
 
                 else
-                    damage = explodeHealthComp.MaxHealth * 0.05;
+                    damage = math.max(explodeHealthComp.MaxHealth * 0.01, 1000);
                 end
                 
             elseif explodeEntityClass.ClassName == "PlayerClass" then
@@ -195,12 +195,11 @@ function Component:__call(damage, range, isLethal)
                 local conSplashReflection = playerClass.Configurations.SplashReflection;
                 if conSplashReflection then
                     splashReflectedValue = conSplashReflection;
-                    newExplosionProcessPacket.ExplosionStun = newExplosionProcessPacket.ExplosionStun*conSplashReflection;
+                    newExplosionProcessPacket.ExplosionStun = newExplosionProcessPacket.ExplosionStun * conSplashReflection;
                 end
                 
-                if playerClass.Properties.tickre then
-                    return true;
-                end
+                local tickRepellentStatus = playerClass.StatusComp:GetOrDefault("tickre");
+                if tickRepellentStatus then return true; end;
 
                 local conTickRepellent = playerClass.Configurations.TickRepellent;
                 if conTickRepellent then
