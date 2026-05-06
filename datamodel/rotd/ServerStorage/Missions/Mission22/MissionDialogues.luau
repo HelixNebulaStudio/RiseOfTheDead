@@ -51,7 +51,7 @@ if RunService:IsServer() then
 			if mission.ProgressionPoint == 1 then
 				dialog:SetInitiate("The key's somewhere in the break room.");
 				
-			elseif mission.ProgressionPoint == 4 then
+			elseif mission.ProgressionPoint == 3 or mission.ProgressionPoint == 4 then
 				dialog:SetInitiate("$PlayerName, did you get the 1000 metal?");
 				
 				local profile = shared.modProfile:Get(player);

@@ -7,7 +7,13 @@ library:Add{
 	Id = "npc";
     Name = "Npc";
     Bubble = true;
-    Arg1 = {Type="npcname"; Label="Name:"; Default="Mason"; Textbox=true; Validate=function(v) return modNpcProfileLibrary:Find(v) ~= nil end};
+    Arg1 = {
+        Type = "npcname"; 
+        Label = "Name:"; 
+        Default = "Mason"; 
+        Textbox=true; 
+        Validate=function(v) return modNpcProfileLibrary:Find(v) ~= nil end;
+    };
     Free = true;
 
     Image = "rbxassetid://15641265681";

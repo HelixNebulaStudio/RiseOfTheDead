@@ -16,7 +16,7 @@ if RunService:IsServer() then
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
 	
-	if modBranchConfigurations.IsWorld("TheUnderground") then
+	if shared.WorldName == "TheUnderground" or shared.WorldName == "BioXResearch" then
 		shared.modEventService:OnInvoked("Interactables_BindDoorInteract", function(eventPacket: EventPacket, ...)
 			local player: Player? = eventPacket.Player;
 			if player == nil then return end;
@@ -47,6 +47,18 @@ if RunService:IsServer() then
 				end)
 			end)
 		end);
+
+		shared.modEventService:OnInvoked("Storage_OnOpen", function(event: EventPacket, ...)
+			local storage: Storage, player: Player = ...;
+			if storage == nil then return end;
+			if storage.Id ~= BACKUPPLAN_STORAGE_ID then return end;
+
+			modMission:Progress(player, MISSION_ID, function(mission)
+				if mission.ProgressionPoint == 3 then
+					mission.ProgressionPoint = 4;
+				end
+			end)
+		end)
 	end
 
 else

@@ -705,28 +705,28 @@ MissionLibrary.New{
 
 -- MARK: 22 - The Backup Plan
 MissionLibrary.New{
-	MissionId=22;
+	MissionId = 22;
 	MissionType = MissionLibrary.MissionTypes.Side;
-	Name="The Backup Plan";
-	From="Carlson";
-	Description="Carlson hid something somewhere as backup for emergency situations, he needs someone to help him get that item.";
-	Persistent=true;
-	World="TheUnderground";
-	Progression={
+	Name = "The Backup Plan";
+	From = "Carlson";
+	Description = "Carlson hid something somewhere as backup for emergency situations, he needs someone to help him get that item.";
+	Persistent = true;
+	World = "TheUnderground";
+	Progression = {
 		"Search for a key in the break room";
 		"Enter the maintenance room";
 		"Search the wooden crate";
 		"Return to Carlson with the items";
 	};
-	GuideText="Talk to Carlson to start";
-	Rewards={
+	GuideText = "Talk to Carlson to start";
+	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Side};
 		{Type="Mission"; Id=28};
 	};
-	StartRequirements={
+	StartRequirements = {
 		Level=35;
 	};
-	Markers={
+	Markers = {
 		[1]={World="TheUnderground"; Label="Search"; Target=Vector3.new(-220.035, 16.43, 128.225); Type=modMarkers.MarkerTypes.Waypoint;};
 		[2]={World="TheUnderground"; Label="Maintenance Room"; Target=Vector3.new(-128.612, 18.274, -73.399); Type=modMarkers.MarkerTypes.Waypoint;};
 		[3]={World="TheUnderground"; Label="Wooden Crate"; Target=Vector3.new(-155.686, 19.493, -92.027); Type=modMarkers.MarkerTypes.Waypoint;};

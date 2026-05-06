@@ -17,6 +17,7 @@ if RunService:IsServer() then
 	modNpcs = shared.modNpcs;
 	modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
+	modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
 	
 	cutsceneAssets = script.Parent:WaitForChild("CutsceneAssets");
 
@@ -28,7 +29,7 @@ end
 --== Script;
 return function(CutsceneSequence)
 	-- MARK: TheMall / BioXResearch
-	if modBranchConfigurations.IsWorld("TheMall") or modBranchConfigurations.IsWorld("BioXResearch") then
+	if shared.WorldName == "TheMall" or shared.WorldName == "BioXResearch" then
 		
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
@@ -95,7 +96,7 @@ return function(CutsceneSequence)
 
 
 	-- MARK: BanditsRecruitment
-	elseif modBranchConfigurations.IsWorld("BanditsRecruitment") then
+	elseif shared.WorldName == "BanditsRecruitment" then
 
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
@@ -103,6 +104,24 @@ return function(CutsceneSequence)
 			local mission = modMission:GetMission(player, MISSION_ID);
 			if mission == nil then return end;
 				
+			local playerClass: PlayerClass = shared.modPlayers.get(player);
+			local playerDied = false;
+			playerClass.OnIsDeadChanged:Connect(function(isDead)
+				if not isDead then return end;
+				playerDied = true;
+
+				Debugger:Warn("Player died");
+				shared.Notify(player, "You died.. Restarting cutscene.", "Inform");
+
+				game.Players:SetAttribute("AutoRespawn", false);
+
+				local player = playerClass:GetInstance();
+				modMission:Progress(player, MISSION_ID, function(mission)
+					mission.ProgressionPoint = 3;
+				end)
+				modServerManager:Teleport(player, "BanditsRecruitment");
+			end)
+
 			game.Players:SetAttribute("AutoRespawn", true);
 			workspace:FindFirstChild("Tom Greyman"):Destroy();
 			
@@ -121,7 +140,6 @@ return function(CutsceneSequence)
 						Seed = player.UserId + info.Index;
 					};
 					BindSetup = function(npcClass: NpcClass)
-						local properties = npcClass.Properties;
 						npcClass.Character:SetAttribute("LookAtClient", false);
 
 						if name == "NameB" then
@@ -283,7 +301,7 @@ return function(CutsceneSequence)
 			local cutsceneTracks = {};
 			local point3Active = false;
 			local function OnChanged(firstRun)
-				local playerClass: PlayerClass = shared.modPlayers.get(player);
+				if playerDied then return end;
 				Debugger:Log("mission", mission)
 				
 				if mission.Type == 2 then -- OnAvailable
