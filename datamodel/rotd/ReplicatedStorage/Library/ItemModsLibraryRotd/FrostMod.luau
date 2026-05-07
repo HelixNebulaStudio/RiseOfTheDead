@@ -98,6 +98,7 @@ if RunService:IsServer() then
 				Radius = modifier.Properties.Radius;
 				Targets = modifier.Properties.Targets;
 				StorageItemBy = modifier.EquipmentClass and modifier.EquipmentClass.StorageItem;
+				TargetPart = packet.TargetPart;
 			};
 		});
 	end
@@ -123,9 +124,10 @@ if RunService:IsServer() then
 		projectile: ProjectileInstance, 
 		arcPoint: ArcPoint
 	)
-		if arcPoint.Hit == nil then return end;
+		local targetPart = arcPoint.Hit;
+		if targetPart == nil then return end;
 
-		local targetModel = arcPoint.Hit.Parent;
+		local targetModel = targetPart.Parent;
 		if targetModel == nil then return end;
 
 
@@ -135,6 +137,7 @@ if RunService:IsServer() then
 
 		modifierPackage.Binds.WeaponShotBulletHit(modifier, {
 			TargetModel = targetModel;
+			TargetPart = targetPart;
 		} :: BulletHitData);
 	end
 

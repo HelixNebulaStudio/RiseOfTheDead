@@ -55,6 +55,8 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
 
         Damage = finalDamage;
         DamageType = "Fire";
+
+        TargetPart = targetPart;
     };
     healthComp:TakeDamage(dmgData);
 

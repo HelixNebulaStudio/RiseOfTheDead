@@ -14,12 +14,16 @@ function statusPackage.BindApply(statusClass: StatusClassInstance)
 
     local toxinTexture = game.ReplicatedStorage.Prefabs.Textures:WaitForChild("ToxinTexture");
 
-    local characterClass : CharacterClass = statusClass.StatusOwner :: CharacterClass;
-    if characterClass.Character == nil then return end;
+    local entityClass: EntityClass = statusClass.StatusOwner :: EntityClass;
 
-    local bodyParts = characterClass.Character:GetChildren();
+    local model = entityClass.Model or entityClass.Character;
+    if model == nil then return end;
+
+    local bodyParts = model:GetDescendants();
     for a=1, #bodyParts do
-        if bodyParts[a]:IsA("BasePart") and bodyParts[a].Name ~= "HumanoidRootPart" and bodyParts[a].Transparency ~= 1 then
+        if bodyParts[a]:IsA("BasePart") 
+        and bodyParts[a].Name ~= "HumanoidRootPart" 
+        and bodyParts[a].Transparency < 0.88 then
             for b=1, #faces do
                 local new = toxinTexture:Clone();
                 new.Face = faces[b];

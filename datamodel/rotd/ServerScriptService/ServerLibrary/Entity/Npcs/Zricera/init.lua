@@ -91,7 +91,7 @@ end
 function npcPackage.Spawning(npcClass: NpcClass)
     local character = npcClass.Character;
     local configurations: ConfigVariable = npcClass.Configurations;
-    local properties: PropertiesVariable<{}> = npcClass.Properties;
+    local properties: PropertiesVariable<anydict> = npcClass.Properties;
 
     local isHard = properties.HardMode;
     local level = math.max(properties.Level, 0);
@@ -217,7 +217,9 @@ function npcPackage.Spawned(npcClass: NpcClass)
             if newHealth == prevHealth then return end;
             if damageData.Damage == nil then return end;
 
+            damageData = damageData:Clone();
             damageData.HideBubble = true;
+
             healthComp:TakeDamage(damageData);
         end)
 

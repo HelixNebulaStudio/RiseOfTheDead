@@ -88,6 +88,7 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
             Damage = -hpPerTick;
             TargetPart = playerClass.RootPart;
             DamageType = "Heal";
+            CanOverHeal = true;
         };
 
         healthComp:TakeDamage(dmgData);

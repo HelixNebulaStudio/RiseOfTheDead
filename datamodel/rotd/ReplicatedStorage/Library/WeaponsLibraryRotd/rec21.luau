@@ -62,7 +62,7 @@ local toolPackage = {
 		-- Focus
 		FocusDuration=4;
 		FocusWalkSpeedReduction=0.65;
-		ChargeDamagePercent=0.2;
+		FocusedDamageMulti=0.2;
 
 		-- Recoil
 		XRecoil=0.1;

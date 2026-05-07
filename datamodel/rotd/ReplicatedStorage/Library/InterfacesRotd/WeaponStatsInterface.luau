@@ -76,7 +76,7 @@ local statTemplates = {
 		{Key="CritMulti"; Text="<b>Crit Multiplier:</b>    $stat"; Type="percent";
 			PostText=postTextFunc.PreModDamageAdd;
 		};
-		{Key="HeadshotMultiplier"; Text="<b>Headshot Multiplier:</b>    $stat%"; Type="percent"; OnlyExpand=true;
+		{Key="HeadshotMultiplier"; Text="<b>Headshot Multiplier:</b>    $stat"; Type="percent"; OnlyExpand=true;
 			PostText=postTextFunc.PreModDamageAdd;
 		};
 		{Key="DamageRev"; Text="<b>Damage Rev:</b>    $stat"; Type="percent";
@@ -100,7 +100,7 @@ local statTemplates = {
 		
 		{Key="FocusDuration"; Text="<b>Focus Time:</b>    $stat"; Type="2dp"; OnlyExpand=true;};
 		{Key="FocusWalkSpeedReduction"; Text="<b>Focus Movespeed:</b>    $stat"; Type="percent"; OnlyExpand=true;};
-		{Key="ChargeDamagePercent"; Text="<b>Focused Multiplier:</b>    $stat"; Type="percent"; OnlyExpand=true;};
+		{Key="FocusedDamageMulti"; Text="<b>Focused Multiplier:</b>    $stat"; Type="percent"; OnlyExpand=true;};
 
 		
 		
@@ -228,8 +228,8 @@ local mouseOverDescription = {
 	FocusWalkSpeedReduction={
 		Desc="Your movement speed is reduced by to the percent when focused. \n\n(Higher is better)";
 	};
-	ChargeDamagePercent={
-		Desc="<b>[Crit Receiver]</b> The additional premod damage multiplier when you fully focused a shot. \n\n(Higher is better)";
+	FocusedDamageMulti={
+		Desc="The additional premod damage multiplier when you fully focused a shot. \n\n(Higher is better)";
 	};
 	CritChance={
 		Desc="<b>[Crit Receiver]</b> The chance to deal critical damage that multiplies your damage with the Crit Multiplier. \n\n(Higher is better)";
@@ -775,7 +775,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             local multishot = configurations.Multishot;
 
             local hsMulti = configurations.HeadshotMultiplier;
-            local chargeMulti = configurations.ChargeDamagePercent;
+            local focusedMulti = configurations.FocusedDamageMulti;
             
             local maxDmg = 0;
             local newBarFrames = {};
@@ -825,8 +825,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 end
 
                 local chargeDmg = nil;
-                if chargeMulti and (a == 1 or a == ammoMag or math.fmod(a, 6) == 0) then
-                    chargeDmg = preModDamage * chargeMulti;
+                if focusedMulti and (a == 1 or a == ammoMag or math.fmod(a, 6) == 0) then
+                    chargeDmg = preModDamage * focusedMulti;
                     damage = damage + chargeDmg;
                 end
                 

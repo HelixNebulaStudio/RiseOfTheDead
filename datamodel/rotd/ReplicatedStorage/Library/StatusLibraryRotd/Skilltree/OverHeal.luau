@@ -21,12 +21,12 @@ if RunService:IsServer() then
             
             local healData: DamageData = ...;
             if healData == nil or healData.DamageTo == nil then return end;
+            if healData.DamageType ~= "Heal" then return end;
+            if healData.CanOverHeal ~= true then return end;
 
             local playerClass: PlayerClass = healData.DamageTo :: PlayerClass;
 
             task.spawn(function()
-                if healData.DamageType ~= "Heal" then return end;
-                
                 local healthComp: HealthComp = playerClass.HealthComp;
                 local statusComp: StatusComp = playerClass.StatusComp;
 

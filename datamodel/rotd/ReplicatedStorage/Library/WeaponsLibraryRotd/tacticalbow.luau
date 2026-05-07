@@ -69,7 +69,7 @@ local toolPackage = {
 		CanUnfocusFire = false;
 		FocusDuration = 4;
 		FocusWalkSpeedReduction = 0.55;
-		ChargeDamagePercent = 1;
+		FocusedDamageMulti = 1;
 
 		-- Recoil
 		XRecoil = 0.0;

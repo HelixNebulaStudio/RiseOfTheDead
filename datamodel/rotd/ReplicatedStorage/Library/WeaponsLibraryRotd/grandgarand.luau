@@ -64,7 +64,7 @@ local toolPackage = {
 		-- Focus
 		FocusDuration=3;
 		FocusWalkSpeedReduction=0.65;
-		ChargeDamagePercent=0.2;
+		FocusedDamageMulti=0.2;
 
 		-- Recoil
 		XRecoil=0.1;
@@ -147,7 +147,7 @@ function toolPackage.newClass()
 			BulletRicochetDistance = 64;
 		};
 		ArrayValues = {
-			PassiveModifiers = "RicochetRifling";
+			PassiveModifiers = "Ricochet Rifling";
 		};
 	});
 

@@ -58,7 +58,7 @@ local toolPackage = {
 		-- Focus
 		FocusDuration=1;
 		FocusWalkSpeedReduction=0.55;
-		ChargeDamagePercent=1;
+		FocusedDamageMulti=1;
 
 		-- Projectile
 		ProjectileId="boltarrow";

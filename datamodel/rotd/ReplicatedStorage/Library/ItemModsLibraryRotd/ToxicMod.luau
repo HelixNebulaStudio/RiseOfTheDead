@@ -49,8 +49,7 @@ if RunService:IsServer() then
 		if targetHealthComp == nil then return end;
 		if targetHealthComp.IsDead or not targetHealthComp:CanTakeDamageFrom(characterClass) then return end;
 	
-		local targetClass: EntityClass = targetHealthComp.CompOwner;
-		local statusComp: StatusComp? = targetClass.StatusComp;
+		local statusComp: StatusComp? = damageTo.StatusComp;
 		if statusComp == nil then return end;
 			
 		local duration = modifier.Properties.Duration;
@@ -69,7 +68,6 @@ if RunService:IsServer() then
 				ImmunityReduction = modifier.Properties.Reduction;
 			};
 		});
-
 	end
 
 	function modifierPackage.Binds.WeaponShotProjectileNew(

@@ -134,7 +134,7 @@ end
 
 local faces = {Enum.NormalId.Back; Enum.NormalId.Bottom; Enum.NormalId.Front; Enum.NormalId.Left; Enum.NormalId.Right; Enum.NormalId.Top;};
 function statusPackage.IceEffect(targetModel: Model, garbageHandler: GarbageHandler)
-    local bodyParts = targetModel:GetChildren();
+    local bodyParts = targetModel:GetDescendants();
 
     local function applyIceShader(bodyPart: BasePart)
         for b=1, #faces do
@@ -170,7 +170,7 @@ function statusPackage.IceEffect(targetModel: Model, garbageHandler: GarbageHand
             continue
         end;
         if bodyPart.Name == "HumanoidRootPart" then continue end;
-        if bodyPart.Transparency == 1 then continue end;
+        if bodyPart.Transparency > 0.88 then continue end;
 
         applyIceShader(bodyPart);
     end
@@ -251,6 +251,8 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
         StorageItem = storageItemBy;
         Damage = damage;
         DamageType = "Frost";
+
+        TargetPart = statusClass.Values.TargetPart;
     });
 end
 
