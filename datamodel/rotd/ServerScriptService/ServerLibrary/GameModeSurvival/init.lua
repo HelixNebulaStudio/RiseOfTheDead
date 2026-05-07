@@ -16,17 +16,13 @@ local modInteractables = shared.require(game.ReplicatedStorage.Library.Interacta
 local modGameModeLibrary = shared.require(game.ReplicatedStorage.Library.GameModeLibrary);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
-local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modDamageTag = shared.require(game.ReplicatedStorage.Library.DamageTag);
-local modItemLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modRewardsLibrary = shared.require(game.ReplicatedStorage.Library.RewardsLibrary);
 local modDropRateCalculator = shared.require(game.ReplicatedStorage.Library.DropRateCalculator);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modGarbageHandler = shared.require(game.ReplicatedStorage.Library.GarbageHandler);
 
 local modNpcs = shared.modNpcs;
-local modItemDrops = shared.require(game.ServerScriptService.ServerLibrary.ItemDrops);
-local modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
 
 local remoteGameModeHud = modRemotesManager:Get("GameModeHud");
 
@@ -504,13 +500,7 @@ function Survival:GetNextWaveInfo(wave)
 		end
 
 		return pickObjective, pickHazard;
-	else
-
-		return self.ObjectivesList[1], nil;
 	end
-
-
-	local random = Random.new(self.Seed);
 
 	if wave < #self.ObjectivesList then
 		pickObjective = self.ObjectivesList[math.fmod(wave-1, #self.ObjectivesList)+1];
@@ -578,6 +568,10 @@ function Survival:GetNextWaveInfo(wave)
 	
 	if self.SetObjective then
 		pickObjective = self.SetObjective;
+	end
+
+	if pickObjective == nil then
+		pickObjective = self.ObjectivesList[1];
 	end
 
 	return pickObjective, pickHazard;
@@ -1119,13 +1113,38 @@ function Survival:StartWave(wave)
 
 		self.GameState = "Intermission";
 
+		local waveSelect;
 		if self.WaveSelectPacket.Active == true then
 			local waveSelectTimeLeft = self.WaveSelectPacket.TimeLeft;
 
+			local skipTimeLeft;
 			for a=waveSelectTimeLeft, 0, -1 do
 				self:RespawnDead();
 				task.wait(1);
-				self.WaveSelectPacket.TimeLeft = a;
+				
+				if self.WaveSelectPacket.Active == true then
+					waveSelect = self.WaveSelectPacket;
+
+					--Skip if all continue;
+					local voteSkipping = true;
+					for uId, pData in pairs(waveSelect.Players) do
+						if pData.HasVoted == false then
+							voteSkipping = false;
+						end
+					end
+					if voteSkipping == true then
+						if skipTimeLeft == nil then
+							skipTimeLeft = 3;
+						else
+							skipTimeLeft -= 1;
+						end
+					else
+						skipTimeLeft = nil;
+					end
+				end
+
+
+				self.WaveSelectPacket.TimeLeft = skipTimeLeft or a;
 				self:Hud{
 					HeaderText =`Choose your {self.IsHard and "rewards" or "waves"}!`;
 					Status = `Lock in {a}s..`;
@@ -1134,11 +1153,12 @@ function Survival:StartWave(wave)
 					WaveHazard = "";
 					HazardDesc = "";
 				};
+
 				if self.Status ~= EnumStatus.InProgress then break; end
+				if skipTimeLeft and skipTimeLeft <= 0 then break; end;
 			end
 		end
 
-		local waveSelect;
 		if self.WaveSelectPacket.Active == true then
 			waveSelect = self.WaveSelectPacket;
 		end
