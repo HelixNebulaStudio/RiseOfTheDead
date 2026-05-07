@@ -983,36 +983,36 @@ function library.onRequire()
 	}
 
 	library:Add{
-		Id="bowricochetmod";
-		Name="Bow Ricochet";
-		Desc="Ricochets an arrow to an enemy within <b>Radius</b> on impact.";
-		Icon="http://www.roblox.com/asset/?id=5539240457";
-		BaseTier=3;
-		Tier=3;
-		Stackable=false;
-		Type={"Bow"};
-		EffectTrigger=library.EffectTrigger.Passive;
-		Module=script.BowRicochet;
-		Category="Rare Mods";
-		Upgrades={
+		Id = "bowricochetmod";
+		Name = "Bow Ricochet";
+		Desc = "Ricochets an arrow to an enemy within <b>Radius</b> on impact at the cost of projectile speed.";
+		Icon = "http://www.roblox.com/asset/?id=5539240457";
+		BaseTier = 2;
+		Tier = 2;
+		Stackable = false;
+		Type = {"Bow"};
+		EffectTrigger = library.EffectTrigger.Passive;
+		Module = script.BowRicochet;
+		Category = "Rare Mods";
+		Upgrades = {
 			{DataTag="R"; Name="Radius"; Syntax="Increase Scan Radius"; ValueType="Normal"; MaxLevel=8; BaseCost=10; MaxCost=100; BaseValue=16; MaxValue=64; TweakBonus=6; Scaling=library.ScalingStyle.Linear;};
 		};
 	}
 
 	-- MARK: Bolt mods;
 	library:Add{
-		Id="bowdeadweightmod";
-		Name="Bow Deadweight";
-		Desc="Allows projectiles to pierce enemies at the cost of projectile speed.";
-		Icon="http://www.roblox.com/asset/?id=13257333197";
-		BaseTier=2;
-		Tier=2;
-		Stackable=false;
-		Type={"Bow"};
-		EffectTrigger=library.EffectTrigger.Passive;
-		Module=script.BowDeadweight;
-		Category="Rare Mods";
-		Upgrades={
+		Id = "bowdeadweightmod";
+		Name = "Bow Deadweight";
+		Desc = "Allows projectiles to pierce enemies at the cost of projectile speed.";
+		Icon = "http://www.roblox.com/asset/?id=13257333197";
+		BaseTier = 3;
+		Tier = 3;
+		Stackable = false;
+		Type = {"Bow"};
+		EffectTrigger = library.EffectTrigger.Passive;
+		Module = script.BowDeadweight;
+		Category = "Rare Mods";
+		Upgrades = {
 			{DataTag="W"; Name="Piercing"; Syntax="Increase Piercing"; ValueType="Normal"; MaxLevel=7; BaseCost=10; MaxCost=100; BaseValue=1; MaxValue=8; TweakBonus=1; Scaling=library.ScalingStyle.Linear;};
 		};
 	}

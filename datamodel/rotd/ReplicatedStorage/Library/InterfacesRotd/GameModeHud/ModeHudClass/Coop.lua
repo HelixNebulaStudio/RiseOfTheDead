@@ -106,7 +106,7 @@ return function(interface: InterfaceInstance, window, frame)
 						stopwatchLabel.Text = "00:00.000";
 						stopWatchRs = RunService.RenderStepped:Connect(function(delta)
 							if data.StopwatchFinal then
-								stopwatchLabel.Text = `Final Time: {modSyncTime.FormatMs(data.StopwatchFinal *1000)}!`;
+								stopwatchLabel.Text = `Level: <b>{data.LevelDif}</b> Final Time: <b>{modSyncTime.FormatMs(data.StopwatchFinal *1000)}</b>!`;
 								return;
 							end
 

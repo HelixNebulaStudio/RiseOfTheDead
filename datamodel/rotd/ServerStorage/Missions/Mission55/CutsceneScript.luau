@@ -42,8 +42,14 @@ return function(CutsceneSequence)
 		Debugger:WarnClient(player, `AnotherSurvivor>>  Loading Cutscene..`);
 
 		local safehomeClass = shared.WorldCore.SafehomeClass;
+		local lc = 0;
 		while safehomeClass == nil and game.Players:IsAncestorOf(player) do
+			safehomeClass = shared.WorldCore.SafehomeClass;
 			task.wait(1);
+			lc += 1;
+			if lc > 30 then
+				Debugger:WarnClient(player, `AnotherSurvivor>>  Still waiting for cutscene to load ({lc})..`);
+			end
 		end
 		if safehomeClass.FactionTag then 
 			Debugger:WarnClient(player, "AnotherSurvivor>>  Mission skipped in faction hq.");

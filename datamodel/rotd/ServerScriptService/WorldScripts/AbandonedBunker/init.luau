@@ -46,8 +46,7 @@ function WorldCore.InitGameController()
         {Name="Dr. Sinister"; Chance=5; Fmod=60; HordeWave=false;};
     };
 
-	local mapWaveCollapse = modWaveCollapseSystem.new(workspace.Environment.CollapseMapTemplate, MAP_SEED);
-
+	local mapWaveCollapse = modWaveCollapseSystem.new(workspace.Environment.CollapseMapTemplate);
 	mapWaveCollapse:PrototypeConstraints({
 		TileFancyTransition = {Weight=4; TotalCountRequirement=24; CountLimit=1;};
 		TileMidClassTransition = {Weight=4; TotalCountRequirement=16; CountLimit=1;};
@@ -95,9 +94,6 @@ function WorldCore.InitGameController()
 		TileDarkVariant11 = {IsParent=false; CountLimit=5};
 
 	});
-	mapWaveCollapse:Solve(workspace.Environment.CollapseMap);
-
-    WorldCore.MapWaveCollapse = mapWaveCollapse;
 
 
     task.spawn(function()
@@ -116,6 +112,11 @@ function WorldCore.InitGameController()
         if mapStorageItem and mapStorageItem.Values and mapStorageItem.Values.Seed then
             MAP_SEED = mapStorageItem.Values.Seed;
         end
+
+        mapWaveCollapse:SetSeed(MAP_SEED);
+        mapWaveCollapse:Solve(workspace.Environment.CollapseMap);
+
+        WorldCore.MapWaveCollapse = mapWaveCollapse;
         
         task.delay(5, function()
             for _, player in pairs(game.Players:GetPlayers()) do

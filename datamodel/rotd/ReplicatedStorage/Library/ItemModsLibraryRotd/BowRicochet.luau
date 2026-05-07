@@ -23,9 +23,9 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 	end
 
 	modifier.SetValues.ProjectileConfig = {
-		MaxBounce = 1;
-		LifeTime = 3;
 		Velocity = 175;
+		LifeTime = 3;
+		MaxBounce = 1;
 	}
 	modifier.Properties.Radius = value;
 end

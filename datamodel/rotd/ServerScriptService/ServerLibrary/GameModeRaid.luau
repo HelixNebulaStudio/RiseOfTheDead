@@ -1391,6 +1391,7 @@ function Raid:Hud(data)
 		PlayMusic = data.PlayMusic;
 		EndStageSound = data.EndStageSound;
 
+		LevelDif = self.Difficulty;
 		StopwatchTick = self.StopwatchTick;
 		StopwatchFinal = self.StopwatchFinal;
 

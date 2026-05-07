@@ -22,6 +22,7 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 
 	modifier.SetValues.ProjectileConfig = {
 		Velocity = 100;
+		LifeTime = 3;
 		MaxBounce = math.ceil(wValue);
 		KeepAcceleration = true;
 	};

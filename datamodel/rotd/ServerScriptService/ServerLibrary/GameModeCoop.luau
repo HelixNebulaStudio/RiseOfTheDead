@@ -62,6 +62,7 @@ function Coop.onRequire()
 			Description = [[Coop commands.
 			
 			/coop resetinteractables
+			/coop complete
 			]];
 
 			RequiredArgs = 0;
@@ -79,6 +80,10 @@ function Coop.onRequire()
 					for _, interactable: InteractableInstance in pairs(gameController.Interactables) do
 						interactable:Reset();
 					end
+
+				elseif action == "complete" then
+					gameController:CompleteCoop();
+					
 				end
 			end
 		};
@@ -973,6 +978,7 @@ function Coop:Hud(data)
 		LootPrefab = self.LootPrefab;
 		PlayMusic = data.PlayMusic;
 
+		LevelDif = self.Difficulty;
 		StopwatchTick = self.StopwatchTick;
 		StopwatchFinal = self.StopwatchFinal;
 	});

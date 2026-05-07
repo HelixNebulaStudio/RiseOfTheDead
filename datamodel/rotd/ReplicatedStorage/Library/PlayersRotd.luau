@@ -51,6 +51,12 @@ end)
 shared.coreBind(modPlayers.Player, "_character_added", function(playerClass: PlayerClass, character: Model)
     local characterComp = playerClass.CharacterComp;
 
+	if RunService:IsServer() then return end;
+
+	task.spawn(function()
+		local modMeleeToolHandler = shared.require(game.ReplicatedStorage.Library.ToolHandler.MeleeTool);
+		modMeleeToolHandler.Init();
+	end)
 end)
 
 function InitDuelSystem()
