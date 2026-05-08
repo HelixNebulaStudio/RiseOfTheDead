@@ -87,7 +87,6 @@ function npcPackage.Spawned(npcClass: NpcClass)
         
         modProjectile.serverSimulate(projectileInstance, {
             Velocity = dirCf * 40;
-            RayWhitelist = {workspace.Environment; workspace.Terrain};
         });
 
         local projectilePart = projectileInstance.Part;

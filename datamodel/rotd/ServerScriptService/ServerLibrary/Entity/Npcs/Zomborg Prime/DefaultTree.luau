@@ -213,7 +213,6 @@ function treePackage.RocketBarrage(npcClass: NpcClass)
                 local velocity = projectileInstance.ArcTracer:GetVelocityByTime(originCf.Position, targetPoint, travelTime);
                 modProjectile.serverSimulate(projectileInstance, {
                     Velocity = velocity;
-                    RayWhitelist = {workspace.Environment; workspace.Terrain};
                     IgnoreEntities = true;
                 });
 

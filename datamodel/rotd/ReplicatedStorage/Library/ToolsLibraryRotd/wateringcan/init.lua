@@ -58,7 +58,7 @@ function toolPackage.ActionEvent(toolHandler: ToolHandlerInstance, packet)
 			local spreadLookVec = modMath.CFrameSpread(-Vector3.yAxis, 90);
 			modProjectile.serverSimulate(projectileInstance, {
 				Velocity = spreadLookVec * 20;
-				RayWhitelist = {workspace.Environment; workspace.Terrain; workspace.Interactables};
+				IncludeInstances = {workspace.Environment; workspace.Terrain; workspace.Interactables};
 				IgnoreEntities = true;
 			});
 

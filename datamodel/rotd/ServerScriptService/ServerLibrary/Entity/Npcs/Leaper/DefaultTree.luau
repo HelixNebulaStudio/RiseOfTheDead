@@ -16,7 +16,7 @@ local treePackage = {
 function treePackage.onRequire()
 	local arcTracer = modArcTracing.new();
 	--arcTracer.DebugArc = true;
-	arcTracer.RayWhitelist = {workspace.Terrain; workspace.Environment; workspace.Clips};
+	arcTracer.IncludeInstances = {workspace.Terrain; workspace.Environment; workspace.Clips};
 	arcTracer.RayRadius = 1.5;
 	arcTracer.Acceleration = Vector3.new(0, -workspace.Gravity, 0);
 	arcTracer.Delta = 1/7;
@@ -36,8 +36,8 @@ function treePackage.Leap(npcClass: NpcClass)
     if dist < 16 then return false; end;
 
     local leapArcTracer = treePackage.LeapArcTracer;
-    leapArcTracer.RayWhitelist = CollectionService:GetTagged("PlayerCharacters");
-    table.insert(leapArcTracer.RayWhitelist, workspace.Environment);
+    leapArcTracer.IncludeInstances = CollectionService:GetTagged("PlayerCharacters");
+    table.insert(leapArcTracer.IncludeInstances, workspace.Environment);
 
     local enemyHealthComp: HealthComp = enemyTargetData.HealthComp;
     local entityClass: EntityClass = enemyHealthComp.CompOwner;

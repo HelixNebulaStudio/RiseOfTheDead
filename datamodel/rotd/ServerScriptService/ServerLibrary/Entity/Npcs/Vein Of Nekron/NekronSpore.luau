@@ -151,7 +151,7 @@ function NekronSpore.spawn(origin, veinTargetPart, param)
 		end
 
         modProjectile.serverSimulate(projectileInstance, {
-            RayWhitelist = rayWhitelist;
+            IncludeInstances = rayWhitelist;
             Velocity = velocity;
         });
 	end)

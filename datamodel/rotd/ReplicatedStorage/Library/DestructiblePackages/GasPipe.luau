@@ -40,7 +40,6 @@ function destructiblePackage.BindNew(destructible: DestructibleInstance)
 			
             modProjectile.serverSimulate(projectileInstance, {
                 Velocity = dirCf * 20;
-                RayWhitelist = {workspace.Environment; workspace.Terrain};
                 IgnoreEntities = true;
             });
 			

@@ -194,7 +194,7 @@ function treePackage.SpitFire(npcClass: NpcClass)
                 projTravelTime + math.random(-40, 40)/100
             );
             modProjectile.serverSimulate(projectileInstance, {
-                RayWhitelist = rayWhitelist;
+                IncludeInstances = rayWhitelist;
                 Velocity = velocity;
             });
         end

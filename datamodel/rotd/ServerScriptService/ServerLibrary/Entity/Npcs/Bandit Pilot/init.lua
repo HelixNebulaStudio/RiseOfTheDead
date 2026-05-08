@@ -741,7 +741,7 @@ function npcPackage.Spawned(npcClass: NpcClass)
             projectileInstance.Part.Parent = properties.MolotovModel;
 
             modProjectile.serverSimulate(projectileInstance, {
-                RayWhitelist = {workspace.Environment; workspace.Terrain};
+                ExcludeInstances = {heliInstance; npcClass.Character};
                 Velocity = originCf.LookVector * 20;
             });
         end

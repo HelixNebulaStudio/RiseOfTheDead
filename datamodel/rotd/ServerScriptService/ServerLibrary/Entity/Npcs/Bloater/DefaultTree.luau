@@ -52,7 +52,7 @@ function treePackage.BurpConfusionGas(npcClass: NpcClass)
 
         modProjectile.serverSimulate(projectile, {
             Velocity = velocity;
-            RayWhitelist = {CollectionService:GetTagged("PlayerCharacters")};
+            IncludeInstances = CollectionService:GetTagged("PlayerCharacters");
         });
 
         npcClass.Move:Face(targetRootPart);

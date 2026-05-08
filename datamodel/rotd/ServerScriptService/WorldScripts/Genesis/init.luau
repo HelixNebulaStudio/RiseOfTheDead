@@ -59,7 +59,7 @@ function WorldCore.onRequire()
             });
 
             modProjectile.serverSimulate(projectileInstance, {
-                RayWhitelist = {workspace.Environment};
+                IncludeInstances = {workspace.Environment};
                 Velocity = dirCf * 20;
                 IgnoreEntities = true;
             });

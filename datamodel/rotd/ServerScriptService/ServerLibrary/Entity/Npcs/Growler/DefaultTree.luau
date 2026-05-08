@@ -15,7 +15,7 @@ local treePackage = {
 --==
 function treePackage.onRequire()
 	local arcTracer = modArcTracing.new();
-	arcTracer.RayWhitelist = {workspace.Terrain; workspace.Environment; workspace.Clips};
+	arcTracer.IncludeInstances = {workspace.Terrain; workspace.Environment; workspace.Clips};
 	arcTracer.RayRadius = 1.5;
 	arcTracer.Acceleration = Vector3.new(0, -workspace.Gravity, 0);
 	arcTracer.Delta = 1/7;
@@ -74,8 +74,8 @@ function treePackage.LeapIfVunerable(npcClass: NpcClass)
     end;
 
     local leapArcTracer = treePackage.LeapArcTracer;
-    leapArcTracer.RayWhitelist = CollectionService:GetTagged("PlayerCharacters");
-    table.insert(leapArcTracer.RayWhitelist, workspace.Environment);
+    leapArcTracer.IncludeInstances = CollectionService:GetTagged("PlayerCharacters");
+    table.insert(leapArcTracer.IncludeInstances, workspace.Environment);
 
     if targetEntityClass.ClassName ~= "PlayerClass" and targetEntityClass.ClassName ~= "NpcClass" then return false; end;
     

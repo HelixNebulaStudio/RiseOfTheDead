@@ -205,8 +205,8 @@ function treePackage.ThrowZombie(npcClass: NpcClass)
     
     local throwArcTracer = treePackage.ThrowArcTracer;
 
-    throwArcTracer.RayWhitelist = CollectionService:GetTagged("PlayerCharacters");
-    table.insert(throwArcTracer.RayWhitelist, workspace.Environment);
+    throwArcTracer.IncludeInstances = CollectionService:GetTagged("PlayerCharacters");
+    table.insert(throwArcTracer.IncludeInstances, workspace.Environment);
 
     local origin = npcClass.RootPart.Position;
     local targetPoint = targetRootPart.CFrame.Position + Vector3.new(0,5,0);

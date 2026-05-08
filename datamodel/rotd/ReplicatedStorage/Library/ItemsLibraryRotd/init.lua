@@ -158,7 +158,7 @@ function modItemsLibrary.onRequire()
     new(throwableBase, {Id="stickygrenade"; Name="Sticky Grenade"; Icon="rbxassetid://5106343976"; Tags={"Explosive"}; Description="Sticks to surfaces thrown on. Does 10% of the enemies' max health on explode, minimal damage is 200.";});
     new(throwableBase, {Id="explosives"; Name="Explosives"; Icon="rbxassetid://7304930076"; Tags={"Explosive"}; Description="Does 10% of the enemies' max health when thrown, minimal damage is 50.";});
 
-    new(throwableBase, {Id="molotov"; Name="Molotov"; Icon="rbxassetid://5088295501"; Tags={"Incendiary"}; Description="Ignites surrounding area on fire on impact, does 5%(Min: 10 damage) of the enemies' max health every 0.5 seconds.";});
+    new(throwableBase, {Id="molotov"; Name="Molotov"; Icon="rbxassetid://5088295501"; Tags={"Incendiary"}; Description="Ignites surrounding area on fire on impact, does 1% (Min: 25 damage) of the enemies' max health every 0.5 seconds.";});
 
     new(throwableBase, {Id="snowballs"; Name="Snowballs"; Icon="rbxassetid://11464691441"; Stackable=false; Tags={"Frostivus"}; Description="Who wants a snowball fight? Does special damage to Winter Treelums.";});
 

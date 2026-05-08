@@ -101,7 +101,7 @@ function treePackage.Shoot(npcClass: NpcClass)
 	end
 
     modProjectile.serverSimulate(projectileInstance, {
-        RayWhitelist = rayWhitelist;
+        IncludeInstances = rayWhitelist;
         Velocity = velocity;
     });
 end

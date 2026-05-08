@@ -52,7 +52,6 @@ function treePackage.PoisonIvyBarrage(npcClass: NpcClass)
         math.random(-45, 60)/100
     );
     modProjectile.serverSimulate(projectileInstance, {
-        RayWhitelist = {workspace.Environment; workspace.Terrain};
         Velocity = velocity;
     });
 end

@@ -96,11 +96,10 @@ function npcPackage.Spawning(npcClass: NpcClass)
         local spreadLookVec = modMath.CFrameSpread(-Vector3.yAxis, 90);
         modProjectile.serverSimulate(projectileInstance, {
             Velocity = spreadLookVec * 20;
-            RayWhitelist = {workspace.Environment; workspace.Terrain};
             IgnoreEntities = true;
         });
 
-        if properties.Ignited then
+        if #npcClass.StatusComp:ListStatusWithTags{"Fire"} > 0 then
             modFlammable:Ignite(projectileInstance.Part);
         end
     end);
