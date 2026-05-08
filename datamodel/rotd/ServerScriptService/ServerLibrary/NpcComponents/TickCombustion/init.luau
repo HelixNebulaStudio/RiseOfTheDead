@@ -137,13 +137,15 @@ function Component:__call(damage, range, isLethal)
             DamageOrigin = explosionPoint;
         };
         
-        newExplosionProcessPacket.BindHealthCompHit = function(explodeHealthComp: HealthComp, damage: number)
+        newExplosionProcessPacket.BindHealthCompHit = function(explodeHealthComp: HealthComp, damageData: DamageData)
             local explodeEntityClass: EntityClass = explodeHealthComp.CompOwner :: EntityClass;
             if explodeEntityClass == npcClass then return true end;
             if explodeHealthComp:CanTakeDamageFrom(npcClass) == false then return true end;
 
             local dist = explodeEntityClass:DistanceFrom(explosionPoint);
             if dist >= 30 then return true end;
+
+            local damage: number = damageData.Damage;
 
             local dmgMulti = (1-math.clamp(dist, 0, 30)/30);
             local dmgData = DamageData.new{

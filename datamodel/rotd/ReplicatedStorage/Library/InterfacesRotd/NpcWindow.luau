@@ -61,7 +61,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     window.CloseWithInteract = true;
 
     local colorPickerObj = modColorPicker.new(interface);
-	colorPickerObj.Parent = windowFrame;
+	colorPickerObj.Frame.Parent = windowFrame;
 
     local binds = window.Binds;
     
@@ -482,8 +482,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 					local new = template:Clone();
 					if type == "ColorPicker" then
-						local colorPickerObj = colorPickerObj;
-
 						local customColors = modData:GetFlag("CustomColors", true);
 						
 						local pickButton = new:WaitForChild("pickButton") :: TextButton;

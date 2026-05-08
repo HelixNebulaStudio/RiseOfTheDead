@@ -19,6 +19,7 @@ function Component:Setup()
 	local npcClass: NpcClass = self.NpcClass;
 
 	local healthComp: HealthComp = npcClass.HealthComp;
+
 	local _takeDamage = healthComp.TakeDamage;
 	function healthComp.TakeDamage(hc, damageData: DamageData)
 		if hc.IsDead then return end;
@@ -30,7 +31,6 @@ function Component:Setup()
 
 		_takeDamage(hc, damageData);
 	end
-
 end
 
 function Component:__call(callerCharacterClass: CharacterClass)
