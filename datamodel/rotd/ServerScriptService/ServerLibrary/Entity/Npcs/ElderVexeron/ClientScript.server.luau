@@ -21,6 +21,7 @@ local rootPart = character:WaitForChild("HumanoidRootPart");
 
 local function screenShake()
 	local distance = localplayer:DistanceFromCharacter(rootPart.Position);
+	modCharacter = modData:GetModCharacter();
 	modCharacter.CameraShakeAndZoom(math.clamp((128-distance)/128, 0, 1)*8, 0, 0.5, nil, false);
 end
 

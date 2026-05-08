@@ -82,7 +82,7 @@ end
 function treePackage.Attack(npcClass: NpcClass)
     local properties = npcClass.Properties;
 
-    if tick()-properties.StageChangedTick >= 10 then
+    if tick()-properties.StageChangedTick >= 8 then
         properties.State = "Idle";
         properties.StageChangedTick = tick();
     end
@@ -97,7 +97,7 @@ end
 function treePackage.Hunt(npcClass: NpcClass)
     local properties = npcClass.Properties;
 
-    if tick()-properties.StageChangedTick >= 16 then
+    if tick()-properties.StageChangedTick >= 26 then
         properties.State = "Attack";
         properties.StageChangedTick = tick();
     end

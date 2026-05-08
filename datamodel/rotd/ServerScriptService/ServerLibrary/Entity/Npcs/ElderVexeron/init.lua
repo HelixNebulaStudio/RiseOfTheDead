@@ -46,7 +46,7 @@ local npcPackage = {
     };
 
     TouchHandler = nil;
-    ThinkCycle = 1;
+    ThinkCycle = 0.1;
 };
 --==
 
@@ -161,12 +161,15 @@ function npcPackage.Spawning(npcClass: NpcClass)
     end))
 
     function properties.UpdateVelocity()
-        bodyVelocity.Velocity = bodyGyro.CFrame.UpVector * bodyVelocity:GetAttribute("Speed");
+        local speedScaler = properties.SpeedScaler or 1;
+
+        local newSpeed = bodyVelocity:GetAttribute("Speed") * speedScaler;
+        bodyVelocity.Velocity = bodyGyro.CFrame.UpVector * newSpeed;
 
         for a=1, #bodyWeights do
             if bodyWeights[a].Parent == nil then continue end;
             
-            bodyWeights[a].Velocity = bodyWeights[a].Parent.CFrame.UpVector * bodyVelocity:GetAttribute("Speed");
+            bodyWeights[a].Velocity = bodyWeights[a].Parent.CFrame.UpVector * newSpeed;
         end
     end
 
@@ -208,6 +211,8 @@ function npcPackage.Spawned(npcClass: NpcClass)
     local healthComp = npcClass.HealthComp;
     local rootPart = npcClass.RootPart;
 
+    local head = npcClass.Head;
+
     local bodyGyro = properties.BodyGyro;
 
     function properties.PointTo(point: Vector3, lerpIntensity: number?)
@@ -235,13 +240,16 @@ function npcPackage.Spawned(npcClass: NpcClass)
 
             local targetPoint;
             if enemyTargetData == nil or properties.State == "Idle" then
+                properties.SpeedScaler = 1;
                 local spinVec = Vector3.new(math.sin(t), 0, math.cos(t));
                 targetPoint = spawnPoint.Position + (spinVec * 80);
 
             elseif properties.State == "Snooze" then
+                properties.SpeedScaler = 1;
                 targetPoint = Vector3.new(0, -100, 0);
 
             elseif properties.State == "Hunt" then
+                properties.SpeedScaler = 2;
                 local enemyDistance = enemyTargetData.Distance;
 
                 local spinVec = Vector3.new(math.sin(t), 0, math.cos(t));
@@ -251,6 +259,11 @@ function npcPackage.Spawned(npcClass: NpcClass)
                 newPos = newPos+ Vector3.new(0, -math.clamp(enemyDistance/4, 0, 25), 0);
                 targetPoint = newPos;
                 
+            elseif properties.State == "Attack" then
+                properties.SpeedScaler = 3;
+
+                local newPos = enemyPosition;
+                targetPoint = newPos;
             end
 
             if targetPoint then
@@ -334,6 +347,34 @@ function npcPackage.Spawned(npcClass: NpcClass)
             if player == nil or player.Character == nil then continue end;
 
             targetHandlerComp:AddTarget(player.Character);
+        end
+    end)
+
+    task.spawn(function()
+        while not healthComp.IsDead do
+            task.wait(0.1);
+
+            if properties.State ~= "Snooze" then
+                local headPos = head.Position;
+
+                local closestPlayer, closestDist = nil, math.huge;
+
+                for _, player: Player in pairs(game.Players:GetPlayers()) do
+                    local character = player.Character;
+                    if character == nil or character:FindFirstChild("vexling") == nil then continue; end;
+
+                    local distFromHead = player:DistanceFromCharacter(headPos);
+                    if distFromHead < closestDist then
+                        closestDist = distFromHead;
+                        closestPlayer = player;
+                    end
+                end
+                
+                Debugger:Warn(`Closest target to eat {closestDist} ({closestPlayer})`);
+                if closestPlayer == nil or closestDist >= 16 then continue end;
+
+                shared.modEventService:ServerInvoke("ElderVexeron_BindEaten", {ReplicateTo={closestPlayer}}, npcClass);
+            end
         end
     end)
 end

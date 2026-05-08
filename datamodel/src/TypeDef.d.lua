@@ -5,6 +5,7 @@ export type anyfunc = ((...any)->...any);
 export type GAME_EVENT_KEY<U> = U
     | "Crates_BindSpawn"
     | "Character_BindDismount"
+    | "Character_BindMount"
     | "Character_BindSitting"
     | "Doors_BindDoorToggle" -- Physical doors
     | "Destructibles_BindDestroyed"
@@ -37,6 +38,7 @@ export type GAME_EVENT_KEY<U> = U
     | "Profile_BindPlayPoints"
     | "Players_BindWieldEvent"
     | "Players_BindStatusApply"
+    | "Storage_OnOpen"
     | "Tools_BindHealTool"
     | "Tools_BindFoodTool"
     | "WeatherService_BindWeatherSet"
@@ -418,7 +420,9 @@ export type Storages = {
         number
     );
     RemoveItemIdFromStorages: (itemId: string, player: Player, amount: number, storageIdSearchList: {string}) -> nil;
-    
+
+    RegisterItemName: (string) -> nil;
+
     -- @signals
     OnItemSourced: EventSignal<Storage, StorageItem, number>;
 };
@@ -526,6 +530,7 @@ export type StorageItem = {
     SetValues: (StorageItem, key: string, value: any?, syncFunc: any?) -> StorageItem;
     DeleteValues: (StorageItem, key: string, syncFunc: any?) -> StorageItem;
     Clone: (StorageItem) -> StorageItem;
+    Shrink: (StorageItem) -> anydict;
 }
 
 
@@ -650,6 +655,7 @@ export type CharacterClass = {
 
     Initialize: () -> nil;
 
+    GetIsUnderWater: (CharacterClass) -> boolean;
     GetMapLocation: (CharacterClass) -> string;
 
     FireAllModifiersBind: (CharacterClass, bindName: string, ...any) -> nil;
@@ -724,6 +730,7 @@ export type StatusClassInstance = {
 export type AnimationController = {
     Animator: Animator;
     Update: (AnimationController) -> nil;
+    Parameters: anydict;
 };
 
 --MARK: NpcClasses
@@ -1538,7 +1545,9 @@ export type DestructibleInstance = {
 --MARK: ArcTracer
 export type ArcTracer = {
     -- @properties
-    RayWhitelist: {Instance};
+    IncludeInstances: {Instance};
+    ExcludeInstances: {Instance};
+
     RayRadius: number;
     Delta: number;
     Acceleration: Vector3;
@@ -1624,6 +1633,8 @@ export type Octree<T> = {
     GetAllNodes: (Octree<T>) -> {OctreeNode<T>};
     KNearestNeighborsSearch: (Octree<T>, position: Vector3, searchCount: number, radius: number) -> ({T}, {number});
     RadiusSearch: (Octree<T>, position: Vector3, radius: number) -> ({T}, {number});
+
+    GetClosestNodeToPoints: (Octree<T>, points: {Vector3}, filterFunc: ((T) -> boolean)?) -> (T?, number?);
     GetFurthestNodeFromPoints: (Octree<T>, points: {Vector3}, filterFunc: ((T) -> boolean)?) -> (T?, number?);
 };
 
@@ -1751,6 +1762,8 @@ export type EntityClass = {
 
 --MARK: DamageData
 type damageData = {
+    Id: number;
+
     Damage: number;
     TargetPart: BasePart;
 

@@ -3,6 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local RunService = game:GetService("RunService");
 
 local modTables = shared.require(game.ReplicatedStorage.Library.Util.Tables);
+local modRegion = shared.require(game.ReplicatedStorage.Library.Region);
 
 if RunService:IsServer() then
     modGameModeManager = shared.require(game.ServerScriptService.ServerLibrary.GameModeManager);
@@ -39,6 +40,8 @@ function WorldCore.onRequire()
     }
 
     task.spawn(function()
+        local vexClip = workspace.Clips:WaitForChild("_vexClip");
+
         while true do
             task.wait(1);
 
@@ -52,6 +55,8 @@ function WorldCore.onRequire()
                 table.insert(validPlayers, playerClass);
             end
 
+            if #modRegion:GetPlayersWithin(vexClip) > 0 then continue end;
+            
             if #validPlayers <= 0 then continue end;
             modTables.Shuffle(validPlayers);
 

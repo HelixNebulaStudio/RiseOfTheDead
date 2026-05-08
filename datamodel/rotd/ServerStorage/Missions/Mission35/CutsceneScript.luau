@@ -70,27 +70,30 @@ return function(CutsceneSequence)
 
 		local id: string, interactable: InteractableInstance = ...;
 
-		if id == "mission35FoodScavenge" then
-			for _, player in pairs(game.Players:GetPlayers()) do
-				shared.Notify(player, triggerPlayer.Name .." has successfully extracted the food package.", "Reward");
-				modMission:Progress(player, MISSION_ID, function(mission)
-					if mission.ProgressionPoint == 3 then
-						local curTime = workspace:GetServerTimeNow();
+		task.spawn(function()
+			if id == "mission35FoodScavenge" then
+				
+				for _, player in pairs(game.Players:GetPlayers()) do
+					shared.Notify(player, triggerPlayer.Name .." has successfully extracted the food package.", "Reward");
+					modMission:Progress(player, MISSION_ID, function(mission)
+						if mission.ProgressionPoint == 3 then
+							local curTime = workspace:GetServerTimeNow();
 
-						local timer = mission.SaveData.Timers.T1;
-						if timer == nil then
-							timer = {StartTime=curTime-299;};
+							local timer = mission.SaveData.Timers.T1;
+							if timer == nil then
+								timer = {StartTime=curTime-299;};
+							end
+
+							mission.SaveData.FactionData = {
+								Timelapsed = curTime - timer.StartTime;
+							}
+							modMission:CompleteMission(player, MISSION_ID);
 						end
-
-						mission.SaveData.FactionData = {
-							Timelapsed = curTime - timer.StartTime;
-						}
-						modMission:CompleteMission(player, MISSION_ID);
-					end
-				end)
+					end)
+				end
+				Debugger.Expire(interactable.Part.Parent, 0);
 			end
-			Debugger.Expire(interactable.Part.Parent, 0);
-		end
+		end)
 	end)
 
 	CutsceneSequence:Initialize(function()

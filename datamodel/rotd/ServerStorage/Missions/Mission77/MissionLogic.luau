@@ -4,9 +4,9 @@ local MissionFunctions = {};
 local RunService = game:GetService("RunService");
 
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 
 local modRichFormatter = shared.require(game.ReplicatedStorage.Library.UI.RichFormatter);
 
@@ -15,76 +15,98 @@ if RunService:IsServer() then
 	local modCrates = shared.require(game.ReplicatedStorage.Library.Crates);
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
-	if modBranchConfigurations.IsWorld("SunkenShip") then
-		shared.modEventService:OnInvoked("Interactables_BindDoorInteract", function(event: EventPacket, ...)
-			local player = event.Player;
-			if player == nil then return end;
+	if shared.WorldName == "SunkenShip" or shared.WorldName == "BioXResearch" then
 
-			local interactable: InteractableInstance = ...;
-			if interactable.Id ~= "ElderVexeronExit" then return end;
-
-			modMission:Progress(player, MISSION_ID, function(mission)
-				if mission.ProgressionPoint <= 4 then
-					mission.ProgressionPoint = 4;
-				end
-			end);
-			
-			modStatusEffects.VexBile(player, 0);
-		end)
-		
 		shared.modEventService:OnInvoked("Generic_BindTrigger", function(event: EventPacket, ...)
-			local player = event.Player;
+			local player: Player? = event.Player;
 			if player == nil then return end;
 
-			local triggerId: string, vexeronNpcClass: NpcClass = ...;
-			if triggerId ~= "EatenByVexeron" then return end;
-
-			local mission = modMission:GetMission(player, MISSION_ID);
-			if mission == nil then return end;
-
-			if not (mission.Type == 1 and mission.ProgressionPoint == 1) then return end;
-			Debugger:Warn("EnterElderVex");
-
-			modStatusEffects.VexBile(player, 10);
-			
-			modAudio.Play("JawsChomp", workspace);
-
-			local playerClass: PlayerClass = shared.modPlayers.get(player);
-			
-			local vexeronRoom = workspace.Environment:WaitForChild("VexeronRoom");
-			local enterPart = vexeronRoom:WaitForChild("Entrance");
-			local destination = enterPart:WaitForChild("Destination");
-			local tpCframe = CFrame.new(destination.WorldPosition) * CFrame.Angles(0, 0, 0);
-			playerClass:SetCFrame(tpCframe);
-			
-			modMission:Progress(player, MISSION_ID, function(mission)
-				if mission.ProgressionPoint <= 2 then
-					mission.ProgressionPoint = 2;
-				end
-			end);
-			
-			if vexeronNpcClass.Properties.SnoozeState == 1 then return end;
-			vexeronNpcClass.Properties.SnoozeState = 1;
+			local id: string, interactable: InteractableInstance = ...;
 
 			task.spawn(function()
-				while mission.ProgressionPoint <= 2 do
-					vexeronNpcClass.Properties.SnoozeTimer = tick();
-					task.wait(1);
-				end
-				vexeronNpcClass.Properties.SnoozeTimer = tick()-240;
+				if id ~= "ElderVexeronExit" then return end;
+
+				local playerClass: PlayerClass = shared.modPlayers.get(player);
+				playerClass:SetCFrame(CFrame.new(-45.057, 374.059, -42.535));
+
+				modMission:Progress(player, MISSION_ID, function(mission)
+					if mission.ProgressionPoint <= 4 then
+						mission.ProgressionPoint = 4;
+					end
+				end);
+				
+				modStatusEffects.VexBile(player, 0);
 			end)
 		end)
 		
+		shared.modEventService:OnInvoked("ElderVexeron_BindEaten", function(event: EventPacket, ...)
+			local player = event.Player;
+			if player == nil then return end;
+
+			local elderVex: NpcClass = ...;
+
+			task.spawn(function()
+				Debugger:Warn("EnterElderVex");
+
+				local mission = modMission:GetMission(player, MISSION_ID);
+				if mission == nil then return end;
+				if not (mission.Type == 1 and mission.ProgressionPoint == 1) then return end;
+
+				modStatusEffects.VexBile(player, 10);
+				
+				modAudio.Play("JawsChomp", workspace);
+
+				local playerClass: PlayerClass = shared.modPlayers.get(player);
+				
+				local vexeronRoom = workspace.Environment:WaitForChild("VexeronRoom");
+				local enterPart = vexeronRoom:WaitForChild("Entrance");
+				local destination = enterPart:WaitForChild("Destination");
+				local tpCframe = CFrame.new(destination.WorldPosition) * CFrame.Angles(0, 0, 0);
+				playerClass:SetCFrame(tpCframe);
+				
+				modMission:Progress(player, MISSION_ID, function(mission)
+					if mission.ProgressionPoint <= 2 then
+						mission.ProgressionPoint = 2;
+					end
+				end);
+				
+				local properties = elderVex.Properties;
+				if properties.State == "Snooze" then return end;
+				properties.State = "Snooze";
+
+				task.spawn(function()
+					while mission.ProgressionPoint <= 2 do
+						if elderVex.HealthComp.IsDead then break; end;
+						if playerClass.HealthComp.IsDead then break; end;
+						properties.StageChangedTick = tick();
+						properties.SnoozeTimer = tick();
+						properties.SpawnSpitterCooldown = tick() + 10;
+						task.wait(1);
+					end
+					
+					if playerClass.HealthComp.IsDead then 
+						properties.SnoozeTimer = tick()-285;
+					else
+						properties.SnoozeTimer = tick()-240;
+					end;
+				end)
+				
+				for _, model in ipairs(properties.ActiveVexSpitters) do
+					game.Debris:AddItem(model, 0);
+				end
+				table.clear(properties.ActiveVexSpitters);
+			end)
+		end)
 	end
 	
 	function MissionFunctions.Init(missionProfile, mission)
 		local player: Player = missionProfile.Player;
 		local profile = shared.modProfile:Get(player);
 
-		if modBranchConfigurations.IsWorld("SunkenShip") then
-			local cleanEnabled = true;
+		if shared.WorldName == "SunkenShip" then
+			local pgEnabled = true;
 			if profile.Premium then
-				cleanEnabled = false;
+				pgEnabled = false;
 			end
 
 			local vexeronRoom = workspace.Environment:WaitForChild("VexeronRoom");
@@ -92,13 +114,16 @@ if RunService:IsServer() then
 			local spinScript: Script = vexeronRoom:WaitForChild("ElderVexIntieriorScript");
 			spinScript.Enabled = true;
 
+			local exitInteractConfig = workspace.Interactables:WaitForChild("ElderVexExit"):WaitForChild("Interactable");
+			local exitInteractable: InteractableInstance = modInteractables.getOrNew(exitInteractConfig);
+
 			local cratesSpawned = false;
 			local function OnChanged(firstRun)
 				if mission.Type == 2 then -- OnAvailable
 
 				elseif mission.Type == 1 then -- OnActive
 					if mission.ProgressionPoint == 1 then
-						if cleanEnabled then
+						if pgEnabled then
 							for _, obj in pairs(vexeronRoom:GetDescendants()) do
 								if obj:IsA("BasePart") then
 									
@@ -124,18 +149,14 @@ if RunService:IsServer() then
 						end
 						
 						
-						if cleanEnabled then
+						if pgEnabled then
 							modAudio.Play("SewersAmbient", enterPart, true, 0.75);
 						end
 
 					elseif mission.ProgressionPoint == 2 then
 						Debugger:Warn("Mission77, ProgressionPoint 2");
 						
-						local exitInteractModule = workspace.Interactables:WaitForChild("ElderVexExit"):WaitForChild("Interactable");
-						local exitInteractData = shared.require(exitInteractModule);
-						exitInteractData.Script = exitInteractModule;
-						exitInteractData.Locked = true;
-						exitInteractData:Sync();
+						exitInteractConfig:SetAttribute("Locked", true);
 						
 						local vexeronRoom = workspace.Environment:WaitForChild("VexeronRoom");
 						local entrancePart = vexeronRoom:WaitForChild("Entrance");
@@ -155,7 +176,9 @@ if RunService:IsServer() then
 						for a=1, #spawnPoints do
 							local spawnPointAtt: Attachment = spawnPoints[a];
 							
-							local newPrefab, interactData = modCrates.spawn("raresunkencrate", spawnPointAtt.WorldCFrame, {player}, {});
+							local newPrefab, interactable = modCrates.spawn("raresunkencrate", spawnPointAtt.WorldCFrame, {player}, {}, true);
+							local storageId = interactable.Values.StorageId;
+
 							local basePart = newPrefab:WaitForChild("Handle");
 							local baseAtt = basePart:WaitForChild("BaseAttachment");
 							
@@ -165,13 +188,21 @@ if RunService:IsServer() then
 							ridgidConstraint.Parent = basePart;
 							basePart.Anchored = false;
 							
+							local helperLight = Instance.new("PointLight");
+							helperLight.Color = Color3.fromRGB(255, 102, 0);
+							helperLight.Range = 6;
+							helperLight.Brightness = 5;
+							helperLight.Parent = basePart;
 
-							local storageId = interactData.StorageId;
-							
 							local crateStorage = shared.modStorage.Get(storageId, player);
+							if crateStorage == nil then
+								Debugger:Warn(`Failed to spawn crate.`);
+								continue;
+							end
+
 							crateStorage:Add("blueprintpiece", {
-								CustomName=shared.modStorage.RegisterItemName("Turret Blueprint Piece ".. a.."/2");
-								Values={
+								CustomName = shared.modStorage.RegisterItemName("Turret Blueprint Piece ".. a.."/2");
+								Values = {
 									DescExtend=modRichFormatter.H3Text("\nMission: ").."There only seem to be two pieces of the blueprint inside Elder Vexeron.";
 								};
 							});
@@ -200,15 +231,8 @@ if RunService:IsServer() then
 
 					elseif mission.ProgressionPoint == 3 then
 						Debugger:Warn("Mission77, ProgressionPoint 3");
-						local exitInteractModule = workspace.Interactables:WaitForChild("ElderVexExit"):WaitForChild("Interactable");
-						local exitInteractData = shared.require(exitInteractModule);
-						exitInteractData.Script = exitInteractModule;
-						exitInteractData.Locked = false;
-						if not cleanEnabled then
-							exitInteractData.EnterSound = "Fart";
-						end
-						exitInteractData:Sync();
-
+						
+						exitInteractConfig:SetAttribute("Locked", false);
 					end
 				end
 			end
@@ -250,13 +274,15 @@ if RunService:IsServer() then
 							
 							Debugger:Warn("onSunkenSalvagesSpawn");
 							
-							--Whitelist
-							local newPrefab, interactData = modCrates.spawn("raresunkencrate", spawnCframe, {player}, {}, true);
-							
-							local storageId = interactData.StorageId;
+							local newPrefab, interactable = modCrates.spawn("raresunkencrate", spawnCframe, {player}, {}, true);
+							local storageId = interactable.Values.StorageId;
 
 							local crateStorage = shared.modStorage.Get(storageId, player);
 							
+							if crateStorage == nil then
+								Debugger:Warn(`Fail to spawn crate.`);
+								return;
+							end
 							crateStorage:Add("blueprintpiece", {
 								CustomName=shared.modStorage.RegisterItemName("Final Turret Blueprint Piece");
 								Values={
@@ -291,7 +317,7 @@ if RunService:IsServer() then
 		end
 	end
 
-	if modBranchConfigurations.IsWorld("TheHarbor") and shared.gameConfig.BranchName == "Dev" then
+	if shared.WorldName == "TheHarbor" and shared.gameConfig.BranchName == "Dev" then
 		task.spawn(function()
 			Debugger.AwaitShared("modCommandsLibrary");
 	

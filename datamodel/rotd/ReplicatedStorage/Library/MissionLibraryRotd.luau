@@ -2277,26 +2277,26 @@ MissionLibrary.New{
 
 -- MARK: 64 - Joseph's Crossbow
 MissionLibrary.New{
-	MissionId=64;
+	MissionId = 64;
 	MissionType = MissionLibrary.MissionTypes.Secret;
-	Name="Joseph's Crossbow";
-	From="Joseph";
-	Description="You showed Joseph your crossbow..";
-	Persistent=true;
-	World={"TheResidentials";};
-	Checkpoint={
+	Name = "Joseph's Crossbow";
+	From = "Joseph";
+	Description = "You showed Joseph your crossbow..";
+	Persistent = true;
+	World = {"TheResidentials";};
+	Checkpoint = {
 		{Text="Figure out how to build Joseph's Crossbow";};
 	};
-	StartRequirements={
+	StartRequirements = {
 		Level=500;
 	};
-	GuideText="Talk to Joseph";
-	RewardText="Received a Arelshift Cross Antique Skin-Perm";
-	Rewards={
+	GuideText = "Talk to Joseph";
+	RewardText = "Received a Arelshift Cross Antique Skin-Perm";
+	Rewards = {
 		{Type="Item"; ItemId="arelshiftcrossantique"; Quantity=1;};
 	};
-	Markers={};
-	AddRequirements={};
+	Markers = {};
+	AddRequirements = {};
 	
 };
 
@@ -2650,13 +2650,13 @@ MissionLibrary.New{
 
 -- MARK: 77 - Belly of the Beast
 MissionLibrary.New{
-	MissionId=77;
+	MissionId = 77;
 	MissionType = MissionLibrary.MissionTypes.Side;
-	Name="Belly of the Beast";
-	From="Mysterious Engineer";
-	Description="You found a piece of blueprint from the SunkenShip Chest, ask the Mysterious Engineer about it.";
-	Persistent=true;
-	Checkpoint={
+	Name = "Belly of the Beast";
+	From = "Mysterious Engineer";
+	Description = "You found a piece of blueprint from the SunkenShip Chest, ask the Mysterious Engineer about it.";
+	Persistent = true;
+	Checkpoint = {
 		{Text="Get eaten by Elder Vexeron";};
 		{Text="Search for the missing blueprint pieces $PieceFound/2";};
 		{Text="Exit Elder Vexeron at the end";};
@@ -2665,16 +2665,14 @@ MissionLibrary.New{
 
 		{Text="Bring the final piece back to the Mysterious Engineer";};
 	};
-	LogEntry={
+	StartRequirements = {
 	};
-	StartRequirements={
-	};
-	SaveData={PieceFound=0;};
-	GuideText="Talk to Mysterious Engineer";
-	Rewards={
+	SaveData = {PieceFound=0;};
+	GuideText = "Talk to Mysterious Engineer";
+	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Side};
 	};
-	Markers={};
+	Markers = {};
 	
 };
 
