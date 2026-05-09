@@ -151,6 +151,7 @@ function Component:__call(damage, range, isLethal)
             local dmgData = DamageData.new{
                 DamageBy = npcClass;
                 Damage = damage * dmgMulti;
+                DamageCate = "TickCombustion";
             };
 
             if explodeEntityClass.ClassName == "NpcClass" then
@@ -188,11 +189,6 @@ function Component:__call(damage, range, isLethal)
                 
             elseif explodeEntityClass.ClassName == "PlayerClass" then
                 local playerClass: PlayerClass = explodeEntityClass :: PlayerClass;
-
-                local conGasProtection = playerClass.Configurations.GasProtection;
-                if conGasProtection then
-                    damage = damage * (1-conGasProtection);
-                end
 
                 local conSplashReflection = playerClass.Configurations.SplashReflection;
                 if conSplashReflection then

@@ -153,13 +153,10 @@ function TilePrototypePackage:Init(raidController, waveCollapseSystem)
 					local playerClass: PlayerClass = shared.modPlayers.get(player);
 
 					if playerClass then
-						if playerClass.Configurations.GasProtection then
-							dmg = 10;
-						end
-
 						playerClass.HealthComp:TakeDamage(DamageData.new{
 							Damage = dmg;
 							DamageType = "IgnoreArmor";
+							DamageCate = "GasLeak";
 							TargetPart = randomRootPart;
 						});
 					end

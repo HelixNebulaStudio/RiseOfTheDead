@@ -48,14 +48,15 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
 
     local damage = statusClass.Values.Damage;
 
-    local characterClass: CharacterClass = statusClass.StatusOwner;
+    local statusComp: StatusComp = statusClass.StatusComp;
+    local characterClass: CharacterClass = statusClass.StatusOwner :: CharacterClass;
     local healthComp: HealthComp = characterClass.HealthComp;
     
     if healthComp then
         local dmgData = DamageData.new{
-            Damage=damage;
+            Damage = damage;
             DamageType = "IgnoreArmor";
-            DamageCate=DamageData.DamageCategory.FumesGas;
+            DamageCate = "FumesGas";
         };
 
         healthComp:TakeDamage(dmgData);

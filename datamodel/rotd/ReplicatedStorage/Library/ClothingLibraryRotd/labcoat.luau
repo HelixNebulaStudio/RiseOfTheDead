@@ -16,7 +16,15 @@ local attirePackage = {
 };
 
 function attirePackage.newClass()
-	return modEquipmentClass.new(attirePackage);
+	local equipmentClass = modEquipmentClass.new(attirePackage);
+	
+	equipmentClass:AddBaseModifier("LabSafety", {
+		ArrayValues = {
+			PassiveModifiers = "Lab Safety";
+		};
+	}); 
+
+	return equipmentClass;
 end
 
 return attirePackage;

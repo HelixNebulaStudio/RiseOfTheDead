@@ -19,7 +19,7 @@ function attirePackage.newClass()
 
 	equipmentClass:AddBaseModifier("NightVision", {
 		ArrayValues = {
-			PassiveModifiers = "NightVision";
+			PassiveModifiers = "Night Vision";
 		};
 	});
 

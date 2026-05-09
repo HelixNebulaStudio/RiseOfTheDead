@@ -26,7 +26,6 @@ function attirePackage.newClass()
 			PassiveModifiers = "Splash Reflect";
 		};
 	}); 
-	
 
 	return equipmentClass;
 end

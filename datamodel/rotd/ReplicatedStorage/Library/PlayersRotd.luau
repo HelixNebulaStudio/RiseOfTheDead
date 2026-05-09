@@ -42,6 +42,8 @@ shared.coreBind(modPlayers.Player, "_new", function(playerClass: PlayerClass)
     wieldComp.TargetableTags.Cultist = true;
 	wieldComp.TargetableTags.Rat = true;
 
+	playerClass:AddBaseModifier("GasProtection");
+
     if RunService:IsClient() then return end;
     
 	local properties = playerClass.Properties;
@@ -49,8 +51,7 @@ shared.coreBind(modPlayers.Player, "_new", function(playerClass: PlayerClass)
 end)
 
 shared.coreBind(modPlayers.Player, "_character_added", function(playerClass: PlayerClass, character: Model)
-    local characterComp = playerClass.CharacterComp;
-
+	local wieldComp: WieldComp = playerClass.WieldComp;
 	if RunService:IsServer() then return end;
 
 	task.spawn(function()
