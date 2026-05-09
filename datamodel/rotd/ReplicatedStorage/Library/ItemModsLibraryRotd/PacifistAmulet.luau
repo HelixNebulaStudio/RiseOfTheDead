@@ -15,9 +15,10 @@ local modifierPackage = {
 if RunService:IsServer() then
 	function modifierPackage.Binds.WieldCompEquipStateChanged(modifier: ItemModifierInstance)
 		local wieldComp: WieldComp? = modifier.WieldComp;
-		local characterClass: CharacterClass? = wieldComp and wieldComp.CompOwner or nil;
+		local characterClass: CharacterClass? = wieldComp and wieldComp.CompOwner :: CharacterClass;
 		local statusComp: StatusComp? = characterClass and characterClass.StatusComp or nil;
-		if characterClass == nil or wieldComp == nil or statusComp == nil then return end;
+		local healthComp: HealthComp = characterClass and characterClass.HealthComp;
+		if characterClass == nil or wieldComp == nil or statusComp == nil or healthComp == nil then return end;
 		
 		local equippedItemId = wieldComp.ItemId;
 		if equippedItemId == nil then return end;
@@ -26,6 +27,8 @@ if RunService:IsServer() then
 							and (modItemsLibrary:HasTag(equippedItemId, "Heal") 
 							or modItemsLibrary:HasTag(equippedItemId, "Food")))
 		if not isPacifist then return; end;
+
+		if healthComp.CurArmor <= 0 then return end;
 
 		local statusClass: StatusClassInstance = statusComp:GetOrDefault("PacifistsAmulet");
 		if statusClass then return end; 
@@ -36,6 +39,14 @@ if RunService:IsServer() then
 			};
 		});
 	end
+end
+
+function modifierPackage.Instancing(modifier: ItemModifierInstance, isFirstTime: boolean)
+	if RunService:IsClient() then return end;
+
+	if modifier.WieldComp and modifier.WieldComp.CompOwner and modifier.WieldComp.CompOwner.ClassName ~= "PlayerClass" then
+		return 
+	end;
 end
 
 function modifierPackage.Update(modifier: ItemModifierInstance)

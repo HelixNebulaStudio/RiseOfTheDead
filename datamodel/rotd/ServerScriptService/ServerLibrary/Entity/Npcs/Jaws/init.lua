@@ -45,17 +45,17 @@ local npcPackage = {
 
 function npcPackage.Spawning(npcClass: NpcClass)
     local configurations: ConfigVariable = npcClass.Configurations;
-    local properties: PropertiesVariable<{}> = npcClass.Properties;
+    local properties: PropertiesVariable<anydict> = npcClass.Properties;
     local character = npcClass.Character;
 
     local level = math.max(properties.Level, 0);
 
     if properties.HardMode then
-        configurations.BaseValues.MaxHealth = math.max(40000 + 6000*level, 100);
-        configurations.BaseValues.AttackDamage = 30;
+        configurations.BaseValues.MaxHealth = math.max(60000 + 3000*level, 100);
+        configurations.BaseValues.AttackDamage = 40;
     else
-        configurations.BaseValues.MaxHealth = math.max(20000 + 3000*level, 100);
-        configurations.BaseValues.AttackDamage = 20;
+        configurations.BaseValues.MaxHealth = math.max(30000 + 1500*level, 100);
+        configurations.BaseValues.AttackDamage = 25;
     end
 
     npcClass.Move:SetMoveSpeed("set", "default", 0);
@@ -96,7 +96,8 @@ function npcPackage.Spawned(npcClass: NpcClass)
         local insideModel = jawModels[a]:WaitForChild("JawInsides");
         
         local jawDestructible: DestructibleInstance = bodyDestructiblesComp:Create(`${key} Jaw`, insideModel);
-        
+        jawDestructible.Properties.DestroyModel = false;
+
         function jawDestructible.HealthComp:TakeDamage(damageData: DamageData)
             npcClass.HealthComp:TakeDamage(damageData);
         end

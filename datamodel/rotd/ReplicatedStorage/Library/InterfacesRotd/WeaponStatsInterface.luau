@@ -1122,10 +1122,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
             local equipmentClass: EquipmentClassRotd = wieldComp:GetEquipmentClass(siid);
             if equipmentClass == nil then
-                classType = equipmentClass.Class;
                 Debugger:Warn(`EquipmentClass not found for siid:{siid}`);
+                weaponStatsWindow:Close();
                 return;
             end
+
+            classType = equipmentClass.Class;
 
             weaponStatsWindow.Binds.LastStorageItem = storageItem;
 

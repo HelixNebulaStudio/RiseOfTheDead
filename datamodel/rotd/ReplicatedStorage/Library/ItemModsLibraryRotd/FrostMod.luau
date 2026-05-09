@@ -6,7 +6,7 @@ local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemM
 
 local modHealthComp = shared.require(game.ReplicatedStorage.Components.HealthComponent);
 
-local statusId = "Frostbite";
+local STATUS_ID = "Frostbite";
 local modifierPackage = {
 	Name = "Frostbite";
 	
@@ -36,16 +36,21 @@ end
 
 if RunService:IsServer() then
 
-	function modifierPackage.Binds.WeaponShotBulletHit(modifier: ItemModifierInstance, packet: BulletHitData)
-		if packet.TargetModel == nil then return end;
-		
-		local characterClass: CharacterClass = (modifier.WieldComp and modifier.WieldComp.CompOwner or nil) :: CharacterClass;
-		if characterClass == nil then return end;
-		
-		local targetHealthComp: HealthComp? = modHealthComp.getByModel(packet.TargetModel);
+	function modifierPackage.Binds.WeaponShotDamageDataNew(modifier: ItemModifierInstance, damageData: DamageData)
+		local damageTo: EntityClass? = damageData.DamageTo;
+		if damageTo == nil then return end;
+
+		if damageData.ToolHandler == nil or modifier.EquipmentClass ~= damageData.ToolHandler.EquipmentClass then
+			return;
+		end
+
+		if modifier.WieldComp == nil or modifier.WieldComp.CompOwner == nil then return end;
+		local characterClass: CharacterClass = modifier.WieldComp.CompOwner :: CharacterClass;
+
+		local targetHealthComp: HealthComp? = damageTo.HealthComp;
 		if targetHealthComp == nil then return end;
-		if targetHealthComp.IsDead or not targetHealthComp:CanTakeDamageFrom(characterClass) then return end;
-	
+		if not targetHealthComp:CanTakeDamageFrom(characterClass) then return end;
+
 		local targetClass: EntityClass = targetHealthComp.CompOwner;
 		local statusComp: StatusComp? = targetClass.StatusComp;
 		if statusComp == nil then return end;
@@ -57,7 +62,7 @@ if RunService:IsServer() then
 			modifier.Properties.Charge = 0;
 		end
 
-		local rate = (60/configurations.Rpm)/5;
+		local rate = (60/configurations.Rpm)/10;
 		if modifier.Properties.Cooldown and workspace:GetServerTimeNow() <= modifier.Properties.Cooldown then return end;
 		if modifier.Properties.Active ~= true then
 			if modifier.Properties.Charge < 1 then
@@ -82,15 +87,15 @@ if RunService:IsServer() then
 		end
 
 
-		local frostbiteStatusClass: StatusClassInstance = statusComp:GetOrDefault(statusId);
+		local frostbiteStatusClass: StatusClassInstance = statusComp:GetOrDefault(STATUS_ID);
 		if frostbiteStatusClass then
-			frostbiteStatusClass.Expires = workspace:GetServerTimeNow() + 5;
+			frostbiteStatusClass.Expires = workspace:GetServerTimeNow() + 8;
 			return;
 		end;
 
-		statusComp:Apply(statusId, {
-			Expires = workspace:GetServerTimeNow() + 5;
-			Duration = 5;
+		statusComp:Apply(STATUS_ID, {
+			Expires = workspace:GetServerTimeNow() + 8;
+			Duration = 8;
 			ApplyBy = characterClass;
 			Values = {
 				DoIceBlast = true;
@@ -98,7 +103,7 @@ if RunService:IsServer() then
 				Radius = modifier.Properties.Radius;
 				Targets = modifier.Properties.Targets;
 				StorageItemBy = modifier.EquipmentClass and modifier.EquipmentClass.StorageItem;
-				TargetPart = packet.TargetPart;
+				TargetPart = damageData.TargetPart;
 			};
 		});
 	end
@@ -117,28 +122,6 @@ if RunService:IsServer() then
 		if bulletTracer then
 			bulletTracer.Color = ColorSequence.new(Color3.fromRGB(0, 170, 255));
 		end
-	end
-
-	function modifierPackage.Binds.WeaponShotProjectileHit(
-		modifier: ItemModifierInstance, 
-		projectile: ProjectileInstance, 
-		arcPoint: ArcPoint
-	)
-		local targetPart = arcPoint.Hit;
-		if targetPart == nil then return end;
-
-		local targetModel = targetPart.Parent;
-		if targetModel == nil then return end;
-
-
-		local targetHealthComp: HealthComp? = modHealthComp.getByModel(targetModel);
-		if targetHealthComp == nil then return end;
-		targetModel = targetHealthComp:GetModel();
-
-		modifierPackage.Binds.WeaponShotBulletHit(modifier, {
-			TargetModel = targetModel;
-			TargetPart = targetPart;
-		} :: BulletHitData);
 	end
 
 	function modifierPackage.Binds.WeaponTriggerSpecial(modifier: ItemModifierInstance)

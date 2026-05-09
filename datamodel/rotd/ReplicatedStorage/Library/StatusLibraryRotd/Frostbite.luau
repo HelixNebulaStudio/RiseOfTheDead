@@ -99,13 +99,13 @@ function statusPackage.IceBlast(applyBy: CharacterClass?, packet: anydict)
 
         local frostStatusClass: StatusClassInstance = statusComp:GetOrDefault(statusPackage.Id);
         if frostStatusClass then
-            frostStatusClass.Expires = workspace:GetServerTimeNow() + 5;
+            frostStatusClass.Expires = workspace:GetServerTimeNow() + 8;
             continue; 
         end;
 
         statusComp:Apply(statusPackage.Id, {
-            Expires = workspace:GetServerTimeNow() + 5;
-            Duration = 5;
+            Expires = workspace:GetServerTimeNow() + 8;
+            Duration = 8;
 			ApplyBy = applyBy;
             Values = {
                 DoIceBlast = false;

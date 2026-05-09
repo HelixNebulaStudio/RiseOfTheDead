@@ -34,7 +34,6 @@ if RunService:IsServer() then
 
         local modifierInstance: ItemModifierInstance? = characterClass.WieldComp:GetOrDefaultItemModifier(mSiid);
         if modifierInstance == nil or not modifierInstance.Enabled then
-            statusClass.IsExpired = true;
             return;
         end
 
@@ -67,7 +66,7 @@ if RunService:IsServer() then
                 end
 
             else
-                statusClass.Values.MaxArmorOverCharge = math.clamp(statusClass.Values.MaxArmorOverCharge - 1, 0, maxAddAp); 
+                statusClass.Values.MaxArmorOverCharge = math.clamp(statusClass.Values.MaxArmorOverCharge - 0.1, 0, maxAddAp); 
 
                 if statusClass.Values.MaxArmorOverCharge <= 0 and statusClass.Expires == nil then
                     statusClass.Expires = workspace:GetServerTimeNow() + 60;

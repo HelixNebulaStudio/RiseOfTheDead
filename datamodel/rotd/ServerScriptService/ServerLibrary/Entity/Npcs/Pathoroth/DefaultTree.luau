@@ -33,8 +33,6 @@ local TRANSFORM_TWEENINFO = TweenInfo.new(5);
 --==
 function treePackage.onRequire()
     GOOP = script.Parent:WaitForChild("Goop");
-    LARGE_ROOT_JOINT = script.Parent:WaitForChild("LargeRootJoint");
-    LARGE_PATHOROTH = script.Parent:WaitForChild("LargePath");
 end
 
 
@@ -319,6 +317,17 @@ function treePackage.PickActiveTarget(npcClass: NpcClass)
     local properties = npcClass.Properties;
     local targetHandlerComp = npcClass:GetComponent("TargetHandler");
 
+    local enemyTargetData: NpcTargetData = npcClass.Properties.EnemyTargetData;
+    if properties.HordeAggression
+    and enemyTargetData
+    and enemyTargetData.HealthComp
+    and enemyTargetData.HealthComp.CompOwner
+    and enemyTargetData.HealthComp.CompOwner.ClassName == "PlayerClass" then
+        properties.ActiveTargetData = enemyTargetData;
+        
+        return properties.ActiveTargetData ~= nil;
+    end
+
     local allyTargetData: NpcTargetData = targetHandlerComp:MatchFirstTarget(function(targetData)
         if targetData.HealthComp == nil or targetData.HealthComp.IsDead then return end;
         local targetCharacterClass: CharacterClass = targetData.HealthComp.CompOwner;
@@ -334,7 +343,6 @@ function treePackage.PickActiveTarget(npcClass: NpcClass)
 
     local newActiveTargetData = allyTargetData;
     
-    local enemyTargetData: NpcTargetData = npcClass.Properties.EnemyTargetData;
     local recentlyDamaged = (workspace:GetServerTimeNow()-npcClass.HealthComp.LastDamageTaken) <= 5
     if enemyTargetData 
     and enemyTargetData.HealthComp.CompOwner.ClassName == "PlayerClass" 
@@ -348,7 +356,7 @@ function treePackage.PickActiveTarget(npcClass: NpcClass)
             npcClass.WieldComp.Controls.Mouse1Down = false;
         end
     end
-    properties.ActiveTargetData = newActiveTargetData
+    properties.ActiveTargetData = newActiveTargetData;
 
     if properties.ActiveTargetData == nil then
         npcClass.Move:Follow();
@@ -448,6 +456,19 @@ function treePackage.FireGun(npcClass: NpcClass)
 
     local shootDirection = (targetCharacterClass:GetCFrame().Position - npcClass:GetCFrame().Position).Unit;
     
+    local equipmentClass: EquipmentClass? = wieldComp.EquipmentClass;
+    if equipmentClass then
+        local configurations: ConfigVariable = equipmentClass.Configurations;
+        if equipmentClass.Class == "Gun" then
+            local modifier: ItemModifierInstance? = configurations:GetModifier("PathorothGun") :: ItemModifierInstance;
+            if modifier then
+                local firerate = 60/configurations.Rpm;
+                modifier.SetValues.Damage = 5 * firerate;
+                modifier.SetValues.PreModDamage = 5 * firerate;
+            end
+        end
+    end
+
     wieldComp:InvokeToolAction(
         "PrimaryFireRequest", 
         shootDirection, 

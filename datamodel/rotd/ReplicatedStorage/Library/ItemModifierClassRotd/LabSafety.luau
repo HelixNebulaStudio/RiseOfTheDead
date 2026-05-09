@@ -22,17 +22,25 @@ function modifierPackage.Instancing(modifier: ItemModifierInstance, isFirstTime:
 	modifier.Properties.LastDamageTick = workspace:GetServerTimeNow();
 
 	modifier.OnEnabledChanged:Connect(function(prevVal: boolean)
-		if not modifier.Enabled then return end;
 		if modifier.WieldComp == nil then return end;
 
 		local playerClass: PlayerClass? = modifier.WieldComp.CompOwner :: PlayerClass;
 		if playerClass == nil or playerClass.ClassName ~= "PlayerClass" then return end;
 		
-		playerClass.StatusComp:Apply("LabCoat", {
-			Values = {
-				ModifierId = modifier.Id;
-			};
-		});
+		if modifier.Enabled then
+			playerClass.StatusComp:Apply("LabCoat", {
+				Values = {
+					ModifierId = modifier.Id;
+				};
+			});
+		else
+			local status: StatusClassInstance = playerClass.StatusComp:GetOrDefault("LabCoat");
+			if status then
+				status.IsExpired = true;
+			end
+		end
+
+
 	end)
 end
 

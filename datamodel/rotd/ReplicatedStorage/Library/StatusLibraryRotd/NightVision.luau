@@ -28,16 +28,6 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
         return;
     end;
     if tickData.ms100 == false then return end;
-    
-    local modifierId = statusClass.Values.ModifierId;
-    if modifierId == nil then return end;
-
-    local playerClass: PlayerClass = statusClass.StatusOwner :: PlayerClass;
-    local modifier: ItemModifierInstance? = playerClass.WieldComp:GetOrDefaultItemModifier(modifierId);
-    if modifier == nil or modifier.Enabled == false then
-        statusClass.IsExpired = true;
-        return;
-    end
 end
 
 function statusPackage.BindExpire(statusClass: StatusClassInstance)
