@@ -1,7 +1,8 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
---== Client Variables;
-local localPlayer = game.Players.LocalPlayer;
+--==
 local RunService = game:GetService("RunService");
+
+local localPlayer = game.Players.LocalPlayer;
 
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
@@ -99,9 +100,9 @@ return function(CutsceneSequence)
 
 						task.wait(1);
 						stanNpcClass.Chat(stanNpcClass.Player, "Hey ehh, Rachel, I need to patch up again..");
-						wait(3.5);
+						task.wait(3.5);
 						if rachelNpcClass then rachelNpcClass.Chat(player, "You need to be careful out there.."); end;
-						wait(3.5);
+						task.wait(3.5);
 						for a=1, 5 do
 							stanNpcClass.HealthComp:TakeDamage(DamageData.new{
 								Damage = -8;
@@ -110,10 +111,10 @@ return function(CutsceneSequence)
 							task.wait(0.5);
 						end
 						if rachelNpcClass then rachelNpcClass.Chat(player, "There, done."); end;
-						wait(2.5)
+						task.wait(2.5)
 						stanNpcClass.Humanoid.Health = 100;
 						stanNpcClass.Chat(stanNpcClass.Player, "Thanks a lot.");
-						wait(1)
+						task.wait(1)
 						
 						stanNpcClass.Move:SetMoveSpeed("set", "default", 7);
 						stanNpcClass.Move:MoveTo(Vector3.new(224.28, 9.83, -10.46));
@@ -123,13 +124,13 @@ return function(CutsceneSequence)
 
 						stanNpcClass.Move:SetMoveSpeed("set", "default", 7);
 						
-						wait(1)
+						task.wait(1)
 						stanNpcClass.Chat(stanNpcClass.Player, "Yo Vlad! When are you going to have stock of that item I wanted?!");
-						wait(5.5)
+						task.wait(5.5)
 						if vladimirNpcClass then
 							vladimirNpcClass.Chat(player, "Ugh.. Not sure, stop asking please. Так раздражает..");
 						end
-						wait(4.5);
+						task.wait(4.5);
 
 						stanNpcClass.Move:MoveTo(Vector3.new(235.3, 9.8, 10.4));
 						stanNpcClass.Move.OnMoveToEnded:Wait(5);
@@ -153,7 +154,7 @@ return function(CutsceneSequence)
 						stanNpcClass:ToggleInteractable(false);
 						stanNpcClass:SetCFrame(CFrame.new(235.310089, 9.83002663, 10.3999949, 1, 0, 0, 0, 1, 0, 0, 0, 1));
 
-						wait(2);
+						task.wait(2);
 						if stanNpcClass == nil then return end;
 
 						stanNpcClass.Move:SetMoveSpeed("set", "default", 7);
@@ -164,12 +165,12 @@ return function(CutsceneSequence)
 
 						stanNpcClass.Move:Face(Vector3.new(230.65, 12.165, 14.3));
 
-						wait(0.5);
+						task.wait(0.5);
 						if stanNpcClass == nil then return end;
 
 						stanNpcClass:UseInteractable("trainStationSafehouseExit2");
 
-						wait(2);
+						task.wait(2);
 						if stanNpcClass == nil then return end;
 
 						stanNpcClass.Move:MoveTo(Vector3.new(271.33, 25.69, -20.69));
@@ -187,7 +188,7 @@ return function(CutsceneSequence)
 
 						stanNpcClass.Chat(stanNpcClass.Player, "Oh boy.. we better just save ammo and run past them.");
 
-						wait(5);
+						task.wait(5);
 						if stanNpcClass == nil then return end;
 
 						stanNpcClass.Move:SetMoveSpeed("set", "default", 25);
@@ -219,8 +220,9 @@ return function(CutsceneSequence)
 		
 		return CutsceneSequence;
 
+
 	--MARK: TheMall
-	elseif modBranchConfigurations.IsWorld("TheMall") then
+	elseif shared.WorldName == "TheMall" then
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
 			local player = players[1];
@@ -229,6 +231,7 @@ return function(CutsceneSequence)
 			
 			local patrickPrefab = workspace.Entity:FindFirstChild("Patrick");
 			local patrickNpcClass: NpcClass = patrickPrefab and modNpcs.getByModel(patrickPrefab);
+			local mallPatrickSpawn = patrickNpcClass.SpawnCFrame;
 			
 			local mallStanSpawn = CFrame.new(755.640137, 59.1950226, -805.369812, -1, 0, 0, 0, 1, 0, 0, 0, -1);
 			local stanNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Stan");
@@ -246,12 +249,13 @@ return function(CutsceneSequence)
 					
 					if mission.ProgressionPoint == 4 then
 						stanNpcClass:SetCFrame(mallStanSpawn);
+						modReplicationManager.SetClientParent(player, patrickPrefab, workspace.Entity);
 						
 					elseif mission.ProgressionPoint == 5 then
 						stanNpcClass:ToggleInteractable(false);
 						stanNpcClass:SetCFrame(mallStanSpawn);
 						
-						wait(2);
+						task.wait(2);
 						stanNpcClass.Move:SetMoveSpeed("set", "default", 25);
 						
 						local waypoint = Vector3.new(714.962, 95.72, -721.133);
@@ -260,7 +264,7 @@ return function(CutsceneSequence)
 						stanNpcClass.Move:MoveTo(waypoint);
 						stanNpcClass.Move.OnMoveToEnded:Wait(20);
 
-						if stanNpcClass:DistanceFromCharacter(waypoint) > 20 then
+						if stanNpcClass:DistanceFrom(waypoint) > 20 then
 							stanNpcClass:SetCFrame(CFrame.new(waypoint));
 						end
 						
@@ -271,7 +275,7 @@ return function(CutsceneSequence)
 						stanNpcClass.Move.OnMoveToEnded:Wait(15);
 						stanNpcClass.Move:Face(Vector3.new(797.496, 160.864, -730.922));
 						
-						if stanNpcClass:DistanceFromCharacter(waypoint) > 20 then
+						if stanNpcClass:DistanceFrom(waypoint) > 20 then
 							stanNpcClass.Move:Stop();
 							stanNpcClass:SetCFrame(CFrame.new(waypoint));
 						end
@@ -301,16 +305,16 @@ return function(CutsceneSequence)
 						stanNpcClass.Move:HeadTrack(patrickNpcClass.Head, 15);
 
 						patrickNpcClass.Chat(player, "HALT! STOP RIGHT THERE OR I SHOOT!");
-						wait(3);
+						task.wait(3);
 						stanNpcClass.Chat(stanNpcClass.Player, "WAIT wait wait!!! We are here to talk!");
-						wait(3);
+						task.wait(3);
 						patrickNpcClass.Chat(player, "What do you want?!");
 						stanNpcClass.Move:Face(patrickNpcClass.RootPart);
-						wait(3);
+						task.wait(3);
 						stanNpcClass.Chat(stanNpcClass.Player, "We want to speak to your leader.");
-						wait(3);
+						task.wait(3);
 						patrickNpcClass.Chat(player, "Not gonna happen. Leave now!");
-						wait(3);
+						task.wait(3);
 						stanNpcClass.Move:Face("Player");
 						
 						modMission:Progress(player, MISSION_ID, function(mission)

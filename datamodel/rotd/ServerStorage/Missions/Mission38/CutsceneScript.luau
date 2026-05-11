@@ -66,7 +66,7 @@ return function(CutsceneSequence)
 						robertNpcClass.Move:SetMoveSpeed("set", "default", 30);
 
 						robertNpcClass:ToggleInteractable(false);
-						spawn(function()
+						task.spawn(function()
 							-- rbxassetid://141728515 original face
 							local face = robertNpcClass.Head:WaitForChild("face");
 							face.Texture = "rbxassetid://5195838286";
@@ -98,7 +98,7 @@ return function(CutsceneSequence)
 						robertNpcClass:SetCFrame(CFrame.new(385.680115, -23.7978725, 121.620682, 0, 0, -1, 0, 1, 0, 1, 0, 0));
 
 						robertWaitForPlayerComp(60);
-						wait(1);
+						task.wait(1);
 
 						modMission:Progress(player, MISSION_ID, function(mission)
 							mission.ProgressionPoint = 4;
@@ -160,7 +160,7 @@ return function(CutsceneSequence)
 						robertNpcClass.Move:SetMoveSpeed("set", "default", 15);
 						robertNpcClass.Move:Face(Vector3.new(1126.967, 58.25, -70.092));
 						
-						spawn(function()
+						task.spawn(function()
 							local face = robertNpcClass.Head:WaitForChild("face");
 							face.Texture = "rbxassetid://5195838286";
 						end)
@@ -175,7 +175,7 @@ return function(CutsceneSequence)
 
 					elseif mission.ProgressionPoint == 6 then
 						robertNpcClass:SetCFrame(postCf)
-						spawn(function()
+						task.spawn(function()
 							local face = robertNpcClass.Head:WaitForChild("face");
 							face.Texture = "rbxassetid://5195838286";
 						end)
@@ -184,7 +184,7 @@ return function(CutsceneSequence)
 					elseif mission.ProgressionPoint == 7 then
 						robertNpcClass:SetCFrame(postCf)
 						robertNpcClass.StopAnimation("LookBack");
-						spawn(function()
+						task.spawn(function()
 							-- rbxassetid://141728515 original face
 							local face = robertNpcClass.Head:WaitForChild("face");
 							face.Texture = "rbxassetid://141728515";
@@ -195,7 +195,7 @@ return function(CutsceneSequence)
 					
 				elseif mission.Type == 3 then -- OnComplete
 					if not firstRun then
-						wait(3);
+						task.wait(3);
 
 						robertNpcClass.Move:SetMoveSpeed("set", "default", 8);
 						

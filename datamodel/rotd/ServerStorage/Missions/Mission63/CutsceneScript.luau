@@ -43,7 +43,7 @@ return function(CutsceneSequence)
 			local function spawnBandit()
 				gateBanditNpcClass = modNpcs.spawn2{
 					Name = "Jason";
-					CFrame = CFrame.new(798.55481, 162.668854, -728.297119, 0, 0, 1, 0, 1, 0, -1, 0, 0);
+					CFrame = CFrame.new(797.824646, 162.674362, -714.198425, 0.190735996, 0, 0.981641412, 0, 1, 0, -0.981641412, 0, 0.190735996);
 					Player = player;
 					ReplicateOut = true;
 					BindSetup = function(npcClass: NpcClass)

@@ -66,6 +66,12 @@ local npcPackage = {
                 Reply="Yep, looks like the price is going up for a while.";
             };
         };
+        FleeSpeech = {
+            {Say="Stop!!"};
+            {Say="You win this time!"};
+            {Say="I'm out!"};
+            {Say="Let me go, please!"};
+        };
     };
     
     AddComponents = {

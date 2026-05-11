@@ -30,7 +30,7 @@ if RunService:IsServer() then
 					if patrickPrefab then
 						modReplicationManager.SetClientParent(player, patrickPrefab, game.ReplicatedStorage);
 					end
-					Debugger:Warn("Hide Patrick");
+					Debugger:Warn("Hide Patrick 1");
 					
 				end
 
@@ -78,7 +78,7 @@ if RunService:IsServer() then
 					if patrickPrefab then
 						modReplicationManager.SetClientParent(player, patrickPrefab, game.ReplicatedStorage);
 					end
-					Debugger:Warn("Hide Patrick");
+					Debugger:Warn("Hide Patrick 2");
 
 				end
 			end
@@ -98,18 +98,6 @@ else
 			patrick.World="Safehome";
 
 			Debugger:Log("Client>> Update patrick class");
-			
-			if modBranchConfigurations.IsWorld("TheMall") then
-				local patrickPrefab;
-				repeat
-					patrickPrefab = workspace.Entity:FindFirstChild("Patrick");
-					if patrickPrefab then
-						patrickPrefab.Parent = game.ReplicatedStorage;
-						Debugger:Warn("Hide Patrick");
-					end
-					task.wait(1);
-				until false;
-			end
 		end
 	end
 	

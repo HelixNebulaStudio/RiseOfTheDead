@@ -10,7 +10,7 @@ local TALK_ANIMATIONS = {"nodyes"; "nodno"; "shrug2"; "laugh"; "point"; "bored";
 local treePackage = {
     LogicString = {
         Default = "!InCutscene & DefaultTree | [DoNothing]";
-        DefaultTree = "HasEnemy & AlertTree | IdleTree";
+        DefaultTree = "HasEnemy & (FleeTree | AlertTree) | IdleTree";
         AlertTree = "EquipWeapon & IsInVision & (ShareIntel & IsUsingMelee & MeleeTree | RangeTree) | HuntTree";
         HuntTree = "KnowEnemyLastPosition & (IsAtLastKnownPosition & [InvestigateArea] | [MoveToLastKnownPosition]) | SeekTree";
         SeekTree = "[GuessEnemyLastPosition]";
@@ -20,6 +20,7 @@ local treePackage = {
         SelfHealTree = "IsHurt & [SelfHeal]";
         PatrolTree = "ConverseTree | [Patrol]";
         ConverseTree = "ShareIntel & IsSpokenTo & [Converse]";
+        FleeTree = "!CanEquip & [Flee]"
     };
 };
 
@@ -48,11 +49,6 @@ function treePackage.HasEnemy(npcClass: NpcClass)
 
             local woundedStatus = targetCharacterClass.StatusComp:GetOrDefault("Wounded");
             if woundedStatus then return false; end;
-
-            if targetCharacterClass.Properties.AllyTypes then
-                local isAlly = table.find(targetCharacterClass.Properties.AllyTypes, npcClass.HumanoidType);
-                if isAlly then return false; end;
-            end
 
             if npcClass.HealthComp.LastDamagedBy == targetCharacterClass then
                 targetData.IsInVision = true;
@@ -168,7 +164,7 @@ function treePackage.IsAtLastKnownPosition(npcClass: NpcClass)
     local isAtLastKnowPos = modVector.DistanceSqrd(lastKnownPos, npcClass:GetCFrame().Position) < 36; --6 units
     
     if isAtLastKnowPos then
-        if properties.ArriveSeekPositionTick == nil or tick()-properties.ArriveSeekPositionTick > 40 then
+        if (properties.ArriveSeekPositionTick == nil or tick()-properties.ArriveSeekPositionTick > 40) and math.random(1, 6) == 1 then
             properties.ArriveSeekPositionTick = tick();
 
             npcClass.PlayAnimation("Idle");
@@ -568,7 +564,7 @@ function treePackage.ShareIntel(npcClass: NpcClass)
         end)
 
         
-        if math.random(1, 3) == 1 then
+        if math.random(1, 5) == 1 then
             local alertPhrases = npcClass.NpcPackage.Chatter.AlertPhrases;
             local filteredAlertPhrases = {};
             for a=1, #(alertPhrases or {}) do
@@ -667,6 +663,35 @@ function treePackage.Converse(npcClass: NpcClass)
 end
 
 function treePackage.DoNothing(npcClass: NpcClass)
+    return true;
+end
+
+
+--MARK: FleeTree
+function treePackage.CanEquip(npcClass: NpcClass)
+    return npcClass.WieldComp.CanEquip;
+end
+
+function treePackage.Flee(npcClass: NpcClass)
+    local properties = npcClass.Properties;
+    local enemyTargetData = npcClass.Properties.EnemyTargetData;
+    local enemyNpcClass: NpcClass = enemyTargetData.HealthComp.CompOwner;
+
+    npcClass.Move:SetMoveSpeed("set", "sprint", properties.SprintSpeed or 18, npcClass.Move.MoveSpeedPriority.Movement, 5);
+    npcClass.Move:Follow(enemyNpcClass.RootPart, 64, 128);
+
+    if (properties.FleeSpeechTick == nil or tick()-properties.FleeSpeechTick > 60) and math.random(1, 3) == 1 then
+        properties.FleeSpeechTick = tick();
+
+        npcClass.PlayAnimation("Surrender");
+
+        local fleeSpeech = npcClass.NpcPackage.Chatter.FleeSpeech;
+        local fleePhrase = fleeSpeech and fleeSpeech[math.random(1, #fleeSpeech)] or nil;
+        if fleePhrase then
+            npcClass.Chat(nil, fleePhrase.Say);
+        end
+    end
+
     return true;
 end
 

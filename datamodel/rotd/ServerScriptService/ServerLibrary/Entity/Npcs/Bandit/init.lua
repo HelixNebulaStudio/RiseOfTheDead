@@ -176,6 +176,12 @@ local npcPackage = {
                 Reply="Should've seen me last week, had to outrun both Fumes AND Shadow.";
             };
         };
+        FleeSpeech = {
+            {Say="Okay, I had enough.."};
+            {Say="Ugh..."};
+            {Say="I give up! I give up!"};
+            {Say="No more, please!"};
+        };
     };
     
     AddComponents = {

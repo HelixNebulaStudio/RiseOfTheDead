@@ -1,5 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Configuration;
+local RunService = game:GetService("RunService");
+
 local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibraryRotd);
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
@@ -515,7 +517,7 @@ function library.onRequire()
 			{Type=ItemDropTypes.Blueprint; ItemId="shotgunammocapbp"; Chance=bpItemDropChance;};
 			(isPrivateWorld and {Type=ItemDropTypes.Screws; ItemId="screws"; Quantity={Min=4; Max=6}; Chance=1/3;} or nil);
 
-			{Type=ItemDropTypes.Tool; ItemId="xm1014"; Chance=1/25; DropIfNotOwned=true;};
+			{Type=ItemDropTypes.Tool; ItemId="xm1014"; Chance=(RunService:IsStudio() and 1 or 1/25); DropIfNotOwned=true;};
 			{Type=ItemDropTypes.Tool; ItemId="mp5"; Chance=1/100; DropIfNotOwned=true;};
 			
 			(SpecialEvent.Christmas and {Type=ItemDropTypes.Coal; ItemId="coal"; Quantity=quan2m4; Chance=1/10;} or nil);
