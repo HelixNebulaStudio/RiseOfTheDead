@@ -54,7 +54,8 @@ local npcPackage = {
             {Say="C'mon out already!"};
             {Say="You can't hide forever."};
             {Say="I swear I heard something here.."};
-            {Say="I might be close.."};
+            {Say="I know you're around here.."};
+            {Say="I know you're here!"};
         };
         PatrolConverse = {
             {
@@ -181,6 +182,16 @@ local npcPackage = {
             {Say="Ugh..."};
             {Say="I give up! I give up!"};
             {Say="No more, please!"};
+            {Say="noooo!"};
+            {Say="Mercy, please!!"};
+        };
+        DeadbodySpeech = {
+            {Say="What the?!"};
+            {Say="We are under attack!"};
+            {Say="Uh oh!"};
+            {Say="Huh?!"};
+            {Say="No way!"};
+            {Say="Nooo!"};
         };
     };
     
@@ -239,6 +250,9 @@ function npcPackage.Spawning(npcClass: NpcClass)
                     MaxAmmoLimit = math.random(60, 120);
                     NpcPercentHealthDamage = 0.1;
                 };
+                ProductValues = {
+                    Rpm = 1/2;
+                };
             });
 
         elseif equipmentClass.Class == "Melee" then
@@ -271,6 +285,34 @@ function npcPackage.Spawned(npcClass: NpcClass)
     if properties.HardMode then
         npcClass:AddComponent("BanditArmor")(npcClass.HealthComp.MaxHealth);
     end
+
+    npcClass.HealthComp.OnIsDeadChanged:Connect(function(isDead)
+        if not isDead then return end;
+        
+        local lastDamageBy: EntityClass? = npcClass.HealthComp.LastDamagedBy;
+        local deathPos = npcClass:GetCFrame().Position;
+        local nearbyNpcClasses, nearbyDistances = shared.modNpcs.Octree:RadiusSearch(deathPos, 32);
+
+        for a=1, #nearbyNpcClasses do
+            local allyNpcClass: NpcClass = nearbyNpcClasses[a];
+            if allyNpcClass.HealthComp.IsDead then continue end;
+            if allyNpcClass.HumanoidType ~= npcClass.HumanoidType then continue end;
+            if not allyNpcClass:IsInVision(npcClass.Character) then continue end;
+
+            allyNpcClass.Properties.SeenDeadbodyData = {
+                SeenTick = tick();
+                Position = deathPos;
+                KillerCharacter = lastDamageBy and lastDamageBy.Character or nil;
+            };
+            
+            if lastDamageBy then
+                local allyTargetHandlerComp = allyNpcClass:GetComponent("TargetHandler");
+                if allyTargetHandlerComp then
+                    allyTargetHandlerComp:AddTarget(lastDamageBy.Character);
+                end
+            end
+        end
+    end)
 end
 
 function npcPackage.Despawning(npcClass: NpcClass)

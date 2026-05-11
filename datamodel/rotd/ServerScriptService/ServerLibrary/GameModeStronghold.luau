@@ -62,7 +62,7 @@ function Stronghold.new()
         
         Doors = {};
         ExtractDoors = {};
-        EnemyClassInstances = {};
+        EnemyClasses = {};
 
         ModeType = nil;
         ModeStage = nil;
@@ -260,7 +260,7 @@ function Stronghold:Initialize(roomData)
                                         * CFrame.new(0, 1, 0) 
                                         * CFrame.Angles(0, math.rad(math.random(0, 360)), 0);
 						
-						if #self.EnemyClassInstances <= Config.EnemyCap then
+						if #self.EnemyClasses <= Config.EnemyCap then
 							self:SpawnEnemy(self:PickEnemy(), {
 								SpawnCFrame = spawnCf;
 							});
@@ -271,7 +271,7 @@ function Stronghold:Initialize(roomData)
 							local chosenNpcClass;
 							
 							for b=1, 3 do
-								chosenNpcClass = self.EnemyClassInstances[math.random(1, #self.EnemyClassInstances)]
+								chosenNpcClass = self.EnemyClasses[math.random(1, #self.EnemyClasses)]
 								if chosenNpcClass.Properties.BasicEnemy == true then break; end;
 							end
 							
@@ -431,12 +431,13 @@ function Stronghold:SpawnEnemy(npcName, paramPacket)
 			HardMode = self.IsHard == true;
 			CanForgetTargets = false;
 			IsHostile = true;
+			OpponentsThreshold = self.IsHard == true and math.random(1, 3) or 1;
 		};
 		BindSetup = function(npcClass: NpcClass)
 			self.EnemiesSpawned = self.EnemiesSpawned + 1;
 			local properties: PropertiesVariable<anydict> = npcClass.Properties;
 			
-			table.insert(self.EnemyClassInstances, npcClass);
+			table.insert(self.EnemyClasses, npcClass);
 
 			local healthComp: HealthComp = npcClass.HealthComp;
 			healthComp.OnIsDeadChanged:Connect(function(isDead)
@@ -445,19 +446,19 @@ function Stronghold:SpawnEnemy(npcName, paramPacket)
 				self.LastKilled = tick();
 
 				local removedFromTable = false;
-				for a=#self.EnemyClassInstances, 1, -1 do
-					if self.EnemyClassInstances[a] == npcClass then
-						table.remove(self.EnemyClassInstances, a);
+				for a=#self.EnemyClasses, 1, -1 do
+					if self.EnemyClasses[a] == npcClass then
+						table.remove(self.EnemyClasses, a);
 						removedFromTable = true;
 						break;
 					end
 				end
-
-				Debugger:WarnClient(game.Players:GetPlayers(), `Stronghold>>  Killed enemy. Alive: {#self.EnemyClassInstances}, Eliminated: {self.EliminateCount}, Removed: {removedFromTable}`);
-				self.EliminateCount = self.EliminateCount +1;
-				self.LastEnemyDeathPos = npcClass.RootPart.CFrame.Position;
 				
 				if self.Status == EnumStatus.InProgress then
+					Debugger:WarnClient(game.Players:GetPlayers(), `Stronghold>>  Killed enemy. Alive: {#self.EnemyClasses}, Eliminated: {self.EliminateCount}, Removed: {removedFromTable}`);
+					self.EliminateCount = self.EliminateCount +1;
+					self.LastEnemyDeathPos = npcClass.RootPart.CFrame.Position;
+
 					local remining = math.max(0, self.EliminateGoal - self.EliminateCount);
 
 					self.ObjectiveStatusText = `Eliminate {remining} enemies`;
@@ -699,10 +700,14 @@ function Stronghold:RespawnDead()
 end
 
 function Stronghold:Restart()
-	for a=#self.EnemyClassInstances, 1, -1 do
-		game.Debris:AddItem(self.EnemyClassInstances[a].Character, 0);
-		table.remove(self.EnemyClassInstances, a);
+	for a=#self.EnemyClasses, 1, -1 do
+		self.EnemyClasses[a]:Destroy();
 	end
+	table.clear(self.EnemyClasses);
+
+	self.EnemiesSpawned = 0;
+	self.EliminateCount = 0;
+	self.EliminateGoal = 0;
 
     for spawnPart, spawnInfo in pairs(self.SpawnPlatforms) do
         spawnInfo.SpawnedAmbientEntity = nil;

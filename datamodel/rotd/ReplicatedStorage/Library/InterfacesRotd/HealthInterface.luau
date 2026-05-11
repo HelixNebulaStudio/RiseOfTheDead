@@ -76,6 +76,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local humanoid = playerClass.Humanoid;
 
     window.OnUpdate:Connect(function()
+		if healthBars.Parent == nil then return end;
+
 		local health, maxHealth = healthComp.CurHealth, healthComp.MaxHealth;
 		local armor, maxArmor = healthComp.CurArmor, healthComp.MaxArmor;
 		armor = armor or 0;
@@ -121,11 +123,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		armorBars.Size = UDim2.new(maxArmor/maxPool, 0, 1, 0);
 		armorBars.Bar:TweenSize(UDim2.new(armorRatio, 0, 1, 0), TWEEN_DIRECTION, TWEEN_STYLE, 0.1, true, refresh);
 		
-		delay(0.05, function()
-			pcall(function()
-				healthBars.LostBar:TweenSize(UDim2.new(healthRatio, 0, 1, 0), TWEEN_DIRECTION, TWEEN_STYLE, 0.4, true, refresh);
-				armorBars.LostBar:TweenSize(UDim2.new(armorRatio, 0, 1, 0), TWEEN_DIRECTION, TWEEN_STYLE, 0.4, true, refresh);
-			end)
+		task.delay(0.05, function()
+			if healthBars.Parent == nil then return end;
+			
+			healthBars.LostBar:TweenSize(UDim2.new(healthRatio, 0, 1, 0), TWEEN_DIRECTION, TWEEN_STYLE, 0.4, true, refresh);
+			armorBars.LostBar:TweenSize(UDim2.new(armorRatio, 0, 1, 0), TWEEN_DIRECTION, TWEEN_STYLE, 0.4, true, refresh);
 		end);
 		
 		if modData.Settings.CombineHealthbars == true then

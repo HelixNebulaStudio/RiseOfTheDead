@@ -886,6 +886,7 @@ function modBranchConfigurations.onRequire()
     elseif curWorldInfo.WorldType == WORLD_TYPES.Menu then
         modConfigurations.Set("AllowFreecam", true);
         modConfigurations.Set("DisableLeaderboard", true);
+        modConfigurations.Set("DisableSocialMenu", false);
         
 
     elseif curWorldInfo.WorldType == WORLD_TYPES.Slaughterfest then

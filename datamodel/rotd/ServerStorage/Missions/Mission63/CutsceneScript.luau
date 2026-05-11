@@ -441,7 +441,7 @@ return function(CutsceneSequence)
 
 						loranNpcClass.Character:SetAttribute("LookAtClient", false);
 						loranNpcClass.StopAnimation("crossedarm");
-						loranNpcClass.Move:SetMoveSpeed("set", "default", 8);
+						loranNpcClass.Move:SetMoveSpeed("set", "default", 9);
 						loranNpcClass.Chat(player, "Alright, let's get moving..");
 						loranNpcClass.Move:MoveTo(Vector3.new(-2189.084, 122.808, 2141.123));
 						loranNpcClass.Move.OnMoveToEnded:Wait(10);
@@ -533,7 +533,6 @@ return function(CutsceneSequence)
 						jointB.Part1 = strangerANpcClass.RootPart;
 						strangerANpcClass.Humanoid.PlatformStand = true;
 						
-						modStatusEffects.DirectCamera(player, loranNpcClass.Head.Position, 3.5);
 						loranNpcClass.Chat(player, "Listen up recruits! We know one of you is a spy.. Reveal yourselves or you will be kicked off the helicopter!");
 						loranNpcClass:GetComponent("AvatarFace"):Set("Frustrated", game.Players:GetPlayers());
 
@@ -550,6 +549,7 @@ return function(CutsceneSequence)
 						strangerCNpcClass.Character:SetAttribute("LookAtClient", nil);
 						
 						task.wait(8);
+						modStatusEffects.DirectCamera(player, loranNpcClass.Head.Position, 1);
 						
 						loranNpcClass.Chat(player, "You have 3 seconds to reveal yourself!");
 						

@@ -1,7 +1,5 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local PathfindingService = game:GetService("PathfindingService");
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modVector = shared.require(game.ReplicatedStorage.Library.Util.Vector);
 local modTables = shared.require(game.ReplicatedStorage.Library.Util.Tables);
 
@@ -55,20 +53,52 @@ function treePackage.HasEnemy(npcClass: NpcClass)
                 return true;
             end;
 
+            local deadbodyData = properties.SeenDeadbodyData;
+
             local isTargetPlayer = targetCharacterClass.HumanoidType == "Player";
             local isHostile = properties.IsHostile == true;
-            if isTargetPlayer and not isHostile and targetData.Damage <= 0 then 
+            if isTargetPlayer and not isHostile and targetData.Damage <= 0 and deadbodyData == nil then 
                 return false;
             end;
 
+            local targetProperties = targetCharacterClass.Properties;
+
             local visionTarget = targetCharacterClass.Head;
-            if targetCharacterClass.Properties.IsCrouching then
+            if targetProperties.IsCrouching then
                 visionTarget = targetCharacterClass.RootPart;
             end
 
             local isInVision = npcClass:IsInVision(visionTarget, 75);
             targetData.IsInVision = isInVision;
             if not isInVision then
+
+                if deadbodyData and deadbodyData.KillerCharacter == targetData.Model then
+                    if tick()-deadbodyData.SeenTick <= 5 then
+                        targetData.LastKnownPosition = deadbodyData.Position + Vector3.new(
+                            math.random(-1, 1) * math.random(0, 4), 
+                            0, 
+                            math.random(-1, 1) * math.random(0, 4)
+                        );
+
+                        if properties.LastDeadbodyDiscoverTick == nil or tick()-properties.LastDeadbodyDiscoverTick > 20 then
+                            properties.LastDeadbodyDiscoverTick = tick();
+
+                            local deadbodySpeech = npcClass.NpcPackage.Chatter.DeadbodySpeech;
+                            local deadbodyPhrase = deadbodySpeech and deadbodySpeech[math.random(1, #deadbodySpeech)] or nil;
+                            if deadbodyPhrase then
+                                npcClass.Chat(nil, deadbodyPhrase.Say);
+                            end
+                        end
+
+                        return true;
+                    end
+                end
+
+                local npcCombatComp = targetCharacterClass:GetComponent("NpcCombat");
+                if npcCombatComp then
+                    return npcCombatComp:CanBeFaughtBy(npcClass);
+                end
+
                 if targetData.LastSeenTick and (tick()-targetData.LastSeenTick < properties.LastSeenMemDuration) then
                     return true;
                 end
@@ -153,6 +183,14 @@ function treePackage.KnowEnemyLastPosition(npcClass: NpcClass)
 
     if lastKnownPos == nil then return false; end;
 
+    local enemyEntityClass: EntityClass = enemyTargetData.HealthComp.CompOwner;
+    if enemyEntityClass.ClassName == "PlayerClass" then
+        local npcCombatComp = (enemyEntityClass :: PlayerClass):GetComponent("NpcCombat");
+        if npcCombatComp then
+            return npcCombatComp:CanBeFaughtBy(npcClass);
+        end
+    end
+
     return true;
 end
 
@@ -196,6 +234,8 @@ end
 
 function treePackage.InvestigateArea(npcClass: NpcClass)
     local properties = npcClass.Properties;
+    local enemyTargetData = npcClass.Properties.EnemyTargetData;
+
     if properties.LastSeekTurnTick == nil or tick() > properties.LastSeekTurnTick then
         properties.LastSeekTurnTick = tick() + math.random(1, 9);
 
@@ -204,6 +244,10 @@ function treePackage.InvestigateArea(npcClass: NpcClass)
 
         npcClass.Move:Face(npcClass:GetCFrame().Position + (lookDir * 100));
     end
+
+    if enemyTargetData then
+        enemyTargetData.LastKnownPosition = nil;
+    end
 end
 
 function treePackage.GuessEnemyLastPosition(npcClass: NpcClass)
@@ -211,21 +255,35 @@ function treePackage.GuessEnemyLastPosition(npcClass: NpcClass)
     local enemyTargetData: NpcTargetData = npcClass.Properties.EnemyTargetData;
     local enemyPosition = enemyTargetData.Model and enemyTargetData.Model:GetPivot().Position or nil;
 
-    if enemyPosition then
-        enemyPosition = enemyPosition + Vector3.new(
-            math.random(-1, 1) * math.random(20, 40), 
-            0, 
-            math.random(-1, 1) * math.random(20, 40)
-        );
-    else
-        enemyPosition = npcClass:GetCFrame().Position + Vector3.new(
-            math.random(-1, 1) * math.random(40, 100), 
-            0, 
-            math.random(-1, 1) * math.random(40, 100)
-        );
-    end
+    if properties.LastGuessTick == nil or tick() > properties.LastGuessTick then
+        properties.LastGuessTick = tick() + math.random(3, 12);
 
-    enemyTargetData.LastKnownPosition = enemyPosition;
+        local moveDir = Vector3.new(
+            math.random(-1, 1) * math.random(5, 15), 
+            0, 
+            math.random(-1, 1) * math.random(5, 15)
+        );
+
+        if enemyPosition then
+            local path: Path = npcClass.Move:ComputePath(npcClass:GetCFrame().Position, enemyPosition);
+            if path.Status == Enum.PathStatus.Success then
+                local waypoints = path:GetWaypoints();
+                if #waypoints > 1 then
+                    local waypoint: PathWaypoint = waypoints[2];
+
+                    local myPos = npcClass:GetCFrame().Position;
+                    local wpPos = Vector3.new(waypoint.Position.X, myPos.Y, waypoint.Position.Z);
+
+                    local newDir = (wpPos - myPos).Unit * math.random(5, 15);
+                    if not shared.IsNan(newDir) then
+                        moveDir = newDir;
+                    end
+                end
+            end
+        end
+
+        enemyTargetData.LastKnownPosition = npcClass:GetCFrame().Position +moveDir;
+    end
 end
 
 --MARK: Combat behavior
@@ -243,10 +301,10 @@ end
 function treePackage.RunToMeleeRange(npcClass: NpcClass)
     local properties = npcClass.Properties;
     local enemyTargetData = npcClass.Properties.EnemyTargetData;
-    local enemyNpcClass: NpcClass = enemyTargetData.HealthComp.CompOwner;
+    local enemyEntityClass: EntityClass = enemyTargetData.HealthComp.CompOwner;
 
     npcClass.Move:SetMoveSpeed("set", "sprint", properties.SprintSpeed or 18, npcClass.Move.MoveSpeedPriority.Movement, 5);
-    npcClass.Move:Follow(enemyNpcClass.RootPart, 3, 2);
+    npcClass.Move:Follow(enemyEntityClass.RootPart, 3, 2);
 end
 
 
@@ -365,7 +423,6 @@ function treePackage.Patrol(npcClass: NpcClass)
 
             local patrolRng = Random.new(math.floor(curPos.X) + math.floor(curPos.Y) + math.floor(curPos.Z));
 
-            local path: Path = PathfindingService:CreatePath(npcClass.PathAgent);
             for a=1, patrolRng:NextInteger(5, 9) do
                 local startPos = curPos;
                 local rngX = patrolRng:NextInteger(-1, 1);
@@ -387,10 +444,7 @@ function treePackage.Patrol(npcClass: NpcClass)
                 if floorRayResult == nil then Debugger:Warn("Patrol no floor"); continue end;
                 endPos = floorRayResult.Position + Vector3.new(0, 1.35, 0);
 
-                local pathS, pathE = pcall(function()
-                    path:ComputeAsync(startPos, endPos)
-                end)
-                if not pathS then Debugger:Warn("Patrol pathE", pathE); continue end;
+                local path: Path = npcClass.Move:ComputePath(startPos, endPos);
                 if path.Status ~= Enum.PathStatus.Success then Debugger:Warn("Patrol no path", path.Status); continue end;
 
                 local wayPoints = path:GetWaypoints();
@@ -440,7 +494,7 @@ function treePackage.Patrol(npcClass: NpcClass)
         and npcClass.Properties.SpokeByMeData == nil 
         and (properties.PassiveTalkCooldown == nil or tick() > properties.PassiveTalkCooldown) then
             properties.PassiveTalkCooldown = tick() + math.random(20, 45);
-            if modBranchConfigurations.IsWorld("BioXResearch") then
+            if shared.WorldName == "BioXResearch" then
                 properties.PassiveTalkCooldown = tick() + 15;
             end
 
@@ -512,6 +566,13 @@ function treePackage.ShareIntel(npcClass: NpcClass)
 
     local enemyTargetData: NpcTargetData = npcClass.Properties.EnemyTargetData;
     local enemyEntityClass: EntityClass? = enemyTargetData and (enemyTargetData.HealthComp.CompOwner :: EntityClass) or nil;
+
+    if enemyEntityClass and enemyEntityClass.ClassName == "PlayerClass" then
+        local npcCombatComp = (enemyEntityClass :: PlayerClass):GetComponent("NpcCombat");
+        if npcCombatComp then
+            npcCombatComp:UpdateFighting(npcClass);
+        end
+    end
 
     if properties.SpokenToMeData and properties.SpokenToMeData.NpcClass and enemyEntityClass then
         local allyNpcClass: NpcClass = properties.SpokenToMeData.NpcClass;
@@ -650,7 +711,7 @@ function treePackage.Converse(npcClass: NpcClass)
     end
 
     spokenToMeData.LastResponseTick = tick() + math.random(10, 11);
-    if modBranchConfigurations.IsWorld("BioXResearch") then
+    if shared.WorldName == "BioXResearch" then
         properties.LastResponseTick = tick() + 11;
     end
 
@@ -662,7 +723,21 @@ function treePackage.Converse(npcClass: NpcClass)
     npcClass.PlayAnimation(aniList[math.random(1, #aniList)]);
 end
 
-function treePackage.DoNothing(npcClass: NpcClass)
+
+function treePackage.SeenDeadbody(npcClass: NpcClass)
+    local properties = npcClass.Properties;
+
+    if properties.SeenDeadbodyData then
+        local deadbodyData = npcClass.Properties.SeenDeadbodyData;
+
+        if properties.LastDiscoverDeadbody == nil or tick() > properties.LastDiscoverDeadbody then
+            properties.LastDiscoverDeadbody = tick() + math.random(6, 12);
+            npcClass.Move:MoveTo(deadbodyData.Position);
+        end
+
+        properties.SeenDeadbodyData = nil;
+    end
+
     return true;
 end
 
@@ -692,6 +767,13 @@ function treePackage.Flee(npcClass: NpcClass)
         end
     end
 
+    return true;
+end
+
+
+
+
+function treePackage.DoNothing(npcClass: NpcClass)
     return true;
 end
 

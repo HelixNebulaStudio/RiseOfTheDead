@@ -913,6 +913,8 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						optionButton.AutomaticSize = Enum.AutomaticSize.Y;
 
 						local colorPickerObj = modColorPicker.new(interface);
+						newDropDownList.Garbage:Tag(colorPickerObj);
+
 						local colorFrame = colorPickerObj.Frame;
 						colorFrame.Size = UDim2.new(0, 310, 0, 300);
 						colorFrame.UIGradient:Destroy();
@@ -922,6 +924,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						colorFrame.Content.Size = UDim2.new(1, 0, 1, 0);
 						colorFrame.Content.Advance.Visible = false;
 						colorFrame.Content.ColorPalette.Size = UDim2.new(1, 0, 1, 0);
+						colorFrame.closeButton.Visible = false;
 						colorFrame.NameTag.Visible = false;
 						colorFrame.Parent = optionButton;
 						
