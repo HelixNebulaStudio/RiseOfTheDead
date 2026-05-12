@@ -61,7 +61,7 @@ function HordeAttack.Initialize(worldEventSystem)
 			modItemDrops.spawn{
 				ItemId = chosenDrop.ItemId;
 				Quantity = chosenDrop.Quantity;
-				Values = chosenDrop.Values;
+				ItemValues = chosenDrop.ItemValues;
 				SpawnCFrame = spawnCf;
 				SharedDrop = true;
 			};

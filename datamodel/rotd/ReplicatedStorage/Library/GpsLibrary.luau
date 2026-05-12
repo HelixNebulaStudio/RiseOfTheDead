@@ -62,7 +62,12 @@ function library.onRequire()
 
         local _storageItem, storage = shared.modStorage.FindIdFromStorages(id, player);
         local unlock = storage:GetValues(id, "Gps") or {};
-        
+
+		if playerClass.Properties.InBossBattle then
+			shared.Notify(player, `Can not fast travel when you are in battle.`, "Negative");
+            return;
+        end
+
         local profile = shared.modProfile:Get(player);
         local activeSave = profile and profile:GetActiveSave();
         local traderProfile = profile and profile.Trader;

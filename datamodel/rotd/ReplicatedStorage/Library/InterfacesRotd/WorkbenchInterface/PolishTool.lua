@@ -25,8 +25,6 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 		listMenu:SetEnableScrollBar(false);
 		listMenu:SetEnableSearchBar(false);
 
-		local ItemValues = storageItem.Values;
-		
 		local newFrame = polishFrameTemplate:Clone();
 		local titleLabel = newFrame:WaitForChild("titleTag");
 		titleLabel.Text = "Polish "..itemLib.Name;

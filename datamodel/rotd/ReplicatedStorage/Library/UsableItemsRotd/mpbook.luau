@@ -8,8 +8,7 @@ if RunService:IsClient() then return UsablePreset; end;
 
 function UsablePreset:ServerUse(player, inputStorageItem)
 	local profile = shared.modProfile:Get(player);
-	local activeSave = profile:GetActiveSave();
-	local storageItem, storage = activeSave:FindItemFromStorages(inputStorageItem.ID);
+	local storageItem, storage = shared.modStorage.FindIdFromStorages(inputStorageItem.ID, player);
 
 	if storageItem == nil or storage == nil then return end;
 

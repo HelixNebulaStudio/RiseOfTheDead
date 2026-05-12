@@ -37,7 +37,7 @@ local catInfoLib = {
 	--Clothing={Order=50;};
 	["Head"]={Order=51; Title="Head";};
 	["Chest"]={Order=52; Title="Chest";};
-	--["Legs"]={Order=53; Title="Legs";};
+	["Legs"]={Order=53; Title="Legs";};
 	["Gloves"]={Order=54; Title="Gloves";};
 	["Shoes"]={Order=55; Title="Shoes";};
 	["Utility Wear"]={Order=56; Title="Utility Wear";};

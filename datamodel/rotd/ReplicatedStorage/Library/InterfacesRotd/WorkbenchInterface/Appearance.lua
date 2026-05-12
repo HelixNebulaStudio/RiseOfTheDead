@@ -54,7 +54,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 		listMenu:SetEnableScrollBar(false);
 		listMenu:SetEnableSearchBar(false);
 		
-		local ItemValues = storageItem.Values;
+		local itemValues = storageItem.Values;
 		local previousPart, previousPartMat, previousPartCol, tweenLink, itemPartSelected;
 		
 		local pickerMenu;
@@ -109,7 +109,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						modItemUnlockablesLibrary.UpdateSkin(obj, unlockId);
 					end
 				end
-				setCharacterAccessories(ItemValues.ActiveSkin);
+				setCharacterAccessories(itemValues.ActiveSkin);
 				
 				listMenu:SetEnableScrollBar(true);
 				listMenu:SetEnableSearchBar(true);
@@ -122,7 +122,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 
 				local refreshButtonFuncs = {};
 				
-				local unlockableData = ItemValues.Skins or {};
+				local unlockableData = itemValues.Skins or {};
 				local chargesData = modData.Profile and modData.Profile.ItemUnlockables[itemId] or {};
 				for b=1, #itemUnlockables do
 					local unlockItemLib = itemUnlockables[b];
@@ -172,10 +172,10 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						
 
 						local function refresh()
-							if ItemValues.ActiveSkin == nil and unlockItemLib.Name == "Default" then
+							if itemValues.ActiveSkin == nil and unlockItemLib.Name == "Default" then
 								selectedLabel.Visible = true;
 							else
-								selectedLabel.Visible = ItemValues.ActiveSkin == unlockableItemId;
+								selectedLabel.Visible = itemValues.ActiveSkin == unlockableItemId;
 							end
 						end
 						table.insert(refreshButtonFuncs, refresh);
@@ -193,15 +193,15 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						end);
 
 						unlockButton.MouseLeave:Connect(function()
-							setCharacterAccessories(ItemValues.ActiveSkin);
+							setCharacterAccessories(itemValues.ActiveSkin);
 						end)
 						
 						if localPlayer.UserId == 16170943 or shared.gameConfig.BranchName == "Dev" then
 							unlockButton.MouseButton2Click:Connect(function()
 								interface:PlayButtonClick();
 								
-								local oldActiveId = ItemValues.ActiveSkin;
-								if ItemValues.ActiveSkin == unlockableItemId then
+								local oldActiveId = itemValues.ActiveSkin;
+								if itemValues.ActiveSkin == unlockableItemId then
 									remoteSetAppearance:FireServer(binds.InteractPart , 9, storageItem.ID, "UnlockableId");
 								else
 									remoteSetAppearance:FireServer(binds.InteractPart , 9, storageItem.ID, "UnlockableId", unlockableItemId);
@@ -210,8 +210,8 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 								
 								for a=1, 10, 0.1 do
 									storageItem = modData.GetItemById(storageItem.ID);
-									ItemValues = storageItem.Values;
-									if ItemValues.ActiveSkin ~= oldActiveId then break; end;
+									itemValues = storageItem.Values;
+									if itemValues.ActiveSkin ~= oldActiveId then break; end;
 									wait(0.1);
 								end
 								
@@ -268,8 +268,8 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 								return
 							end;
 							
-							local oldActiveId = ItemValues.ActiveSkin;
-							if ItemValues.ActiveSkin == unlockableItemId then
+							local oldActiveId = itemValues.ActiveSkin;
+							if itemValues.ActiveSkin == unlockableItemId then
 								remoteSetAppearance:FireServer(binds.InteractPart , 9, storageItem.ID, "UnlockableId");
 							else
 								remoteSetAppearance:FireServer(binds.InteractPart , 9, storageItem.ID, "UnlockableId", unlockableItemId);
@@ -278,8 +278,8 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 							
 							for a=1, 10, 0.1 do
 								storageItem = modData.GetItemById(storageItem.ID);
-								ItemValues = storageItem.Values;
-								if ItemValues.ActiveSkin ~= oldActiveId then break; end;
+								itemValues = storageItem.Values;
+								if itemValues.ActiveSkin ~= oldActiveId then break; end;
 								wait(0.1);
 							end
 							
@@ -291,7 +291,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 											local prefab = itemDisplay.DisplayModels[a].Prefab;
 
 											for _, obj in pairs(prefab:GetChildren()) do
-												modItemUnlockablesLibrary.UpdateSkin(obj, ItemValues.ActiveSkin);
+												modItemUnlockablesLibrary.UpdateSkin(obj, itemValues.ActiveSkin);
 											end
 										end
 									end);
@@ -357,7 +357,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 				local dataKey = prefix..partName;
 				
 				local function updateUi()
-					if ItemValues.PartAlpha and ItemValues.PartAlpha[dataKey] == true then
+					if itemValues.PartAlpha and itemValues.PartAlpha[dataKey] == true then
 						partTitle = "<s>"..partTitle.."</s>";
 					end
 
@@ -366,13 +366,13 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 				updateUi();
 
 				local defaultPartColor = refBasePart.Color;
-				local colorObject = ItemValues.Colors and ItemValues.Colors[dataKey] and modColorsLibrary.Get(ItemValues.Colors[dataKey]);
+				local colorObject = itemValues.Colors and itemValues.Colors[dataKey] and modColorsLibrary.Get(itemValues.Colors[dataKey]);
 				if colorObject then
 					textureLabel.BackgroundColor3 = colorObject.Color;
 				else
 					textureLabel.BackgroundColor3 = partInstance and partInstance.Color or defaultPartColor;
 				end
-				local skinObject = ItemValues.Textures and ItemValues.Textures[dataKey] and modSkinsLibrary.Get(ItemValues.Textures[dataKey]);
+				local skinObject = itemValues.Textures and itemValues.Textures[dataKey] and modSkinsLibrary.Get(itemValues.Textures[dataKey]);
 				if skinObject then
 					textureLabel.Image = skinObject.Image;
 					textureLabel.ImageColor3 = skinObject.Color;
@@ -428,7 +428,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 							modColorsLibrary.SetColor(itemPartSelected, activePartColor);
 							modSkinsLibrary.SetTexture(itemPartSelected, activePartTexture);
 
-							local invis = ItemValues.PartAlpha and ItemValues.PartAlpha[dataKey]
+							local invis = itemValues.PartAlpha and itemValues.PartAlpha[dataKey]
 							if invis == true then
 								itemPartSelected.Transparency = 1;
 								
@@ -675,7 +675,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 										itemPartSelected:SetAttribute("DefaultTransparency", itemPartSelected.Transparency);
 									end
 									
-									local invis = ItemValues.PartAlpha and ItemValues.PartAlpha[dataKey]
+									local invis = itemValues.PartAlpha and itemValues.PartAlpha[dataKey]
 									if invis == true then
 										itemPartSelected.Transparency = 0;
 									else
@@ -698,20 +698,20 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 
 									remoteSetAppearance:FireServer(binds.InteractPart , 6, storageItem.ID, dataKey);
 									
-									local invis = ItemValues.PartAlpha and ItemValues.PartAlpha[dataKey]
+									local invis = itemValues.PartAlpha and itemValues.PartAlpha[dataKey]
 									if invis == true then
 										if itemPartSelected:GetAttribute("DefaultTransparency") then
 											itemPartSelected.Transparency = itemPartSelected:GetAttribute("DefaultTransparency");
 										end
 										
-										ItemValues.PartAlpha[dataKey] = nil;
+										itemValues.PartAlpha[dataKey] = nil;
 									else
 										itemPartSelected.Transparency = 1;
 										
-										if ItemValues.PartAlpha == nil then
-											ItemValues.PartAlpha = {};
+										if itemValues.PartAlpha == nil then
+											itemValues.PartAlpha = {};
 										end
-										ItemValues.PartAlpha[dataKey] = true;
+										itemValues.PartAlpha[dataKey] = true;
 									end
 									
 									updateUi();
@@ -795,7 +795,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 			listMenu:Add(newCateTab, 3);
 			listMenu:Add(unlockablesList, 4);
 
-			local weaponSkins = ItemValues.Skins or {};
+			local weaponSkins = itemValues.Skins or {};
 			local refreshButtonFuncs = {};
 			for a=1, #weaponSkins do
 				local skinId = weaponSkins[a];
@@ -815,7 +815,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 				selectedLabel.Visible = false;
 
 				local function refreshButton()
-					if ItemValues.ActiveSkin == skinId then
+					if itemValues.ActiveSkin == skinId then
 						selectedLabel.Visible = true;
 					else
 						selectedLabel.Visible = false;
@@ -827,8 +827,8 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 				unlockButton.MouseButton1Click:Connect(function()
 					interface:PlayButtonClick();
 
-					local oldActiveId = ItemValues.ActiveSkin;
-					if ItemValues.ActiveSkin == skinId then
+					local oldActiveId = itemValues.ActiveSkin;
+					if itemValues.ActiveSkin == skinId then
 						remoteSetAppearance:FireServer(binds.InteractPart , 9, storageItem.ID, "WeaponSkinId");
 					else
 						remoteSetAppearance:FireServer(binds.InteractPart , 9, storageItem.ID, "WeaponSkinId", skinId);
@@ -837,8 +837,8 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 					
 					for a=1, 10, 0.1 do
 						storageItem = modData.GetItemById(storageItem.ID);
-						ItemValues = storageItem.Values;
-						if ItemValues.ActiveSkin ~= oldActiveId then break; end;
+						itemValues = storageItem.Values;
+						if itemValues.ActiveSkin ~= oldActiveId then break; end;
 						wait(0.1);
 					end
 

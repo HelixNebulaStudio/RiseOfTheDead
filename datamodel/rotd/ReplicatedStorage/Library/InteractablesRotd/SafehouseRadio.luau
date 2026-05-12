@@ -6,13 +6,13 @@ local TweenService = game:GetService("TweenService");
 local modMath = shared.require(game.ReplicatedStorage.Library.Util.Math);
 
 local songs = {
-	{Name="Rave"; Id="rbxassetid://1846368080", v=0.5, p=1};
-	{Name="Activity"; Id="rbxassetid://1842306658", v=0.5, p=1};
-	{Name="Wonderful Day"; Id="rbxassetid://1843382633", v=0.5, p=1};
-	{Name="Meltdown"; Id="rbxassetid://1845092181", v=0.5, p=1};
-	{Name="UpTown"; Id="rbxassetid://1845554017", v=0.5, p=1};
-	{Name="Hardstyle"; Id="rbxassetid://1839246774", v=0.5, p=1};
-	{Name="On The Beach"; Id="rbxassetid://1845891180", v=0.5, p=1};
+	{Name="Rave"; Id="rbxassetid://1846368080", v=1, p=1};
+	{Name="Activity"; Id="rbxassetid://1842306658", v=1, p=1};
+	{Name="Wonderful Day"; Id="rbxassetid://1843382633", v=1, p=1};
+	{Name="Meltdown"; Id="rbxassetid://1845092181", v=1, p=1};
+	{Name="UpTown"; Id="rbxassetid://1845554017", v=1, p=1};
+	{Name="Hardstyle"; Id="rbxassetid://1839246774", v=1, p=1};
+	{Name="On The Beach"; Id="rbxassetid://1845891180", v=1, p=1};
 }
 local randomColors = {
 	Color3.fromRGB(255, 0, 0),
@@ -32,6 +32,7 @@ function interactablePackage.init(super) -- Server/Client
     };
 
 	local lightSources = {};
+    local lightDirsObjValues = {};
 	local lastsong = nil;
 
     function SafehouseRadio.new(interactable: InteractableInstance)
@@ -46,15 +47,41 @@ function interactablePackage.init(super) -- Server/Client
 
             local sound = Instance.new("Sound");
             sound.Name = `Loop`;
-            sound.RollOffMaxDistance = 70;
+            sound.RollOffMaxDistance = 128;
             sound.RollOffMinDistance = 35;
-            sound.RollOffMode = Enum.RollOffMode.Linear;
-            sound.Volume = 0.5;
+            sound.RollOffMode = Enum.RollOffMode.InverseTapered;
+            sound.Volume = 0;
             sound.Looped = true;
             sound.SoundGroup = game.SoundService:FindFirstChild("BackgroundMusic");
             sound.Parent = interactPoint;
 
             interactable.Values.LoopSound = sound;
+
+        else
+            task.spawn(function()
+                local sound = config:WaitForChild("InteractPoint"):WaitForChild("Loop");
+                local radioLightPart = config.Parent and config.Parent:FindFirstChild("_lightSource", true) or nil;
+                local radioPointLight = radioLightPart and radioLightPart:WaitForChild("PointLight") or nil;
+
+                while workspace:IsAncestorOf(config) do
+                    local loudness = modMath.MapNum(sound.PlaybackLoudness, 0, 1000, 16, 64);
+                    
+                    if radioLightPart then
+                        radioLightPart.CastShadow = false;
+                        radioLightPart.Size = Vector3.new(1,1,1) * (1+loudness) * sound.Volume;
+                    else
+                        return;
+                    end
+                    if radioPointLight then
+                        radioPointLight.Range = 8 + (loudness/4);
+                    else
+                        return;
+                    end
+
+                    RunService.Heartbeat:Wait();
+                end
+            end)
+
         end
 
         interactable.Values.IsActive = false;
@@ -70,7 +97,6 @@ function interactablePackage.init(super) -- Server/Client
 
         local radioPointLight = interactable.Values.RadioPointLight;
         if radioLightPart and radioPointLight then
-
             table.insert(lightSources, {
                 Source = radioLightPart; 
                 OriginalColor = radioLightPart.Color; 
@@ -101,7 +127,6 @@ function interactablePackage.init(super) -- Server/Client
 		local players = game.Players:GetPlayers();
 		shared.Notify(players, '<b><font size="16">Radio</font></b>: Play Track ('..trackName..')', "Message");
 
-
         local radioLightPart = interactable.Values.RadioLightPart;
         if radioLightPart then
 		    radioLightPart.Transparency = 0;
@@ -119,18 +144,53 @@ function interactablePackage.init(super) -- Server/Client
             local discoTick = tick();
             task.wait(1);
 
+            for _, obj in pairs(config:GetChildren()) do
+                if not obj:IsA("ObjectValue") then continue end;
+                
+                local value = obj.Value;
+                if value == nil then continue end;
+
+                if lightDirsObjValues[obj] then continue end;
+                lightDirsObjValues[obj] = value;
+                
+                local sourcePartCache = {};
+                for _, lightObj in pairs(value:GetDescendants()) do
+                    if not lightObj:IsA("Light") then continue end;
+
+                    local parentBasePart;
+                    if lightObj.Parent
+                    and lightObj.Parent:IsA("Attachment")
+                    and lightObj.Parent.Parent:IsA("BasePart")
+                    and lightObj.Parent.Parent.Name == "_lightSource" then
+                        parentBasePart = lightObj.Parent.Parent; 
+                    end
+                    if parentBasePart == nil then continue end;
+
+                    local packet = sourcePartCache[parentBasePart];
+                    if packet == nil then
+                        packet = {
+                            Source = parentBasePart; 
+                            OriginalColor = parentBasePart.Color; 
+                            LightObjects = {}
+                        };
+                        sourcePartCache[parentBasePart] = packet;
+                        
+                        table.insert(lightSources, packet);
+                    end
+
+                    if packet then
+                        table.insert(packet.LightObjects, {
+                            Light = lightObj; 
+                            OriginalColor = lightObj.Color;
+                        });
+                    end
+                end
+                table.clear(sourcePartCache);
+            end
+
             while radioSound.IsPlaying do
                 task.wait(1/30);
                     
-                local loudness = modMath.MapNum(radioSound.PlaybackLoudness, 0, 1000, 12, 24);
-                
-                if radioLightPart then
-                    radioLightPart.Size = Vector3.new(1,1,1) * (1+loudness) * radioSound.Volume;
-                end
-                if radioPointLight then
-                    radioPointLight.Range = 8 + (loudness/4);
-                end
-
                 if tick() < discoTick then continue end;
                 discoTick = tick()+1;
 
@@ -173,7 +233,10 @@ function interactablePackage.init(super) -- Server/Client
         end)
 
 		
-		radioSound.Volume = pickSong.v;
+		radioSound.Volume = 0;
+        TweenService:Create(radioSound, TweenInfo.new(5), {
+            Volume = pickSong.v;
+        }):Play();
 		radioSound.PlaybackSpeed = pickSong.p;
 
 		local length = 110;

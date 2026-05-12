@@ -36,6 +36,7 @@ local remoteDeconstruct = modRemotesManager:Get("DeconstructItem");
 local remoteTweakItem = modRemotesManager:Get("TweakItem");
 local remotePolishTool = modRemotesManager:Get("PolishTool");
 local remoteWorkbenchService = modRemotesManager:Get("WorkbenchService");
+local remoteEquipmentClass = modRemotesManager:Get("EquipmentClass");
 
 local debounceCache = {};
 --== Script;
@@ -404,7 +405,7 @@ function remoteModHandler.OnServerInvoke(player, interactPart, action, modifierS
 
 	local playerClass: PlayerClass = shared.modPlayers.get(player);
 	
-	local modifierStorageItem, storageOfModifier = activeSave:FindItemFromStorages(modifierSiid);
+	local modifierStorageItem, storageOfModifier = shared.modStorage.FindIdFromStorages(modifierSiid, player);
 	if modifierStorageItem == nil then return 3; end
 	
 	local modLib = modItemModsLibrary.Get(modifierStorageItem.ItemId);
@@ -432,7 +433,8 @@ function remoteModHandler.OnServerInvoke(player, interactPart, action, modifierS
 	
 	if action == 1 then --== Equip;
 		if modLib == nil then return 3; end
-		local storageItem, _itemStorage = activeSave:FindItemFromStorages(siid);
+		if siid == nil then return 3; end
+		local storageItem, _itemStorage = shared.modStorage.FindIdFromStorages(siid, player);
 		
 		local toolWorkbenchLib = modWorkbenchLibrary.ItemUpgrades[storageItem.ItemId];
 		local toolCompatType = toolWorkbenchLib and toolWorkbenchLib.Type or nil;
@@ -516,9 +518,8 @@ function remoteModHandler.OnServerInvoke(player, interactPart, action, modifierS
 		end
 
 	elseif action == 2 then --== Unequip;
-		local item = activeSave:FindItemFromStorages(storageOfModifier.Id);
-		
-		if modifierStorageItem and item then
+
+		if modifierStorageItem then
 			local emptyIndex = inventory:FindEmpty();
 			if emptyIndex then
 				local refreshStorages = storageOfModifier:SetIndex(player, modifierSiid, {Id=inventory.Id; Index=emptyIndex;});
@@ -536,6 +537,7 @@ function remoteModHandler.OnServerInvoke(player, interactPart, action, modifierS
 				local modifier: ItemModifierInstance? = playerClass.WieldComp:GetOrDefaultItemModifier(modifierSiid);
 				if modifier and (equipmentClass == nil or equipmentClass.Enabled == false) then
 					modifier:SetEnabled(false);
+					remoteEquipmentClass:FireClient(player, "setenable", modifierStorageItem.ID, false);
 				end
 				
 				table.insert(refreshStorages, storageOfModifier:Shrink());
@@ -563,7 +565,7 @@ function remotePurchaseUpgrade.OnServerInvoke(player, interactPart, id, dataTag)
 	local playerClass: PlayerClass = shared.modPlayers.get(player);
 	local profile = modProfile:Get(player);
 	local playerSave = profile:GetActiveSave();
-	local storageItem, storage = playerSave:FindItemFromStorages(id);
+	local storageItem, storage = shared.modStorage.FindIdFromStorages(id, player);
 	local storageId = storage.Id;
 	local modLib = modItemModsLibrary.Get(storageItem.ItemId);
 	
@@ -631,7 +633,7 @@ remoteSetAppearance.OnServerEvent:Connect(function(player, interactPart, action,
 	if not IsInWorkbenchRange(player, interactPart) then return end;
 	local profile = modProfile:Get(player);
 	local activeSave = profile:GetActiveSave();
-	local storageItem, _storage = activeSave:FindItemFromStorages(id);
+	local storageItem, _storage = shared.modStorage.FindIdFromStorages(id, player);
 	
 	if storageItem == nil then return end;
 

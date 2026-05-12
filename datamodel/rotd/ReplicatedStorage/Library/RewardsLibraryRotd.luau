@@ -29,24 +29,24 @@ function library.onRequire()
 	library:Add{
 		Id="RegionDrop:Mall Street";
 		Rewards={
-			{Type=ItemDropTypes.Tool; ItemId="wantedposter"; Values={WantedNpc="Kat";}; Chance=1/500;};
-			{Type=ItemDropTypes.Tool; ItemId="wantedposter"; Values={WantedNpc="Rachel";}; Chance=1/500;};
+			{Type=ItemDropTypes.Tool; ItemId="wantedposter"; ItemValues={WantedNpc="Kat";}; Chance=1/500;};
+			{Type=ItemDropTypes.Tool; ItemId="wantedposter"; ItemValues={WantedNpc="Rachel";}; Chance=1/500;};
 		};
 	};
 
 	library:Add{
 		Id="RegionDrop:Residential Street";
 		Rewards={
-			{Type=ItemDropTypes.Tool; ItemId="wantedposter"; Values={WantedNpc="Rafael";}; Chance=1/50;};
-			{Type=ItemDropTypes.Tool; ItemId="wantedposter"; Values={WantedNpc="Scarlett";}; Chance=1/500;};
+			{Type=ItemDropTypes.Tool; ItemId="wantedposter"; ItemValues={WantedNpc="Rafael";}; Chance=1/50;};
+			{Type=ItemDropTypes.Tool; ItemId="wantedposter"; ItemValues={WantedNpc="Scarlett";}; Chance=1/500;};
 		};
 	};
 
 	library:Add{
 		Id="RegionDrop:Harbor Crash Site";
 		Rewards={
-			{Type=ItemDropTypes.Tool; ItemId="wantedposter"; Values={WantedNpc="Jackie";}; Chance=1/50;};
-			{Type=ItemDropTypes.Tool; ItemId="wantedposter"; Values={WantedNpc="Zoey";}; Chance=1/500;};
+			{Type=ItemDropTypes.Tool; ItemId="wantedposter"; ItemValues={WantedNpc="Jackie";}; Chance=1/50;};
+			{Type=ItemDropTypes.Tool; ItemId="wantedposter"; ItemValues={WantedNpc="Zoey";}; Chance=1/500;};
 		};
 	};
 

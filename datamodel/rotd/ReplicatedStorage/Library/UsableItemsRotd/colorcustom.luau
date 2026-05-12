@@ -13,8 +13,7 @@ function UsablePreset:ServerUse(player, inputStorageItem)
 
     local profile = shared.modProfile:Get(player);
 	local flags = profile.Flags;
-	local activeSave = profile:GetActiveSave();
-	local storageItem, storage = activeSave:FindItemFromStorages(inputStorageItem.ID);
+	local storageItem, storage = shared.modStorage.FindIdFromStorages(inputStorageItem.ID, player);
 
 	if storageItem == nil or storage == nil then return end;
 

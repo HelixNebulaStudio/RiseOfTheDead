@@ -14,8 +14,7 @@ function UsablePreset:ServerUse(player, inputStorageItem)
     local remoteHudNotification = modRemotesManager:Get("HudNotification");
 
     local profile = shared.modProfile:Get(player);
-	local activeSave = profile:GetActiveSave();
-	local storageItem, storage = activeSave:FindItemFromStorages(inputStorageItem.ID);
+	local storageItem, storage = shared.modStorage.FindIdFromStorages(inputStorageItem.ID, player);
 
 	if storageItem == nil or storage == nil then return end;
 	local itemLib = storageItem.Library;
