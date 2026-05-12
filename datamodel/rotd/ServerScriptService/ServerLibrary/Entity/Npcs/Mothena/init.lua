@@ -2,6 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
+local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modMath = shared.require(game.ReplicatedStorage.Library.Util.Math);
 
 local npcPackage = {
@@ -25,6 +26,7 @@ local npcPackage = {
         SkipMoveInit = true;
 
         MovementFrequency = 50;
+        AltReduction = 0;
     };
 
     AddComponents = {
@@ -59,7 +61,7 @@ function npcPackage.Spawning(npcClass: NpcClass)
         for _, obj in pairs(npcClass.Character:GetDescendants()) do
             if obj:IsA("BasePart") and obj.Material == Enum.Material.Foil then
                 obj.Material = Enum.Material.Sand;
-                obj.Color = Color3.fromRGB(90, 76, 66);
+                obj.Color = Color3.fromRGB(214, 82, 82);
             end
         end
     end
@@ -79,6 +81,7 @@ function npcPackage.Spawning(npcClass: NpcClass)
 end
 
 function npcPackage.Spawned(npcClass: NpcClass)
+    local configurations: ConfigVariable = npcClass.Configurations;
     local properties = npcClass.Properties;
     local npcChar = npcClass.Character;
     local rootPart = npcClass.RootPart;
@@ -93,23 +96,35 @@ function npcPackage.Spawned(npcClass: NpcClass)
 
         local destructible: DestructibleInstance = bodyDestructiblesComp:Create(wingModel.Name, wingModel);
         destructible.Properties.DestroyModel = false;
-        local newHealth = isHard and 50000 or 25000;
+        local newHealth = configurations.MaxHealth * (isHard and 0.25 or 0.15);
 
         local limbHealthComp: HealthComp = destructible.HealthComp;
+        
+        destructible:SetupHealthbar{
+            Size = UDim2.new(2, 0, 0.5, 0);
+            Distance = 128;
+            OffsetWorldSpace = Vector3.new(0, 1, 0);
+            ShowLabel = false;
+        };
+        destructible:SetHealthbarEnabled(true);
+
         limbHealthComp:SetMaxHealth(newHealth);
         limbHealthComp:Reset();
         
         limbHealthComp.OnHealthChanged:Connect(function(newHealth, prevHealth, damageData)
             if limbHealthComp.IsDead then return end;
-            if newHealth == prevHealth then return end;
-            if damageData.Damage == nil then return end;
 
-            npcClass.HealthComp:TakeDamage(damageData);
+            local newDmg = damageData:Clone();
+            newDmg.HideBubble = true;
+            
+            npcClass.HealthComp:TakeDamage(newDmg);
         end)
 
         destructible.OnDestroy:Connect(function()
-            primaryPart.Color = Color3.fromRGB(50, 50, 50);
-            properties.MovementFrequency = math.clamp(properties.MovementFrequency - 20, 10, 50);
+            primaryPart.Color = Color3.fromRGB(26, 0, 0);
+            modAudio.Play("TicksZombieExplode", primaryPart.Position).PlaybackSpeed = 0.3;
+            properties.AltReduction = math.max(properties.AltReduction-15, -30);
+            wingModel:SetAttribute("EntityParent", true);
         end)
     end
 
@@ -120,6 +135,8 @@ function npcPackage.Spawned(npcClass: NpcClass)
     local seed = 0.12345;
     local offset = Vector3.new();
 
+    local isFrost = false;
+
     npcClass.Garbage:Tag(RunService.Stepped:Connect(function(delta)
         for _, v in next, npcChar:GetDescendants() do
             if not v:IsA("BasePart") then continue end;
@@ -127,8 +144,15 @@ function npcPackage.Spawned(npcClass: NpcClass)
         end
 
         local moveFreq = properties.MovementFrequency;
+        local altReduce = properties.AltReduction;
         local hoverPoint = properties.HoverPoint;
         local facePoint = properties.FacePoint;
+
+        if isFrost then
+            moveFreq /= 4;
+        end
+
+        hoverPoint += Vector3.new(0, altReduce, 0);
 
         local dir = (hoverPoint-bodyPosition.Position).Unit;
         local rotY = 0;
@@ -150,8 +174,9 @@ function npcPackage.Spawned(npcClass: NpcClass)
         );
 
         bodyPosition.Position = hoverPoint + offset;
-        bodyPosition.P = npcClass.StatusComp:GetOrDefault("FrostMod") and 4000 or 11000;
+        bodyPosition.P = isFrost and 5000 or 11000;
     end));
+
 
     local lastPosition = rootPart.Position;
     local clockWiseSpin = math.random(0, 1) == 1 and 1 or -1;
@@ -159,8 +184,6 @@ function npcPackage.Spawned(npcClass: NpcClass)
         local t=0;
         while not npcClass.HealthComp.IsDead do
             local delta = task.wait(0.1);
-            
-		    local frostStatus = npcClass.StatusComp:GetOrDefault("FrostMod");
             
             local enemyTargetData: NpcTargetData = npcClass.Properties.EnemyTargetData;
             if enemyTargetData then
@@ -215,6 +238,7 @@ function npcPackage.Spawned(npcClass: NpcClass)
                     end
 
                     t += delta;
+
                     local swerveVec = v;
                     properties.HoverPoint = lastPosition + Vector3.new(0, 35, 0) + swerveVec * 80;
                     properties.FacePoint = enemyPosition;
@@ -235,6 +259,10 @@ function npcPackage.Spawned(npcClass: NpcClass)
             end
 
         end
+    end)
+
+    npcClass.StatusComp.OnProcess:Connect(function()
+        isFrost = #npcClass.StatusComp:ListStatusWithTags{"Frost"} > 0;
     end)
 end
 

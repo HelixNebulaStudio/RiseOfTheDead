@@ -57,6 +57,7 @@ function Component:__call(packet: anydict)
 
 	if interactable.Type == "Door" and interactable.Values.DoorConfig then
 		local doorConfig = interactable.Values.DoorConfig;
+		if doorConfig:GetAttribute("CanBreach") == false then return end;
 
 		local doorInstance: DoorInstance = modDoors.getOrNew(doorConfig);
 		if doorConfig:GetAttribute("DoorOpen") == true then return end;

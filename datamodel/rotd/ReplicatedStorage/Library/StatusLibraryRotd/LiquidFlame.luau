@@ -10,6 +10,7 @@ local statusPackage = {
     Description = "Burning from liquid flame.";
     Buff = true;
     ExpiresOnDeath = true;
+    Tags = {"DOT"; "Fire"};
 };
 
 function statusPackage.BindApply(statusClass: StatusClassInstance)

@@ -45,7 +45,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         end
 		if visible then
 			interface:HideAll{[window.Name]=true;};
-			spawn(function()
+			task.spawn(function()
 				remoteDisguiseKitRemote:InvokeServer(storageItem.ID, "open");
 			end)
             window:Update();
@@ -104,6 +104,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			
 			if disguiseLib.Price == nil or unlockedDisguises[disguiseLib.Id] then
 				remoteDisguiseKitRemote:InvokeServer(activeStorageItem.ID, "disguise", disguiseLib.Id);
+                window:Close();
 				return;
             end
 

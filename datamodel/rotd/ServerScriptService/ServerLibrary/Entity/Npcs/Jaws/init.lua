@@ -79,7 +79,7 @@ function npcPackage.Spawning(npcClass: NpcClass)
     properties.IsJawOpen = true;
     properties.JawModels = jawModels;
     properties.JawMotors = jawMotors;
-    properties.LastStrikeCooldown = tick()+5;
+    properties.LastStrikeCooldown = tick()+1;
 end
 
 function npcPackage.Spawned(npcClass: NpcClass)

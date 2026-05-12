@@ -2,6 +2,8 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
+
 local Dialogues = {};
 --==
 
@@ -25,6 +27,12 @@ Dialogues.DialogueStrings = {
 		Say="You said something about starting our own faction?";
 		Reply="Yeah! I'll help with distributing the information to keep the members up to date.. But I'll need 5000 gold before we begin..";
 		ReturnToInit=true;
+	};
+	
+	["map_banditoutpost"]={
+		Face="Happy";
+		Say="Hey, I've lost my Bandit Outpost Map..";
+		Reply="Hmm.. Alright, here's another one.";
 	};
 };
 
@@ -92,7 +100,46 @@ if RunService:IsServer() then
 			dialog:AddChoice("guide_factions");
 		end
 		
-	
+
+		--MARK: Bandit Outpost
+		if shared.WorldName == "Safehome" or shared.WorldName == "BioXResearch" then
+			dialog:AddDialog({
+				Say="Could you take me to the Bandit Outpost?";
+				Reply="Sure..";
+			}, function(dialog)
+				local npcChar = dialog.Character;
+
+				local raidInteractConfig = npcChar:FindFirstChild("banditOutpostInteractable");
+				if raidInteractConfig == nil then
+					raidInteractConfig = modInteractables.createInteractable("GameModeEnter");
+					raidInteractConfig.Name = "banditOutpostInteractable";
+					raidInteractConfig:SetAttribute("Mode", "Raid");
+					raidInteractConfig:SetAttribute("Stage", "BanditOutpost");
+					raidInteractConfig.Parent = npcChar;
+				end
+				dialog:InteractRequest(raidInteractConfig);
+			end);
+
+			local banditOutpostMapStorageItem = shared.modStorage.FindItemIdFromStorages("banditoutpostmap", player);
+			if banditOutpostMapStorageItem == nil and modEvents:GetEvent(player, "banditoutpostMapGift") then
+				dialog:AddChoice("map_banditoutpost", function(dialog)
+					local profile = shared.modProfile:Get(player);
+					local playerSave = profile:GetActiveSave();
+					local inventory = playerSave.Inventory;
+
+					local hasSpace = inventory:SpaceCheck{{ItemId="banditoutpostmap"}};
+					if not hasSpace then
+						shared.Notify(player, "Inventory is full!", "Negative");
+
+					else
+						inventory:Add("banditoutpostmap");
+						shared.Notify(player, "You received a Bandit Outpost Map.", "Reward");
+					end
+				end)
+			end
+		end
+
+		--MARK: Wanted posters
 		local wantedPoster = modEvents:GetEvent(player, "wantedPoster");
 		if wantedPoster then
 			local dialogPacket = {

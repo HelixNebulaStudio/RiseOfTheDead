@@ -272,7 +272,6 @@ if RunService:IsServer() then
 		elseif mission.Type == 3 then -- Complete
 
 			if modEvents:GetEvent(player, "banditoutpostMapGift") == nil then
-
 				dialog:AddChoice("banditmapGift", function(dialog)
 					local profile = shared.modProfile:Get(player);
 					local playerSave = profile:GetActiveSave();

@@ -14,13 +14,7 @@ function UsablePreset:ClientUse(storageItem)
 end
 
 function UsablePreset:ClientInit()
-	local localPlayer = game.Players.LocalPlayer;
 
-	CollectionService:GetInstanceAddedSignal("DisguiseObject"):Connect(function(object)
-		if localPlayer.Character == nil then return end;
-		if not localPlayer.Character:IsAncestorOf(object) then return end;
-		object.CanCollide = true;
-	end)
 end
 
 

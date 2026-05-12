@@ -1386,7 +1386,6 @@ function Raid:Hud(data)
 		Status = self.StatusText or "";
 		IsHard = self.IsHard;
 		
-		
 		LootPrefab = self.LootPrefab;
 		PlayMusic = data.PlayMusic;
 		EndStageSound = data.EndStageSound;

@@ -108,7 +108,7 @@ function Objective:Begin()
 			BossKilled=true;
 		};
 		
-		local canRagdoll = bossChar:GetAttribute("HasRagdoll") == true;
+		local canRagdoll = bossChar:GetAttribute("HasRagdoll") == true or bossChar:GetAttribute("RagdollRig") == true;
 		if not canRagdoll then
 			for _, obj in pairs(bossChar:GetDescendants()) do
 				if obj:IsA("Motor6D") then

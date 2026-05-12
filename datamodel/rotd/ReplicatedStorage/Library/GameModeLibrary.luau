@@ -469,6 +469,7 @@ GameModeLibrary.GameModes={
 				Soundtrack = "Soundtrack:Born With It";
 				
 				HardModeEnabled=true;
+				EnableStopwatch=true;
 			};
 			
 			["Tombs"]={

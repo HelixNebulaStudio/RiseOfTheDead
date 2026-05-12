@@ -12,7 +12,7 @@ local projectilePackage = {
 	Id = script.Name;
 
 	ArcTracerConfig = {
-		LifeTime = 30;
+		LifeTime = 20;
 		Velocity = 20;
 		Bounce = 0;
 		Acceleration = Vector3.new(0, -workspace.Gravity/16, 0);
@@ -44,7 +44,7 @@ function projectilePackage.onRequire()
             if playerClass == nil then return end;
             if not playerClass.HealthComp:CanTakeDamageFrom(npcClass) then return end;
 
-            modStatusEffects.Poisoned(player, 6);
+            modStatusEffects.Poisoned(player, 4);
             playerClass.HealthComp:TakeDamage(DamageData.new{
                 Damage = projectilePackage.Properties.Damage;
                 DamageBy = npcClass;

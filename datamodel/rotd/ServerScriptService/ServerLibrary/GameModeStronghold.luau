@@ -19,7 +19,7 @@ local modItemDrops = shared.require(game.ServerScriptService.ServerLibrary.ItemD
 
 local Config = {
     EnemyCap = 20;
-    SpawnPlatformRadius = 64;
+    SpawnPlatformRadius = 128;
 
     MinSpawnCount = 2;
     MaxSpawnCount = 4;
@@ -330,6 +330,15 @@ function Stronghold:Initialize(roomData)
 		clearAlive();
 	end)
 
+
+	shared.modEventService:OnInvoked("Doors_BindDoorToggle", function(eventPacket: EventPacket, ...)
+		local doorInstance: DoorInstance = ...;
+		if doorInstance == nil or doorInstance.Values.Raided == true then return end;
+		
+		doorInstance.Values.Raided = true;
+		self:BeginCount();
+	end)
+
 	while #self.Players <= 0 do
 		task.wait();
 	end
@@ -456,6 +465,8 @@ function Stronghold:SpawnEnemy(npcName, paramPacket)
 				
 				if self.Status == EnumStatus.InProgress then
 					Debugger:WarnClient(game.Players:GetPlayers(), `Stronghold>>  Killed enemy. Alive: {#self.EnemyClasses}, Eliminated: {self.EliminateCount}, Removed: {removedFromTable}`);
+					self:BeginCount();
+					
 					self.EliminateCount = self.EliminateCount +1;
 					self.LastEnemyDeathPos = npcClass.RootPart.CFrame.Position;
 
@@ -576,6 +587,21 @@ function Stronghold:DropReward()
 	end
 end
 
+function Stronghold:BeginCount()
+	if self.Status ~= EnumStatus.InProgress then return end;
+	
+	if self.StageLib.EnableStopwatch == true then
+		if self.StopwatchTick == nil then
+			self.StopwatchTick = workspace:GetServerTimeNow();
+		end
+	end
+
+	self:Hud({
+		Status = self.StatusText;
+		PlayMusic = true;
+	});
+end
+
 function Stronghold:Start()
 	self.StopwatchTick = nil;
 	Debugger:Warn("Stronghold:Start");
@@ -612,6 +638,7 @@ function Stronghold:Start()
 		local doorInstance: DoorInstance = self.Doors[a];
 		local doorModel = doorInstance.Model;
 		
+		doorInstance.Values.Raided = nil;
 		doorInstance:Toggle(false);
 
         if doorModel:GetAttribute("ShouldBarricade") == false then continue end;
@@ -662,7 +689,7 @@ function Stronghold:Start()
     
 	for a=5, 1, -1 do
 		self:Hud({
-			Status = `Stronhold is starting in {a}s..`;
+			Status = `Stronghold is starting in {a}s..`;
 		});
 		task.wait(1);
 	end
@@ -730,6 +757,7 @@ function Stronghold:Restart()
 	self:Start();
 end
 
+--MARK: Hud
 function Stronghold:Hud(data)
 	if not self.Loaded then return end;
 	data = data or {};
@@ -751,6 +779,7 @@ function Stronghold:Hud(data)
 		LootPrefab=self.LootPrefab;
 		PlayMusic=data.PlayMusic;
 
+		LevelDif = self.Difficulty;
 		StopwatchTick = self.StopwatchTick;
 		StopwatchFinal = self.StopwatchFinal;
 	});

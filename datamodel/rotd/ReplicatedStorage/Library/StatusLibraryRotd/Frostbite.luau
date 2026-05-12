@@ -19,6 +19,7 @@ local statusPackage = {
     Name = "Hit by Frostbite bullet.";
     Description = "Frostbite causing stun and lethal damage.";
     Buff = false;
+    Tags = {"DOT"; "Frost"};
 };
 
 function statusPackage.onRequire()

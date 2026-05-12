@@ -26,6 +26,10 @@ function treePackage.HasEnemy(npcClass: NpcClass)
                     return false;
                 end
             end
+
+        elseif npcClass.NetworkOwners then
+            return false;
+            
         end
 
         local isAlive = targetCharacterClass.HealthComp.IsDead ~= true;
