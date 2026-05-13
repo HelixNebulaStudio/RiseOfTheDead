@@ -5,7 +5,9 @@ local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemM
 local modifierPackage = {
 	Name = "Armor Points";
 	
-	Tags = {};
+	Tags = {
+		Unique_ArmorMods = true;
+	};
 	Binds = {};
 };
 --==

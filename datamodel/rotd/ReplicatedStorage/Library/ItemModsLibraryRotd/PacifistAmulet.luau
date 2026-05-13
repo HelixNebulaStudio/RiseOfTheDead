@@ -8,7 +8,10 @@ local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemM
 local modifierPackage = {
 	Name = "Pacifist Amulet";
 	
-	Tags = {};
+	Tags = {
+		Unique_ArmorMods = true;
+		Unique_PacifistsWarmongers = true;
+	};
 	Binds = {};
 };
 --==

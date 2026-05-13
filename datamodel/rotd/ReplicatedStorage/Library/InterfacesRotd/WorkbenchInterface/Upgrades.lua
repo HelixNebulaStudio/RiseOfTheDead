@@ -42,6 +42,8 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 	local ModUpgrader = {};
 	local upgradesGuiTable = {};
 
+	local playerClass: PlayerClass = shared.modPlayers.get(localPlayer);
+
 	function ModUpgrader.new(modLib, modifierStorageItem, equipmentStorageItem)
 		local self = {
 			RefreshEquippedMods = nil;
@@ -117,7 +119,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 				modStorageInterface.UpdateStorages(success);
 				if self.RefreshEquippedMods then self.RefreshEquippedMods() end;
 				
-				local equipmentClass = shared.modPlayers.get(localPlayer).WieldComp:GetEquipmentClass(equipmentSiid);
+				local equipmentClass = playerClass.WieldComp:GetEquipmentClass(equipmentSiid);
 				if equipmentClass then
 					equipmentClass.Configurations:Calculate();
 				end
@@ -293,7 +295,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 					
 					if currencyType == "Perks" and (playerStats[currencyType] or 0) < upgradeCost then
 						newLevelButton.Text = "Not enough Perks";
-						wait(1);
+						task.wait(1);
 						interface:ToggleWindow("GoldMenu", true, "PerksPage");
 						return;
 					end
@@ -470,7 +472,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 			listMenu:Add(upgrader.UpgradeFrame);
 			
 		else
-			local equipmentClass = shared.modPlayers.get(localPlayer).WieldComp:GetEquipmentClass(equipmentSiid);
+			local equipmentClass = playerClass.WieldComp:GetEquipmentClass(equipmentSiid);
 			
 			interface:ToggleWindow("WeaponStats", true, storageItem);
 			interface:UpdateWindow("WeaponStats", storageItem);
@@ -530,8 +532,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 				end;
 				refreshCapcityLabel();
 
-				--TODO: modInventoryInterface.UpdateHotbarSize();
-				local equipmentClass = shared.modPlayers.get(localPlayer).WieldComp:GetEquipmentClass(equipmentSiid); 
+				local equipmentClass = playerClass.WieldComp:GetEquipmentClass(equipmentSiid); 
 				if equipmentClass then
 					equipmentClass.Configurations:Calculate();
 				end
@@ -561,7 +562,6 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						modStorageInterface.UpdateStorages(success);
 						binds:PlayUpgradeSound();
 
-						local playerClass: PlayerClass = shared.modPlayers.get(localPlayer);
 						local equipmentClass = playerClass.WieldComp:GetEquipmentClass(equipmentSiid); 
 						if equipmentClass then
 							equipmentClass.Configurations:Calculate();

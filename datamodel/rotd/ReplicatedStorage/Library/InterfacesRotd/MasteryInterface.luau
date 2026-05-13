@@ -6,7 +6,6 @@ local UserInputService = game:GetService("UserInputService");
 
 local localPlayer = game.Players.LocalPlayer;
 
-local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modSkillTreeLibrary = shared.require(game.ReplicatedStorage.Library.SkillTreeLibrary);
@@ -510,6 +509,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 markDirty = true;
                 return true;
             end
+            return;
         end
         local function minusPoint()
             if self.Disabled then return end;
@@ -526,6 +526,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 markDirty = true;
                 return true;
             end
+            return;
         end
         
         
@@ -806,6 +807,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         end
         refreshTree();
     end)
+
+	interface.Garbage:Tag(modData.OnDataEvent:Connect(function(action, hierarchyKey, data)
+		if action ~= "sync" or hierarchyKey ~= "GameSave/Masteries" then return end;
+
+        window:Update();
+	end))
 
 end
 

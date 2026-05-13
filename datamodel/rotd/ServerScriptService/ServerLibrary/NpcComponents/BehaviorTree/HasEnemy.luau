@@ -63,7 +63,7 @@ function treePackage.HasEnemy(npcClass: NpcClass)
     elseif properties.CanForgetTargets ~= false then
         enemyTargetData = properties.EnemyTargetData;
         if enemyTargetData ~= nil then
-            local targetCharacterClass: CharacterClass = enemyTargetData.HealthComp.CompOwner;
+            local targetCharacterClass: EntityClass = enemyTargetData.HealthComp.CompOwner :: EntityClass;
             if targetCharacterClass.HealthComp.IsDead then
                 properties.LastEnemyLockOn = nil;
             end

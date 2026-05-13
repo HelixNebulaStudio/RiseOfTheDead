@@ -1,14 +1,16 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modHealthComponent = shared.require(game.ReplicatedStorage.Components.HealthComponent);
+
 local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClassRotd);
 
 local modifierPackage = {
 	Name = "Warmonger Scales";
 	
-	Tags = {};
+	Tags = {
+		Unique_HealthMods = true;
+		Unique_PacifistsWarmongers = true;
+	};
 	Binds = {};
 };
 --==

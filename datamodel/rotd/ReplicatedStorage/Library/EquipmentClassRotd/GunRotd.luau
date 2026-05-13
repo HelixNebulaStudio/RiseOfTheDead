@@ -73,6 +73,7 @@ function Gun.UpdatePotential(gunClass, equipmentClass: EquipmentClass, weaponLev
     potentialModifier.SetValues.PreModDamage = preModDamage;
     potentialModifier.SetValues.Damage = preModDamage;
     potentialModifier.Tags.Base = true;
+    potentialModifier.Enabled = true;
 
     configurations:Calculate();
 end

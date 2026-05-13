@@ -5,7 +5,9 @@ local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemM
 local modifierPackage = {
 	Name = "Health Points";
 	
-	Tags = {};
+	Tags = {
+		Unique_HealthMods = true;
+	};
 	Binds = {};
 };
 --==

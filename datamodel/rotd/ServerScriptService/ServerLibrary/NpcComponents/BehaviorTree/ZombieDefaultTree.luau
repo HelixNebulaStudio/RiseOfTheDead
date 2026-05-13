@@ -61,7 +61,7 @@ function treePackage.HasEnemy(npcClass: NpcClass)
         local isTargettable = targetHealthComp:CanTakeDamageFrom(npcClass);
         if not isTargettable then return false end;
 
-        if properties.HordeAggression then return true; end;
+        if properties.HordeAggression and targetEntityClass.HumanoidType == "Player" then return true; end;
         if npcClass.HealthComp.LastDamagedBy and npcClass.HealthComp.LastDamageTaken+25 > curServerTime then return true end;
 
         local isInRange = (targetData.Distance <= properties.TargetableDistance);
