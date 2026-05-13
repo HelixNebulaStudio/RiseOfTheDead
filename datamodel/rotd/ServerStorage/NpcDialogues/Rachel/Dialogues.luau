@@ -113,18 +113,17 @@ if RunService:IsServer() then
 	-- MARK: DialogueHandler
 	Dialogues.DialogueHandler = function(player, dialog, data)
 		local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
-		local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
-		if modBranchConfigurations.IsWorld("Safehome") then
-			local survivorDialogueHandler = shared.require(script.Parent.Parent.Survivor);
-			survivorDialogueHandler(player, dialog, data);
+		if shared.WorldName == "Safehome" then
+			local survivorDialoguesPackage = dialog:GetGenericDialogues("Survivor/SafehomeLevel");
+			survivorDialoguesPackage.DialogueHandler(player, dialog, data);
 			
 		else
 			dialog:AddChoice("heal_request", function()
 				if not dialog.InRange() then return end;
 				modStatusEffects.FullHeal(player, 0.15);
 	
-				shared.modEventService:ServerInvoke("Dialogue_BindMedicHeal", {}, player, dialog);
+				shared.modEventService:ServerInvoke("Dialogue_BindMedicHeal", {ReplicateTo={player}}, player, dialog);
 			end)
 		
 		end

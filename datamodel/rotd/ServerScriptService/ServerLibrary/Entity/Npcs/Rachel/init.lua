@@ -14,7 +14,6 @@ local npcPackage = {
     AddComponents = {
         "TargetHandler";
         "Chat";
-        --SafehomeSurvivor;
     };
 
     Voice = {

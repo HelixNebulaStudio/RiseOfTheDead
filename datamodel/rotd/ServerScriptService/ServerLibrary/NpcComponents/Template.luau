@@ -12,4 +12,9 @@ function Component.new(npcClass: NpcClass)
 	return self;
 end
 
+-- Called after NpcClass.Setup, Spawned and Respawn;
+function Component:Setup()
+    
+end
+
 return Component;

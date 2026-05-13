@@ -8,16 +8,23 @@ local npcPackage = {
     Properties = {
         BasicEnemy = true;
         Level = 1;
-        ResourceDropId = "rat";
         MoneyReward = NumberRange.new(2, 4);
         ExperiencePool = 40;
         IsHostile = false;
+        DropRewardId = "rat";
     };
 
     Chatter = {
         AlertPhrases= {
             {Say="Looks like the zombies are here!"; HumanoidType="Zombie";};
+            {Say="Another dead walking"; HumanoidType="Zombie";};
+            {Say="Survivors spotted!"; HumanoidType="Human";};
+            {Say="Bandits!"; HumanoidType="Bandit";};
             {Say="Hostiles!!";};
+            {Say="We got a pest over here!";};
+            {Say="Lock n' loaded!";};
+            {Say="You're dead now..";};
+            {Say="Your time's up buddy!";};
         };
         KillPhrases = {
             {Say="Target down!"};
@@ -26,6 +33,9 @@ local npcPackage = {
             {Say="Night night!"};
             {Say="Ugh, this one splashed guts all over me!"; HumanoidType="Zombie";};
             {Say="Go cry to Zark!"; HumanoidType="Bandit";};
+            {Say="Sleep tight!"};
+            {Say="What a noob.."};
+            {Say="See ya later, alligator~"};
         };
         HuntSpeech = {
             {Say="Come out, come out~!"};

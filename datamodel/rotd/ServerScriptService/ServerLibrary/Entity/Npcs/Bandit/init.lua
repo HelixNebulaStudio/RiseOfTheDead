@@ -8,10 +8,10 @@ local npcPackage = {
     Properties = {
         BasicEnemy = true;
         Level = 1;
-        ResourceDropId = "bandit";
         MoneyReward = NumberRange.new(2, 4);
         ExperiencePool = 40;
         IsHostile = false;
+        DropRewardId = "bandit";
     };
 
     Chatter = {

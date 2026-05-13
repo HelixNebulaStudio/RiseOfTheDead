@@ -29,15 +29,6 @@ return function(CutsceneSequence)
 		local mission = modMission:GetMission(player, MISSION_ID);
 		if mission == nil then return end;
 			
-		-- local jesseModule = modNpcs.getPlayerNpc(player, "Jesse");
-		-- if jesseModule == nil then
-		-- 	local npc = modNpcs.spawn("Jesse", nil, function(npc, npcModule)
-		-- 		npcModule.Player = player;
-		-- 		jesseModule = npcModule;
-		-- 	end, modNpcs.NpcBaseConstructors.BasicNpcModule);
-		-- 	modReplicationManager.ReplicateOut(player, npc);
-		-- end
-		
 		local function OnChanged(firstRun)
 			if mission.Type == 2 then -- OnAvailable
 				

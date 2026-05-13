@@ -18,7 +18,6 @@ local npcPackage = {
 
         Level = 1;
         ExperiencePool = 40;
-        DropRewardId = "bandit";
     };
 
     AddComponents = {

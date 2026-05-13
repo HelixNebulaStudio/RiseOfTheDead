@@ -9,6 +9,8 @@ local modInteractables = shared.require(game.ReplicatedStorage.Library.Interacta
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modSfxService = shared.require(game.ReplicatedStorage.Library.SfxService);
 local modDestructibles = shared.require(game.ReplicatedStorage.Entity.Destructibles);
+local modRewardsLibrary = shared.require(game.ReplicatedStorage.Library.RewardsLibrary);
+local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 
 local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 
@@ -16,6 +18,7 @@ if RunService:IsServer() then
     modGameModeRaid = shared.require(game.ServerScriptService.ServerLibrary.GameModeRaid);
     modGameModeManager = shared.require(game.ServerScriptService.ServerLibrary.GameModeManager);
     modRailwaySystem = shared.require(game.ServerScriptService.ServerLibrary.RailwaySystem);
+    modItemDrops = shared.require(game.ServerScriptService.ServerLibrary.ItemDrops);
 
     modGameModeManager.GameWorld = true;
 end
@@ -97,6 +100,12 @@ function WorldCore.InitMapLogic(gameController)
             + basePart.CFrame.RightVector * math.random(-trainObject.Speed, trainObject.Speed);
 
         if trainObject.Speed > 25 then
+            npcClass.StatusComp:Apply("ExplosionRagdoll", {
+                Expires = workspace:GetServerTimeNow() + 3;
+                Values = {
+                    Ragdoll = true;
+                }
+            });
             healthComp:TakeDamage(DamageData.new{
                 Damage = healthComp.MaxHealth+100;
             });
@@ -198,7 +207,10 @@ function WorldCore.InitMapLogic(gameController)
                 end)
             end
 
-            local trainDestructibleConfig = modDestructibles.createDestructible("Scarecrow");
+            local trainDestructibleConfig = trainPrefab:FindFirstChild("Destructible");
+            if trainDestructibleConfig == nil then
+                trainDestructibleConfig = modDestructibles.createDestructible("Scarecrow");
+            end
             trainDestructibleConfig:SetAttribute("_AttractRange", 128);
             trainDestructibleConfig:SetAttribute("_ExpiringDamageTick", false);
             trainDestructibleConfig:SetAttribute("_HordeAggression", true);
@@ -380,6 +392,45 @@ function WorldCore.InitMapLogic(gameController)
             });
             gameController:CompleteRaid();
 
+        elseif triggerId == "BonusCrate" then
+            local rewardSpawnAtt = interactable.Config:WaitForChild("RewardSpawn");
+
+            if interactable.Values.Dropped then return end;
+            interactable.Values.Dropped = true;
+
+            local stageRewardId = gameController.StageLib.RewardsId;
+            if stageRewardId == nil then return end;
+
+            local rewardInfo;
+
+            if gameController.IsHard then
+                rewardInfo = {
+                    ItemId = stageRewardId;
+                    Quantity = 1;
+                };
+
+            else
+                local chosenDrop = modItemDrops.ChooseDrop(modRewardsLibrary:Find(stageRewardId));
+                if chosenDrop then
+                    rewardInfo = chosenDrop;
+                end;
+            end
+
+            if rewardInfo then
+                modItemDrops.spawn{
+                    ItemId = rewardInfo.ItemId;
+                    Quantity = rewardInfo.Quantity;
+                    ItemValues = rewardInfo.ItemValues;
+                    SpawnCFrame = rewardSpawnAtt.WorldCFrame;
+                    SharedDrop = true;
+                    DespawnDuration = false;
+                    Anchored = true;
+                    DisableTouchPickup = true;
+                };
+
+                local itemLib = modItemsLibrary:Find(rewardInfo.ItemId);
+                interactable.Config:SetAttribute("_Label", `You found {itemLib.Name} from this crate`);
+            end
         end;
 
     end)

@@ -409,12 +409,12 @@ if RunService:IsServer() then
 								end
 
 								local healthComp: HealthComp = activeTarget.HealthComp;
-								local enemyNpcClass: NpcClass = healthComp.CompOwner;
+								local enemyNpcClass: NpcClass = healthComp.CompOwner :: NpcClass;
 
 								npcClass.Move:HeadTrack(enemyNpcClass.RootPart, 2);
 								npcClass.Move:Face(enemyNpcClass.RootPart.Position);
 
-								local shootDirection = (enemyNpcClass.RootPart.Position - npcClass.RootPart.Position).Unit;
+								local shootDirection = (enemyNpcClass:GetCFrame().Position - npcClass:GetCFrame().Position).Unit;
 								
 								wieldComp:InvokeToolAction(
 									"PrimaryFireRequest", 
@@ -464,6 +464,10 @@ if RunService:IsServer() then
 			addDialog("Head track", "Okie dokie", function(dialog)
 				local playerClass: PlayerClass = shared.modPlayers.get(player);
 				npcClass.Move:HeadTrack(playerClass.Head);
+			end)
+
+			addDialog("ExpiringTest", "Close this dialogue in 5s", function(dialog)
+				dialog:SetExpireTime(workspace:GetServerTimeNow()+5);
 			end)
 
 			addDialog("Follow me", "Okie dokie", function(dialog)

@@ -10,13 +10,17 @@ function Component.onRequire()
 end
 
 function Component.new(npcClass: NpcClass)
-	local self = {};
+	local self = {
+		NpcClass = npcClass;
+	};
 	
 	setmetatable(self, Component);
 	return self;
 end
 
-function Component:__call(npcClass: NpcClass)
+function Component:Setup()
+	local npcClass: NpcClass = self.NpcClass;
+
 	local bodyDestructiblesComp =  npcClass:AddComponent("BodyDestructibles");
 	local npcChar = npcClass.Character;
 

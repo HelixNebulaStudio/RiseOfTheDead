@@ -14,10 +14,6 @@ local Dialogues = {
 };
 
 local MISSION_ID = 75;
-local cache = {
-	SecondBribe=nil;
-};
-
 --==
 
 --MARK: Rachel Dialogues
@@ -408,60 +404,6 @@ if shared.WorldName == "MedicalBreakthrough" then
 		
 		if mission.Type == 1 and mission.ProgressionPoint == 9 then
 			local playerSave = shared.modProfile:Get(player):GetActiveSave();
-
-			if cache.SecondBribe then
-				local bribeCost = 1000;
-				dialog:SetInitiate("You know what.. Another $1'000 and I'll leave you alone.");
-
-				if playerSave:GetStat("Money") >= bribeCost then
-					dialog:AddDialog({
-						Face="Hehe";
-						Say=".. *Give $1'000 to bandit*";
-						Reply="Alright, haha, see you next time.";
-					}, function(dialog)
-						dialog:SetExpireTime(workspace:GetServerTimeNow()+10);
-						
-						patrolBandit:ToggleInteractable(false);
-	
-						playerSave:AddStat("Money", -bribeCost);
-						
-						task.wait(4);
-						patrolBandit.Move:MoveTo(Vector3.new(508.548, 136.42, -1184.096));
-						task.wait(4);
-						patrolBandit:TeleportHide();
-	
-						modMission:Progress(player, MISSION_ID, function(mission)
-							if mission.ProgressionPoint <= 11 then
-								mission.ProgressionPoint = 11;
-							end
-						end);
-					end);
-
-				else
-					dialog:AddDialog({
-						Face="Serious";
-						Say=".. I don't have any more money.";
-						Reply="Ugh.. fine.";
-					}, function(dialog)
-						dialog:SetExpireTime(workspace:GetServerTimeNow()+10);
-						
-						patrolBandit:ToggleInteractable(false);
-	
-						task.wait(4);
-						patrolBandit.Move:MoveTo(Vector3.new(508.548, 136.42, -1184.096));
-						task.wait(4);
-						patrolBandit:TeleportHide();
-	
-						modMission:Progress(player, MISSION_ID, function(mission)
-							if mission.ProgressionPoint <= 11 then
-								mission.ProgressionPoint = 11;
-							end
-						end);
-					end)
-				end
-				
-				return;
-			end
 			
 			dialog:SetInitiate("Identify yourself immediately!");
 			dialog:SetExpireTime(workspace:GetServerTimeNow()+10);
@@ -505,14 +447,17 @@ if shared.WorldName == "MedicalBreakthrough" then
 									Reply="It doesn't matter! *Loads weapon*\n*Clicks walkie talkie* \"I'll be needing backup here..\"\n\nYou have a count of 3!";
 									
 								}, function(dialog)
+									-- Bandit was angered, you will be attacked
 									patrolBandit.WieldComp:InvokeToolAction("LoadGun");
 
 									task.wait(4);
-									for a=3, 1, -1 do
-										patrolBandit.Chat(player, a..string.rep("!",3-a));
-										task.wait(1);
-										if mission.ProgressionPoint == 10 then
-											break;
+									if not patrolBandit.HealthComp.IsDead then
+										for a=3, 1, -1 do
+											patrolBandit.Chat(player, a..string.rep("!",3-a));
+											task.wait(1);
+											if mission.ProgressionPoint == 10 or patrolBandit.HealthComp.IsDead then
+												break;
+											end
 										end
 									end
 									
@@ -546,23 +491,24 @@ if shared.WorldName == "MedicalBreakthrough" then
 								Say="Not sure, it's probably unimportant..";
 								Reply=".. Alright.. I'll leave you to it..";
 							}, function(dialog)
+								-- Bandit believes you and lets you go
 								dialog:SetExpireTime(workspace:GetServerTimeNow()+3);
 
 								patrolBandit.Properties.CallingBackup = true;
 								patrolBandit:ToggleInteractable(false);
+
+								modMission:Progress(player, MISSION_ID, function(mission)
+									if mission.ProgressionPoint <= 11 then
+										mission.ProgressionPoint = 11;
+									end
+								end);
+								
+								patrolBandit.Move:SetMoveSpeed("set", "walk", 8, 5);
 								patrolBandit.Move:MoveTo(Vector3.new(508.548, 136.42, -1184.096));
-								task.wait(3);
-								
-								patrolBandit.Chat(player, "*Clicks Walkie Talkie* Potential high value cargo, 1 hostile, go in 3..");
-								task.wait(3);
-								
+								task.wait(8);
 								if not patrolBandit.HealthComp.IsDead then
-									modMission:Progress(player, MISSION_ID, function(mission)
-										if mission.ProgressionPoint == 9 then
-											mission.ProgressionPoint = 10;
-										end
-									end);
-								end
+									patrolBandit:Destroy();
+								end;
 							end);
 						end);
 					end)
@@ -585,11 +531,13 @@ if shared.WorldName == "MedicalBreakthrough" then
 						patrolBandit.WieldComp:InvokeToolAction("LoadGun");
 
 						task.wait(2);
-						for a=5, 1, -1 do
-							patrolBandit.Chat(player, a..string.rep("!",4-a));
-							task.wait(1);
-							if mission.ProgressionPoint == 10 then
-								break;
+						if not patrolBandit.HealthComp.IsDead then
+							for a=5, 1, -1 do
+								patrolBandit.Chat(player, a..string.rep("!",4-a));
+								task.wait(1);
+								if mission.ProgressionPoint == 10 or patrolBandit.HealthComp.IsDead then
+									break;
+								end
 							end
 						end
 
@@ -619,26 +567,30 @@ if shared.WorldName == "MedicalBreakthrough" then
 								dialog:AddDialog({
 									Face="Serious";
 									Say="Fine, here.. *Give $2'000 to bandit*";
-									Reply="Alright, you get 5 minutes!";
+									Reply="Alright, you better be gone by the time we come back!";
 								}, function(dialog)
+									-- Bandit takes your bribe and lets you go
 									playerSave:AddStat("Money", -bribeCost);
 	
 									local patrolBandit: NpcClass = dialog:GetNpcClass();
 									patrolBandit:ToggleInteractable(false);
+									patrolBandit.Properties.CallingBackup = true;
 									
-									cache.SecondBribe = true;
-									task.wait(4);
-									patrolBandit.Move:MoveTo(Vector3.new(508.548, 136.42, -1184.096));
-									task.wait(4)
-									patrolBandit.Chat(player, "Wait.. You know what..");
-									patrolBandit.Move:MoveTo(Vector3.new(507.441, 136.42, -1112.584));
-									
-									task.wait(4);
-									patrolBandit:ToggleInteractable(true);
-									
-									modDialogueService:InvokeDialogue(player, "talk", {
-										NpcModel = patrolBandit.Character;
-									});
+									task.wait(2);
+									modMission:Progress(player, MISSION_ID, function(mission)
+										if mission.ProgressionPoint <= 11 then
+											mission.ProgressionPoint = 11;
+										end
+									end);
+
+									if not patrolBandit.HealthComp.IsDead then
+										patrolBandit.Move:SetMoveSpeed("set", "walk", 8, 5);
+										patrolBandit.Move:MoveTo(Vector3.new(508.548, 136.42, -1184.096));
+										task.wait(8)
+									end
+									if not patrolBandit.HealthComp.IsDead then
+										patrolBandit:Destroy();
+									end;
 								end);
 							end
 
@@ -647,7 +599,7 @@ if shared.WorldName == "MedicalBreakthrough" then
 								Say="Noo way, that's too much!";
 								Reply="Well, then you have 5 seconds to leave!";
 							}, function(dialog)
-								
+								-- Bandit was angered, you will be attacked
 								leaveNow5Sec();
 							end);
 							
@@ -667,7 +619,7 @@ if shared.WorldName == "MedicalBreakthrough" then
 							Say="Please, I just need 5 minutes..";
 							Reply="No, leave now. You have 5 seconds!";
 						}, function(dialog)
-							
+							-- Bandit was angered, you will be attacked
 							leaveNow5Sec();
 						end)
 					end)

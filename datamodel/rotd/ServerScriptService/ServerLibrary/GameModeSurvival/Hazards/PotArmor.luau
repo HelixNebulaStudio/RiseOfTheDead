@@ -27,7 +27,7 @@ function Hazard:Begin()
         if npcClass.HumanoidType ~= "Zombie" then return end;
         if npcClass.Properties.BasicEnemy ~= true then return end;
 
-        npcClass:AddComponent("PotArmor")(npcClass);
+        npcClass:AddComponent("PotArmor");
     end))
 end
 

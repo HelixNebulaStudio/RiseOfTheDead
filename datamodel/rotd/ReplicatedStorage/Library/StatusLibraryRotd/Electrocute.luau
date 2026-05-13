@@ -11,9 +11,9 @@ local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 
 --
 local statusPackage = {
-    Id = "ElectricCharge";
+    Id = "Electrocute";
     Icon = "";
-    Name = "Electric Charge";
+    Name = "Electrocute";
     Description = "Shock and strike nearby targets.";
     Buff = false;
 };
@@ -21,7 +21,7 @@ local statusPackage = {
 local Arc = {
     Color = Color3.fromRGB(255, 179, 0);
     Color2 = Color3.new(1, 1, 1);
-    Amount = 1;
+    Amount = 2;
     Thickness = 0.2;
 };
 
@@ -44,7 +44,7 @@ function statusPackage.StrikeTarget(applyBy: CharacterClass, statusValues: anydi
     
     statusComp:Apply(statusPackage.Id, {
         ApplyBy = applyBy;
-        Expires = workspace:GetServerTimeNow()+1; 
+        Expires = workspace:GetServerTimeNow()+2;
         Values = statusValues;
     });
 end
@@ -67,7 +67,7 @@ function statusPackage.BindApply(statusClass: StatusClassInstance)
     if originAtt then
         local hitAtt = Instance.new("Attachment");
         hitAtt.Parent = hitPart;
-        hitAtt.Name = `ElectricCharge_{hitPart.Name}`;
+        hitAtt.Name = `Electrocute_{hitPart.Name}`;
         Debugger.Expire(hitAtt, 1);
 
         Debugger.Expire(modArcParticles.broadcast(originAtt, hitAtt, {
@@ -85,7 +85,7 @@ function statusPackage.BindApply(statusClass: StatusClassInstance)
         local damagePercent = statusClass.Values.DamagePercent;
         local targetsHit = statusClass.Values.TargetsHit;
 
-        local dmgRatio = math.clamp(damagePercent - 0.02*targetsHit, 0.05, 1);
+        local dmgRatio = math.clamp(damagePercent, 0.05, 1);
         
         healthComp:TakeDamage(DamageData.new{
             DamageBy = applyBy;
@@ -110,7 +110,7 @@ function statusPackage.BindApply(statusClass: StatusClassInstance)
         task.wait(0.1);
 
         local hitAtt = Instance.new("Attachment");
-        hitAtt.Name = `ElectricCharge_{hitPart.Name}`;
+        hitAtt.Name = `Electrocute_{hitPart.Name}`;
         hitAtt.Parent = hitPart;
         Debugger.Expire(hitAtt, 1);
         statusClass.Values.OriginAtt = hitAtt;

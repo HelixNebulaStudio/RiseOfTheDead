@@ -110,8 +110,8 @@ Dialogues.DialogueStrings = {
 if RunService:IsServer() then
 	-- MARK: DialogueHandler
 	Dialogues.DialogueHandler = function(player, dialog, data)
-		local survivorDialogueHandler = shared.require(script.Parent.Parent.Survivor);
-		survivorDialogueHandler(player, dialog, data);
+		local survivorDialoguesPackage = dialog:GetGenericDialogues("Survivor/SafehomeLevel");
+		survivorDialoguesPackage.DialogueHandler(player, dialog, data);
 	end 
 end
 

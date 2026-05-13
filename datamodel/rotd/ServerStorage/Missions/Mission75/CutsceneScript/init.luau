@@ -694,6 +694,7 @@ return function(CutsceneSequence)
 							task.delay(5, function()
 								if lastTalkedToTick == nil or tick()-lastTalkedToTick > 4 then
 									if patrolBandit.HealthComp.IsDead then return end;
+									if patrolBandit.Properties.CallingBackup then return end;
 									patrolBandit.Chat(player, threatenMsgs[math.random(1, #threatenMsgs)]);
 								end
 							end)

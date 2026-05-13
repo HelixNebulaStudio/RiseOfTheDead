@@ -615,6 +615,16 @@ function Coop:SpawnEnemy(npcName, paramPacket)
 	local rngLevel = self.Difficulty + math.random(-1,1);
 	local level = math.max(rngLevel, 1);
 	
+	local npcPackage = modNpcs.getNpcPackage(npcName);
+
+	local addComponents = {};
+
+	if self.IsHard == true then
+		if npcPackage.HumanoidType == "Zombie" and math.random(1, 4) == 1 then
+			table.insert(addComponents, "PotArmor");
+		end
+	end
+
 	return modNpcs.spawn2{
 		Name = npcName;
 		CFrame = spawnCf;
@@ -625,6 +635,7 @@ function Coop:SpawnEnemy(npcName, paramPacket)
 			IsHostile = true;
 			TargetableDistance = 4096;
 		};
+		AddComponents = addComponents;
 		BindSetup = function(npcClass: NpcClass)
 			self.EnemiesSpawned = self.EnemiesSpawned + 1;
 
@@ -633,11 +644,6 @@ function Coop:SpawnEnemy(npcName, paramPacket)
 			npcClass.HealthComp.OnIsDeadChanged:Connect(function()
 				if not npcClass.HealthComp.IsDead then return end;
 			end)
-
-			if not properties.HardMode then return end;
-			if npcClass.HumanoidType == "Zombie" and math.random(1, 4) == 1 then
-				npcClass:AddComponent("PotArmor")(npcClass);
-			end
 		end
 	};
 end

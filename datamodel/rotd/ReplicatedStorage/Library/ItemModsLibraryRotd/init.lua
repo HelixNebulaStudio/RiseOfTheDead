@@ -1117,21 +1117,21 @@ function library.onRequire()
 
 	library:Add{
 		Id="electricmod";
-		Name="Electric Charge";
-		Desc="Electrocute nearby enemies and deal an additional <b>Damage</b> based on the weapon's <b>Premod Damage</b> as electric damage. For every enemies hit, damage percent is reduced by 2%. (Cooldown: 2s)";
+		Name="Electrocute";
+		Desc="Electrocute nearby enemies and deal an additional <b>Damage</b> based on the weapon's <b>Premod Damage</b> as electric damage. (Cooldown: 3s)";
 		Icon="rbxassetid://3576196956";
 		BaseTier=1;
 		Tier=1;
 		Upgrades={
-			{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage Percent"; MaxLevel=10; BaseCost=20; MaxCost=200; BaseValue=0.1; MaxValue=0.75; TweakBonus=0.1; Scaling=library.ScalingStyle.NaturalCurve;};
+			{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage Percent"; MaxLevel=10; BaseCost=20; MaxCost=200; BaseValue=0.1; MaxValue=1; TweakBonus=0.1; Scaling=library.ScalingStyle.NaturalCurve;};
 			{DataTag="T"; Name="Targets"; Syntax="Increase Targets"; ValueType="Normal"; MaxLevel=5; BaseCost=10; MaxCost=100; BaseValue=1; MaxValue=6; Scaling=library.ScalingStyle.Linear;};
 		};
 		Stackable=false;
 		Type={"Pistol"; "Submachine Gun"; "Shotgun"; "Rifle"; "Sniper"; "Heavy machine gun"; "Bow"; "Launcher";};
 
 		EffectTrigger = library.EffectTrigger.Passive;
-		ActivationDuration=2;
-		CooldownDuration=2;
+		ActivationDuration=3;
+		CooldownDuration=3;
 
 		Module=script.ElectricMod;
 		Category="Elemental Mods";

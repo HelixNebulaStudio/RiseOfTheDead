@@ -4,15 +4,15 @@ local RunService = game:GetService("RunService");
 
 local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClassRotd);
 
-local statusKey = "ElectricCharge";
+local statusKey = "Electrocute";
 
 local modifierPackage = {
-	Name = "Electric Charge";
+	Name = "Electrocute";
 	
 	Tags = {};
 	Binds = {};
 	Properties = {
-		CooldownDuration = 2;
+		CooldownDuration = 3;
 	};
 };
 --==
@@ -86,10 +86,10 @@ if RunService:IsServer() then
 		if originAtt == nil then return end;
 
 		statusComp:Apply(statusKey, {
-			Expires = workspace:GetServerTimeNow()+1;
+			Expires = workspace:GetServerTimeNow()+2;
 			ApplyBy = characterClass;
 			Values = {
-				WeakRoot = 0.5;
+				WeakRoot = 1;
 
 				MaxTargets = maxTargets;
 				StorageItemBy = storageItemBy;
@@ -129,8 +129,8 @@ else
 	function modifierPackage.Binds.WeaponRenderStepped(modifier: ItemModifierInstance, toolStatusHud: anydict)
 		if modifier.Enabled == false then return end;
 
-		if toolStatusHud.ElectricCharge == nil then
-			toolStatusHud.ElectricCharge = {
+		if toolStatusHud.Electrocute == nil then
+			toolStatusHud.Electrocute = {
 				ModifierId = modifier.Id;
 				ModItemId = "electricmod";
 				Order = 1;
@@ -138,7 +138,7 @@ else
 			};
 		end
 
-		local hudData = toolStatusHud.ElectricCharge;
+		local hudData = toolStatusHud.Electrocute;
 
 		local cooldownTick = modifier.Properties.CooldownTick;
 		local charge = 1;

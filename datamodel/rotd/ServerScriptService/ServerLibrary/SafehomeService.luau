@@ -271,6 +271,9 @@ function SafehomeClass:LoadNpcs(namesList)
             Name = npcName;
             CFrame = npcSpotAtt.WorldCFrame;
             Player = self.Owner;
+            AddComponents = {
+                "SafehomeSurvivor";
+            };
         };
 
         self.NpcClassList[npcName] = npcClass;
