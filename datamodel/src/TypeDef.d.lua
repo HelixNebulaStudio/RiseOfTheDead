@@ -639,7 +639,7 @@ export type CharacterClass = {
     PositionalOctreeNode: OctreeNode<NpcClass>;
     
     Configurations: ConfigVariable;
-    Properties: anydict;
+    Properties: PropertiesVariable<anydict>;
 
     Garbage: GarbageHandler;
 
@@ -659,6 +659,12 @@ export type CharacterClass = {
     GetMapLocation: (CharacterClass) -> string;
 
     FireAllModifiersBind: (CharacterClass, bindName: string, ...any) -> nil;
+
+    AddBaseModifier: (CharacterClass, modifierId: string, config: anydict?) -> ItemModifierInstance?;  
+
+    AddComponent: (CharacterClass, component: string | ModuleScript) -> any;
+    GetComponent: (CharacterClass, componentName: string) -> any;
+    ListComponents: (CharacterClass) -> {any};
 } & EntityClass;
 
 --MARK: Entity
@@ -743,6 +749,8 @@ export type NpcClasses = {
     getNpcPackage: (npcName: string) -> anydict;
     getByModel: (Model) -> NpcClass?;
     getById: (number) -> NpcClass?;
+    getByConfig: (ModuleScript) -> NpcClass?;
+
     getPlayerNpc: (player: Player, npcName: string, matchFunc: ((npcClass: NpcClass) -> boolean)?) -> NpcClass?;
     listNpcClasses: (matchFunc: (npcClass: NpcClass) -> boolean) -> {NpcClass};
     listInRange: (position: Vector3, radius: number, maxRootpart: number?) -> {NpcClass};
@@ -810,6 +818,7 @@ export type NpcMoveComponent = {
     Resume: (NpcMoveComponent) -> nil;
     Recompute: (NpcMoveComponent) -> nil;
     Fly: (NpcMoveComponent, trajPoints: ({{Velocity: Vector3;Direction: Vector3;}})?, delta: number?, onStepFunc: anyfunc?) -> nil;
+    ComputePath: (NpcMoveComponent, a: Vector3, b: Vector3, recreatePath: boolean?) -> Path;
 
     -- @signals
     OnMoveToEnded: EventSignal<any>;
@@ -820,7 +829,6 @@ export type NpcClass = CharacterClass & {
     -- @properties
     Id: number;
     SpawnCFrame: CFrame;
-    IsReady: boolean;
 
     Player: Player?;
     NetworkOwners: {Player};
@@ -847,10 +855,6 @@ export type NpcClass = CharacterClass & {
     Destroy: (NpcClass) -> nil;
     TeleportHide: (NpcClass) -> nil;
     Respawn: (NpcClass, cframe: CFrame?) -> nil;
-
-    AddComponent: (NpcClass, component: string | ModuleScript) -> any;
-    GetComponent: (NpcClass, componentName: string) -> any;
-    ListComponents: (NpcClass) -> {any};
     
     SetNetworkOwner: (NpcClass, player: Player?) -> nil;
     BreakJoint: (NpcClass, motor: Motor6D) -> nil;
@@ -1951,6 +1955,7 @@ export type StatusComp = {
     ProcessNextStep: boolean;
     UseScheduler: boolean;
     IsDestroyed: boolean;
+    EarliestExpireTime: number;
 
     -- @methods
     Apply: (StatusComp, uid: string, value: StatusCompApplyParam?) -> StatusClassInstance;
@@ -1990,6 +1995,8 @@ export type WieldComp = {
     ItemModifierList: {ItemModifierInstance};
     ProxyStorageItemList: {[string]: StorageItem};
     
+    CanEquip: boolean;
+
     -- @methods
     GetEquipmentClass: (WieldComp, siid: string, itemId: string?, storageItem: StorageItem?) -> EquipmentClass;
     GetToolHandler: (WieldComp, siid: string, itemId: string, storageItem: StorageItem?, toolModels: ({Model}?)) -> ToolHandlerInstance;

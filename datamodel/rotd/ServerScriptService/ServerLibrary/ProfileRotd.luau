@@ -200,7 +200,7 @@ function modProfile.onRequire()
 			teleportOptions:SetTeleportData(teleportData);
 
 			shared.Notify(player, "Traveling to DevBranch..", "Inform");
-			game:GetService("TeleportService"):TeleportAsync(54092940, {player}, teleportOptions);
+			game:GetService("TeleportService"):TeleportAsync(71538688017707, {player}, teleportOptions);
 
 			rPacket.Success = true;
 			return rPacket;

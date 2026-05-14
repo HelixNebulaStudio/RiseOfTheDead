@@ -4,8 +4,9 @@ local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.Br
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 --==
 local LEGACY_GAME_ID = 65708455;
+local LEGACY_DEV_GAME_ID = 11770238;
 local LIVE_GAME_ID = 9704136497;
-local DEV_GAME_ID = 11770238;
+local DEV_GAME_ID = 10166800763;
 
 local WORLD_TYPES = {
     Menu = 0;
@@ -24,7 +25,8 @@ local WORLDS = {
         PlaceIds = {
             [LEGACY_GAME_ID] = 141084271;
             [LIVE_GAME_ID] = 95518711955879;
-            [DEV_GAME_ID] = 54092940;
+            [LEGACY_DEV_GAME_ID] = 54092940;
+            [DEV_GAME_ID] = 71538688017707;
         };
         
         WorldType = WORLD_TYPES.Menu;
@@ -41,7 +43,8 @@ local WORLDS = {
         PlaceIds = {
             [LEGACY_GAME_ID] = 7021428831;
             [LIVE_GAME_ID] = 7021428831;
-            [DEV_GAME_ID] = 7005837755;
+            [LEGACY_DEV_GAME_ID] = 7005837755;
+            [DEV_GAME_ID] = 132786383071956;
         };
         
         WorldType = WORLD_TYPES.General;
@@ -52,7 +55,8 @@ local WORLDS = {
         PlaceIds = {
             [LEGACY_GAME_ID] = 11627133100;
             [LIVE_GAME_ID] = 11627133100;
-            [DEV_GAME_ID] = 5904157734;
+            [LEGACY_DEV_GAME_ID] = 5904157734;
+            [DEV_GAME_ID] = 70465549334898;
         };
         
         WorldType = WORLD_TYPES.General;
@@ -67,7 +71,8 @@ local WORLDS = {
         PlaceIds = {
             [LEGACY_GAME_ID] = 464575687;
             [LIVE_GAME_ID] = 74727871207166;
-            [DEV_GAME_ID] = 1642290020;
+            [LEGACY_DEV_GAME_ID] = 1642290020;
+            [DEV_GAME_ID] = 88897187155505;
         };
         
         WorldType = WORLD_TYPES.General;
@@ -83,7 +88,8 @@ local WORLDS = {
         PlaceIds = {
             [LEGACY_GAME_ID] = 480661072;
             [LIVE_GAME_ID] = 126735923549685;
-            [DEV_GAME_ID] = 1959581122;
+            [LEGACY_DEV_GAME_ID] = 1959581122;
+            [DEV_GAME_ID] = 140185617183608;
         };
         
         WorldType = WORLD_TYPES.General;
@@ -100,7 +106,8 @@ local WORLDS = {
         PlaceIds = {
             [LEGACY_GAME_ID] = 4413486022;
             [LIVE_GAME_ID] = 121856513802733;
-            [DEV_GAME_ID] = 4136448647;
+            [LEGACY_DEV_GAME_ID] = 4136448647;
+            [DEV_GAME_ID] = 88082514414935;
         };
         
         WorldType = WORLD_TYPES.General;
@@ -116,7 +123,8 @@ local WORLDS = {
         PlaceIds = {
             [LEGACY_GAME_ID] = 4718770953;
             [LIVE_GAME_ID] = 95903556488607;
-            [DEV_GAME_ID] = 4718358739;
+            [LEGACY_DEV_GAME_ID] = 4718358739;
+            [DEV_GAME_ID] = 126261314365557;
         };
         
         WorldType = WORLD_TYPES.General;
@@ -132,7 +140,8 @@ local WORLDS = {
         PlaceIds = {
             [LEGACY_GAME_ID] = 5001877367;
             [LIVE_GAME_ID] = 130961448163734;
-            [DEV_GAME_ID] = 4973139830;
+            [LEGACY_DEV_GAME_ID] = 4973139830;
+            [DEV_GAME_ID] = 83707646530335;
         };
         
         WorldType = WORLD_TYPES.General;
@@ -152,7 +161,8 @@ local WORLDS = {
         PlaceIds = {
             [LEGACY_GAME_ID] = 3735072414;
             [LIVE_GAME_ID] = 0;
-            [DEV_GAME_ID] = 3180202162;
+            [LEGACY_DEV_GAME_ID] = 3180202162;
+            [DEV_GAME_ID] = 111276396160854;
         };
         
         WorldType = WORLD_TYPES.General;
@@ -164,7 +174,8 @@ local WORLDS = {
         PlaceIds = {
             [LEGACY_GAME_ID] = 6130274415;
             [LIVE_GAME_ID] = 0;
-            [DEV_GAME_ID] = 5919919462;
+            [LEGACY_DEV_GAME_ID] = 5919919462;
+            [DEV_GAME_ID] = 94620506655272;
         };
         
         WorldType = WORLD_TYPES.General;
@@ -176,7 +187,8 @@ local WORLDS = {
         PlaceIds = {
             [LEGACY_GAME_ID] = 7206473065;
             [LIVE_GAME_ID] = 0;
-            [DEV_GAME_ID] = 7121066979;
+            [LEGACY_DEV_GAME_ID] = 7121066979;
+            [DEV_GAME_ID] = 104132048628084;
         };
         
         WorldType = WORLD_TYPES.General;
@@ -188,7 +200,8 @@ local WORLDS = {
         PlaceIds = {
             [LEGACY_GAME_ID] = 77974241048068;
             [LIVE_GAME_ID] = 0;
-            [DEV_GAME_ID] = 106260060051724;
+            [LEGACY_DEV_GAME_ID] = 106260060051724;
+            [DEV_GAME_ID] = 71918795072769;
         };
         
         WorldType = WORLD_TYPES.General;
@@ -204,7 +217,8 @@ local WORLDS = {
         PlaceIds = {
             [LEGACY_GAME_ID] = 3473383899;
             [LIVE_GAME_ID] = 0;
-            [DEV_GAME_ID] = 3413033523;
+            [LEGACY_DEV_GAME_ID] = 3413033523;
+            [DEV_GAME_ID] = 85165009457706;
         };
         
         WorldType = WORLD_TYPES.General;
@@ -216,7 +230,8 @@ local WORLDS = {
         PlaceIds = {
             [LEGACY_GAME_ID] = 4672930500;
             [LIVE_GAME_ID] = 0;
-            [DEV_GAME_ID] = 4667884778;
+            [LEGACY_DEV_GAME_ID] = 4667884778;
+            [DEV_GAME_ID] = 103473773786217;
         };
         
         WorldType = WORLD_TYPES.General;
@@ -228,7 +243,8 @@ local WORLDS = {
         PlaceIds = {
             [LEGACY_GAME_ID] = 4942812724;
             [LIVE_GAME_ID] = 0;
-            [DEV_GAME_ID] = 4923823858;
+            [LEGACY_DEV_GAME_ID] = 4923823858;
+            [DEV_GAME_ID] = 125514962171373;
         };
         
         WorldType = WORLD_TYPES.General;
@@ -240,7 +256,8 @@ local WORLDS = {
         PlaceIds = {
             [LEGACY_GAME_ID] = 5515514657;
             [LIVE_GAME_ID] = 0;
-            [DEV_GAME_ID] = 5495827291;
+            [LEGACY_DEV_GAME_ID] = 5495827291;
+            [DEV_GAME_ID] = 135159268055786;
         };
         
         WorldType = WORLD_TYPES.General;
@@ -252,7 +269,8 @@ local WORLDS = {
         PlaceIds = {
             [LEGACY_GAME_ID] = 6570550977;
             [LIVE_GAME_ID] = 81205082701357;
-            [DEV_GAME_ID] = 6491538349;
+            [LEGACY_DEV_GAME_ID] = 6491538349;
+            [DEV_GAME_ID] = 90383674483036;
         };
         
         WorldType = WORLD_TYPES.General;
@@ -264,7 +282,8 @@ local WORLDS = {
         PlaceIds = {
             [LEGACY_GAME_ID] = 13543270317;
             [LIVE_GAME_ID] = 0;
-            [DEV_GAME_ID] = 12858416962;
+            [LEGACY_DEV_GAME_ID] = 12858416962;
+            [DEV_GAME_ID] = 114919974920605;
         };
         
         WorldType = WORLD_TYPES.General;
@@ -280,7 +299,8 @@ local WORLDS = {
         PlaceIds = {
             [LEGACY_GAME_ID] = 7825169805;
             [LIVE_GAME_ID] = 0;
-            [DEV_GAME_ID] = 7431407555;
+            [LEGACY_DEV_GAME_ID] = 7431407555;
+            [DEV_GAME_ID] = 80765968285660;
         };
         
         WorldType = WORLD_TYPES.General;
@@ -290,7 +310,8 @@ local WORLDS = {
         PlaceIds = {
             [LEGACY_GAME_ID] = 11213276767;
             [LIVE_GAME_ID] = 0;
-            [DEV_GAME_ID] = 10523367357;
+            [LEGACY_DEV_GAME_ID] = 10523367357;
+            [DEV_GAME_ID] = 76591950169300;
         };
         
         WorldType = WORLD_TYPES.General;
@@ -300,7 +321,8 @@ local WORLDS = {
         PlaceIds = {
             [LEGACY_GAME_ID] = 81844970195036;
             [LIVE_GAME_ID] = 0;
-            [DEV_GAME_ID] = 18503534484;
+            [LEGACY_DEV_GAME_ID] = 18503534484;
+            [DEV_GAME_ID] = 121272600931650;
         };
         
         WorldType = WORLD_TYPES.General;
@@ -314,7 +336,8 @@ local WORLDS = {
         PlaceIds = {
             [LEGACY_GAME_ID] = 464351538;
             [LIVE_GAME_ID] = 464351538;
-            [DEV_GAME_ID] = 2126368003;
+            [LEGACY_DEV_GAME_ID] = 2126368003;
+            [DEV_GAME_ID] = 121933806456593;
         };
         
         WorldType = WORLD_TYPES.Cutscene;
@@ -325,7 +348,8 @@ local WORLDS = {
         PlaceIds = {
             [LEGACY_GAME_ID] = 4942807832;
             [LIVE_GAME_ID] = 0;
-            [DEV_GAME_ID] = 4887155779;
+            [LEGACY_DEV_GAME_ID] = 4887155779;
+            [DEV_GAME_ID] = 94172182321121;
         };
         
         WorldType = WORLD_TYPES.Cutscene;
@@ -336,7 +360,8 @@ local WORLDS = {
         PlaceIds = {
             [LEGACY_GAME_ID] = 5594212861;
             [LIVE_GAME_ID] = 0;
-            [DEV_GAME_ID] = 5556946607;
+            [LEGACY_DEV_GAME_ID] = 5556946607;
+            [DEV_GAME_ID] = 83217632603845;
         };
         
         WorldType = WORLD_TYPES.Cutscene;
@@ -347,7 +372,8 @@ local WORLDS = {
         PlaceIds = {
             [LEGACY_GAME_ID] = 6898757722;
             [LIVE_GAME_ID] = 0;
-            [DEV_GAME_ID] = 6881018371;
+            [LEGACY_DEV_GAME_ID] = 6881018371;
+            [DEV_GAME_ID] = 131563916033742;
         };
         
         WorldType = WORLD_TYPES.Cutscene;
@@ -359,7 +385,8 @@ local WORLDS = {
         PlaceIds = {
             [LEGACY_GAME_ID] = 10098877922;
             [LIVE_GAME_ID] = 0;
-            [DEV_GAME_ID] = 9672014875;
+            [LEGACY_DEV_GAME_ID] = 9672014875;
+            [DEV_GAME_ID] = 101546955477063;
         };
         
         WorldType = WORLD_TYPES.Cutscene;
@@ -371,7 +398,8 @@ local WORLDS = {
         PlaceIds = {
             [LEGACY_GAME_ID] = 11906832290;
             [LIVE_GAME_ID] = 0;
-            [DEV_GAME_ID] = 11642377451;
+            [LEGACY_DEV_GAME_ID] = 11642377451;
+            [DEV_GAME_ID] = 110939690414626;
         };
         
         WorldType = WORLD_TYPES.Cutscene;
@@ -382,7 +410,8 @@ local WORLDS = {
         PlaceIds = {
             [LEGACY_GAME_ID] = 15934332075;
             [LIVE_GAME_ID] = 0;
-            [DEV_GAME_ID] = 15877604745;
+            [LEGACY_DEV_GAME_ID] = 15877604745;
+            [DEV_GAME_ID] = 86343013165128;
         };
         
         WorldType = WORLD_TYPES.General;
@@ -397,7 +426,8 @@ local WORLDS = {
         PlaceIds = {
             [LEGACY_GAME_ID] = 4861957178;
             [LIVE_GAME_ID] = 0;
-            [DEV_GAME_ID] = 4852144007;
+            [LEGACY_DEV_GAME_ID] = 4852144007;
+            [DEV_GAME_ID] = 108251450640867;
         };
         
         WorldType = WORLD_TYPES.General;
@@ -405,11 +435,12 @@ local WORLDS = {
         PublicWorld = true;
     };
     HalloweenBasement = {
-        DisplayName = "Slaughterfest: Halloween Basement";
+        DisplayName = "Witherween: Basement";
         PlaceIds = {
             [LEGACY_GAME_ID] = 5894210737;
             [LIVE_GAME_ID] = 0;
-            [DEV_GAME_ID] = 5884577465;
+            [LEGACY_DEV_GAME_ID] = 5884577465;
+            [DEV_GAME_ID] = 87519309268533;
         };
         
         WorldType = WORLD_TYPES.General;
@@ -418,21 +449,23 @@ local WORLDS = {
         PublicWorld = true;
     };
     KlawsWorkshop = {
-        DisplayName = "Winterfest: Mr. Klaw's Workshop";
+        DisplayName = "Winterfest: Klaw's Workshop";
         PlaceIds = {
             [LEGACY_GAME_ID] = 8407865225;
             [LIVE_GAME_ID] = 0;
-            [DEV_GAME_ID] = 8374649741;
+            [LEGACY_DEV_GAME_ID] = 8374649741;
+            [DEV_GAME_ID] = 74757438835863;
         };
         
         WorldType = WORLD_TYPES.General;
     };
     Slaughterfest = {
-        DisplayName = "Slaughterfest: Slaughter Woods";
+        DisplayName = "Slaughterfest: Forest";
         PlaceIds = {
             [LEGACY_GAME_ID] = 11319107048;
             [LIVE_GAME_ID] = 0;
-            [DEV_GAME_ID] = 11264091769;
+            [LEGACY_DEV_GAME_ID] = 11264091769;
+            [DEV_GAME_ID] = 94521811737793;
         };
 
         WorldType = WORLD_TYPES.Slaughterfest;
@@ -449,8 +482,9 @@ local WORLDS = {
         DisplayName = "Experimental: BioX Research Facility";
         PlaceIds = {
             [LEGACY_GAME_ID] = 4861955160;
-            [LIVE_GAME_ID] = 0;
-            [DEV_GAME_ID] = 289213709;
+            [LIVE_GAME_ID] = 120826427686169;
+            [LEGACY_DEV_GAME_ID] = 289213709;
+            [DEV_GAME_ID] = 85130166199806;
         };
 
         WorldType = WORLD_TYPES.Dev;
@@ -460,11 +494,12 @@ local WORLDS = {
         OverWorldIndex = 0;
     };
     NekronsGambit = {
-        DisplayName = "Arena: Nekron's Gambit";
+        DisplayName = "Nekron's Gambit";
         PlaceIds = {
             [LEGACY_GAME_ID] = 113036405627921;
             [LIVE_GAME_ID] = 0;
-            [DEV_GAME_ID] = 140550016869053;
+            [LEGACY_DEV_GAME_ID] = 140550016869053;
+            [DEV_GAME_ID] = 113574505592496;
         };
 
         WorldType = WORLD_TYPES.NekronsGambit;
@@ -484,7 +519,8 @@ local WORLDS = {
         PlaceIds = {
             [LEGACY_GAME_ID] = 11234483877;
             [LIVE_GAME_ID] = 0;
-            [DEV_GAME_ID] = 10976260433;
+            [LEGACY_DEV_GAME_ID] = 10976260433;
+            [DEV_GAME_ID] = 128012537048605;
         };
         WorldType = WORLD_TYPES.General;
         
@@ -496,7 +532,8 @@ local WORLDS = {
         PlaceIds = {
             [LEGACY_GAME_ID] = 2133546838;
             [LIVE_GAME_ID] = 0;
-            [DEV_GAME_ID] = 54152100;
+            [LEGACY_DEV_GAME_ID] = 54152100;
+            [DEV_GAME_ID] = 92373687028998;
         };
         WorldType = WORLD_TYPES.General;
         
@@ -508,7 +545,8 @@ local WORLDS = {
         PlaceIds = {
             [LEGACY_GAME_ID] = 14896299784;
             [LIVE_GAME_ID] = 0;
-            [DEV_GAME_ID] = 14504730660;
+            [LEGACY_DEV_GAME_ID] = 14504730660;
+            [DEV_GAME_ID] = 104301639618390;
         };
         WorldType = WORLD_TYPES.General;
 

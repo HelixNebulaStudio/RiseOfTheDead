@@ -6,6 +6,10 @@ local npcPackage = {
     
 	Configurations = {};
     Properties = {
+        AllyTypes = {"Rat"};
+        PrimaryGunItemId = "sawedoff";
+        MeleeItemId = "spikedbat";
+        MeleeRange = 8;
         Immortal = 1;
     };
 

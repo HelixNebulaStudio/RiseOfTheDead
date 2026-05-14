@@ -11,7 +11,6 @@ local attirePackage = {
 	
 	Configurations={
 		HasFlinchProtection = true;
-		EnemyDetectionRange = (modConfigurations.SpecialEvent.Easter == true or RunService:IsStudio()) and 2 or nil;
 		Warmth = 6;
 	};
 	Properties={};
@@ -19,6 +18,15 @@ local attirePackage = {
 
 function attirePackage.newClass()
 	local equipmentClass = modEquipmentClass.new(attirePackage);
+
+	equipmentClass:AddBaseModifier("DeadBunny", {
+		MinValues = {
+			EnemyDetectionRange = (modConfigurations.SpecialEvent.Easter == true or RunService:IsStudio()) and 2 or nil;
+		};
+		ArrayValues = {
+			PassiveModifiers = "Dead Bunny";
+		};
+	})
 
 	return equipmentClass;
 end
