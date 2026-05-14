@@ -52,7 +52,7 @@ if RunService:IsServer() then
 		local frenzyRate = modifier.Properties.FrenzyRate;
 
 		modifier.Properties.Stacks = math.clamp(modifier.Properties.Stacks + frenzyRate, 0, 1);
-		modifier.Properties.CooldownTick = tick()+10;
+		modifier.Properties.CooldownTick = tick()+20;
 	end
 
 	function modifierPackage.Binds.WeaponShotDamageDataNew(modifier: ItemModifierInstance, damageData: DamageData)

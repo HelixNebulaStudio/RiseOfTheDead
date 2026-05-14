@@ -84,14 +84,14 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 				tierOfItem = (upgradeLib and upgradeLib.Tier) or 1;
 				
 				tierOfMod = modifierStorageItem.Values.Tier or modLib.Tier;
-				
-				-- if tierOfItem < tierOfMod then
-				-- 	titleTag.Text = modLib.Name..' <font color="rgb(221, 97, 97)">(Incompatible Tier)</font>';
-				-- end
 			end
 
-			if modifierStorageItem.Values.StackConflict then
-				titleTag.Text = modLib.Name..' <font color="rgb(221, 97, 97)">('.. modifierStorageItem.Values.StackConflict ..' Conflict)</font>';
+			local modifier: ItemModifierInstance? = playerClass.WieldComp:GetOrDefaultItemModifier(itemModifierSiid);
+			if modifier and modifier.EquipmentClass then
+				local stackConflict = modifier.Properties.StackConflict;
+				if stackConflict then
+					titleTag.Text = `{modLib.Name} <font color="rgb(221, 97, 97)">({stackConflict} Conflict)</font>`
+				end
 			end
 		end
 		updateFrameDetails();
@@ -151,8 +151,8 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 			expandDebounce = true;
 			for oId, obj in pairs(upgradesGuiTable) do
 				if oId ~= itemModifierSiid then
-					spawn(function()
-					obj.Minimize();
+					task.spawn(function()
+						obj.Minimize();
 					end)
 				end
 			end
@@ -199,7 +199,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 		end)
 		
 		local LevelObject = {};
-		self.Update = function(siom)
+		self.UpdateModPanel = function()
 			modifierStorageItem = modData.GetItemById(itemModifierSiid);
 
 			tierColor = modItemLibrary.TierColors[itemLib.Tier];
@@ -209,7 +209,8 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 			end
 			
 			updateFrameDetails();
-			descTag.Text = binds.ListMods.UpdateModDesc(modifierStorageItem, modLib, equipmentStorageItem);
+			local descText = binds.ListMods.UpdateModDesc(modifierStorageItem, modLib, equipmentStorageItem);
+			descTag.Text = descText;
 			
 			for b=1, #modLib.Upgrades do
 				if LevelObject[b] ~= nil then LevelObject[b].Update(); continue end;
@@ -275,7 +276,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 								remoteEquipmentClass:FireServer("modifiersetvalue", setValuePacket);
 								modifierStorageItem.Values[upgradeData.SliderTag] = valToLvl;
 								
-								self.Update();
+								self.UpdateModPanel();
 								if self.RefreshEquippedMods then self.RefreshEquippedMods() end;
 								sliderObj.Disabled = false;
 							end
@@ -334,15 +335,15 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 							sliderObj.Update(sliderObj.MaxValue);
 						end
 						
-						self.Update();
+						self.UpdateModPanel();
 						
-						wait(0.45);
+						task.wait(0.45);
 						if dataUpgradeLevel < upgradeMaxLevel then
 							upgradeCost = modWorkbenchLibrary.CalculateCost(upgradeData, dataUpgradeLevel);
 							newLevelButton.Text = upgradeData.Syntax.." ("..upgradeCost.." "..currencyType..")";
 						end
 						
-						self.Update();
+						self.UpdateModPanel();
 						if self.RefreshEquippedMods then 
 							self.RefreshEquippedMods();
 						end;
@@ -350,7 +351,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 					else
 						Debugger:Warn("Upgrade Purchase>> Error Code:"..serverReply);
 						newLevelButton.Text = string.gsub(modWorkbenchLibrary.PurchaseReplies[serverReply] or ("Error Code: "..serverReply), "$Currency", currencyType);
-						wait(1);
+						task.wait(1);
 						newLevelButton.Text = upgradeData.Syntax.." ("..upgradeCost.." "..currencyType..")";
 						
 					end
@@ -441,7 +442,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 			table.clear(self);
 		end
 		
-		self.Update();
+		self.UpdateModPanel();
 		
 		return self;
 	end
@@ -501,6 +502,8 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 			local function refreshEquippedMods()
 				modsAttached = 0;
 				
+				local equipmentClass = playerClass.WieldComp:GetEquipmentClass(equipmentSiid); 
+
 				local itemStorage = modData.GetItemStorage(equipmentSiid);
 				if itemStorage then
 					local pModOrder = {};
@@ -515,12 +518,12 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 							local upgrader = ModUpgrader.new(modLib, modifierStorageItem, storageItem);
 							upgrader.RefreshEquippedMods = refreshEquippedMods;
 							
-							listMenu:Add(upgrader.UpgradeFrame); --, modifierStorageItem.Index
+							listMenu:Add(upgrader.UpgradeFrame);
 							upgradesGuiTable[modId] = upgrader;
 						end
 						
 						pModOrder[modLib.Id] = modifierStorageItem.Index;
-						upgradesGuiTable[modId].Update(modifierStorageItem);
+						upgradesGuiTable[modId].UpdateModPanel();
 					end
 					
 					for id, upgradeObject in pairs(upgradesGuiTable) do
@@ -532,7 +535,6 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 				end;
 				refreshCapcityLabel();
 
-				local equipmentClass = playerClass.WieldComp:GetEquipmentClass(equipmentSiid); 
 				if equipmentClass then
 					equipmentClass.Configurations:Calculate();
 				end

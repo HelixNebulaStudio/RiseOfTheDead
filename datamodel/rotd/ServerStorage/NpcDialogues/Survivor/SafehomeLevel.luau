@@ -315,7 +315,10 @@ if RunService:IsServer() then
 				dialog:AddChoice("shelter_lvl4_choice2", nil, {ChoiceUnlockTime=unlockTime});
 
 			elseif npcLevel == 5 then
-				dialog:AddChoice("shelter_recycle", shared.require(script.Parent.DialogueModules:WaitForChild("RecyclerDialog")));
+				dialog:AddChoice("shelter_recycle", function(dialog)
+					local recyclerDialoguesPackage = dialog:GetGenericDialogues("Survivor/RecyclerDialog");
+					recyclerDialoguesPackage.DialogueHandler(dialog.Player, dialog, dialog:GetData());
+				end);
 				
 			end
 			

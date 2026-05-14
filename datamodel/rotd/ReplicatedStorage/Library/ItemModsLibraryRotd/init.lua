@@ -1075,12 +1075,12 @@ function library.onRequire()
 	library:Add{
 		Id="frenzydamagemod";
 		Name="Frenzy Damage";
-		Desc="Additional <b>Damage</b> is built up when you take damage.\n<b>Stack Rate:</b> 1% per Damage\n<b>Decay Delay:</b> 10s";
+		Desc="Additional <b>Damage</b> is built up when you take damage.\n<b>Stack Rate:</b> 1% per Damage\n<b>Decay Delay:</b> 20s";
 		Icon="rbxassetid://105743703562476";
 		BaseTier=2;
 		Tier=2;
 		Upgrades={
-			{DataTag="FD"; Name="Frenzy Damage"; Syntax="Upgrade Frenzy Damage"; MaxLevel=10; BaseCost=5; MaxCost=100; BaseValue=0.01; MaxValue=0.09; TweakBonus=0.01; Scaling=library.ScalingStyle.NaturalCurve; Rate=1.5;};
+			{DataTag="FD"; Name="Frenzy Damage"; Syntax="Upgrade Frenzy Damage"; MaxLevel=10; BaseCost=5; MaxCost=100; BaseValue=0.01; MaxValue=0.35; TweakBonus=0.01; Scaling=library.ScalingStyle.NaturalCurve; Rate=1.5;};
 		};
 		Stackable=false;
 		Type={"Pistol"; "Submachine Gun"; "Shotgun"; "Rifle"; "Sniper"; "Heavy machine gun";};
