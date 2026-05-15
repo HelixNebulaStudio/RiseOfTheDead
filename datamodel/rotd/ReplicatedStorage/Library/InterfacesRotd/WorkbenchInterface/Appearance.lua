@@ -5,8 +5,8 @@ local UserInputService = game:GetService("UserInputService");
 
 local localPlayer = game.Players.LocalPlayer;
 
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modItemLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
+local modClothingLibrary = shared.require(game.ReplicatedStorage.Library.ClothingLibrary);
 
 local modColorsLibrary = shared.require(game.ReplicatedStorage.Library.ColorsLibrary);
 local modSkinsLibrary = shared.require(game.ReplicatedStorage.Library.SkinsLibrary);
@@ -97,13 +97,31 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 			if itemUnlockables then
 				local function setCharacterAccessories(unlockId)
 					if itemDisplay.OnDisplayID ~= storageItem.ID then return end;
+								
+					local previewUnlockableLib = modItemUnlockablesLibrary:Find(unlockId);
+					if previewUnlockableLib then
+						local previewUnlockId = previewUnlockableLib.PackageId or unlockId;
+						if itemDisplay.DisplayStorageItem 
+						and itemDisplay.DisplayStorageItem.Values
+						and itemDisplay.DisplayStorageItem.Values.ActiveSkin == previewUnlockId then
+							return;
+						end
+						itemDisplay:SetDisplay({
+							ID = storageItem.ID;
+							ItemId = itemId;
+							Values = {
+								ActiveSkin = previewUnlockableLib.PackageId or unlockId;
+							};
+						});
+						return;
+					end
 
 					for a=0, 30 do
 						if itemDisplay.DisplayModels[1] then break; end;
 						task.wait(1/30);
 					end
 					if itemDisplay.DisplayModels[1] == nil then return end;
-					
+									
 					local prefab = itemDisplay.DisplayModels[1].Prefab;
 					for _, obj in pairs(prefab:GetChildren()) do
 						modItemUnlockablesLibrary.UpdateSkin(obj, unlockId);

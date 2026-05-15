@@ -114,7 +114,7 @@ function Spawner:GetSpawnCFrame()
     local groundHit, groundPoint = workspace:FindPartOnRayWithWhitelist(groundRay, {workspace.Environment; workspace.Terrain}, false);
 
     if groundHit then
-        targetPos = Vector3.new(targetPos.X, groundPoint.Y + (self.SpawnModelSize.Y/2)-0.25, targetPos.Z);
+        targetPos = Vector3.new(targetPos.X, groundPoint.Y + (self.SpawnModelSize.Y/2), targetPos.Z);
     end;
     
     local targetCFrame = CFrame.new(targetPos) * CFrame.Angles(0, math.rad(math.random(0, 360)), 0);

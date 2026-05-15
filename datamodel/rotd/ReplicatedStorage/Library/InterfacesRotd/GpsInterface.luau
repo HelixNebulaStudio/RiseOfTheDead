@@ -64,6 +64,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         end
         if activeToolHandler == nil then return end;
 
+        local playerClass = shared.modPlayers.get(localPlayer);
         local storageItem = activeToolHandler.StorageItem;
         
         if storageItem == nil then
@@ -98,7 +99,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             local isInLocation = false;
 
             for a=1, #gpsLib.Locations do
-                if gpsLib.Locations[a] == localPlayer:GetAttribute("Location") then
+                if gpsLib.Locations[a] == playerClass:GetMapLocation() then
                     isInLocation = true;
                     break;
                 end
@@ -159,7 +160,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 if unlockedGps[gpsLib.Id] == nil and gpsLib.UnlockedByDefault ~= true then
 
                     for a=1, #gpsLib.Locations do
-                        if gpsLib.Locations[a] == localPlayer:GetAttribute("Location") then 
+                        if gpsLib.Locations[a] == playerClass:GetMapLocation() then 
                             isInLocation = true;
                             break;
                         end

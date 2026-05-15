@@ -138,7 +138,7 @@ function npcPackage.createHelicopter(isHard: boolean, spawnPoint: Vector3)
             self.IsBodyColliding = #hitParts > 0;
         end
 
-        self.CollisionAltitudeOffset = math.max(self.CollisionAltitudeOffset + (self.IsBodyColliding and 0.2 or -0.2), 0);
+        self.CollisionAltitudeOffset = math.clamp(self.CollisionAltitudeOffset + (self.IsBodyColliding and 0.2 or -0.2), 0, 20);
 
         local altitudeVec = Vector3.new(0, self.Altitude + self.CollisionAltitudeOffset, 0);
         local worldDir = modVector.CleanUnitVec(heliBase.Position, bodyPosition.Position);

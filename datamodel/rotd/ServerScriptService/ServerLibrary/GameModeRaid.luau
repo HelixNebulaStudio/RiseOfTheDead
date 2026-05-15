@@ -184,6 +184,8 @@ function Raid:Load()
 		
 		mapFolder.Parent = game.ReplicatedStorage;
 		
+		local modMapLibrary = shared.require(game.ReplicatedStorage.Library.MapLibrary);
+		modMapLibrary:LoadDynamicMap(mapFolder);
 	end
 
 	local spawnPlatformFolder = Instance.new("Folder");

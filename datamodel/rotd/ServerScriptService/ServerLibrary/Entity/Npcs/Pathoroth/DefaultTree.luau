@@ -289,7 +289,9 @@ function treePackage.TransformLarge(npcClass: NpcClass)
             head.Transparency = 1;
             head.Size = Vector3.zero;
 
-            properties.FaceDecal:Destroy();
+            if properties.FaceDecal then
+                properties.FaceDecal:Destroy();
+            end
         end)
         tween:Play();
     end

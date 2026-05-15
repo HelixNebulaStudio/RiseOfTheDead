@@ -128,6 +128,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 	local localPlayerPointer;
 	local localPlayerClass = shared.modPlayers.get(localPlayer);
+
+	local dynamicMapFolder = game.ReplicatedStorage:FindFirstChild("DynamicMap");
 	--==
 	
 	local function getCenterVec()
@@ -314,24 +316,30 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				
 				obj.Size = UDim2.new(0, size.X*scaleRatio, 0, size.Z*scaleRatio);
 
-				new.Position = UDim2.new(
-					0.5, 
-					((cframe.X*scaleRatio) - baseCenterOffset.X)*mapRatio.X, 
-					0.5, 
-					((cframe.Z*scaleRatio) - baseCenterOffset.Y)*mapRatio.Y
-				);
+				local guiObj = boundMapObj.GuiObject;
+
+				local offsetX = (((cframe.X)*scaleRatio) - baseCenterOffset.X)*mapRatio.X - guiObj.Position.X.Offset;
+				local offsetY = (((cframe.Z)*scaleRatio) - baseCenterOffset.Y)*mapRatio.Y - guiObj.Position.Y.Offset;
+
+				new.Position = UDim2.new(0.5, offsetX, 0.5, offsetY);
 			end
 			mapObj:Update();
+			table.insert(mapObjects, mapObj);
 			
 			local layerAlphaPacket = {
 				Active = nil;
 			};
 			local objectType = objInfo.Type;
+			new.Name = objectType;
 			
 			if objectType == "Wall" then
 				local heightColor = 50+(90 * heightRatio);
 				obj.BackgroundColor3 = Color3.fromRGB(heightColor + (layerData.HostileZone and 50 or 0), heightColor, heightColor);
 				
+				if objInfo.Object and dynamicMapFolder and dynamicMapFolder:IsAncestorOf(objInfo.Object) then
+					obj.BackgroundColor3 = objInfo.Object.Color;
+				end
+
 			elseif objectType == "RampUp" or objectType == "RampDown" then
 				obj.BackgroundColor3 = Color3.fromRGB(80, 80, 80);
 				obj.Color = obj.BackgroundColor3;
@@ -348,7 +356,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				end)
 
 				obj.BackgroundColor3 = layerAlphaPacket.GetOriginalValue();
-
 				
 			else
 				obj.ZIndex = 5;
@@ -590,7 +597,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			mapImage.Image = "";
 		end
 		
-		local layerName = localPlayer:GetAttribute("Location");
+		local layerName = localPlayerClass:GetMapLocation();
 		if layerName then
 			if layerName ~= activeLayer then
 				local frameData = layerFrames[layerName];
@@ -697,7 +704,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		if mapLoaded then return end
 		mapLoaded = true;
 		
-		local dynamicMapFolder = game.ReplicatedStorage:FindFirstChild("DynamicMap");
+		dynamicMapFolder = game.ReplicatedStorage:FindFirstChild("DynamicMap");
 		if dynamicMapFolder then
 			modMapLibrary:LoadDynamicMap(dynamicMapFolder);
 			
@@ -806,22 +813,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			if inputObject.UserInputType == Enum.UserInputType.MouseWheel then
 				local preScale = scaleRatio;
 				
-				scaleRatio = math.clamp(scaleRatio + inputObject.Position.Z*0.5, 0.5, 8);
+				local step = RunService:IsStudio() and 0.1 or 0.5;
+				local min = RunService:IsStudio() and 0.1 or 0.5;
+				local max = RunService:IsStudio() and 16 or 8;
+				scaleRatio = math.clamp(scaleRatio + inputObject.Position.Z*step, min, max);
 				
 				if scaleRatio ~= preScale then
-					
-					-- local mousePosition = UserInputService:GetMouseLocation();
-					
-					-- local localMousePos = mousePosition - (mapImage.AbsolutePosition + mapImage.AbsoluteSize/2);
-					-- local rawMousePos = localMousePos/mapImage.AbsoluteSize;
-					
-					-- mapImage.Size = UDim2.new(0, mapScale*scaleRatio, 0, mapScale*scaleRatio);
-					
-					-- local new = rawMousePos*mapImage.AbsoluteSize;
-					-- local offset = localMousePos-new;
-					
-					-- binds.MapFrameOffset = binds.MapFrameOffset + offset;
-					
 					binds.MapFrameOffset = getCenterVec();
                     window:Update();
 				end

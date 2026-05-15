@@ -1,13 +1,11 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
-local PhysicsService = game:GetService("PhysicsService");
 
 local modHealthComponent = shared.require(game.ReplicatedStorage.Components.HealthComponent);
 local modStatusLibrary = shared.require(game.ReplicatedStorage.Library.StatusLibrary);
 local modStatusClass = shared.require(game.ReplicatedStorage.Library.StatusLibrary.StatusClass);
 local modTouchHandler = shared.require(game.ReplicatedStorage.Library.TouchHandler);
-local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClassRotd);
 
 local modifierPackage = {
 	Name = "Chivalrous Kick";
@@ -144,7 +142,7 @@ function modifierPackage.Binds.CharacterClassIsSlidingChanged(modifier: ItemModi
 			playerClass.CharacterGarbage:Tag(newGreavesAndSabatons);
 
 			while playerClass.Properties.IsSliding == true do
-				task.wait(0.1);
+				task.wait();
 			end
 			Debugger.Expire(newGreavesAndSabatons, 0);
 			playerClass.CharacterGarbage:Untag(newGreavesAndSabatons);
@@ -155,7 +153,7 @@ function modifierPackage.Binds.CharacterClassIsSlidingChanged(modifier: ItemModi
 			local collisionRootPart = character:WaitForChild("CollisionRootPart");
 			collisionRootPart.CollisionGroup = "PlayersPhase";
 			while playerClass.Properties.IsSliding == true do
-				task.wait(0.1);
+				task.wait();
 			end
 			collisionRootPart.CollisionGroup = "Players";
 		end)

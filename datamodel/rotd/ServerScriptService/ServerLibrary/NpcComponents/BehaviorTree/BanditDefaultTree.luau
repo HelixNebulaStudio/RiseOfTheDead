@@ -7,7 +7,7 @@ local TALK_ANIMATIONS = {"nodyes"; "nodno"; "shrug2"; "laugh"; "point"; "bored";
 
 local treePackage = {
     LogicString = {
-        Default = "!InCutscene & DefaultTree | [DoNothing]";
+        Default = "PreLogic | !InCutscene & DefaultTree | [DoNothing]";
         DefaultTree = "HasEnemy & (FleeTree | AlertTree) | IdleTree";
         AlertTree = "EquipWeapon & IsInVision & (ShareIntel & IsUsingMelee & MeleeTree | RangeTree) | HuntTree";
         HuntTree = "KnowEnemyLastPosition & (IsAtLastKnownPosition & [InvestigateArea] | [MoveToLastKnownPosition]) | SeekTree";
@@ -21,6 +21,15 @@ local treePackage = {
         FleeTree = "!CanEquip & [Flee]"
     };
 };
+
+function treePackage.PreLogic(npcClass: NpcClass)
+    local processStatusesComp = npcClass:GetComponent("ProcessStatuses");
+    if processStatusesComp then
+        return processStatusesComp();
+    end
+    
+    return false;
+end
 
 function treePackage.InCutscene(npcClass: NpcClass)
     return npcClass.Properties.CutsceneActive == true;

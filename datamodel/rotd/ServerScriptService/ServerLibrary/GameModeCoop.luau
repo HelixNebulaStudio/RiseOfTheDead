@@ -389,6 +389,7 @@ function Coop:Initialize(roomData)
 			end
 		end)
 
+		
 		player:GetAttributeChangedSignal("Location"):Connect(function()
 			local data = {
 				Players = {};

@@ -115,7 +115,7 @@ function treePackage.WalkToRest(npcClass: NpcClass)
         npcClass.PlayAnimation("Idle");
     end
     if idleData.RestFunctionName then
-        local restFunction = npcClass.Properties[idleData.RestFunctionName];
+        local restFunction = properties[idleData.RestFunctionName];
         if restFunction then
             restFunction();
         end
@@ -259,7 +259,8 @@ function treePackage.WalkToIdleTask(npcClass: NpcClass)
                     end
                 end
 
-                if math.random(1, 5) == 1 then
+                if (properties.LastTaskPhraseTick == nil or tick() > properties.LastTaskPhraseTick) and math.random(1, 5) == 1 then
+                    properties.LastTaskPhraseTick = tick() + math.random(60, 180);
                     npcClass.Chat(npcClass.Player or game.Players:GetPlayers(), sayMsg);
                 end
             end

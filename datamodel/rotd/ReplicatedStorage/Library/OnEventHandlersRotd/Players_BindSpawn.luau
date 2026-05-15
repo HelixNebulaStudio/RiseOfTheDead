@@ -6,28 +6,30 @@ local modInteractables = shared.require(game.ReplicatedStorage.Library.Interacta
 return function(event: EventPacket, playerClass: PlayerClass)
     if playerClass == nil or playerClass.ClassName ~= "PlayerClass" then return end;
 
-    local player: Player = playerClass:GetInstance();
-    if player == nil then return end;
+    task.spawn(function()
+        local player: Player = playerClass:GetInstance();
+        if player == nil then return end;
 
-    local humanoid = playerClass.Humanoid;
-    humanoid.Touched:Connect(function(touchPart: BasePart)
-        if playerClass.HealthComp.IsDead then return end; 
+        local humanoid = playerClass.Humanoid;
+        humanoid.Touched:Connect(function(touchPart: BasePart)
+            if playerClass.HealthComp.IsDead then return end; 
 
-        local objectModel = touchPart.Parent and touchPart.Parent:IsA("Model") and touchPart.Parent or nil;
-        local interactObject = objectModel and objectModel.PrimaryPart or nil;
-        local interactModule = objectModel and objectModel:FindFirstChild("Interactable");
+            local objectModel = touchPart.Parent and touchPart.Parent:IsA("Model") and touchPart.Parent or nil;
+            local interactObject = objectModel and objectModel.PrimaryPart or nil;
+            local interactModule = objectModel and objectModel:FindFirstChild("Interactable");
 
-        if interactObject == nil or interactModule == nil or not interactModule:IsA("ModuleScript") then return end;
+            if interactObject == nil or interactModule == nil or not interactModule:IsA("ModuleScript") then return end;
 
-        local interactData = shared.require(interactModule);
-        interactData.Object = interactObject;
-        interactData.Script = interactModule;
+            local interactData = shared.require(interactModule);
+            interactData.Object = interactObject;
+            interactData.Script = interactModule;
 
-        if interactData == nil or interactData.TouchInteract ~= true then return end;
-        if interactData.TouchPickUp == false then return end;
-        
-        if interactData.Type == modInteractables.Types.Pickup then
-            shared.modEventService:ServerInvoke("Skills_BindResourceGatherers", {ReplicateTo={player}}, player, interactData);
-        end
+            if interactData == nil or interactData.TouchInteract ~= true then return end;
+            if interactData.TouchPickUp == false then return end;
+            
+            if interactData.Type == modInteractables.Types.Pickup then
+                shared.modEventService:ServerInvoke("Skills_BindResourceGatherers", {ReplicateTo={player}}, player, interactData);
+            end
+        end)
     end)
 end;

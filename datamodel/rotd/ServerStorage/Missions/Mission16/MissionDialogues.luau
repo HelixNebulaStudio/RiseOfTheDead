@@ -35,11 +35,13 @@ Dialogues.Jesse.DialogueStrings = {
 		ReturnToInit=true;
 	};
 	["aGoodDeal_org"]={
+		MissionId=0;
 		Say="Who do you work for?"; 
 		Reply="R.A.T., now stop asking..";
 		ReturnToInit=true;
 	};
 	["aGoodDeal_why"]={
+		MissionId=0;
 		Say="Why are you working in this apocalypse?"; 
 		Reply="I work for them and they protect me alright? I'm not going to answer anymore questions.";
 		ReturnToInit=true;

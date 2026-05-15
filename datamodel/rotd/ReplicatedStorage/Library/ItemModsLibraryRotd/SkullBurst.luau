@@ -13,6 +13,9 @@ local modifierPackage = {
 --==
 
 function modifierPackage.Update(modifier: ItemModifierInstance)
+	assert(modifier.EquipmentClass, `Missing equipment class: {modifier}`);
+	modItemModifierClass.AddTierDamage(modifier);
+
 	local layerInfo = modItemModifierClass.Library.calculateLayer(modifier, "F");
 	local value, tweakVal = layerInfo.Value, layerInfo.TweakValue;
 	
