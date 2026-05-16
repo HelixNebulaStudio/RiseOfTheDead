@@ -189,16 +189,18 @@ function GameModeManager.onRequire()
 		elseif requestEnum == enumRequests.CloseInterface then
 
 			local gameTable = GameModeManager:GetPlayerMenuRoom(player);
+			local gameRooom;
 			if gameTable then
-				local room = gameTable:GetPlayerRoom(player);
-				if room then
-					room:RemovePlayer(player);
+				gameRooom = gameTable:GetPlayerRoom(player);
+				if gameRooom and gameRooom.State == enumRoomStates.Idle then
+					gameRooom:RemovePlayer(player);
 				end
-				
 			end
 
-			GameModeManager:DisconnectPlayer(player);
-			
+			if gameRooom == nil or gameRooom.State == enumRoomStates.Idle then
+				GameModeManager:DisconnectPlayer(player);
+			end
+
 		elseif requestEnum == enumRequests.JoinRoom then
 			local roomId = ...;
 			
@@ -690,9 +692,9 @@ function GameModeManager:Initialize(gameType, gameStage)
 					if stageLib.SingleArena then
 						room:SetState(enumRoomStates.Intermission);
 
-						room.StartTime = modSyncTime.GetTime() + (gameTable.StageLib.ReadyLength or modGameModeLibrary.DefaultReadyLength);
+						room.StartTime = workspace:GetServerTimeNow() + (gameTable.StageLib.ReadyLength or modGameModeLibrary.DefaultReadyLength);
 						if RunService:IsStudio() then
-							room.StartTime = modSyncTime.GetTime() + 5;
+							room.StartTime = workspace:GetServerTimeNow() + 5;
 						end
 						gameTable:Sync();
 						
@@ -723,19 +725,19 @@ function GameModeManager:Initialize(gameType, gameStage)
 								canStart = false;
 							end
 							task.wait(0.1);
-						until not canStart or room.State ~= enumRoomStates.Intermission or room.StartTime-modSyncTime.GetTime() <= 0;
+						until not canStart or room.State ~= enumRoomStates.Intermission or room.StartTime-workspace:GetServerTimeNow() <= 0;
 						StartRoom(canStart);
 					else
 						if room:IsReady() then
 							room:SetState(enumRoomStates.Intermission);
 							local canStart = true;
-							room.StartTime = modSyncTime.GetTime() + (gameTable.StageLib.ReadyLength or modGameModeLibrary.DefaultReadyLength);
+							room.StartTime = workspace:GetServerTimeNow() + (gameTable.StageLib.ReadyLength or modGameModeLibrary.DefaultReadyLength);
 							
 							gameTable:Sync();
 							repeat
 								task.wait(0.1);
 								if not room:IsReady() then canStart = false; break; end;
-							until room.State ~= enumRoomStates.Intermission or room.StartTime-modSyncTime.GetTime() <= 0;
+							until room.State ~= enumRoomStates.Intermission or room.StartTime-workspace:GetServerTimeNow() <= 0;
 							
 							StartRoom(canStart);
 						end
@@ -793,7 +795,7 @@ function GameModeManager:Initialize(gameType, gameStage)
 		
 		room.OnStateChanged:Connect(function()
 			if room.State == enumRoomStates.Ending then
-				room.EndTime = modSyncTime.GetTime() + (room.EndDuration or endingDuration);
+				room.EndTime = workspace:GetServerTimeNow() + (room.EndDuration or endingDuration);
 				task.delay((room.EndDuration or endingDuration), function()
 					room:SetState(enumRoomStates.Close);
 				end)

@@ -1,6 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
+local UserInputService = game:GetService("UserInputService");
 
 local localPlayer = game.Players.LocalPlayer;
 
@@ -21,24 +22,26 @@ local modToolsLibrary;
 --==
 
 local toolPackage = {
-	Class="Tool";
-	HandlerType="GenericTool";
+	Class = "Tool";
+	HandlerType = "GenericTool";
 
-	Animations={
+	ToolWindow = "GameRoom";
+
+	Animations = {
 		Core={Id=139169439697737;};
 		Use={Id=131853830244385};
 	};
-	Audio={};
-	Configurations={
+	Audio = {};
+	Configurations = {
 		UseViewmodel = false;
 
 		ItemPromptHint = " to use map.";
 	};
-	Properties={};
+	Properties = {};
 };
 toolPackage.__index = toolPackage;
 
-function toolPackage.ClientItemPrompt(handler: ToolHandlerInstance)
+function toolPackage.ClientToolWindowRequest(handler: ToolHandlerInstance)
 	local playerClass = shared.modPlayers.get(localPlayer);
 
 	if playerClass.Properties.InBossBattle or modConfigurations.DisableMapItems then
@@ -53,13 +56,9 @@ function toolPackage.ClientItemPrompt(handler: ToolHandlerInstance)
 	
 	local gameRoomWindow: InterfaceWindow = modClientGuis.getWindow("GameRoom");
 	if gameRoomWindow.Visible then
-		modClientGuis.toggleGameBlinds(false, 0.5);
-        task.wait(0.5);
-        remoteGameModeRequest:InvokeServer(REQUESTS_ENUM.CloseInterface);
-        gameRoomWindow:Close();
-		return
+		gameRoomWindow:Close();
+		return;
 	end;
-	gameRoomWindow.QuickButton = handler.EquipmentClass.Properties.QuickButton;
 
 	modClientGuis.toggleGameBlinds(false, 0.5);
 	
@@ -77,6 +76,9 @@ function toolPackage.ClientItemPrompt(handler: ToolHandlerInstance)
 	end;
 
 	modClientGuis.toggleGameBlinds(true, 0.5);
+	if modClientGuis.ActiveInterface then
+		modClientGuis.ActiveInterface:UpdateInterface();
+	end
 end
 
 function toolPackage.ActionEvent(handler: ToolHandlerInstance, packet)

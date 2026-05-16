@@ -401,11 +401,15 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             end
 
             gameRoomFrame.Visible = false;
+	        modClientGuis.toggleGameBlinds(false, 0.5);
+            task.wait(0.5);
 	        modCameraGraphics:Unbind("lobbycamera");
+            task.wait();
+            interface:ToggleGameBlinds(true, 0.5);
             binds.ViewingRoomId = nil;
             binds.PlayerRoomId = nil;
-            interface:ToggleGameBlinds(true, 0.5);
             clearIndicators();
+            remoteGameModeRequest:InvokeServer(REQUESTS_ENUM.CloseInterface);
 
         end
     end)

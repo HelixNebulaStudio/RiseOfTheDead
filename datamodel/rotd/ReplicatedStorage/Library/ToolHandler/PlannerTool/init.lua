@@ -398,12 +398,25 @@ if RunService:IsClient() then -- MARK: Client
 		local mainToolModel = handler.MainToolModel;
 		local mainHandle = mainToolModel.PrimaryPart;
 
+		local function ToolWindowRequest(inputState)
+			if inputState ~= "Begin" then return end;
+			if not characterProperties.CanAction then return end;
+
+			local activeInteractable = playerClass.ActiveInteractable;
+			if activeInteractable ~= nil and activeInteractable.CanInteract and activeInteractable.Reachable then return end;
+			
+			if toolPackage.ToolWindow then
+				modClientGuis.toggleWindow(toolPackage.ToolWindow, nil, handler);
+			end
+		end
+		handler.Binds["KeyToolWindow"] = ToolWindowRequest;
+
 		if toolPackage.ToolWindow then
 			local quickButton = modClientGuis.ActiveInterface:NewQuickButton(itemLib.Name, nil, itemLib.Icon);
 			quickButton.Name = toolPackage.ToolWindow;
 			quickButton.LayoutOrder = 999;
 			quickButton:WaitForChild("BkFrame").Visible = true;
-			modClientGuis.ActiveInterface:ConnectQuickButton(quickButton, "KeyInteract");
+			modClientGuis.ActiveInterface:ConnectQuickButton(quickButton, "KeyToolWindow");
 			
 			handler.Garbage:Tag(function()
 				quickButton:Destroy();
@@ -468,7 +481,7 @@ if RunService:IsClient() then -- MARK: Client
 		
 		local function createHighlight(prefab)
 			placementHighlight = prefab:Clone();
-			delay(120, function()
+			task.delay(120, function()
 				if placementHighlight then
 					placementHighlight:Destroy();
 					placementHighlight = nil;

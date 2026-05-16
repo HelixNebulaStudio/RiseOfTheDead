@@ -68,6 +68,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	binds.Workbenches = {};
 	binds.ActiveWorkbenches = {};
 
+	local prevSetPage = nil;
+
 	if modConfigurations.CompactInterface then
 		workbenchWindow.BoolStringWhenActive = {String="!CharacterHud | CurrencyStats"; Priority=5;};
 		clearSelectionButton = workbenchFrame.TitleFrame:WaitForChild("clearSelectionButton");
@@ -206,6 +208,15 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             binds.RefreshNavigations();
             
         end
+    end))
+
+    interface.Garbage:Tag(modData.OnDataEvent:Connect(function(action, hierarchyKey, data)
+        if action ~= "sync" or (hierarchyKey:sub(1, 10) ~= "SkinsPacks" and hierarchyKey:sub(1, 10) ~= "ColorPacks") then return end;
+		
+		Debugger:StudioLog(`Sync packs {hierarchyKey}`);
+
+		if prevSetPage == nil then return end;
+		binds.SetPage(prevSetPage)
     end))
 
 
@@ -578,6 +589,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		end
 		binds.RefreshNavigations();
 		modStorageInterface.ToggleDesc(false);
+		
+		prevSetPage = pageObject;
 	end
 
 	function binds.ClearPages(name)

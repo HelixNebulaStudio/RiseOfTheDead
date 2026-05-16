@@ -108,8 +108,12 @@ end
 
 function npcPackage.Spawned(npcClass: NpcClass)
     npcClass.Garbage:Tag(npcClass.OnThink:Connect(function()
-        if npcClass.Humanoid.Sit then return end;
+        if npcClass.Humanoid.Sit then 
+            npcClass.RootPart.Massless = true;
+            return
+        end;
 
+        npcClass.RootPart.Massless = false;
         npcClass.BehaviorTree:RunTree("BanditDefaultTree", true);
     end));
 end
