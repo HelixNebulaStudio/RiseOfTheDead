@@ -304,7 +304,7 @@ end
 
 function treePackage.InMeleeRange(npcClass: NpcClass)
     local enemyTargetData = npcClass.Properties.EnemyTargetData;
-    return enemyTargetData.Distance <= 6;
+    return enemyTargetData.Distance <= 4;
 end
 
 function treePackage.RunToMeleeRange(npcClass: NpcClass)

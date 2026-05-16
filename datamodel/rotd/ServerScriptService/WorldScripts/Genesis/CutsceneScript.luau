@@ -306,7 +306,6 @@ return function(CutsceneSequence)
 				});
 				projectile.Properties.ExplosionRadius = 128;
 				projectile.Properties.Damage = 5000;
-				projectile.Properties.TargetableTags = {Zombie=1;};
 
 				local velocity = projectile.ArcTracer:GetVelocityByTime(origin.p, targetPoint, 1);
 				modProjectile.serverSimulate(projectile, {

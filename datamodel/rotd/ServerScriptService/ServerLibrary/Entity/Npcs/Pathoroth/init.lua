@@ -66,8 +66,6 @@ function npcPackage.Spawning(npcClass: NpcClass)
 
     character:SetAttribute("EntityHudHealth", true);
 
-    npcClass.WieldComp.TargetableTags.Zombie = true;
-
     local horrorParticle = HORROR_PARTICLE:Clone();
     horrorParticle.Parent = npcClass.RootPart;
     properties.HorrorParticle = horrorParticle;

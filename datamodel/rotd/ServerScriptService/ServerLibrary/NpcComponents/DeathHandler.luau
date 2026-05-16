@@ -26,7 +26,7 @@ function Component.new(npcClass: NpcClass)
 	return self;
 end
 
-function Component:__call()
+function Component:__call(damagedata: DamageData)
 	if self._called then return end;
 	self._called = true;
 
@@ -173,7 +173,7 @@ function Component:__call()
 		end
 
 		task.spawn(function()
-			playerClass:FireAllModifiersBind("DeathHandler", npcClass);
+			playerClass:FireAllModifiersBind("DeathHandler", npcClass, damagedata);
 		end)
 	end
 

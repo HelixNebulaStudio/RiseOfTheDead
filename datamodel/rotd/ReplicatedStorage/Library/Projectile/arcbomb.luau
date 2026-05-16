@@ -104,10 +104,8 @@ function projectilePackage.BindFire(projectile: ProjectileInstance)
         Radius = explosionRadius;
     });
 
-    local targetableTags = damageBy and damageBy.WieldComp.TargetableTags or nil;
     modExplosionHandler:Process(explosionPoint, hitLayers, {
         ExplosionBy = damageBy;
-        TargetableTags = targetableTags;
 
         Damage = explosionDamage;
         MinDamage = 5;

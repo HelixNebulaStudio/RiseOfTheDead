@@ -2026,10 +2026,6 @@ function library.onRequire()
 		Icon = "rbxassetid://5642499590";
 		PackageId = "onyxhoodielegacy";
 		Unlocked = true;
-
-		Textures = {
-			["Handle"] = "rbxassetid://4769659026";
-		};
 	};
 
 end

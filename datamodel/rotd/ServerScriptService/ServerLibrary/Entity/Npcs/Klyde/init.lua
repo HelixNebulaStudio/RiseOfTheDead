@@ -72,8 +72,6 @@ end
 function npcPackage.Spawned(npcClass: NpcClass)
     local wieldComp: WieldComp = npcClass.WieldComp;
 
-    wieldComp.TargetableTags.Destructibles = true;
-
     npcClass.WieldComp:Equip{
         ItemId = "grenadelauncher";
         OnSuccessFunc = function(toolHandler: ToolHandlerInstance)

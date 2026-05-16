@@ -34,7 +34,6 @@ function destructiblePackage.BindNew(destructible: DestructibleInstance)
         local damageBy: CharacterClass = reasonData.DamageBy;
 		modExplosionHandler:Process(targetPos, hitLayers, {
 			ExplosionBy = damageBy;
-			TargetableTags = {Humanoid=1; Zombie=1; Bandit=1; Rat=1;};
 
 			ExplosionStun = 1;
 

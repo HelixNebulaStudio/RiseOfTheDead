@@ -519,8 +519,6 @@ function TurretRuntime(weaponStorageItem)
 
 			ReplicateToShotOwner = true;
 
-			TargetableTags = table.clone(playerClass.WieldComp.TargetableTags);
-
 			IsPat = true;
 			MaistPercent = maistPercent;
 		};

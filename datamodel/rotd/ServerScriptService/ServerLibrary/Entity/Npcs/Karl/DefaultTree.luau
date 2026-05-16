@@ -90,7 +90,6 @@ function treePackage.PlantExplosive(npcClass: NpcClass)
 
         modExplosionHandler:Process(explosionPoint, hitLayers, {
             ExplosionBy = npcClass;
-            TargetableTags = npcClass.WieldComp.TargetableTags;
 
             Damage = 25;
             MinDamage = 5;

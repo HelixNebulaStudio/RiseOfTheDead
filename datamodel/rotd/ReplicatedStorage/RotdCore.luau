@@ -4,6 +4,13 @@ local RunService = game:GetService("RunService");
 
 local RotdCore = {};
 --==
+local modGlobalVars = shared.require(game.ReplicatedStorage.GlobalVariables);
+modGlobalVars.DevVersion="3.0.x";
+modGlobalVars.GameVersion = "3.0.0";
+modGlobalVars.GameBuild = "51";
+modGlobalVars.ModeVerLabel = `$Fps fps\t$UpTime\tRotd $GameVersion $BranchName $IsMobile`;
+
+--==
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library:WaitForChild("BranchConfigurationsRotd"));
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManagerRotd);
 local modOnEventsHandlers = shared.require(game.ReplicatedStorage.Library.OnEventHandlersRotd);

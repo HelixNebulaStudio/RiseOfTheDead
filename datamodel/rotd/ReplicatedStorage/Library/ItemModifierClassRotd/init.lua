@@ -51,6 +51,11 @@ local TierDamageLibrary = {
         0.25;
         0.3;
     };
+    ["Melee"] = {
+        2;
+        2.5;
+        3;
+    };
 };
 --== 
 
@@ -68,11 +73,14 @@ function modItemModifierClass.AddTierDamage(modifier: ItemModifierInstance)
     if modifier.ModLibrary == nil then return end;
     if modifier.EquipmentClass == nil then return end;
     if modifier.EquipmentClass.Package == nil then return end;
-    if modifier.EquipmentClass.Package.WeaponClass == nil then return end;
+
+    local weaponClass = modifier.EquipmentClass.Package.WeaponClass;
+    if modifier.EquipmentClass.Package.Class == "Melee" then
+        weaponClass = "Melee";
+    end
+    if weaponClass == nil then return end;
 
     local tier = modifier.ModLibrary.BaseTier or 1;
-
-    local weaponClass = modifier.EquipmentClass.Package.WeaponClass; 
 
     local tierDmgLib = TierDamageLibrary[weaponClass];
     if tierDmgLib == nil then return end;

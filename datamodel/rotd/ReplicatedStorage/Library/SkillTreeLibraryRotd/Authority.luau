@@ -149,7 +149,7 @@ library:Add{
 	Requirements = {};
 	Description = "Damaging enemies enhances your vision in the dark for $Time seconds.";
 	Stats={
-		Time={Base=3; Max=18};
+		Time={Base=5; Max=30};
 	};
 
 	Level=25;

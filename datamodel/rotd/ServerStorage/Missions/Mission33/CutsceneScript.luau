@@ -242,6 +242,7 @@ return function(CutsceneSequence)
 					CFrame = CFrame.new(-0.0199999996, 163.47496, -38.7299995, 1, 0, 0, 0, 1, 0, 0, 0, 1);
 					Player = player;
 				};
+				stanNpcClass.HealthComp:SetCanBeHurtBy("Zark");
 			end
 			
 			local zarkNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Zark");
@@ -251,6 +252,7 @@ return function(CutsceneSequence)
 					CFrame = CFrame.new(-66.0924, 194.8646, -32.347, -0.0348989, 0, 0.9993, 0, 1, 0, -0.9993, 0, -0.0348989);
 					Player = player;
 				};
+				zarkNpcClass.HealthComp:SetCanBeHurtBy("Stan");
 			end
 
 			local jasonNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Jason");
@@ -261,7 +263,7 @@ return function(CutsceneSequence)
 					Player = player;
 				};
 				jasonNpcClass:ToggleInteractable(false);
-				jasonNpcClass.WieldComp.TargetableTags.Player = true;
+				jasonNpcClass.HealthComp:SetCanBeHurtBy("!Human");
 				jasonNpcClass.WieldComp:Equip{
 					ItemId="ak47";
 				};
@@ -422,8 +424,9 @@ return function(CutsceneSequence)
 						
 						playerClass:SetCFrame(CFrame.new(-99.0285263, 194.909668, -36.03228, -0.173647955, 0, -0.984807789, 0, 1, 0, 0.984807789, 0, -0.173647955));
 						
+						zarkNpcClass.Move:SetMoveSpeed("set", "walk", 8, 5);
 						zarkNpcClass.Move:MoveTo(Vector3.new(-92.1926346, 194.99115, -32.4804077));
-						zarkNpcClass.Move.OnMoveToEnded:Wait(5);
+						zarkNpcClass.Move.OnMoveToEnded:Wait(6);
 
 						zarkNpcClass:SetCFrame(CFrame.new(-91.4179306, 194.941971, -32.5195656, 0.419815749, 3.3732789e-08, 0.907609344, -8.04018683e-08, 1, 2.33395889e-11, -0.907609344, -7.29832834e-08, 0.419815749));
 
@@ -444,7 +447,6 @@ return function(CutsceneSequence)
 
 					elseif mission.ProgressionPoint == 8 then
 					
-						zarkNpcClass.WieldComp.TargetableTags.Human = true;
 						zarkNpcClass.WieldComp:Equip{
 							ItemId = "deagle";
 							OnSuccessFunc = function(toolHandler: ToolHandlerInstance)
@@ -745,7 +747,6 @@ return function(CutsceneSequence)
 								Player = player;
 							};
 						end
-						patrickNpcClass.WieldComp.TargetableTags.Bandit = true;
 						patrickNpcClass.WieldComp:Equip{
 							ItemId = "ak47";
 							OnSuccessFunc = function(toolHandler: ToolHandlerInstance)
@@ -794,7 +795,6 @@ return function(CutsceneSequence)
 						game.Debris:AddItem(rewardSpawnPart, 0);
 
 						patrickNpcClass:ToggleInteractable(false);
-						patrickNpcClass.WieldComp.TargetableTags.Bandit = true;
 						patrickNpcClass.Properties.Immortal = 0.5;
 
 						local followPlayerComp = patrickNpcClass:GetComponent("FollowPlayer");

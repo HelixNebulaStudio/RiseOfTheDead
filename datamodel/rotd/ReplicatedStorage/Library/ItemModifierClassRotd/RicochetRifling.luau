@@ -103,7 +103,6 @@ function modifierPackage.Binds.WeaponShotBulletHit(modifier: ItemModifierInstanc
             RicochetCount = packet.RicochetCount or bulletRicochetCount;
 
             ToolModel = packet.ToolModel;
-			TargetableTags = table.clone(toolHandler.WieldComp.TargetableTags);
         };
         
         if packet.FocusCharge then

@@ -101,19 +101,16 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 					local previewUnlockableLib = modItemUnlockablesLibrary:Find(unlockId);
 					if previewUnlockableLib then
 						local previewUnlockId = previewUnlockableLib.PackageId or unlockId;
-						if itemDisplay.DisplayStorageItem 
-						and itemDisplay.DisplayStorageItem.Values
-						and itemDisplay.DisplayStorageItem.Values.ActiveSkin == previewUnlockId then
+						if unlockableLib.PackageId ~= previewUnlockId then
+							itemDisplay:SetDisplay({
+								ID = storageItem.ID;
+								ItemId = itemId;
+								Values = {
+									ActiveSkin = previewUnlockableLib.PackageId or unlockId;
+								};
+							});
 							return;
 						end
-						itemDisplay:SetDisplay({
-							ID = storageItem.ID;
-							ItemId = itemId;
-							Values = {
-								ActiveSkin = previewUnlockableLib.PackageId or unlockId;
-							};
-						});
-						return;
 					end
 
 					for a=0, 30 do
@@ -230,7 +227,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 									storageItem = modData.GetItemById(storageItem.ID);
 									itemValues = storageItem.Values;
 									if itemValues.ActiveSkin ~= oldActiveId then break; end;
-									wait(0.1);
+									task.wait(0.1);
 								end
 								
 								if unlockItemLib.PackageId or unlockItemLib.DefaultPackage then
@@ -298,7 +295,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 								storageItem = modData.GetItemById(storageItem.ID);
 								itemValues = storageItem.Values;
 								if itemValues.ActiveSkin ~= oldActiveId then break; end;
-								wait(0.1);
+								task.wait(0.1);
 							end
 							
 							if unlockItemLib.PackageId or unlockItemLib.DefaultPackage then
@@ -414,7 +411,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 					modSkinsLibrary.SetTexture(partInstance, nil);
 
 					textureLabel.Image = "";
-					wait(0.1);
+					task.wait(0.1);
 					styleButtonDebounce = false;
 				end
 				
@@ -774,7 +771,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 					binds.RefreshNavigations();
 					binds.SetPage(pickerMenu.Menu);
 
-					wait(0.1);
+					task.wait(0.1);
 					styleButtonDebounce = false;
 				end)
 
@@ -857,7 +854,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						storageItem = modData.GetItemById(storageItem.ID);
 						itemValues = storageItem.Values;
 						if itemValues.ActiveSkin ~= oldActiveId then break; end;
-						wait(0.1);
+						task.wait(0.1);
 					end
 
 					if prefab then

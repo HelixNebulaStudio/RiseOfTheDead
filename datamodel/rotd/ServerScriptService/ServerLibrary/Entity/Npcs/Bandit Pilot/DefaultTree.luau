@@ -69,6 +69,16 @@ function treePackage.Circle(npcClass: NpcClass)
                         CFrame = seatPart.CFrame;
                         PackageOverride = "Bandit Gunmen";
                         NetworkOwners = npcClass.NetworkOwners;
+                        Properties = {
+                            JointsStrength = {
+                                RightWrist = true; -- true = only breaks on lethal damage
+                                RightElbow = true;
+                                RightShoulder = true;
+                                LeftWrist = true;
+                                LeftElbow = true;
+                                LeftShoulder = true;
+                            };
+                        };
                         BindSetup = function(banditNpcClass: NpcClass)
                             banditNpcClass.RootPart.Anchored = true;
                             

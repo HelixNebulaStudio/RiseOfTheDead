@@ -29,7 +29,7 @@ function modifierPackage.onRequire()
 		if lastSpawnTick and workspace:GetServerTimeNow() < lastSpawnTick then
 			return;
 		end
-		modifier.Properties.LastCultistSpawnTick = workspace:GetServerTimeNow() + 5;
+		modifier.Properties.LastCultistSpawnTick = workspace:GetServerTimeNow() + 15;
 
 		shared.modNpcs.spawn2{
 			Name = "Cultist";

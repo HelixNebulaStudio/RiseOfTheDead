@@ -89,7 +89,7 @@ function toolPackage.ClientPrimaryFire(handler)
 	shotData.RayPoint = modRaycastUtil.castHitscanRay{
 		Origin = mouseProperties.Focus.p;
 		Direction = mouseProperties.Direction;
-		IncludeList = rayWhitelist;
+		IncludeInstances = rayWhitelist;
 		Range = 20;
 		
 		OnCastFunc = onCast;

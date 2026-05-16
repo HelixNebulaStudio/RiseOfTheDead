@@ -36,12 +36,7 @@ shared.coreBind(modPlayers.Player, "_new", function(playerClass: PlayerClass)
     local player = playerClass:GetInstance();
 
 	local wieldComp: WieldComp = playerClass.WieldComp;
-
-	wieldComp.TargetableTags.Zombie = true;
-	wieldComp.TargetableTags.Bandit = true;
-    wieldComp.TargetableTags.Cultist = true;
-	wieldComp.TargetableTags.Rat = true;
-
+	
 	playerClass:AddBaseModifier("GasProtection");
 
     if RunService:IsClient() then return end;

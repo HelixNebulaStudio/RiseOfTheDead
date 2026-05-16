@@ -173,6 +173,7 @@ return function(CutsceneSequence)
 					ReplicateOut = true;
 				};
 				robertNpcClass.Properties.Immortal = 0.5;
+				robertNpcClass.HealthComp:SetCanBeHurtBy("Nate|Dallas");
 			end
 			
 			local nateNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Nate");
@@ -293,11 +294,12 @@ return function(CutsceneSequence)
 						nateNpcClass.WieldComp:Equip{
 							ItemId = "m4a4";
 						};
-						nateNpcClass.WieldComp.TargetableTags.Robert = true;
+						nateNpcClass.HealthComp:SetCanBeHurtBy("Robert");
+						
 						dallasNpcClass.WieldComp:Equip{
 							ItemId = "m4a4";
 						};
-						dallasNpcClass.WieldComp.TargetableTags.Robert = true;
+						dallasNpcClass.HealthComp:SetCanBeHurtBy("Robert");
 
 						nateNpcClass.Move:Face(robertNpcClass.RootPart);
 						robertNpcClass:GetComponent("AvatarFace"):Set("Disbelief");

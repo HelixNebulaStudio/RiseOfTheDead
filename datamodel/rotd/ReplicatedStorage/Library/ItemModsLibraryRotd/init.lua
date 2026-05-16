@@ -1218,7 +1218,7 @@ function library.onRequire()
 		BaseTier=1;
 		Tier=1;
 		Upgrades={
-			{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage"; MaxLevel=10; BaseCost=10; MaxCost=100; BaseValue=0.1; MaxValue=5; Scaling=library.ScalingStyle.NaturalCurve;};
+			{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage"; MaxLevel=10; BaseCost=10; MaxCost=100; BaseValue=0.1; MaxValue=2; Scaling=library.ScalingStyle.NaturalCurve;};
 		};
 		Stackable=true;
 		Type={"Edged Melee"};
@@ -1227,6 +1227,7 @@ function library.onRequire()
 		Module=script.MeleeDamage;
 		Category="Damage Mods";
 	};
+
 
 	-- MARK: Blunt Melee Mods;
 	library:Add{
@@ -1237,7 +1238,7 @@ function library.onRequire()
 		BaseTier=1;
 		Tier=1;
 		Upgrades={
-			{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage"; MaxLevel=10; BaseCost=10; MaxCost=100; BaseValue=0.1; MaxValue=5; Scaling=library.ScalingStyle.NaturalCurve;};
+			{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage"; MaxLevel=10; BaseCost=10; MaxCost=100; BaseValue=0.1; MaxValue=2; Scaling=library.ScalingStyle.NaturalCurve;};
 		};
 		Stackable=true;
 		Type={"Blunt Melee"};
@@ -1291,7 +1292,7 @@ function library.onRequire()
 		BaseTier=1;
 		Tier=1;
 		Upgrades={
-			{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage"; MaxLevel=10; BaseCost=10; MaxCost=100; BaseValue=0.1; MaxValue=5; Scaling=library.ScalingStyle.NaturalCurve;};
+			{DataTag="D"; Name="Damage"; Syntax="Upgrade Damage"; MaxLevel=10; BaseCost=10; MaxCost=100; BaseValue=0.1; MaxValue=2; Scaling=library.ScalingStyle.NaturalCurve;};
 		};
 		Stackable=true;
 		Type={"Pointed Melee"};
@@ -1299,6 +1300,25 @@ function library.onRequire()
 		Module=script.MeleeDamage;
 		Category="Damage Mods";
 	};
+
+	-- MARK: Rare Melee
+	library:Add{
+		Id = "healthreaper";
+		Name = "Melee Health Reaper";
+		Desc = "Killing 3 enemies within a time window heals you.\nTime Window: 5s\nCooldown: 8s";
+		Icon = "rbxassetid://90627529952716";
+		BaseTier = 2;
+		Tier = 2;
+		Upgrades = {
+			{DataTag="H"; Name="Heal"; Syntax="Upgrade Heal"; MaxLevel=5; BaseCost=5; MaxCost=100; BaseValue=5; MaxValue=20; Scaling=library.ScalingStyle.Linear;};
+		};
+		Stackable = false;
+		Type = {"Edged Melee"; "Pointed Melee"; "Blunt Melee"};
+		EffectTrigger = library.EffectTrigger.Passive;
+		Module = script.MeleeHealthReaper;
+		Category = "Rare Mods";
+	}
+
 
 
 	-- MARK: Clothing Mods;
@@ -1463,7 +1483,7 @@ function library.onRequire()
 		Id = "damagedividermod";
 		Name = "Damage Divider";
 		Desc = "When armor > 0, the damage you take is divided to health and armor damage with an additional damage reduction.";
-		Icon = shared.Const.PlaceholderIcon;
+		Icon = "rbxassetid://126596327167927";
 		BaseTier = 2;
 		Tier = 2;
 		Upgrades = {
@@ -1495,7 +1515,7 @@ function library.onRequire()
 	};
 
 	library:Add{
-		Id="armortrigger";
+		Id="armortrigger"; --test
 		Name="Armor Trigger";
 		Desc="DevBranchOnly: Bonus Armor when equipped.";
 		Icon=shared.Const.PlaceholderIcon;
@@ -1558,6 +1578,7 @@ function library.onRequire()
 		Module=script.MeleeFury;
 		Category="Rare Mods";
 	}
+
 end
 
 return library;

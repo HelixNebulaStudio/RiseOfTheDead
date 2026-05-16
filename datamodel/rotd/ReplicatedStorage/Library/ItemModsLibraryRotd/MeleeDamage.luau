@@ -20,10 +20,14 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 		value = value + tweakVal;
 	end
 
+	assert(modifier.EquipmentClass, `Missing equipment class: {modifier}`);
+	local tierDmg = modItemModifierClass.AddTierDamage(modifier);
+
     local configurations = modifier.EquipmentClass.Configurations;
-    local baseDamage = configurations:GetBase("Damage");
+	local baseDamage = configurations.PreModDamage;
+	local additionalDmg = baseDamage * value;
 	
-	modifier.SumValues.Damage = baseDamage * value;
+	modifier.SumValues.Damage = additionalDmg + tierDmg;
 end
 
 return modifierPackage;

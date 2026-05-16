@@ -394,7 +394,6 @@ return function(CutsceneSequence)
 											angerState = 3;
 
 										elseif angerState == 4 then
-											banditBNpcClass.WieldComp.TargetableTags.Player = true;
 											banditBNpcClass.Move:Face(playerClass.RootPart.Position);
 											banditBNpcClass.WieldComp:InvokeToolAction("PrimaryFireRequest", nil, playerClass.Humanoid);
 

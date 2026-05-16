@@ -68,8 +68,6 @@ function npcPackage.Spawned(npcClass: NpcClass)
     local configurations: ConfigVariable = npcClass.Configurations;
     local wieldComp: WieldComp = npcClass.WieldComp;
 
-    wieldComp.TargetableTags.Destructibles = true;
-
     npcClass.WieldComp:Equip{
         ItemId = "machete";
         OnSuccessFunc = function(toolHandler: ToolHandlerInstance)
