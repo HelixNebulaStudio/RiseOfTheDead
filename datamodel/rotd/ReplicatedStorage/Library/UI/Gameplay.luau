@@ -46,6 +46,7 @@ function GameplayUI.RenderWeaponStatusHud(weaponStatusHud, config: ConfigVariabl
             hotKeyFrame.Visible = true;
             local hotKeyLabel = hotKeyFrame:WaitForChild("button");
             hotKeyLabel.Text = modKeyBindsHandler:ToString(statusInfo.KeyString);
+            hotKeyLabel.RichText = true;
         else
             hotKeyFrame.Visible = false;
         end

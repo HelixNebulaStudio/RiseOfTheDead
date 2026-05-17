@@ -2,6 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local UserInputService = game:GetService("UserInputService");
 local RunService = game:GetService("RunService");
+local GuiService = game:GetService("GuiService");
 
 local camera = workspace.CurrentCamera;
 local localPlayer = game.Players.LocalPlayer;
@@ -392,6 +393,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 end;
             }, 2);
             
+            if interface.isPreferringGamepad() then
+                GuiService.SelectedObject = joinButton;
+            end
+
         else
             gameLib, stageLib, rewardsId = nil, nil, nil;
 

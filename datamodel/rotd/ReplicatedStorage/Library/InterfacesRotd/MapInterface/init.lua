@@ -761,6 +761,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			
 			interface:HideAll{[window.Name]=true;};
 			
+			window.CloseWithInteract = true;
 			binds.MapFrameOffset = getCenterVec();
             window:Update();
 
@@ -867,6 +868,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		window.UseTween = false;
         interface:RefreshInterfaces();
 		closeButton.Visible = false;
+		
+		window.CloseWithInteract = false;
 
 		if modConfigurations.CompactInterface then
 			mapMenu.AnchorPoint = Vector2.new(0, 0);

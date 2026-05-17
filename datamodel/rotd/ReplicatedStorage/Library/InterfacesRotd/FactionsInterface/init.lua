@@ -75,6 +75,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 	local window: InterfaceWindow = interface:NewWindow("FactionsMenu", windowFrame);
 	window.CompactFullscreen = true;
+	window.CloseWithInteract = true;
 	
 	if modConfigurations.CompactInterface then
 		window:SetClosePosition(UDim2.new(0.5, 0, -1, 0), UDim2.new(0.5, 0, 0, 0));

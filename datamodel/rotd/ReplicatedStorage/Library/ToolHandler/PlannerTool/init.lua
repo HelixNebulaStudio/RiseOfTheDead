@@ -717,6 +717,13 @@ if RunService:IsClient() then -- MARK: Client
 
 		properties.IsActive = false;
 		properties.BuildSelectId = nil;
+		
+		local plans: {Model} = CollectionService:GetTagged("EngineersPlans");
+		for _, planModel: Model in pairs(plans) do
+			if planModel:GetAttribute("Owner") ~= localPlayer.Name then continue end;
+			
+			planModel.Parent = game.ReplicatedStorage:WaitForChild("EngineersPlans");
+		end
 	end
 
 

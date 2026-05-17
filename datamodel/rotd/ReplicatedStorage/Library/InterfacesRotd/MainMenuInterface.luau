@@ -4,6 +4,8 @@ local RunService = game:GetService("RunService");
 local TweenService = game:GetService("TweenService");
 local TeleportService = game:GetService("TeleportService");
 local HttpService = game:GetService("HttpService");
+local UserInputService = game:GetService("UserInputService");
+local GuiService = game:GetService("GuiService");
 
 local localPlayer = game.Players.LocalPlayer;
 
@@ -235,6 +237,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             task.spawn(function()
                 modAudio.Preload("MainTheme", true);
                 mainTheme = modAudio.Play("MainTheme", interface.ScreenGui);
+
+                if interface.isPreferringGamepad() then
+                    GuiService.SelectedObject = frontPageFrame.ButtonList:WaitForChild("MainCampaign");
+                end
             end)
         else
             modCameraGraphics:Unbind("menucamera");

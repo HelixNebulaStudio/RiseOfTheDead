@@ -793,7 +793,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             end
             
             new.Parent = rScrollFrame;
-            if a == 1 and #UserInputService:GetConnectedGamepads() >0 then
+            if a == 1 and interface.isPreferringGamepad() then
                 GuiService.SelectedObject = new;
             end
         end
@@ -1076,7 +1076,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             end
 
             new.Parent = rScrollFrame;
-            if a == 1 and #UserInputService:GetConnectedGamepads() >0 then
+            if a == 1 and interface.isPreferringGamepad() then
                 GuiService.SelectedObject = new;
             end
         end
