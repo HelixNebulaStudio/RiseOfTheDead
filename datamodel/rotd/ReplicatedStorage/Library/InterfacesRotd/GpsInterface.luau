@@ -51,6 +51,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     local binds = window.Binds;
 
 	local finit = false;
+    --MARK: OnToggle
 	window.OnToggle:Connect(function(visible, toolHandler)
 		if visible then
 			interface:HideAll{[window.Name]=true;};
@@ -58,6 +59,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		end
 	end)
 
+    --MARK: OnUpdate
     window.OnUpdate:Connect(function(toolHandler)
         if toolHandler then
             activeToolHandler = toolHandler;
@@ -187,6 +189,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                                         if r == 1 then
                                             statusLabel.Text = "Location unlocked";
                                             binds.SetDestinationMarker(nil);
+                                            window:Update();
 
                                         elseif r == 2 then
                                             statusLabel.Text= "Already purchased";

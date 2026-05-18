@@ -15,11 +15,11 @@ if RunService:IsServer() then
 		local function OnChanged(firstRun)
 			if mission.Type == 1 then -- OnActive
 				if not modBranchConfigurations.IsWorld("BanditsRecruitment") then
-					if mission.ProgressionPoint >= 3 and mission.ProgressionPoint <= 11 then
+					if mission.ProgressionPoint >= 3 and mission.ProgressionPoint <= 12 then
 						if firstRun then
 							modMission:Progress(player, MISSION_ID, function(mission)
+								Debugger:Warn(`Reverted to point 2, not in mission world.`)
 								mission.ProgressionPoint = 2;
-								Debugger:Log("Rewind mission 62 to point 2.");
 							end)
 						end
 						

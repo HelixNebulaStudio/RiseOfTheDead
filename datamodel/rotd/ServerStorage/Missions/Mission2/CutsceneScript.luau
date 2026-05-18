@@ -330,6 +330,7 @@ return function(CutsceneSequence)
 		wakeAnimation = humanoid:LoadAnimation(script:WaitForChild("Wake"));
 		
 		modCharacter.CharacterProperties.CanMove = false;
+		modCharacter.CharacterProperties.CanTurn = false;
 		modCharacter.CharacterProperties.CanInteract = false;
 		modCharacter.MouseProperties.CameraSmoothing = 0.02;
 		modCharacter.CharacterProperties.FirstPersonCamCFrame = CFrame.new(-23.2607307, 58.3400955, -40.5012398, 0, -0.559190929, -0.829038858, 0, 0.829038858, -0.559190929, 1, 0, 0);
@@ -390,6 +391,7 @@ return function(CutsceneSequence)
 		task.wait(5);
 		modConfigurations.Set("DisableWaypointers", false);
 		modCharacter.CharacterProperties.CanMove = true;
+		modCharacter.CharacterProperties.CanTurn = true;
 		modCharacter.CharacterProperties.CanInteract = true;
 		rootPart.Anchored = false;
 		wakeAnimation:Stop();

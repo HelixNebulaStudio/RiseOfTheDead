@@ -8,19 +8,18 @@ local modStatusClass = shared.require(game.ReplicatedStorage.Library.StatusLibra
 
 --==
 local statusPackage = {
-    Id="TiedUp";
-    Icon="rbxassetid://4983245856";
-    Name="Tied Up";
-    Description="You are tied up and cannot move or do anything while being tied up.";
-    Buff=false;
+    Id = "Unconscious";
+    Icon = "rbxassetid://4644356184";
+    Name = "Unconscious";
+    Description = "You are unconscious";
+    Buff = false;
     Tags = {"Mobility"; "Stun";};
-    Cleansable=true;
-    ExpiresOnDeath=true;
+    Cleansable = false;
+    ExpiresOnDeath = true;
 };
 
 function statusPackage.onRequire()
-    ropePrefab = game.ReplicatedStorage.Prefabs.Objects:WaitForChild("TieUpRope");
-    tiedUpAnimation = game.ReplicatedStorage.Prefabs.Animations.Generic:WaitForChild("TiedUpStatus");
+    unconsciousAnimation = game.ReplicatedStorage.Prefabs.Animations.Generic:WaitForChild("UnconsciousStatus");
 
     if RunService:IsClient() then
         modData = shared.require(localPlayer:WaitForChild("DataModule"));
@@ -34,35 +33,24 @@ function statusPackage.BindApply(statusClass: StatusClassInstance)
     local rootPart = characterClass.RootPart;
 
     if RunService:IsServer() then
-		if rootPart then
-            game.Debris:AddItem(characterClass.Character:FindFirstChild("TieUpRope") , 0);
-
-            local newRope = ropePrefab:Clone();
-            newRope:SetAttribute("FirstPersonVisible", 2);
-			local joint = newRope:WaitForChild("Weld");
-			newRope.Parent = characterClass.Character;
-			joint.Part0 = newRope;
-			joint.Part1 = rootPart;
-            statusClass.Garbage:Tag(newRope);
-		end
-
         if characterClass.ClassName == "NpcClass" then
             local npcClass: NpcClass = characterClass :: NpcClass;
 
             npcClass.Move:SetMoveSpeed("set", statusPackage.Id, 0, npcClass.Move.MoveSpeedPriority.StatusEffect);
 
-            npcClass.PlayAnimation(tiedUpAnimation.Name);
+            npcClass.PlayAnimation(unconsciousAnimation.Name);
         end
 
     elseif RunService:IsClient() then
 
 		local animator = characterClass.Humanoid:WaitForChild("Animator");
-		local track: AnimationTrack = animator:LoadAnimation(tiedUpAnimation);
+		local track: AnimationTrack = animator:LoadAnimation(unconsciousAnimation);
 		track:Play(0.25);
         statusClass.Values.AnimationTrack = track;
 
 		local modCharacter = modData:GetModCharacter();
 		modCharacter.CharacterProperties.CanMove = false;
+		modCharacter.CharacterProperties.CanTurn = false;
 		modCharacter.CharacterProperties.CanAction = false;
 		modCharacter.MouseProperties.Mouse1Down = false;
 		modCharacter.MouseProperties.Mouse2Down = false;
@@ -81,7 +69,7 @@ function statusPackage.BindExpire(statusClass: StatusClassInstance)
 
             npcClass.Move:SetMoveSpeed("remove", statusPackage.Id);
 
-            npcClass.StopAnimation(tiedUpAnimation.Name);
+            npcClass.StopAnimation(unconsciousAnimation.Name);
         end
 
     else
@@ -93,6 +81,7 @@ function statusPackage.BindExpire(statusClass: StatusClassInstance)
         
 		local modCharacter = modData:GetModCharacter();
         modCharacter.CharacterProperties.CanMove = true;
+		modCharacter.CharacterProperties.CanTurn = true;
         modCharacter.CharacterProperties.CanAction = true;
         modCharacter.UpdateWalkSpeed();
 

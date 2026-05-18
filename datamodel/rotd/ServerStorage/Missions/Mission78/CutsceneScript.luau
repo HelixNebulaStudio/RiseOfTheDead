@@ -101,7 +101,7 @@ if RunService:IsServer() then
 						mission.ProgressionPoint = 2;
 						storage.Locked = true;
 
-						npcClass.Chat(npcClass.Player, "Yay, let's go zombies hunting!");
+						npcClass.Chat(player, "Yay, let's go zombies hunting!");
 					end
 				end
 			end)
@@ -115,7 +115,10 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	if not modBranchConfigurations.IsWorld("Safehome") and not modBranchConfigurations.IsWorld("BioXResearch") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
+	if shared.WorldName ~= "Safehome" and shared.WorldName ~= "BioXResearch" then 
+		Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); 
+		return;
+	end;
 	
 	CutsceneSequence:Initialize(function()
 		local players = CutsceneSequence:GetPlayers();
@@ -125,6 +128,10 @@ return function(CutsceneSequence)
 			
 		local lydiaNpcClass: NpcClass;
 		
+		local checkpoint2 = false;
+		local checkpoint3 = false;
+		local checkpoint4 = false;
+		local checkpoint5 = false;
 		local function OnChanged(firstRun)
 			if lydiaNpcClass == nil then
 				lydiaNpcClass = modNpcs.getPlayerNpc(player, "Lydia");
@@ -146,6 +153,8 @@ return function(CutsceneSequence)
 
 				elseif mission.ProgressionPoint == 2 then
 					task.wait(4);
+					if checkpoint2 then return end;
+					checkpoint2 = true;
 
 					modMission:Progress(player, MISSION_ID, function(mission)
 						if mission.ProgressionPoint == 2 then
@@ -156,19 +165,28 @@ return function(CutsceneSequence)
 					end)
 					
 				elseif mission.ProgressionPoint == 3 then
-					local hordeSpawnPart = workspace:FindFirstChild("HostileSpawnPart")
-					local spawnPoints = hordeSpawnPart:GetChildren();
+					if checkpoint3 then return end;
+					checkpoint3 = true;
+
+					local safehomeClass = shared.WorldCore.SafehomeClass;
 
 					task.spawn(function()
 						while mission.ProgressionPoint <= 4 do
-							local pickSpawnAtt = spawnPoints[math.random(1, #spawnPoints)];
+							local newSpawnCf: CFrame = safehomeClass:GetSpawnPlatform(
+								Vector3.new(3, 6, 1),
+								function(spawnPlatformPart)
+									return spawnPlatformPart.Name == "Outside"; 
+								end
+							);
 
 							local zombieNpcClass: NpcClass = modNpcs.spawn2{
 								Name = "Zombie";
-								CFrame = pickSpawnAtt.WorldCFrame * CFrame.new(0, 1.35, 0);
+								CFrame = newSpawnCf;
+								Properties = {
+									TargetableDistance = 4096;
+									HordeAggression = true;
+								};
 								BindSetup = function(npcClass: NpcClass)
-									npcClass.Properties.TargetableDistance = 4096;
-									npcClass.Properties.HordeAggression = true;
 								end;
 							};
 
@@ -185,26 +203,39 @@ return function(CutsceneSequence)
 
 					repeat task.wait() until lydiaNpcClass.WieldComp.ItemId ~= nil;
 					
-					lydiaNpcClass.Chat(lydiaNpcClass.Player, "Wow, it's quite heavy..");
+					lydiaNpcClass.Chat(lydiaNpcClass.Player, "Wow, this piece of metal is quite heavy..");
 					lydiaNpcClass.WieldComp:InvokeToolAction("ToggleIdle");
 					
-					lydiaNpcClass:GetComponent("ProtectPlayer")(nil, function()
-						if mission.ProgressionPoint >= 4 then
-							return true;
-
-						else
-							lydiaNpcClass.Move:Face(player.Character and player.Character.PrimaryPart);
-
+					lydiaNpcClass:GetComponent("FollowPlayer")(nil, function()
+						if mission.ProgressionPoint <= 3 then
+							if math.random(1, 100) == 1 then
+								lydiaNpcClass.Move:Face(player.Character and player.Character.PrimaryPart);
+							end
 						end
-						
 						return mission.ProgressionPoint <= 6 and mission.Type == 1;
 					end);
 					
 
+				elseif mission.ProgressionPoint == 4 then
+					if checkpoint4 then return end;
+					checkpoint4 = true;
+					
+					local attractNpcsComp = lydiaNpcClass:GetComponent("AttractNpcs");
+					if attractNpcsComp then
+						attractNpcsComp.AttractHumanoidType = {"Zombie"};
+						attractNpcsComp.SelfAttractAlert = true;
+						attractNpcsComp:Activate();
+					end
+					lydiaNpcClass:GetComponent("ProtectPlayer")();
+
+
 				elseif mission.ProgressionPoint == 5 then
+					if checkpoint5 then return end;
+					checkpoint5 = true;
+
 					task.spawn(function()
 						local timeOutTick = tick();
-						while mission.ProgressionPoint == 4 do
+						while mission.ProgressionPoint == 5 do
 							local zombieNpcClasses = modNpcs.listNpcClasses(function(npcClass: NpcClass) 
 								return npcClass.HumanoidType == "Zombie";
 							end);
@@ -221,6 +252,7 @@ return function(CutsceneSequence)
 							if mission.ProgressionPoint == 5 then
 								lydiaNpcClass.Chat(lydiaNpcClass.Player, "Wow, that was fun!");
 								mission.ProgressionPoint = 6;
+								lydiaNpcClass:GetComponent("ProtectPlayer").IsProtecting = false;
 							end
 						end)
 					end)

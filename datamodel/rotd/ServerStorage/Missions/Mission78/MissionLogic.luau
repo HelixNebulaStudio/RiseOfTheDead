@@ -3,8 +3,6 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local MissionFunctions = {};
 local RunService = game:GetService("RunService");
 
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
-
 local MISSION_ID = 78;
 if RunService:IsServer() then
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
@@ -12,13 +10,14 @@ if RunService:IsServer() then
 	function MissionFunctions.Init(missionProfile, mission)
 		local player: Player = missionProfile.Player;
 
-        if not modBranchConfigurations.IsWorld("Safehome") then
+        if shared.WorldName ~= "Safehome" and shared.WorldName ~= "BioXResearch" then
             local function OnChanged(firstRun)
                 if mission.Type == 2 then -- OnAvailable
     
                 elseif mission.Type == 1 then -- OnActive
                     if mission.ProgressionPoint >= 2 and mission.ProgressionPoint <= 5 then
                         modMission:Progress(player, MISSION_ID, function(mission)
+                            Debugger:StudioWarn("Reverted to point 1, not in mission world.");
                             mission.ProgressionPoint = 1;
                         end)
 

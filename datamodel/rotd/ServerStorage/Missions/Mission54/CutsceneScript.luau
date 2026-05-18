@@ -56,7 +56,7 @@ return function(CutsceneSequence)
 
 		local safehomeClass = shared.WorldCore.SafehomeClass;
 		while safehomeClass.Owner ~= modServerManager.PrivateWorldCreator do
-			wait(1);
+			task.wait(1);
 			Debugger:Log("Waiting for private world creator.");
 		end
 

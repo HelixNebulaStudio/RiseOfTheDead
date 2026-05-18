@@ -162,6 +162,11 @@ function npcPackage.Spawned(npcClass: NpcClass)
         end)
         
         local destructible: DestructibleInstance = bodyDestructiblesComp:Create("Eye", eye);
+        destructible.Properties.DestroyModel = false;
+
+        local healthComp: HealthComp = destructible.HealthComp;
+        healthComp.MaxHealth = npcClass.HealthComp.MaxHealth;
+        healthComp:Reset();
 
         destructible:SetupHealthbar{
             Size = UDim2.new(1.2, 0, 0.25, 0);
@@ -169,7 +174,7 @@ function npcPackage.Spawned(npcClass: NpcClass)
             ShowLabel = false;
         };
 
-        destructible.HealthComp.OnHealthChanged:Connect(function(newHealth, oldHealth, damageData)
+        healthComp.OnHealthChanged:Connect(function(newHealth, oldHealth, damageData)
             if newHealth > oldHealth then return end;
             if not eyeVisible then return; end
             

@@ -78,10 +78,9 @@ if RunService:IsServer() then
 	-- MARK: Lydia Handler
 	Dialogues.Lydia.DialogueHandler = function(player, dialog, data, mission)
 		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
-		local modNpcs = shared.modNpcs;
 
-		local lydiaModule = modNpcs.getByModel(dialog.Character)
-		if lydiaModule == nil or lydiaModule.Player ~= player then
+		local lydiaNpcClass: NpcClass = dialog:GetNpcClass();
+		if lydiaNpcClass == nil or lydiaNpcClass.Player ~= player then
 			shared.Notify(player, "[The Killer Hues] You are not in your safehome for this mission.", "Inform"); 
 			return;
 		end;
@@ -106,8 +105,9 @@ if RunService:IsServer() then
 					Reply="Yay!";
 					ToggleWindow="NpcWindow";
 				}, function(dialog)
-					if lydiaModule then
-						lydiaModule.Chat(lydiaModule.Player, "I hope the gun is pretty. :3");
+					if lydiaNpcClass and lydiaNpcClass.Properties.M78_PrettyGunDialogue ~= true then
+						lydiaNpcClass.Properties.M78_PrettyGunDialogue = true;
+						lydiaNpcClass.Chat(lydiaNpcClass.Player, "I hope the gun is pretty. :3");
 					end
 				end, "Lydia");
 				

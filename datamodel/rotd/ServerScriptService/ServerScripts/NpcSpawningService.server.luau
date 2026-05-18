@@ -120,7 +120,6 @@ function Spawner:GetSpawnCFrame()
     local targetCFrame = CFrame.new(targetPos) * CFrame.Angles(0, math.rad(math.random(0, 360)), 0);
 
     local isFreeSpace = modVector.IsFreeSpace(targetCFrame + Vector3.new(0, 0.5, 0), self.SpawnModelSize);
-    
     if isFreeSpace == false then 
         return nil;
     end;
@@ -197,23 +196,15 @@ function Spawner:Spawn(cframe: CFrame, playerClasses: {PlayerClass})
             npcClass.Character:SetAttribute("NaturalSpawn", true);
             table.insert(self.ActiveNpcs, npcClass);
 
-            if self.Config:GetAttribute("BodyForceAnchor") then
-                local bodyVelocity = Instance.new("BodyVelocity");
-                local maxForce = 10000;
-                bodyVelocity.MaxForce = Vector3.new(maxForce, 1000, maxForce);
-                bodyVelocity.Velocity = Vector3.new(0, 0, 0);
-                
-                bodyVelocity.Parent = npcClass.RootPart;
+            local bodyVelocity = Instance.new("BodyVelocity");
+            local maxForce = 10000;
+            bodyVelocity.MaxForce = Vector3.new(maxForce, 1000, maxForce);
+            bodyVelocity.Velocity = Vector3.new(0, 0, 0);
+            bodyVelocity.Parent = npcClass.RootPart;
+
+            if self.Config:GetAttribute("BodyForceAnchor") ~= true then
+                Debugger.Expire(bodyVelocity, 1);
             end
-
-            task.spawn(function()
-                local rp = npcClass.RootPart;
-                if rp == nil then return end;
-
-                rp.Anchored = true;
-                task.wait(0.5);
-                rp.Anchored = false;
-            end)
             
             local layerName = modMapLibrary:GetLayer(cframe.Position);
             npcClass.Properties.MapLayerName = layerName;

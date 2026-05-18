@@ -88,7 +88,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     end)
     goldMenuCloseButton.NextSelectionDown = rScrollFrame;
 
-	interface:ConnectQuickButton(goldButton);
+	interface:ConnectQuickButton(goldButton, nil, function()
+        interface:PlayButtonClick();
+        goldShopWindow:Toggle();
+    end);
 	interface:BindConfigKey("DisableGoldMenu", {goldShopWindow}, {goldStatFrame});
 
 
@@ -130,6 +133,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						local pageType = pageDetails.Type;
 						if pageType == "Product" then
 							local productLib = modGoldShopLibrary.Products:Find(pageDetails.Id);
+                            if productLib == nil then
+                                Debugger:Warn(`Product ({pageDetails.Id}) no longer exist.`);
+                                continue;
+                            end
 							productLib.ParentId = pageId;
 
 							if productLib.Product == nil then continue end;
@@ -628,8 +635,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             local lib;
             if pageType == "Product" then
                 lib = modGoldShopLibrary.Products:Find(pageDetails.Id);
-
-                if lib.Product and lib.Product.Type == "GamePass" then
+                
+                if lib and lib.Product and lib.Product.Type == "GamePass" then
                     task.spawn(function()
                         local own = false;
                         pcall(function() 
@@ -645,6 +652,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 lib = pageDetails;
 
             end
+            if lib == nil then continue end;
             
             new.LayoutOrder = pageDetails.Order or new.LayoutOrder;
 

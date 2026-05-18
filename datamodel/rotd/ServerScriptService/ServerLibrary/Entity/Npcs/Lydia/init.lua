@@ -16,6 +16,7 @@ local npcPackage = {
         "Chat";
         "ProtectPlayer";
         "FollowPlayer";
+        "AttractNpcs";
     };
 };
 

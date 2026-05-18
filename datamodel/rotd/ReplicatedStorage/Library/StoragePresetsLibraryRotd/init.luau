@@ -139,17 +139,6 @@ modStoragePresetsLibrary:Add{
     };
 };
 
-
---MARK: Npc
-modStoragePresetsLibrary:Add{
-    Id = "npcstorage";
-    Configuration = {
-        Persistent=true; 
-        Size=5; 
-        MaxSize=5;
-    };
-}
-
 --MARK: Event
 modStoragePresetsLibrary:Add{
     Id = "HalloweenCauldron";

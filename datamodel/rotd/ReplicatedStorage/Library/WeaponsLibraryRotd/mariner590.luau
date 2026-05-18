@@ -13,7 +13,7 @@ local toolPackage = {
 		PrimaryFire={Id=91267786732266;};
 		Reload={Id=101087315049852;};
 		Load={Id=112951965982569;};
-		Inspect={Id=125651503210341;};
+		Inspect={Id=102585378365241;};
 		Sprint={Id=100237466610388};
 		Empty={Id=127657384790191;};
 		Unequip={Id=126196627858337};

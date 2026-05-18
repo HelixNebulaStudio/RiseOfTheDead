@@ -96,12 +96,14 @@ and {
 };
 
 return function(CutsceneSequence)
-	if not modBranchConfigurations.IsWorld("TheBeginning") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
+	if shared.WorldName ~= "TheBeginning" then
+		Debugger:Warn("Invalid place for cutscene ("..script.Name..")");
+		return;
+	end;
 
-	
 	local studioLogo, titleLogo, blurEffect, bloomEffect, musicTrack;
 
-	if modData then
+	if RunService:IsClient() and modData then
 		local camera = workspace.CurrentCamera;
 		blurEffect = Instance.new("BlurEffect");
 		blurEffect.Name = "CutsceneBlur";
@@ -126,6 +128,8 @@ return function(CutsceneSequence)
 		modConfigurations.Set("DisableMapMenu", true);
 		modConfigurations.Set("CanQuickEquip", false);
 		modConfigurations.Set("ShowNameDisplays", false);
+		
+		modAudio.Preload("1943677171");
 	end
 	
 	--== Server
@@ -217,6 +221,7 @@ return function(CutsceneSequence)
 		playerAnimTracks.CrouchPickUp = humanoid:LoadAnimation(script:WaitForChild("CrouchPickUp"));
 		
 		modCharacter.CharacterProperties.CanMove = false;
+		modCharacter.CharacterProperties.CanTurn = false;
 		modCharacter.CharacterProperties.CanInteract = false;
 		modCharacter.CharacterProperties.FirstPersonCamCFrame = CFrame.new(2.75, 54.7760048, -187.500031, 0.99984777, 0.00950372685, 0.0146345021, 0.000608999864, 0.819155276, -0.573571563, -0.0174389966, 0.573493183, 0.819024682);
 		modCharacter.MouseProperties.CameraSmoothing = 0.02;
@@ -649,6 +654,7 @@ return function(CutsceneSequence)
 			modCharacter.CharacterProperties.CrouchSpeed = 10;
 		end)
 		modCharacter.CharacterProperties.CanMove = true;
+		modCharacter.CharacterProperties.CanTurn = true;
 		modCharacter.CharacterProperties.CanInteract = true;
 		modCharacter.CharacterProperties.FirstPersonCamCFrame = nil;
 		modConfigurations.Set("DisablePinnedMission", false);
@@ -794,6 +800,7 @@ return function(CutsceneSequence)
 		modClientGuis.toggleGameBlinds(false, 9);
 		
 		modCharacter.CharacterProperties.CanMove = false;
+		modCharacter.CharacterProperties.CanTurn = false;
 		modCharacter.CharacterProperties.CanInteract = false;
 		modCharacter.MouseProperties.CameraSmoothing = 0.1;
 	end);

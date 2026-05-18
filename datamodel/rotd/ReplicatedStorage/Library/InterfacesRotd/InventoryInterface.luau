@@ -7,6 +7,7 @@ local TweenService = game:GetService("TweenService");
 local localPlayer = game.Players.LocalPlayer;
 local camera = workspace.CurrentCamera;
 
+local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library:WaitForChild("Configurations"));

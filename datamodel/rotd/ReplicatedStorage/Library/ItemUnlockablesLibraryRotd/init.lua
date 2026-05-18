@@ -25,10 +25,6 @@ function library.onRequire()
 		PackageId="brownleatherbootsclassic";
 		Unlocked=true;
 		
-		-- SurfaceAppearance={
-		-- 	ColorMap="rbxassetid://81644359023125";
-		-- };
-		-- SurfaceAppearanceParent=script;
 	};
 
 	library:Add{

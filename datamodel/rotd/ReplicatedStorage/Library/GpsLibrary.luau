@@ -60,8 +60,12 @@ function library.onRequire()
         local layerName, _layerData = modMapLibrary:GetLayer(playerClass:GetCFrame().Position);
         local gpsLib = library:Find(gpsId);
 
-        local _storageItem, storage = shared.modStorage.FindIdFromStorages(id, player);
-        local unlock = storage:GetValues(id, "Gps") or {};
+        local storageItem: StorageItem?, _storage = shared.modStorage.FindIdFromStorages(id, player);
+		if storageItem == nil then
+			shared.Notify(player, `Missing GPS.`, "Negative");
+			return;
+		end
+        local unlock = storageItem:GetValues("Gps") or {};
 
 		if playerClass.Properties.InBossBattle then
 			shared.Notify(player, `Can not fast travel when you are in battle.`, "Negative");
@@ -100,7 +104,8 @@ function library.onRequire()
                     if gpsLib.Locations[a] == layerName then
                         if unlock[gpsLib.Id] == nil then
                             unlock[gpsLib.Id] = 1;
-                            storage:SetValues(id, {Gps=unlock});
+							storageItem:SetValues("Gps", unlock);
+							storageItem:Sync({"Gps"});
                             shared.Notify(player, "Unlocked "..gpsLib.Name.." on GPS.", "Reward");
                             mission49Check();
                             
@@ -121,7 +126,8 @@ function library.onRequire()
                 
                 if playerGold >= 100 then
                     unlock[gpsLib.Id] = 1;
-                    storage:SetValues(id, {Gps=unlock});
+					storageItem:SetValues("Gps", unlock);
+					storageItem:Sync({"Gps"});
                     traderProfile:AddGold(-100);
                     shared.Notify(player, "Unlocked "..gpsLib.Name.." on GPS.", "Reward");
 
