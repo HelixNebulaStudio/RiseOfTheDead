@@ -12,7 +12,7 @@ local statusPackage = {
 };
 
 function statusPackage.BindApply(statusClass: StatusClassInstance)
-    local characterClass: CharacterClass = statusClass.StatusOwner;
+    local characterClass: CharacterClass = statusClass.StatusOwner :: CharacterClass;
     if characterClass == nil then return end;
 
     if characterClass.RootPart then
@@ -21,7 +21,7 @@ function statusPackage.BindApply(statusClass: StatusClassInstance)
 end
 
 function statusPackage.BindExpire(statusClass: StatusClassInstance)
-    local characterClass: CharacterClass = statusClass.StatusOwner;
+    local characterClass: CharacterClass = statusClass.StatusOwner :: CharacterClass;
     if characterClass == nil then return end;
 
     characterClass.Properties.ArmorRegenDelay = 1;
