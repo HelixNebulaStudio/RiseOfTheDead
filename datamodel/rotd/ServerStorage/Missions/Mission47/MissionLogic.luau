@@ -2,14 +2,13 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 
 local MissionLogic = {};
 local RunService = game:GetService("RunService");
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 local MISSION_ID = 47;
 
 if RunService:IsServer() then
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
-	if not modBranchConfigurations.IsWorld("TheWarehouse") then return {} end;
+	if shared.WorldName ~= "TheWarehouse" and shared.WorldName ~= "BioXResearch" then return {} end;
 
 	shared.modEventService:OnInvoked("Instrument_BindNotesPlayed", function(event: EventPacket, ...)
 		local player = event.Player;
@@ -58,6 +57,7 @@ if RunService:IsServer() then
 					end)
 					
 				end
+				
 			else
 				modMission:Progress(player, MISSION_ID, function(mission)
 					if mission.ProgressionPoint == 2 then
@@ -65,10 +65,12 @@ if RunService:IsServer() then
 					end;
 				end)
 				profile.Junk.M47List = {};
+
 				break;
 			end
 		end
 	end)
+
 end
 
 return MissionLogic;

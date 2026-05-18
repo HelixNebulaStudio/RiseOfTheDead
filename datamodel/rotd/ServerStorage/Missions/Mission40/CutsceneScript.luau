@@ -265,7 +265,7 @@ return function(CutsceneSequence)
 		end)
 		
 
-	elseif modBranchConfigurations.IsWorld("Tombs") then
+	elseif shared.WorldName == "Tombs" then
 
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
@@ -273,6 +273,8 @@ return function(CutsceneSequence)
 			local mission = modMission:GetMission(player, MISSION_ID);
 			if mission == nil then return end;
 				
+			local profile = shared.modProfile:Get(player);
+
 			if modEvents:GetEvent(player, "takeNekronMask") == nil then
 				local new = tombRaidPickup:Clone();
 				local interactConfig = modInteractables.createInteractable("Collectible");
@@ -291,12 +293,19 @@ return function(CutsceneSequence)
 				if mission.Type == 2 then -- OnAvailable
 					
 				elseif mission.Type == 1 then -- OnActive
-					if mission.ProgressionPoint >= 5 and modEvents:GetEvent(player, "takeNekronMask") then
-						modMission:Progress(player, MISSION_ID, function(mission)
-							if mission.ProgressionPoint <= 7 then
-								mission.ProgressionPoint = 7;
-							end;
-						end)
+					if mission.ProgressionPoint >= 5 then
+						if mission.ProgressionPoint < 7 
+						and (profile.Collectibles["nm"] or modEvents:GetEvent(player, "takeNekronMask")) then
+							if profile.Collectibles["nm"] then
+								modEvents:NewEvent(player, {Id="takeNekronMask"});
+							end
+							modMission:Progress(player, MISSION_ID, function(mission)
+								if mission.ProgressionPoint < 7 then
+									mission.ProgressionPoint = 7;
+								end;
+							end)
+						end
+						
 					end
 				elseif mission.Type == 3 then -- OnComplete
 

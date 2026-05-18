@@ -7,7 +7,7 @@ local modReplicationManager = shared.require(game.ReplicatedStorage.Library.Repl
 
 local MISSION_ID = 45;
 if RunService:IsServer() then
-	if not modBranchConfigurations.IsWorld("Prison") then return {}; end;
+	if shared.WorldName ~= "Prison" then return {}; end;
 
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
@@ -60,8 +60,9 @@ if RunService:IsServer() then
 
 	function MissionLogic.Init(missionProfile, mission)
 		local player: Player = missionProfile.Player;
-
 		if mission.Type == 3 then return end;
+		
+		local profile = shared.modProfile:Get(player);
 		
 		local function OnChanged(firstRun)
 			if mission.Type == 2 then -- OnAvailable
@@ -71,6 +72,14 @@ if RunService:IsServer() then
 					local new = luckyCoin:Clone();
 					new.Parent = workspace.Interactables;
 					modReplicationManager.ReplicateOut(player, new);
+
+					if profile.Collectibles["mlc"] then
+						modMission:Progress(player, MISSION_ID, function(mission)
+							if mission.ProgressionPoint <= 4 then
+								mission.ProgressionPoint = 4;
+							end;
+						end)
+					end
 				end
 			elseif mission.Type == 3 then -- OnComplete
 
