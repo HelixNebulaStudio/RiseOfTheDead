@@ -31,6 +31,7 @@ local toolPackage = {
 		Unequip = {Id=109703950319099};
 		LeftClimbHook = {Id=114825587353553;};
 		RightClimbHook = {Id=121356522251923;};
+		FrontClimbHook = {Id=140253595577585;};
 	};
 	Audio={
 		Load = {Id=116507113186443; Pitch=0.6; Volume=0.5;};
@@ -44,7 +45,7 @@ local toolPackage = {
 		Type = "Tool";
 		
 		EquipLoadTime = 0.6;
-		Damage = 750;
+		Damage = 500;
 
 		PrimaryAttackSpeed = 0.3;
 		HitRange = 14;
@@ -122,6 +123,47 @@ if RunService:IsClient() then
 		local properties = equipmentClass.Properties;
 		local rootPart = playerClass.RootPart;
 
+		local dustEmitters = {};
+		for _, model in pairs(handler.Prefabs) do
+			local emitter = model:FindFirstChild("DustParticle", true);
+			if emitter then
+				if handler.MainToolModel:IsAncestorOf(emitter) then
+					emitter:SetAttribute("RightHand", true);
+				end
+				table.insert(dustEmitters, emitter);
+			end
+		end
+		handler.Garbage:Tag(function() 
+			for _, emitter in pairs(dustEmitters) do
+				emitter.Enabled = false;
+			end
+		end)
+		handler.Garbage:Tag(properties.OnChanged:Connect(function(k, v)
+			if k ~= "HookInfo" then return end;
+			
+			if v == nil then
+				for _, emitter in pairs(dustEmitters) do
+					emitter.Enabled = false;
+				end
+				return;
+			end
+
+			local dir = v.WallDirection;
+			if dir == "Left" then
+				for _, emitter in pairs(dustEmitters) do
+					emitter.Enabled = emitter:GetAttribute("RightHand") ~= true;
+				end
+			elseif dir == "Right" then
+				for _, emitter in pairs(dustEmitters) do
+					emitter.Enabled = emitter:GetAttribute("RightHand") == true;
+				end
+			else
+				for _, emitter in pairs(dustEmitters) do
+					emitter.Enabled = true;
+				end
+			end
+		end))
+
 		handler.Garbage:Tag(RunService.PreSimulation:Connect(function(delta: number)
 			if playerClass.HealthComp.IsDead then return end;
 
@@ -146,14 +188,18 @@ if RunService:IsClient() then
 
 			local ROOT_OFFSET_VEC = Vector3.new(0, 1.5, 0);
 			local function getClosestWallInfo()
+				local hookInfo = properties.HookInfo;
+
 				local rpCf = rootPart.CFrame;
 
-				local origin = rpCf.Position + ROOT_OFFSET_VEC;
+				local origin = (rpCf.Position + ROOT_OFFSET_VEC);
 				local dir;
 
 				local rightHitInfo: HitInfo, leftHitInfo: HitInfo;
+				local frontHitInfo: HitInfo;
 				do
-					dir = rootPart.CFrame.RightVector;
+					dir = rpCf.RightVector;
+					-- Debugger.Expire(Debugger:Ray(Ray.new(origin, dir*WALLRAY_DIST)), 0.2);
 					modRaycastUtil.castHitscanRay{
 						Origin = origin;
 						Direction = dir;
@@ -167,7 +213,8 @@ if RunService:IsClient() then
 					};
 				end
 				do
-					dir = -rootPart.CFrame.RightVector;
+					dir = -rpCf.RightVector;
+					-- Debugger.Expire(Debugger:Ray(Ray.new(origin, dir*WALLRAY_DIST)), 0.2);
 					modRaycastUtil.castHitscanRay{
 						Origin = origin;
 						Direction = dir;
@@ -180,14 +227,38 @@ if RunService:IsClient() then
 						end;
 					};
 				end
+				do
+					local frontOrigin = origin;
+					if hookInfo then
+						if hookInfo.WallDirection == "Left" then
+							frontOrigin += -rpCf.RightVector;
+						elseif hookInfo.WallDirection == "Right" then
+							frontOrigin += rpCf.RightVector;
+						end
+					end
+					dir = rpCf.LookVector;
+					-- Debugger.Expire(Debugger:Ray(Ray.new(frontOrigin, dir*WALLRAY_DIST)), 0.2);
+					modRaycastUtil.castHitscanRay{
+						Origin = frontOrigin;
+						Direction = dir;
+						IncludeInstances = rayWhitelist;
+						Range = WALLRAY_DIST;
+						OnCastFunc = function(...)
+							if frontHitInfo then return end;
+							frontHitInfo = onCast(...);
+							return;
+						end;
+					};
+				end
+				
 
 				local closerWallInfo = nil;
 				if leftHitInfo == nil and rightHitInfo then
-					rightHitInfo.RightWall = true;
+					rightHitInfo.WallDirection = "Right";
 					closerWallInfo = rightHitInfo;
 
 				elseif rightHitInfo == nil and leftHitInfo then
-					leftHitInfo.RightWall = false;
+					leftHitInfo.WallDirection = "Left";
 					closerWallInfo = leftHitInfo;
 
 				elseif leftHitInfo and rightHitInfo then
@@ -196,12 +267,16 @@ if RunService:IsClient() then
 					rightHitInfo.Distance = (rightHitInfo.Position-origin).Magnitude;
 
 					if leftHitInfo.Distance < rightHitInfo.Distance then
-						leftHitInfo.RightWall = false;
+						leftHitInfo.WallDirection = "Left";
 						closerWallInfo = leftHitInfo;
 					else
-						rightHitInfo.RightWall = true;
+						rightHitInfo.WallDirection = "Right";
 						closerWallInfo = rightHitInfo;
 					end
+
+				elseif frontHitInfo then
+					frontHitInfo.WallDirection = "Front";
+					closerWallInfo = frontHitInfo;
 
 				end
 
@@ -225,29 +300,19 @@ if RunService:IsClient() then
 			end
 			
 			if isHookKeyDown and hookInfo == nil and isInAir then
-				local wallInfo = getClosestWallInfo();
 
+				local wallInfo = getClosestWallInfo();
 				if wallInfo then
 					characterProperties.WallClimbCooldown= tick()+1;
 					wallInfo.Velocity = rootPart.AssemblyLinearVelocity;
 					wallInfo.StartTick = tick();
 					properties.HookInfo = wallInfo;
 
-					local toolAnimator: ToolAnimator = handler.ToolAnimator;
-					local animTrack: AnimationTrack;
-					
-					if equipmentClass.Properties.ClimbAnim then
-						equipmentClass.Properties.ClimbAnim:Stop();
-						equipmentClass.Properties.ClimbAnim = nil;
+					if properties.ClimbAnim then
+						properties.ClimbAnim:Stop();
+						properties.ClimbAnim = nil;
 					end
-					if wallInfo.RightWall then
-						animTrack = toolAnimator:Play("RightClimbHook");
-					else
-						animTrack = toolAnimator:Play("LeftClimbHook");
-					end
-					equipmentClass.Properties.ClimbAnim = animTrack;
 
-					modAudio.Play("BodySlide", rootPart).PlaybackSpeed = 4;
 				end
 
 
@@ -258,6 +323,7 @@ if RunService:IsClient() then
 				if wallInfo and wallInfo.Part == prevWallInfo.Part then
 					prevWallInfo.Position = wallInfo.Position;
 					prevWallInfo.Normal = wallInfo.Normal;
+					prevWallInfo.WallDirection = wallInfo.WallDirection;
 					wallInfo = prevWallInfo;
 					
 				else
@@ -267,11 +333,46 @@ if RunService:IsClient() then
 				end
 
 				if wallInfo then
-					--MARK: Wall Mount
+					if properties.ClimbAnim 
+					and properties.ClimbAnim:GetAttribute("Direction") ~= wallInfo.WallDirection then
+						properties.ClimbAnim:Stop();
+						properties.ClimbAnim = nil;
+					end
+					if properties.ClimbAnim == nil then
+						local toolAnimator: ToolAnimator = handler.ToolAnimator;
+						local animTrack: AnimationTrack;
 
-					local timeSinceStart = math.max(0.3-math.max(tick()-wallInfo.StartTick, 0), 0.01);
-					local wallPosition = wallInfo.Position + (GRAVITY * delta * timeSinceStart);
+						if wallInfo.WallDirection == "Right" then
+							animTrack = toolAnimator:Play("RightClimbHook");
+							animTrack:SetAttribute("Direction", "Right")
+						elseif wallInfo.WallDirection == "Left" then
+							animTrack = toolAnimator:Play("LeftClimbHook");
+							animTrack:SetAttribute("Direction", "Left")
+						elseif wallInfo.WallDirection == "Front" then
+							animTrack = toolAnimator:Play("FrontClimbHook");
+							animTrack:SetAttribute("Direction", "Front")
+						end
+						properties.ClimbAnim = animTrack;
+
+						modAudio.Play("BodySlide", rootPart).PlaybackSpeed = 2;
+					end
+
+					--MARK: Wall Mount
+					if wallInfo.StartTick == nil then
+						wallInfo.StartTick = tick();
+					end
+
+					local curVel = rootPart.AssemblyLinearVelocity;
+					local rate = math.clamp(math.abs(curVel.Y)/10, 0, 1) * 16;
+					for _, emitter: ParticleEmitter in pairs(dustEmitters) do
+						emitter.Rate = rate;
+					end
+					local timeSinceStart = math.max(0.3-math.max(tick()-wallInfo.StartTick, 0), 0);
+
+					local wallPosition = wallInfo.Position;
 					local wallNormal = wallInfo.Normal;
+					
+					wallPosition += (GRAVITY * delta * timeSinceStart);
 
 					local wallAtt: Attachment = wallInfo.Att;
 					if wallAtt == nil then
@@ -286,7 +387,6 @@ if RunService:IsClient() then
 					wallAtt.WorldPosition = (wallPosition - ROOT_OFFSET_VEC) + (wallNormal * WALL_OFFSET);
 					properties.HookInfo = wallInfo;
 
-					characterProperties.CanTurn = false;
 					characterProperties.AllowLerpBody = false;
 
 					charAlignPosition.Position = wallAtt.WorldPosition;
@@ -305,8 +405,8 @@ if RunService:IsClient() then
 
 				end
 
-			elseif not isInAir then
 
+			elseif not isInAir then
 				charAlignPosition.Enabled = false;
 				if hookInfo and hookInfo.Att then
 					hookInfo.Att:Destroy();
@@ -314,10 +414,11 @@ if RunService:IsClient() then
 				properties.HookInfo = nil;
 				characterProperties.WallClimbCooldown = tick();
 
-				if equipmentClass.Properties.ClimbAnim then
-					equipmentClass.Properties.ClimbAnim:Stop();
-					equipmentClass.Properties.ClimbAnim = nil;
+				if properties.ClimbAnim then
+					properties.ClimbAnim:Stop();
+					properties.ClimbAnim = nil;
 				end
+
 
 			end
 		end))
@@ -346,12 +447,11 @@ if RunService:IsClient() then
 
 		characterProperties.WallClimbCooldown = tick();
 
-		characterProperties.CanTurn = true;
 		characterProperties.AllowLerpBody = true;
 
-		if equipmentClass.Properties.ClimbAnim then
-			equipmentClass.Properties.ClimbAnim:Stop();
-			equipmentClass.Properties.ClimbAnim = nil;
+		if properties.ClimbAnim then
+			properties.ClimbAnim:Stop();
+			properties.ClimbAnim = nil;
 		end
 	end
 

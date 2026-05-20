@@ -245,6 +245,7 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
     if healthComp == nil then return end;
 
     local storageItemBy: StorageItem? = statusClass.Values.StorageItemBy;
+    local toolHandler: ToolHandlerInstance? = statusClass.Values._ToolHandler;
 
     local damage = statusClass.Values.Damage or 1;
     healthComp:TakeDamage(DamageData.new{
@@ -254,6 +255,7 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
         DamageType = "Frost";
 
         TargetPart = statusClass.Values.TargetPart;
+        ToolHandler = toolHandler;
     });
 end
 

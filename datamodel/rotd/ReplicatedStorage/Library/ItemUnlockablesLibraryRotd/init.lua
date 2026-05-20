@@ -6,37 +6,38 @@ local library = shared.require(game.ReplicatedStorage.Library.ItemUnlockablesLib
 function library.onRequire()
 	-- MARK: brownleatherboots
 	library:Add{
-		Id="brownleatherboots";
-		ItemId="brownleatherboots";
-		Name="Default";
-		DefaultPackage=true;
+		Id = "brownleatherboots";
+		ItemId = "brownleatherboots";
+		Name = "Default";
+		DefaultPackage = true;
 
-		SurfaceAppearance={
-			ColorMap="rbxassetid://89618350805668";
+		SurfaceAppearance = {
+			ColorMap = "rbxassetid://89618350805668";
 		};
-		SurfaceAppearanceParent=script;
+		SurfaceAppearanceParent = script;
 	};
 	
 	library:Add{
-		Id="brownleatherbootsclassic";
-		ItemId="brownleatherboots";
-		Name="Classic";
-		Icon="rbxassetid://4866819545";
-		PackageId="brownleatherbootsclassic";
-		Unlocked=true;
+		Id = "brownleatherbootsclassic";
+		ItemId = "brownleatherboots";
+		Name = "Classic";
+		Icon = "rbxassetid://4866819545";
+		PackageId = "brownleatherbootsclassic";
+		Unlocked = true;
 		
+		BaseColor =Color3.fromRGB(105, 64, 40);
 	};
 
 	library:Add{
-		Id="brownleatherbootsblack";
-		ItemId="brownleatherboots";
-		Name="Black";
-		DefaultPackage=true;
+		Id = "brownleatherbootsblack";
+		ItemId = "brownleatherboots";
+		Name = "Black";
+		DefaultPackage = true;
 
-		SurfaceAppearance={
-			ColorMap="rbxassetid://102039474574433";
+		SurfaceAppearance = {
+			ColorMap = "rbxassetid://102039474574433";
 		};
-		SurfaceAppearanceParent=script;
+		SurfaceAppearanceParent = script;
 	};
 	
 
@@ -1694,6 +1695,7 @@ function library.onRequire()
 		SurfaceAppearance={
 			ColorMap="rbxassetid://10392911200";
 		};
+		SurfaceAppearanceParent=script;
 	};
 
 	library:Add{
@@ -1703,6 +1705,7 @@ function library.onRequire()
 		SurfaceAppearance={
 			ColorMap="rbxassetid://13021400982";
 		};
+		SurfaceAppearanceParent=script;
 	};
 
 
@@ -1935,6 +1938,7 @@ function library.onRequire()
 		SurfaceAppearance={
 			ColorMap="rbxassetid://11235294308";
 		};
+		SurfaceAppearanceParent=script;
 	};
 
 	library:Add{
@@ -1944,6 +1948,7 @@ function library.onRequire()
 		SurfaceAppearance={
 			ColorMap="rbxassetid://15007537005";
 		};
+		SurfaceAppearanceParent=script;
 	};
 
 

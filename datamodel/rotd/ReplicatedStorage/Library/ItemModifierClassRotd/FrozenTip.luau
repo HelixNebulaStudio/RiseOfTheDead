@@ -2,10 +2,6 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
-local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClassRotd);
-local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
-local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
-
 local STATUS_ID = "Frostbite";
 local STATUS_DURATION = 1;
 local MOD_COOLDOWN = 2;
@@ -66,6 +62,7 @@ if RunService:IsServer() then
 				Damage = configurations.PreModDamage;
 				StorageItemBy = storageItem;
 				TargetPart = damageData.TargetPart;
+				_ToolHandler = damageData.ToolHandler;
 			};
 		});
     end

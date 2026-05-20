@@ -90,39 +90,29 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 
 		local appearanceListingFrames = {};
 		local styleButtonDebounce = false;
+		local previewChangeTick = tick();
 		
 		local unlockableLib = modItemUnlockablesLibrary:Find(itemId);
 		if unlockableLib then
 			local itemUnlockables = modItemUnlockablesLibrary:ListByKeyValue("ItemId", itemId);
 			if itemUnlockables then
 				local function setCharacterAccessories(unlockId)
-					if itemDisplay.OnDisplayID ~= storageItem.ID then return end;
-								
-					local previewUnlockableLib = modItemUnlockablesLibrary:Find(unlockId);
-					if previewUnlockableLib then
-						local previewUnlockId = previewUnlockableLib.PackageId or unlockId;
-						if unlockableLib.PackageId ~= previewUnlockId then
-							itemDisplay:SetDisplay({
-								ID = storageItem.ID;
-								ItemId = itemId;
-								Values = {
-									ActiveSkin = previewUnlockableLib.PackageId or unlockId;
-								};
-							});
-							return;
-						end
+					local previewActiveSkin = nil;
+					if itemDisplay.DisplayStorageItem
+					and itemDisplay.DisplayStorageItem.Values then
+						previewActiveSkin = itemDisplay.DisplayStorageItem.Values.ActiveSkin;
 					end
 
-					for a=0, 30 do
-						if itemDisplay.DisplayModels[1] then break; end;
-						task.wait(1/30);
-					end
-					if itemDisplay.DisplayModels[1] == nil then return end;
-									
-					local prefab = itemDisplay.DisplayModels[1].Prefab;
-					for _, obj in pairs(prefab:GetChildren()) do
-						modItemUnlockablesLibrary.UpdateSkin(obj, unlockId);
-					end
+					if previewActiveSkin == unlockId then return end;
+					
+					itemDisplay:SetDisplay({
+						ID = storageItem.ID;
+						ItemId = itemId;
+						Index = 1;
+						Values = {
+							ActiveSkin = unlockId;
+						};
+					});
 				end
 				setCharacterAccessories(itemValues.ActiveSkin);
 				
@@ -195,20 +185,21 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						end
 						table.insert(refreshButtonFuncs, refresh);
 						
-						local canPreview;
 						local function previewStyle()
-							canPreview = true;
+							previewChangeTick = tick();
 							setCharacterAccessories(unlockableItemId);
 						end
 
 						unlockButton.MouseEnter:Connect(previewStyle);
-						unlockButton.MouseMoved:Connect(function()
-							if not canPreview then return end;
-							previewStyle()
-						end);
 
 						unlockButton.MouseLeave:Connect(function()
-							setCharacterAccessories(itemValues.ActiveSkin);
+							local t = tick();
+							previewChangeTick = t;
+							task.delay(0.2, function()
+								if previewChangeTick ~= t then return end;
+
+								setCharacterAccessories(itemValues.ActiveSkin);
+							end)
 						end)
 						
 						if localPlayer.UserId == 16170943 or shared.gameConfig.BranchName == "Dev" then
@@ -221,7 +212,6 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 								else
 									remoteSetAppearance:FireServer(binds.InteractPart , 9, storageItem.ID, "UnlockableId", unlockableItemId);
 								end
-								canPreview = false;
 								
 								for a=1, 10, 0.1 do
 									storageItem = modData.GetItemById(storageItem.ID);
