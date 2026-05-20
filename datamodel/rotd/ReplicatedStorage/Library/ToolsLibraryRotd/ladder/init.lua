@@ -28,9 +28,9 @@ local toolPackage = {
 	Properties={};
 };
 
-function toolPackage.InputEvent(toolHandler: ToolHandlerInstance, inputData)
+function toolPackage.InputEvent(toolHandler: ToolHandlerInstance, inputData: ToolInputData)
 	local maxLadderRange = 24;
-	if inputData.InputType ~= "Begin" then return end;
+	if inputData.InputState ~= "Begin" then return end;
 
 	rayParam.FilterDescendantsInstances = {workspace.Environment; workspace.Terrain; workspace.Interactables};
 	

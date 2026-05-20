@@ -8,7 +8,7 @@ local statusPackage = {
     Icon = "";
     Name = "Liquid Flame";
     Description = "Burning from liquid flame.";
-    Buff = true;
+    Buff = false;
     ExpiresOnDeath = true;
     Tags = {"DOT"; "Fire"};
 };

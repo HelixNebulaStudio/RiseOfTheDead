@@ -16,6 +16,7 @@ local toolPackage = {
 		Throw={Id=5075441987};
 	};
 	Audio={
+		Load={Id=103509010955857; Pitch=1; Volume=1;};
 		ProjectileBounce={Id=5082995723; Pitch=1; Volume=1;};
 		Throw={Id=5083063763; Pitch=1; Volume=1;};
 	};

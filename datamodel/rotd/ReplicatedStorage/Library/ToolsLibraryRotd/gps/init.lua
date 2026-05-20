@@ -9,6 +9,7 @@ local toolPackage = {
 	HandlerType="GenericTool";
 
 	ToolWindow = "GpsWindow";
+	OpenWindowOnEquip = true;
 
 	Animations={
 		Core={Id=5932487712;};

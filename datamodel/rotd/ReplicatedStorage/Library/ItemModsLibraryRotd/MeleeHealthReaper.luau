@@ -94,16 +94,17 @@ else
 
 		if toolStatusHud.HealthReaper == nil then
 			toolStatusHud.HealthReaper = {
-				ModItemId=`healthreaper`;
-				Order=1;
-				Text="";
+				ModItemId = `healthreaper`;
+				Order = 1;
+				Text = "";
+				Color = Color3.fromRGB(179, 50, 50):ToHex();
 			};
 		end
 
         local curTime = workspace:GetServerTimeNow();
 
 		local modifierValues = modifier.Properties;
-        local cooldownTl = (modifierValues.CooldownTick or curTime-5) - curTime;
+        local cooldownTl = (modifierValues.CooldownTick or curTime-MOD_COOLDOWN) - curTime;
         toolStatusHud.HealthReaper.ColorPercent = 1-math.clamp(cooldownTl/MOD_COOLDOWN, 0, 1);
 	end
 

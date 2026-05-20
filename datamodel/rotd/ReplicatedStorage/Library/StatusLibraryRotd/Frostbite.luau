@@ -221,16 +221,16 @@ function statusPackage.BindExpire(statusClass: StatusClassInstance)
 
     local rootPartSize = rootPart.Size.Magnitude*0.1;
     local particlePacket = {
-        Type=1;
-        Origin=CFrame.new(rootPart.Position);
-        Velocity=Vector3.new(0, 1, 0);
-        SizeRange={Min=rootPartSize; Max=rootPartSize};
-        Color=Color3.fromRGB(255,255,255);
-        Material=Enum.Material.Ice;
-        DespawnTime=3;
-        Speed=30;
-        MinSpawnCount=4;
-        MaxSpawnCount=6;
+        Type = 1;
+        Origin = CFrame.new(rootPart.Position);
+        Velocity = Vector3.new(0, 1, 0);
+        SizeRange = {Min=rootPartSize; Max=rootPartSize};
+        Color = Color3.fromRGB(255,255,255);
+        Material = Enum.Material.Ice;
+        DespawnTime = 3;
+        Speed = 30;
+        MinSpawnCount = 4;
+        MaxSpawnCount = 6;
     };
     modParticleSprinkler:Emit(particlePacket);
 

@@ -22,9 +22,11 @@ function GameplayUI.RenderWeaponStatusHud(weaponStatusHud, config: ConfigVariabl
 
             if statusInfo.ModItemId then
                 local modLib = modItemModsLibrary.Get(statusInfo.ModItemId);
-                statusLabel:SetAttribute("Icon", modLib.Icon);
-                if modLib.Color then
-                    statusLabel:SetAttribute("Color", modLib.Color:ToHex());
+                if modLib then
+                    statusLabel:SetAttribute("Icon", modLib.Icon);
+                    if modLib.Color then
+                        statusLabel:SetAttribute("Color", modLib.Color:ToHex());
+                    end
                 end
             end
         end

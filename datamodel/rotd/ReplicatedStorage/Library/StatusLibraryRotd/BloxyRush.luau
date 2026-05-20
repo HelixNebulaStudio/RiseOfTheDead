@@ -23,8 +23,8 @@ function statusPackage.BindApply(statusClass: StatusClassInstance)
         statusModifier = configurations.newModifier(modifierId);
         statusModifier.Name = statusPackage.Name;
 
-        statusModifier.MaxValues.MeleeRecoveryRecoveryRate = 30;
-        statusModifier.MaxValues.MeleeRecoveryRecoveryDelay = 1;
+        statusModifier.MaxValues.MeleeStaminaRecoveryRate = 30;
+        statusModifier.MaxValues.MeleeStaminaRecoveryDelay = 1;
         statusModifier.MaxValues.SprintSpeed = 26.4;
         statusModifier.ArrayValues.PassiveModifiers = "Bloxy Rush";
 

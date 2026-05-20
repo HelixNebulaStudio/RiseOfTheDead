@@ -28,10 +28,13 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
 
     local bleedDamage = math.ceil(statusClass.Values.Damage * (statusClass.Values.DamagePercent or 0.05));
 
+    local toolHandler: ToolHandlerInstance? = statusClass.Values._ToolHandler;
+
     local dmgData = DamageData.new{
         DamageBy = applyBy;
         Damage = bleedDamage;
         DamageType = "Bleed";
+        ToolHandler = toolHandler;
     };
 
     healthComp:TakeDamage(dmgData);

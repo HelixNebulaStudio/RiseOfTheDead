@@ -9,6 +9,7 @@ local toolPackage = {
 	HandlerType="GenericTool";
 
 	ToolWindow = "MarketNewspaper";
+	OpenWindowOnEquip = true;
 
 	Animations={
 		Core={Id=13067320148;};

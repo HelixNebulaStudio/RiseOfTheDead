@@ -47,8 +47,8 @@ function toolPackage.onRequire()
 end
 
 function toolPackage.ClientPrimaryFire(handler)
-	local localplayer = game.Players.LocalPlayer;
-	local modData = shared.require(localplayer:WaitForChild("DataModule") :: ModuleScript);
+	local localPlayer = game.Players.LocalPlayer;
+	local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 	local modCharacter = modData:GetModCharacter();
 	
 	local mouseProperties = modCharacter.MouseProperties;

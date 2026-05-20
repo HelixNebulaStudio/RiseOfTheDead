@@ -116,8 +116,8 @@ local toolPackage = {
 	Properties={};
 };
 
-function toolPackage.InputEvent(toolHandler, inputData)
-	if inputData.InputType ~= "Begin" then return end;
+function toolPackage.InputEvent(toolHandler: ToolHandlerInstance, inputData: ToolInputData)
+	if inputData.InputState ~= "Begin" then return end;
 	
 	local posterPrefab = modPoster.Script:WaitForChild("PosterModel");
 

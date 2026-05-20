@@ -4,11 +4,11 @@ local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.Equipmen
 --==
 
 local toolPackage = {
-	ItemId=script.Name;
-	Class="Melee";
-	HandlerType="MeleeTool";
+	ItemId = script.Name;
+	Class = "Melee";
+	HandlerType = "MeleeTool";
 
-	Animations={
+	Animations = {
 		Core={Id=16971427992;};
 		Load={Id=16971430052;};
 		PrimaryAttack={Id=16971425618};
@@ -16,14 +16,14 @@ local toolPackage = {
 		Inspect={Id=16971433041; WaistStrength=0.2;};
 		Unequip={Id=16971435376; Looped=false;};
 	};
-	Audio={
+	Audio = {
 		Load={Id=2304904662; Pitch=0.6; Volume=0.5;};
 		PrimaryHit={Id=4844105915; Pitch=1.4; Volume=1;};
 		PrimarySwing={Id=4601593953; Pitch=1.4; Volume=1;};
 		HeavySwing={Id=158037267; Pitch=0.70; Volume=1;};
 	};
 	
-	Configurations={
+	Configurations = {
 		Category = "Edged";
 		Type="Tool";
 		EquipLoadTime=1;
@@ -44,18 +44,15 @@ local toolPackage = {
 		BleedDamagePercent=0.1;
 		BleedSlowPercent=0.2;
 	};
-	Properties={};
+	Properties = {};
 };
 
 function toolPackage.newClass()
 	local equipmentClass: EquipmentClass = modEquipmentClass.new(toolPackage);
 
 	equipmentClass:AddBaseModifier("AxeOfFire", {
-		SetValues={
-			AxeOfFireIgnitionChance = 0.66;
-			AxeOfFireDamage = 50;
-			AxeOfFireDuration = 5;
-			AxeOfFireUseCurrentHpDmg = true;
+		ArrayValues = {
+			PassiveModifiers = "Axe of Fire";
 		};
 	});
 

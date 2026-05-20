@@ -56,8 +56,8 @@ local toolPackage = {
 		StaminaCost = 28;
 		StaminaDeficiencyPenalty = 0.6;
 
-		BleedDamagePercent=0.2;
-		BleedSlowPercent=0.2;
+		BleedDamagePercent=0.35;
+		BleedSlowPercent=0.35;
 	};
 	Properties={
 		ActiveCategory = "Edged";
@@ -65,7 +65,7 @@ local toolPackage = {
 };
 
 function toolPackage.InputEvent(toolHandler: ToolHandlerInstance, inputData)
-	if inputData.InputType ~= "Begin" or inputData.KeyIds.KeyToggleSpecial == nil then return end;
+	if inputData.InputState ~= "Begin" or inputData.KeyIds.KeyToggleSpecial == nil then return end;
 	
 	local properties = toolHandler.EquipmentClass.Properties;
 

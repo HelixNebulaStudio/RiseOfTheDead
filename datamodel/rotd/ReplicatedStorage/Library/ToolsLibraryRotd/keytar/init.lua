@@ -68,8 +68,8 @@ local toolPackage = {
 };
 --==
 
-function toolPackage.InputEvent(handler: ToolHandlerInstance, inputData)
-	if inputData.InputType ~= "Begin" or inputData.KeyIds.KeyFire == nil then return end;
+function toolPackage.InputEvent(handler: ToolHandlerInstance, inputData: ToolInputData)
+	if inputData.InputState ~= "Begin" or inputData.KeyIds.KeyFire == nil then return end;
 
 	local properties = handler.EquipmentClass.Properties;
 

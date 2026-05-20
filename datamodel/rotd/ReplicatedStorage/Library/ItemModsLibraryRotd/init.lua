@@ -1310,7 +1310,7 @@ function library.onRequire()
 		BaseTier = 2;
 		Tier = 2;
 		Upgrades = {
-			{DataTag="H"; Name="Heal"; Syntax="Upgrade Heal"; MaxLevel=5; BaseCost=5; MaxCost=100; BaseValue=5; MaxValue=20; Scaling=library.ScalingStyle.Linear;};
+			{DataTag="H"; Name="Heal"; Syntax="Upgrade Heal"; ValueType="Normal"; MaxLevel=5; BaseCost=5; MaxCost=100; BaseValue=5; MaxValue=20; Scaling=library.ScalingStyle.Linear;};
 		};
 		Stackable = false;
 		Type = {"Edged Melee"; "Pointed Melee"; "Blunt Melee"};
