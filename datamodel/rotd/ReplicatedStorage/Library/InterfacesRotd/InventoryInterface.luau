@@ -217,13 +217,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		bodyEquipmentsFrame.Parent = invContainerFrame;
 		bodyEquipmentsFrame.LayoutOrder = 99;
 		
-		hotbarFrame.AnchorPoint = Vector2.new(0.5, 1);
+		hotbarFrame.AnchorPoint = Vector2.new(0, 1);
 		if not modConfigurations.CompactInterface then
 			hotbarFrame.Position = UDim2.new(1, -200, 1, -85);
 			hotbarWindow:SetClosePosition(UDim2.new(1, -200, 2, -85), UDim2.new(1, -200, 1, -85));
 		else
-			hotbarFrame.Position = UDim2.new(0.75, 5, 1, -75);
-			hotbarWindow:SetClosePosition(UDim2.new(0.75, 5, 2, 0), UDim2.new(0.75, 5, 1, -75));
+			hotbarFrame.Position = UDim2.new(0.75, 0, 1, -55);
+			hotbarWindow:SetClosePosition(UDim2.new(0.75, 5, 2, 0), UDim2.new(0.75, 0, 1, -55));
 		end
 		hotbarFrame.Size = UDim2.new(0, 50, 0, 0);
 		Debugger.Expire(hotbarFrame:WaitForChild("UIListLayout"));
@@ -561,12 +561,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	end
 	
 	local lastHotEquipSlots = nil;
-	playerClass.Configurations.OnCalculate:Connect(function()
+	interface.Garbage:Tag(playerClass.Configurations.OnCalculate:Connect(function()
 		if lastHotEquipSlots ~= playerClass.Configurations.HotEquipSlots then
 			lastHotEquipSlots = playerClass.Configurations.HotEquipSlots;
 			hotbarWindow.Binds.UpdateHotbarSize();
 		end
-	end)
+	end))
 
 	function hotbarWindow.Binds.UpdateHotbarSize()
 		properties.ActiveHotbarKeys = configurations.HotEquipSlots;
@@ -588,25 +588,25 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				new.AnchorPoint = Vector2.zero;
 
 				if a == 1 then
-					new.Position = UDim2.new(0, -100, 0, -35);
+					new.Position = UDim2.new(0, -50, 0, -35);
 				elseif a == 2 then
-					new.Position = UDim2.new(0, -90, 0, -90);
+					new.Position = UDim2.new(0, -25, 0, -90);
 				elseif a == 3 then
-					new.Position = UDim2.new(0, -35, 0, -90);
+					new.Position = UDim2.new(0, 0, 0, -145);
 
 				elseif a == 4 then
-					new.Position = UDim2.new(0, -25, 0, -145);
+					new.Position = UDim2.new(0, -110, 0, -35);
 				elseif a == 5 then
-					new.Position = UDim2.new(0, -155, 0, -35);
+					new.Position = UDim2.new(0, -85, 0, -90);
 				elseif a == 6 then
-					new.Position = UDim2.new(0, -145, 0, -90);
+					new.Position = UDim2.new(0, -60, 0, -145);
 					
 				elseif a == 7 then
-					new.Position = UDim2.new(0, -80, 0, -145);
+					new.Position = UDim2.new(0, -170, 0, -35);
 				elseif a == 8 then
-					new.Position = UDim2.new(0, -135, 0, -145);
+					new.Position = UDim2.new(0, -145, 0, -90);
 				elseif a == 9 then
-					new.Position = UDim2.new(0, -15, 0, -200);
+					new.Position = UDim2.new(0, -120, 0, -145);
 				end
 			end
 			new.Parent = hotbarFrame;
@@ -625,11 +625,16 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		hotbarStorageInterface:Update();
 	end
 	if UserInputService.TouchEnabled then
+		local touchEquipDebounce = tick();
 		properties.OnChanged:Connect(function(k)
 			if k ~= "IsHotbarToggled" then return end;
+
 			hotbarWindow:Toggle(properties.IsHotbarToggled == true);
 			hotbarWindow.Binds.UpdateHotbarSize();
 			hotbarStorageInterface.OnItemButton1Click = function(...)
+				if tick() <= touchEquipDebounce then return end;
+				touchEquipDebounce = tick() +0.3;
+
 				properties.IsHotbarToggled = false;
 				hotbarStorageInterface.UseItem(...);
 			end;
