@@ -1,35 +1,34 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
+local localPlayer = game.Players.LocalPlayer;
+
 local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 --==
 
 local toolPackage = {
-	ItemId=script.Name;
-	Class="Tool";
-	HandlerType="GenericTool";
+	ItemId = script.Name;
+	Class = "Tool";
+	HandlerType = "GenericTool";
 
-	ToolWindow = "TerminalWindow";
-	
-	Animations={
+	Animations = {
 		Core={Id=14471065189;};
 		Use={Id=14471085942};
 	};
-	Audio={};
-	Configurations={
+	Audio = {};
+	Configurations = {
 		UseViewmodel = false;
 
 		ItemPromptHint = " to use tablet.";
 	};
-	Properties={};
+	Properties = {};
 };
 
-function toolPackage.ServerEquip(handler)
-	local weaponModel = handler.Prefabs[1];
-	local handle = weaponModel.Handle;
+function toolPackage.ServerEquip(handler: ToolHandlerInstance)
+	local weaponModel = handler.MainToolModel;
 	
-	local baseInteractable = script:WaitForChild("Interactable");
-	handler.InteractScript = baseInteractable:Clone();
-	handler.InteractScript.Parent = handle;
+	local newInteractConfig = modInteractables.createInteractable("Terminal");
+	newInteractConfig.Parent = weaponModel;
 end
 
 function toolPackage.ActionEvent(handler, packet)
@@ -38,15 +37,13 @@ function toolPackage.ActionEvent(handler, packet)
 	handler.IsActive = packet.IsActive == true;
 end
 
-function toolPackage.ClientItemPrompt(handler)
-	local localPlayer = game.Players.LocalPlayer;
+function toolPackage.ClientItemPrompt(handler: ToolHandlerInstance)
 	local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
-	local prefab = handler.Prefabs[1];
-	local primaryPart = prefab.PrimaryPart;
-	local interactableModule = primaryPart:FindFirstChild("Interactable");
-	
-	modData.InteractRequest(interactableModule, primaryPart);
+	local prefab = handler.MainToolModel;
+	local interactConfig = prefab:FindFirstChild("Interactable");
+
+	modData.InteractRequest(interactConfig);
 end
 
 function toolPackage.newClass()

@@ -102,17 +102,22 @@ function toolPackage.BindAnimPlay(handler: ToolHandlerInstance, animName: string
 	end
 end
 
-local STEEPNESS_THRESHOLD = math.cos(math.rad(55));
+function toolPackage.onRequire()
+	if RunService:IsClient() then
+		modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
+	end
+end
+
 
 if RunService:IsClient() then
 
 	local isHookKeyDown = false;
+	local STEEPNESS_THRESHOLD = math.cos(math.rad(55));
 	local WALLRAY_DIST = 4;
 	local GRAVITY = Vector3.new(0, -game.Workspace.Gravity, 0);
 	local WALL_OFFSET = 1.5;
 
 	function toolPackage.ClientEquip(handler: ToolHandlerInstance)
-		local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 		local modCharacter = modData:GetModCharacter();
 		local characterProperties = modCharacter.CharacterProperties;
 
@@ -165,7 +170,11 @@ if RunService:IsClient() then
 		end))
 
 		handler.Garbage:Tag(RunService.PreSimulation:Connect(function(delta: number)
-			if playerClass.HealthComp.IsDead then return end;
+			if playerClass.HealthComp.IsDead then
+				return
+			end;
+
+			local shouldDismount = false;
 
 			local charAlignPosition: AlignPosition = rootPart.RootPosition;
 
@@ -395,37 +404,21 @@ if RunService:IsClient() then
 					properties.CanLeap = tick();
 
 				else
-					charAlignPosition.Enabled = false;
-					if prevWallInfo.Att then
-						prevWallInfo.Att:Destroy();
-					end
-					properties.HookInfo = nil;
-
-					characterProperties.WallClimbCooldown = tick();
-
+					shouldDismount = true;
 				end
-
 
 			elseif not isInAir then
-				charAlignPosition.Enabled = false;
-				if hookInfo and hookInfo.Att then
-					hookInfo.Att:Destroy();
-				end
-				properties.HookInfo = nil;
-				characterProperties.WallClimbCooldown = tick();
+				shouldDismount = true;
 
-				if properties.ClimbAnim then
-					properties.ClimbAnim:Stop();
-					properties.ClimbAnim = nil;
-				end
+			end
 
-
+			if shouldDismount and properties.HookInfo then
+				toolPackage.CancelHook(handler);
 			end
 		end))
 	end
 	
 	function toolPackage.CancelHook(handler: ToolHandlerInstance)
-		local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 		local modCharacter = modData:GetModCharacter();
 
 		local characterProperties = modCharacter.CharacterProperties;
@@ -456,7 +449,6 @@ if RunService:IsClient() then
 	end
 
 	function toolPackage.InputEvent(handler: ToolHandlerInstance, inputData: ToolInputData)
-		local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 		local modCharacter = modData:GetModCharacter();
 
 		if inputData.KeyIds.KeyFocus == true then

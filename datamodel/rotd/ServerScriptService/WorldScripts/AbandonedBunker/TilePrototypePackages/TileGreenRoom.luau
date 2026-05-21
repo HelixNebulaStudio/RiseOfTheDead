@@ -76,6 +76,9 @@ function TilePrototypePackage:Start(player)
 	local npcClass: NpcClass = shared.modNpcs.spawn2{
 		Name = miniBossName;
 		CFrame = specialSpawn.WorldCFrame;
+		AddComponents = {
+        	"DropReward";
+		};
 		BindSetup = function(npcClass: NpcClass)
 			local properties = npcClass.Properties;
 			properties.Level = math.max(properties.Level + self.Controller.Difficulty, 1);

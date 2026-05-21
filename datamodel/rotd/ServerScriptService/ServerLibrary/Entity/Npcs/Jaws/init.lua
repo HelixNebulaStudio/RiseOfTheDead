@@ -36,7 +36,6 @@ local npcPackage = {
         "TargetHandler";
         "ZombieBasicMeleeAttack";
         "BodyDestructibles";
-        "DropRewardId";
     };
     AddBehaviorTrees = {
         "HasEnemy";

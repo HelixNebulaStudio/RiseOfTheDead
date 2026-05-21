@@ -290,8 +290,21 @@ local WORLDS = {
         LoadLeaderboard = true;
         MaxPlayers = 6;
     };
+    EighthStreet = {
+        DisplayName = "Eighth Street";
+        PlaceIds = {
+            [LEGACY_GAME_ID] = 0;
+            [LIVE_GAME_ID] = 0;
+            [LEGACY_DEV_GAME_ID] = 0;
+            [DEV_GAME_ID] = 131876661413681;
+        };
+        
+        WorldType = WORLD_TYPES.General;
+        LoadLeaderboard = false;
+        MaxPlayers = 6;
+    };
 
-
+    -- 
 
     --MARK: Gamemode Coop
     Genesis = {

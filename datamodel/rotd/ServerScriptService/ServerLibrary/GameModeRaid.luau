@@ -207,6 +207,7 @@ function Raid:Load()
 						table.insert(self.Doors, doorInstance);
 						
 					elseif child.Name == "SpawnPlatform" then
+						child.Transparency = 1;
 						child.Parent = spawnPlatformFolder;						
 						
 						if mapTotalVec == nil then

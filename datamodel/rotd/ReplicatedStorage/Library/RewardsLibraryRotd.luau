@@ -1345,7 +1345,6 @@ function library.onRequire()
 	};
 
 
-
 	--== Community;
 	library:Add{
 		Id="communitycrate";
