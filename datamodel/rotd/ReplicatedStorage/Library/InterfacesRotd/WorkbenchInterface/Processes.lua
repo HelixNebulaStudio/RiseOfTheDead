@@ -1,6 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
+local AdService = game:GetService("AdService");
 
 local localPlayer = game.Players.LocalPlayer;
 
@@ -9,8 +10,9 @@ local modItem = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modBlueprintLibrary = shared.require(game.ReplicatedStorage.Library.BlueprintLibraryRotd);
 local modSyncTime = shared.require(game.ReplicatedStorage.Library:WaitForChild("SyncTime"));
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
-local modRichFormatter = shared.require(game.ReplicatedStorage.Library.UI.RichFormatter);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
+local modRichFormatter = shared.require(game.ReplicatedStorage.Library.UI.RichFormatter);
+local modUIUtil = shared.require(game.ReplicatedStorage.Library.UI.UIUtil);
 
 local processTypeNames = {
 	Building = "Building";
@@ -19,7 +21,11 @@ local processTypeNames = {
 	PolishTool = "PolishTool";
 }
 
-local WorkbenchClass = {};
+local WorkbenchClass = {
+	LastAdCheck = nil;
+	AdIsAvailable = false;
+	AdTimeSkipButtonDebounce = nil;
+};
 --==
 
 
@@ -32,6 +38,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 	local remoteDeconstruct = modRemotesManager:Get("DeconstructItem");
 	local remotePolishTool = modRemotesManager:Get("PolishTool");
 	local remoteBlueprintHandler = modRemotesManager:Get("BlueprintHandler");
+	local remoteWorkbenchService = modRemotesManager:Get("WorkbenchService");
 
 	local refreshFunc;
 	interface.Garbage:Tag(modData.OnDataEvent:Connect(function(action, hierarchyKey, data)
@@ -49,7 +56,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 			local sync = activeSyncs[a];
 			local i = a;
 			if type(sync) == "function" then
-				spawn(function()
+				task.spawn(function()
 					local keep = sync(Time);
 					if keep ~= true then
 						table.remove(activeSyncs, i);
@@ -70,8 +77,37 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 		local processList = binds.GetProcesses();
 		local cateList = {};
 		
+		local function checkForAds()
+			task.spawn(function()
+				if RunService:IsStudio() then
+					WorkbenchClass.AdIsAvailable = true;
+				end
+				if WorkbenchClass.LastAdCheck and tick() < WorkbenchClass.LastAdCheck then
+					return;
+				end
+				WorkbenchClass.LastAdCheck = tick()+5;
+				if WorkbenchClass.AdIsAvailable then 
+					return 
+				end;
+
+				local adAvailableResult;
+				local isSuccess = pcall(function()
+					adAvailableResult = AdService:GetAdAvailabilityNowAsync(Enum.AdFormat.RewardedVideo);
+				end)
+				if not isSuccess 
+				or adAvailableResult == nil 
+				or adAvailableResult.AdAvailabilityResult ~= Enum.AdAvailabilityResult.IsAvailable then
+					WorkbenchClass.LastAdCheck = tick()+2;
+					return;
+				end
+
+				WorkbenchClass.AdIsAvailable = true;
+			end)
+		end
+
 		local function refreshProcessPage()
 			processList = binds.GetProcesses();
+			checkForAds();
 			
 			binds.ClearPages("processList");
 			binds.ActiveWorkbenches.Processes = binds.Workbenches.Processes.Workbench.new();
@@ -95,6 +131,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 			local cancelingBar = cancelButton:WaitForChild("Bar");
 			local claimButton = buttonsFrame:WaitForChild("ClaimButton");
 			local skipButton = buttonsFrame:WaitForChild("SkipButton");
+			local adTimeSkipButton = buttonsFrame:WaitForChild("AdTimeSkipButton");
 			
 			if cateList[process.Type] == nil then
 				cateList[process.Type] = listMenu:NewBasicList()
@@ -115,20 +152,72 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 			local function refreshContent(t)
 				t = modSyncTime.GetTime();
 				
-				if newProcessFrame:IsDescendantOf(interface.ScreenGui) then
-					if process.Type == "Building" or process.Type == "BuildComplete" then
-						titleTag.Text = "Build "..bpLib.Name;
+				if not newProcessFrame:IsDescendantOf(interface.ScreenGui) then return end;
+
+				if process.Type == "Building" or process.Type == "BuildComplete" then
+					titleTag.Text = `Build {bpLib.Name}`;
+					
+					local timeLeft = process.Data.BT-t;
+					local buildPercent = math.clamp(1-(timeLeft/bpLib.Duration), 0, 1);
+					
+					local initTween = progressBar:GetAttribute("initTween");
+					if initTween == nil then
+						progressBar:SetAttribute("initTween", tick());
+						pcall(function()
+							progressBar:TweenSize(UDim2.new(buildPercent, 0, 1, 0), Enum.EasingDirection.InOut, Enum.EasingStyle.Linear, 0.5, true);
+						end);
 						
-						local timeLeft = process.Data.BT-t;
-						local buildPercent = math.clamp(1-(timeLeft/bpLib.Duration), 0, 1);
+					elseif (tick()-initTween) > 0.5 then
+						progressBar.Size = UDim2.new(buildPercent, 0, 1, 0);
+						pcall(function()
+							progressBar:TweenSize(UDim2.new(1, 0, 1, 0), Enum.EasingDirection.InOut, Enum.EasingStyle.Linear, timeLeft, true);
+						end);
+					end
+					
+					if buildPercent >= 1 then
+						process.Type = "BuildComplete";
+					end;
+					
+					if cateList[process.Type] and cateList[process.Type].Parent ~= nil then
+						newProcessFrame.Parent = cateList[process.Type].list;
+					end
+					if process.Type == "BuildComplete" then
+						timeTag.Text = "Build Complete";
+						progressBar.Size = UDim2.new(1, 0, 1, 0);
+						cancelButton.Visible = false;
+						claimButton.Visible = true;
+						skipButton.Visible = false;
+						skipCost = nil;
+
+					else
+						cancelButton.Visible = true;
+						claimButton.Visible = false;
 						
+						skipButton.Visible = true;
+						skipCost = modWorkbenchLibrary.GetSkipCost(timeLeft);
+						skipButton.Text = `Skip Build ({skipCost} Perks)`;
+						
+						timeTag.Text = modSyncTime.ToString(timeLeft > 0 and timeLeft or 0);
+
+						adTimeSkipButton.Visible = WorkbenchClass.AdIsAvailable;
+					end
+
+				elseif process.Type == "Deconstruction" then
+					local data = process.Data;
+					local itemLib = modItem:Find(data.ItemId);
+					if itemLib then
+						titleTag.Text = `Deconstruct {itemLib.Name}`;
+						
+						local timeLeft = process.Data.T-t;
+						local buildPercent = math.clamp(1-(timeLeft/600), 0, 1);
+
 						local initTween = progressBar:GetAttribute("initTween");
 						if initTween == nil then
 							progressBar:SetAttribute("initTween", tick());
 							pcall(function()
 								progressBar:TweenSize(UDim2.new(buildPercent, 0, 1, 0), Enum.EasingDirection.InOut, Enum.EasingStyle.Linear, 0.5, true);
 							end);
-							
+
 						elseif (tick()-initTween) > 0.5 then
 							progressBar.Size = UDim2.new(buildPercent, 0, 1, 0);
 							pcall(function()
@@ -137,19 +226,51 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						end
 						
 						if buildPercent >= 1 then
-							process.Type = "BuildComplete";
-						end;
-						
-						if cateList[process.Type] and cateList[process.Type].Parent ~= nil then
-							newProcessFrame.Parent = cateList[process.Type].list;
+							timeTag.Text = "Deconstruct Complete";
+							progressBar.Size = UDim2.new(1, 0, 1, 0);
+							cancelButton.Visible = false;
+							claimButton.Visible = true;
+						else
+							cancelButton.Visible = true;
+							claimButton.Visible = false;
+							timeTag.Text = modSyncTime.ToString(timeLeft > 0 and timeLeft or 0);
 						end
-						if process.Type == "BuildComplete" then
-							timeTag.Text = "Build Complete";
+					else
+						titleTag.Text = "Unknown item id: "..data.ItemId;
+						cancelButton.Visible = false;
+						claimButton.Visible = false;
+					end
+
+
+				elseif process.Type == "PolishTool" then
+					local data = process.Data;
+					local itemLib = modItem:Find(data.ItemId);
+					if itemLib then
+						titleTag.Text = `Polish {itemLib.Name}`;
+
+						local timeLeft = process.Data.T-t;
+						local buildPercent = math.clamp(1-(timeLeft/modWorkbenchLibrary.PolishDuration), 0, 1);
+
+						local initTween = progressBar:GetAttribute("initTween");
+						if initTween == nil then
+							progressBar:SetAttribute("initTween", tick());
+							pcall(function()
+								progressBar:TweenSize(UDim2.new(buildPercent, 0, 1, 0), Enum.EasingDirection.InOut, Enum.EasingStyle.Linear, 0.5, true);
+							end);
+
+						elseif (tick()-initTween) > 0.5 then
+							progressBar.Size = UDim2.new(buildPercent, 0, 1, 0);
+							pcall(function()
+								progressBar:TweenSize(UDim2.new(1, 0, 1, 0), Enum.EasingDirection.InOut, Enum.EasingStyle.Linear, timeLeft, true);
+							end);
+						end
+
+						if buildPercent >= 1 then
+							timeTag.Text = "Polish Complete";
 							progressBar.Size = UDim2.new(1, 0, 1, 0);
 							cancelButton.Visible = false;
 							claimButton.Visible = true;
 							skipButton.Visible = false;
-							skipCost = nil;
 
 						else
 							cancelButton.Visible = true;
@@ -157,114 +278,35 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 							
 							skipButton.Visible = true;
 							skipCost = modWorkbenchLibrary.GetSkipCost(timeLeft);
-							skipButton.Text = "Skip Build ("..skipCost.." Perks)";
-							
+							skipButton.Text = `Skip Polish ({skipCost} Perks)`;
+
 							timeTag.Text = modSyncTime.ToString(timeLeft > 0 and timeLeft or 0);
+
+							adTimeSkipButton.Visible = WorkbenchClass.AdIsAvailable;
 						end
-						return true;
-						
-					elseif process.Type == "Deconstruction" then
-						local data = process.Data;
-						local itemLib = modItem:Find(data.ItemId);
-						if itemLib then
-							titleTag.Text = "Deconstruct "..itemLib.Name;
-							
-							local timeLeft = process.Data.T-t;
-							local buildPercent = math.clamp(1-(timeLeft/600), 0, 1);
 
-							local initTween = progressBar:GetAttribute("initTween");
-							if initTween == nil then
-								progressBar:SetAttribute("initTween", tick());
-								pcall(function()
-									progressBar:TweenSize(UDim2.new(buildPercent, 0, 1, 0), Enum.EasingDirection.InOut, Enum.EasingStyle.Linear, 0.5, true);
-								end);
-
-							elseif (tick()-initTween) > 0.5 then
-								progressBar.Size = UDim2.new(buildPercent, 0, 1, 0);
-								pcall(function()
-									progressBar:TweenSize(UDim2.new(1, 0, 1, 0), Enum.EasingDirection.InOut, Enum.EasingStyle.Linear, timeLeft, true);
-								end);
-							end
-							
-							if buildPercent >= 1 then
-								timeTag.Text = "Deconstruct Complete";
-								progressBar.Size = UDim2.new(1, 0, 1, 0);
-								cancelButton.Visible = false;
-								claimButton.Visible = true;
-							else
-								cancelButton.Visible = true;
-								claimButton.Visible = false;
-								timeTag.Text = modSyncTime.ToString(timeLeft > 0 and timeLeft or 0);
-							end
-						else
-							titleTag.Text = "Unknown item id: "..data.ItemId;
-							cancelButton.Visible = false;
-							claimButton.Visible = false;
-						end
-						return true;
-
-					elseif process.Type == "PolishTool" then
-						local data = process.Data;
-						local itemLib = modItem:Find(data.ItemId);
-						if itemLib then
-							titleTag.Text = `Polish {itemLib.Name}`;
-
-							local timeLeft = process.Data.T-t;
-							local buildPercent = math.clamp(1-(timeLeft/modWorkbenchLibrary.PolishDuration), 0, 1);
-
-							local initTween = progressBar:GetAttribute("initTween");
-							if initTween == nil then
-								progressBar:SetAttribute("initTween", tick());
-								pcall(function()
-									progressBar:TweenSize(UDim2.new(buildPercent, 0, 1, 0), Enum.EasingDirection.InOut, Enum.EasingStyle.Linear, 0.5, true);
-								end);
-
-							elseif (tick()-initTween) > 0.5 then
-								progressBar.Size = UDim2.new(buildPercent, 0, 1, 0);
-								pcall(function()
-									progressBar:TweenSize(UDim2.new(1, 0, 1, 0), Enum.EasingDirection.InOut, Enum.EasingStyle.Linear, timeLeft, true);
-								end);
-							end
-
-							if buildPercent >= 1 then
-								timeTag.Text = "Polish Complete";
-								progressBar.Size = UDim2.new(1, 0, 1, 0);
-								cancelButton.Visible = false;
-								claimButton.Visible = true;
-								skipButton.Visible = false;
-
-							else
-								cancelButton.Visible = true;
-								claimButton.Visible = false;
-								
-								skipButton.Visible = true;
-								skipCost = modWorkbenchLibrary.GetSkipCost(timeLeft);
-								skipButton.Text = "Skip Polish (".. skipCost .." Perks)";
-
-								timeTag.Text = modSyncTime.ToString(timeLeft > 0 and timeLeft or 0);
-							end
-						else
-							titleTag.Text = "Unknown item id: "..data.ItemId;
-							cancelButton.Visible = false;
-							claimButton.Visible = false;
-						end
-						return true;
-						
+					else
+						titleTag.Text = `Unknown item id: {data.ItemId}`;
+						cancelButton.Visible = false;
+						claimButton.Visible = false;
 					end
+
 				end
-				return;
 			end
 			
 			local open = false;
 			newProcessFrame.MouseButton1Click:Connect(function()
 				interface:PlayButtonClick();
+				open = not open;
+
 				if open then
-					newProcessFrame:TweenSize(UDim2.new(1, 0, 0, 55), Enum.EasingDirection.InOut, Enum.EasingStyle.Quad, 0.2, true);
-				else
+					checkForAds();
+
 					newProcessFrame:TweenSize(UDim2.new(1, 0, 0, 
 						coreListLayout.AbsoluteContentSize.Y), Enum.EasingDirection.InOut, Enum.EasingStyle.Quad, 0.2, true);
+				else
+					newProcessFrame:TweenSize(UDim2.new(1, 0, 0, 55), Enum.EasingDirection.InOut, Enum.EasingStyle.Quad, 0.2, true);
 				end
-				open = not open;
 			end)
 			
 			local actionButtonDebounce = false;
@@ -376,7 +418,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						refreshProcessPage();
 					else
 						cancelButton.Text = modWorkbenchLibrary.DeconstructModReplies[serverReply] or ("Error Code: "..serverReply);
-						wait(1);
+						task.wait(1);
 						cancelButton.Text = "Cancel";
 					end
 
@@ -388,7 +430,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						refreshProcessPage();
 					else
 						cancelButton.Text = modWorkbenchLibrary.PolishToolReplies[serverReply] or ("Error Code: "..serverReply);
-						wait(1);
+						task.wait(1);
 						cancelButton.Text = "Cancel";
 					end
 					
@@ -397,6 +439,24 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 				actionButtonDebounce = false;
 			end);
 			
+			adTimeSkipButton.MouseButton1Click:Connect(function()
+				if WorkbenchClass.AdTimeSkipButtonDebounce and tick() < WorkbenchClass.AdTimeSkipButtonDebounce then
+					return;
+				end
+				WorkbenchClass.AdTimeSkipButtonDebounce = tick()+2;
+
+				interface:PlayButtonClick();
+				
+				local rPacket = remoteWorkbenchService:InvokeServer("adskip", {
+					InteractConfig = binds.Interactable and binds.Interactable.Config;
+					Index = process.Index;
+				});
+				if rPacket and rPacket.Success then
+					WorkbenchClass.AdIsAvailable = false;
+					WorkbenchClass.LastAdCheck = tick();
+				end
+			end)
+
 			skipButton.MouseButton1Click:Connect(function()
 				if skipCost == nil then return end;
 				interface:PlayButtonClick();

@@ -36,7 +36,7 @@ function modifierPackage.onRequire()
 			CFrame = characterClass:GetCFrame();
 			Player = characterClass.ClassName == "PlayerClass" and (characterClass :: PlayerClass):GetInstance() or nil;
 			BindSetup = function(npcClass: NpcClass)
-				npcClass.HealthComp:SetCanBeHurtBy("!Player&!Human");
+				npcClass.HealthComp:SetCanBeHurtBy("!Player");
 
 				local targetHandlerComp = npcClass:GetComponent("TargetHandler");
 				targetHandlerComp:AddTarget(damageBy.Character);
@@ -61,6 +61,9 @@ function modifierPackage.onRequire()
 								npcClass.Character:Destroy();
 							end
 						end
+					end
+					if tick()-npcClass.SpawnTime > 60*3 then
+						npcClass.Character:Destroy();
 					end
 				end)
 

@@ -237,7 +237,13 @@ function npcPackage.Spawning(npcClass: NpcClass)
 						newPlaqueDestructible:SetHealthbarEnabled(true);
                         
                         newPlaqueDestructible.HealthComp.OnHealthChanged:Connect(function(curHealth, oldHealth, damageData)
-                            if (curHealth > oldHealth) then return end;
+							if newPlaqueDestructible.HealthComp.IsDead then return end;
+							if curHealth == oldHealth then return end;
+							if damageData.Damage == nil then return end;
+
+							damageData = damageData:Clone();
+							damageData.HideBubble = true;
+
 							healthComp:TakeDamage(damageData);
                         end)
 
@@ -248,9 +254,11 @@ function npcPackage.Spawning(npcClass: NpcClass)
                             modAudio.Play("NekronHurt", newPlaque).PlaybackSpeed = math.random(50, 60)/100;
                             
                             local amount = baseHealth * 0.35;
-                            -- if isOnFire then
-                            --     amount = amount *2;
-                            -- end
+												
+							local fireStatues = npcClass.StatusComp:ListStatusWithTags{"Fire"};
+							if #fireStatues > 0 then
+								amount += baseHealth * 0.25;
+							end
                             
                             healthComp:TakeDamage(DamageData.new{
                                 Damage = amount;
@@ -314,16 +322,15 @@ function npcPackage.Spawning(npcClass: NpcClass)
 			randomPlaquePart = npcClass.RootPart;
 		end
 
-        local toxicStatus = npcClass.StatusComp:GetOrDefault("ToxicMod");
+		local toxicStatues = npcClass.StatusComp:ListStatusWithTags{"Toxic"};
         if #taggedObjects > 0 then
 			if tick()-properties.LastHeal >= 0.5 then
 				properties.LastHeal = tick();
 				
 				local healAmt = math.ceil(#taggedObjects * (baseHealth * 0.0025));
 				
-				if toxicStatus then
-					local ratio = math.clamp(1 - (toxicStatus or 0) , 0, 1);
-					healAmt = healAmt * ratio;
+				if #toxicStatues > 0 then
+					healAmt = healAmt * 0.5;
 				end
 				
 				healthComp:TakeDamage(DamageData.new{

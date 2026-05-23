@@ -173,7 +173,7 @@ if RunService:IsServer() then
 							};
 						};
 
-						if coopMission.CheckPoint == 5 then
+						if coopMission.CheckPoint == 4 or coopMission.CheckPoint == 5 then
 							coopMission.CheckPoint = 6;
 						end
 					end

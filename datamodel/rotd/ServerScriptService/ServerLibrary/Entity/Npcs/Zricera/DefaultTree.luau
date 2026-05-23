@@ -50,11 +50,11 @@ function treePackage.Throw(npcClass: NpcClass)
         properties.ThrowPlayerCooldown = tick();
         npcClass.PlayAnimation("ThrowPlayer", 0.05);
 
-        local frostStatus = npcClass.StatusComp:GetOrDefault("FrostMod");
+        local forstStatues = npcClass.StatusComp:ListStatusWithTags{"Frost"};
         local throwTargetComp = npcClass:GetComponent("ThrowTarget");
 
         local configMaxDamage = npcClass.Configurations.MaxDamage;
-        throwTargetComp(enemyTargetData.HealthComp.CompOwner, 100, frostStatus and configMaxDamage*0.5 or configMaxDamage);
+        throwTargetComp(enemyTargetData.HealthComp.CompOwner, 100, #forstStatues > 0 and configMaxDamage*0.5 or configMaxDamage);
     end
 end
 
@@ -94,8 +94,8 @@ function treePackage.Leap(npcClass: NpcClass)
     task.delay(0.3, function()
         modAudio.Play(`ZombieAttack{math.random(1,3)}`, npcClass.RootPart).PlaybackSpeed = math.random(110, 140)/100;
         
-        local frostStatus = npcClass.StatusComp:GetOrDefault("FrostMod");
-        local leapPower = frostStatus and 170 or 200;
+        local forstStatues = npcClass.StatusComp:ListStatusWithTags{"Frost"};
+        local leapPower = #forstStatues >0 and 170 or 200;
 
         local tarPos = enemyRootPart.CFrame.Position;
         npcClass.RootPart.AssemblyLinearVelocity = Vector3.new();

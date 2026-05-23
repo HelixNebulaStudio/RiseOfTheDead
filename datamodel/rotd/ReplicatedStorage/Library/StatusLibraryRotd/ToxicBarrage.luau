@@ -1,11 +1,12 @@
 local modStatusClass = shared.require(game.ReplicatedStorage.Library.StatusLibrary.StatusClass);
 --==
 local statusPackage = {
-    Id="ToxicBarrage";
-    Icon="";
-    Name="Toxic Barrage";
-    Description="Reduced immunity";
-    Buff=true;
+    Id = "ToxicBarrage";
+    Icon = "";
+    Name = "Toxic Barrage";
+    Description = "Reduced immunity";
+    Buff = false;
+    Tags = {"Toxic"};
 };
 
 local faces = {Enum.NormalId.Back; Enum.NormalId.Bottom; Enum.NormalId.Front; Enum.NormalId.Left; Enum.NormalId.Right; Enum.NormalId.Top;};

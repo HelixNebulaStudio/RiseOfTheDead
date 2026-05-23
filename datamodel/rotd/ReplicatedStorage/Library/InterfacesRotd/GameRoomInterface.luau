@@ -252,6 +252,18 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             createFrame.Visible = stageLib.SingleArena ~= true;
         end)
     end
+    if interface.isPreferringGamepad() then
+        createRoomButton:GetPropertyChangedSignal("GuiState"):Connect(function()
+            if createRoomButton.GuiState == Enum.GuiState.Hover then
+                if stageLib == nil then return end;
+
+                createRoomButton.ImageColor3 = interface.Colors.Branch;
+                createFrame.Visible = stageLib.SingleArena ~= true;
+            else
+                createRoomButton.ImageColor3 = Color3.fromRGB(255,255,255);
+            end
+        end)
+    end
 
     readyButton.MouseButton1Click:Connect(function()
         if tick()-debounceTick < debounceDuration then return end;
@@ -301,6 +313,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             createFrame.Visible = false;
         end)
     end
+    
     for _, button in pairs(createFrame:GetDescendants()) do
         if button.Name == "CreateFrame" then
             if not UserInputService.TouchEnabled then

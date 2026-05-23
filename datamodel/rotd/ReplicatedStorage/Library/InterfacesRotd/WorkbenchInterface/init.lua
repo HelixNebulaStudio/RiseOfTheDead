@@ -100,7 +100,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				or modData.Profile.GamePass.PortableWorkbench == nil;
 		end)
 	end)
-	interface:BindConfigKey("DisableWorkbench", {workbenchWindow});
+	interface:BindConfigKey("DisableWorkbench", {workbenchWindow}, nil, function()
+		return modData.Profile == nil 
+			or modData.Profile.GamePass == nil 
+			or modData.Profile.GamePass.PortableWorkbench == nil;
+	end);
 	workbenchWindow:AddCloseButton(workbenchFrame);
 	
     

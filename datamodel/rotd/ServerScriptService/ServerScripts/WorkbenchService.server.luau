@@ -1,6 +1,9 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 shared.waitForIgnition();
 --==
+local AdService = game:GetService("AdService");
+local RunService = game:GetService("RunService");
+
 local modWeapons = shared.require(game.ReplicatedStorage.Library.WeaponsLibrary);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modWorkbenchLibrary = shared.require(game.ReplicatedStorage.Library.WorkbenchLibrary);
@@ -61,11 +64,62 @@ function IsInWorkbenchRange(player, interactPart)
 end
 
 function remoteWorkbenchService.OnServerInvoke(player, action: string, ...)
+	local rPacket = {};
+	local profile = modProfile:Get(player);
+
 	if action == "interfacetoggle" then
 		shared.modEventService:ServerInvoke("WorkbenchService_BindInterfaceToggle", {ReplicateTo={player}}, ...);
 	elseif action == "itemselect" then
 		shared.modEventService:ServerInvoke("WorkbenchService_BindItemSelect", {ReplicateTo={player}}, ...);
+
+	elseif action == "adskip" then
+		local packet = ...;
+
+		local playerSave = profile:GetActiveSave();
+		local inventory = profile.ActiveInventory;
+		local userBlueprints = playerSave.Blueprints;
+		local userWorkbench = playerSave.Workbench;
+
+		local buildIndex = packet.Index;
+
+		local activeBp = userWorkbench:GetProcess(buildIndex);
+		
+		if activeBp == nil or activeBp.BT-modSyncTime.GetTime() <= 0 then
+			rPacket.FailMsg = "Invalid process";
+			return rPacket;
+		end
+
+		local itemId = activeBp.ItemId;
+		local bpLib = modBlueprintLibrary.Get(itemId);
+
+		local showAdResult;
+		if not RunService:IsStudio() then
+			local isSuccess = pcall(function()
+				local adReward = AdService:CreateAdRewardFromDevProductId(20802461);
+				showAdResult = AdService:ShowRewardedVideoAdAsync(player, adReward);
+			end)
+			if not isSuccess then
+				rPacket.FailMsg = "Could not show Ad";
+				return rPacket;
+			end
+		else
+			showAdResult = Enum.ShowAdResult.ShowCompleted;
+		end
+
+		if showAdResult == Enum.ShowAdResult.ShowCompleted then
+			local timeLeft = activeBp.BT-modSyncTime.GetTime();
+			Debugger:StudioLog(`adskip timeLeft = {timeLeft}`);
+
+			activeBp.BT = os.time()+ (timeLeft - shared.Const.Hour);
+			userWorkbench:Sync();
+		end
+		
+		rPacket.Success = true;
+		return rPacket;
+
 	end
+
+	return rPacket;
 end
 
 function CheckBlueprintCost(player, bpId)

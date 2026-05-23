@@ -73,11 +73,15 @@ if RunService:IsServer() then
 		local duration = modifier.Properties.Duration;
 
 		local statusClass: StatusClassInstance? = statusComp:GetOrDefault(statusKey);
+
+		local dmg = modifier.Properties.Damage;
+		local stackInit = 0;
 		if statusClass then
-			statusClass.Expires = workspace:GetServerTimeNow() + duration;
+			if statusClass.Values.Damage > dmg then
+				dmg = statusClass.Values.Damage;
+			end
 			statusClass.Values.Stacks = statusClass.Values.Stacks +1;
-			
-			return;
+			stackInit = statusClass.Values.Stacks;
 		end
 
 		statusComp:Apply(statusKey, {
@@ -85,10 +89,10 @@ if RunService:IsServer() then
 			Duration = duration;
 			ApplyBy = characterClass;
 			Values = {
-				Damage = modifier.Properties.Damage;
+				Damage = dmg;
 				StorageItemBy = modifier.EquipmentClass and modifier.EquipmentClass.StorageItem;
 				TargetPart = targetPart;
-				Stacks = 0;
+				Stacks = stackInit;
 			};
 		});
 	end

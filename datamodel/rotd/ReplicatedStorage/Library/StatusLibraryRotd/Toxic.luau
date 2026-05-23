@@ -9,7 +9,7 @@ local statusPackage = {
     Name = "Toxic";
     Description = "You are taking toxic damage. Can be nullified by wearing a Gas Mask.";
     Buff = false;
-    Tags = {"DOT";};
+    Tags = {"DOT"; "Toxic"};
     Cleansable = true;
     ExpiresOnDeath = true;
 };
