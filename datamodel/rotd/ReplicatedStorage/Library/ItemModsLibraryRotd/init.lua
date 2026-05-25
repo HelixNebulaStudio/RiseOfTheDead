@@ -1093,7 +1093,7 @@ function library.onRequire()
 	library:Add{
 		Id = "incendiarymod";
 		Name = "Incendiary Rounds";
-		Desc = "Ignites enemies and deal an additional <b>Damage</b> + <b>0.1% * stacks (max 1%) of their current health</b> as fire damage. Burn ticks every 0.5s over the duration.";
+		Desc = "Ignites enemies and deal an additional <b>Damage * stacks</b> + <b>0.1% * stacks (max 1%) of their current health</b> as fire damage. Burn ticks every 0.5s over the duration.";
 		Icon = "rbxassetid://3576196270";
 		BaseTier = 1;
 		Tier = 1;

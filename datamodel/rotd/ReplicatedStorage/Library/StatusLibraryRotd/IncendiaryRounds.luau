@@ -32,7 +32,6 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
     local damage = statusClass.Values.Damage;
     local stacks = statusClass.Values.Stacks;
     local targetPart = statusClass.Values.TargetPart;
-    local useCurrentHpDmg = statusClass.Values.UseCurrHpDmg;
 
     local storageItemBy: StorageItem? = statusClass.Values.StorageItemBy;
 
@@ -44,11 +43,10 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
     
     local finalDamage = stackedDamage;
 
-    if useCurrentHpDmg ~= false then
-        local curHpRatio = 0.1 /100;
-        local chargeUp = math.clamp(stacks/10, 0, 1);
-        finalDamage = finalDamage + math.max(math.ceil(healthComp.CurHealth * curHpRatio * chargeUp), 1);
-    end
+    local curHpRatio = 1 /100; -- 1%
+    local chargeUp = math.clamp(stacks/10, 0, 1);
+    finalDamage = finalDamage + math.max(math.ceil(healthComp.CurHealth * curHpRatio * chargeUp), 1);
+
     if stackedDamage <= 0 then return; end
     
     local dmgData: DamageData = DamageData.new{
