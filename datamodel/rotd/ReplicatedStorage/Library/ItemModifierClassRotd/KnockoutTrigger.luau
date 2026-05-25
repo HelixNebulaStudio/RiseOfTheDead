@@ -6,7 +6,7 @@ local modHealthComponent = shared.require(game.ReplicatedStorage.Components.Heal
 
 local modifierPackage = {
 	Name = "Knockout Trigger";
-	StatusId = "KnockoutRagdollCd";
+	StatusId = "NpcKnockedOut";
 	
 	Tags = {};
 	Binds = {};

@@ -30,18 +30,21 @@ end
 
 function modifierPackage.Binds.WeaponShotDamageDataNew(modifier: ItemModifierInstance, damageData: DamageData)
 	if RunService:IsClient() then return end;
-	if damageData.TargetModel == nil then return end;
-	
+
+	if damageData.ToolHandler == nil or modifier.EquipmentClass ~= damageData.ToolHandler.EquipmentClass then
+        return;
+    end
+
 	local characterClass: CharacterClass;
 	if modifier.WieldComp == nil then return end;
 	if modifier.WieldComp and modifier.WieldComp.CompOwner then
 		characterClass = modifier.WieldComp.CompOwner :: CharacterClass;
 	end
 	
-	local healthComp: HealthComp? = modHealthComp.getByModel(damageData.TargetModel);
-	if healthComp == nil or healthComp.IsDead or not healthComp:CanTakeDamageFrom(characterClass) then return end;
-	if healthComp.CompOwner.ClassName ~= "NpcClass" then return end;
-	if damageData.Damage < (healthComp.MaxHealth + healthComp.MaxArmor) then return end;
+	local damageTo: CharacterClass? = damageData.DamageTo :: CharacterClass;
+	if damageTo == nil or damageTo.ClassName ~= "NpcClass" then return end;
+	
+	if damageData.Damage < (damageTo.HealthComp.MaxHealth + damageTo.HealthComp.MaxArmor) then return end;
 
 	local roll = math.random(0, 1000)/1000;
 	if not RunService:IsStudio() and roll > modifier.Properties.AmmoRecycler then return end;

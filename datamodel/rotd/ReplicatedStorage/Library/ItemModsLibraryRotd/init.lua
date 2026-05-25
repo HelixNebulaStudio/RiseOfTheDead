@@ -1091,28 +1091,28 @@ function library.onRequire()
 
 	-- MARK: Elementals Mods 500-599;
 	library:Add{
-		Id="incendiarymod";
-		Name="Incendiary Rounds";
-		Desc="Ignites enemies and deal an additional <b>Damage</b> + <b>1% of their current health</b> as fire damage. Burn ticks every 0.5s over the duration.";
-		Icon="rbxassetid://3576196270";
-		BaseTier=1;
-		Tier=1;
-		Upgrades={
+		Id = "incendiarymod";
+		Name = "Incendiary Rounds";
+		Desc = "Ignites enemies and deal an additional <b>Damage</b> + <b>0.1% * stacks (max 1%) of their current health</b> as fire damage. Burn ticks every 0.5s over the duration.";
+		Icon = "rbxassetid://3576196270";
+		BaseTier = 1;
+		Tier = 1;
+		Upgrades = {
 			{DataTag="D"; Name="Flat Damage"; Syntax="Upgrade Damage"; ValueType="Normal"; MaxLevel=10; BaseCost=20; MaxCost=200; BaseValue=5; MaxValue=100; TweakBonus=20; Scaling=library.ScalingStyle.NaturalCurve;};
 			{DataTag="T"; Name="Duration"; Syntax="Upgrade Duration"; ValueType="Normal"; Suffix="s"; MaxLevel=10; BaseCost=10; MaxCost=100; BaseValue=5; MaxValue=25; TweakBonus=5; Scaling=library.ScalingStyle.Linear;};
 		};
-		Stackable=false;
-		Type={"Pistol"; "Submachine Gun"; "Shotgun"; "Rifle"; "Sniper"; "Heavy machine gun"; "Bow"; "Launcher";};
+		Stackable = false;
+		Type = {"Pistol"; "Submachine Gun"; "Shotgun"; "Rifle"; "Sniper"; "Heavy machine gun"; "Bow"; "Launcher";};
 		
-		EffectTrigger=library.EffectTrigger.Passive;
-		ActivationDuration=60;
-		CooldownDuration=120;
+		EffectTrigger = library.EffectTrigger.Passive;
+		ActivationDuration = 60;
+		CooldownDuration = 120;
 		
-		Module=script.FlameMod;
-		Category="Elemental Mods";
+		Module = script.FlameMod;
+		Category = "Elemental Mods";
 		
-		Element="Fire";
-		Color=Color3.fromRGB(131, 0, 0);
+		Element = "Fire";
+		Color = Color3.fromRGB(131, 0, 0);
 	}
 
 	library:Add{
@@ -1440,24 +1440,24 @@ function library.onRequire()
 	};
 
 	library:Add{
-		Id="warmongerscalesmod";
-		Name="Warmonger's Scales";
-		Desc="<b>Pacifists & Warmongers</b>\nFor every percent damage done, temporary increases max health. Heals only if health pool was newly increased.";
-		Icon="rbxassetid://16084490297";
-		BaseTier=1;
-		Tier=1;
-		Upgrades={
+		Id = "warmongerscalesmod";
+		Name = "Warmonger's Scales";
+		Desc = "<b>Pacifists & Warmongers</b>\nFor every kill, temporary increases max health. Heals only if health pool was newly increased.";
+		Icon = "rbxassetid://16084490297";
+		BaseTier = 1;
+		Tier = 1;
+		Upgrades = {
 			{DataTag="HPK"; Name="Health Per Kill"; Syntax="Increase Health Per Kill"; ValueType="Normal"; MaxLevel=5; BaseCost=10; MaxCost=100; BaseValue=0; MaxValue=10; Scaling=library.ScalingStyle.Linear;};
 			{DataTag="HP"; Name="Max Health"; Syntax="Increase Max Health"; ValueType="Normal"; MaxLevel=5; BaseCost=10; MaxCost=100; BaseValue=0; MaxValue=100; Scaling=library.ScalingStyle.Linear;};
 		};
-		Stackable={
+		Stackable = {
 			["Health Mods"]=false;
 			["Pacifists & Warmongers"]=false;
 		};
-		Type={"Chest"};
-		EffectTrigger=library.EffectTrigger.Passive;
-		Module=script.WarmongerScales;
-		Category="Health Mods";
+		Type = {"Chest"};
+		EffectTrigger = library.EffectTrigger.Passive;
+		Module = script.WarmongerScales;
+		Category = "Health Mods";
 	};
 
 	library:Add{

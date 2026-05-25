@@ -22,7 +22,7 @@ Dialogues.InitStrings = {
 
 -- MARK: DialogueStrings
 Dialogues.DialogueStrings = {
-	["shop_ratShop"]={
+	["shop_noRatShop"]={
 		Say="Do you sell anything?";
 		Reply="No, go talk to the others..";
 	};
@@ -44,18 +44,7 @@ if RunService:IsServer() then
 			dialog:SetInitiate("Are you seriously waking me up for nothing?!", "Angry");
 		end
 		
-		dialog:AddChoice("shop_ratShop", function()
-			local npcChar = dialog.Character;
-
-			local shopInteractConfig = npcChar:FindFirstChild("ShopInteractable");
-			if shopInteractConfig == nil then
-				shopInteractConfig = modInteractables.createInteractable("Shop");
-				shopInteractConfig.Name = "ShopInteractable";
-				shopInteractConfig:SetAttribute("ShopType", "Rats");
-				shopInteractConfig.Parent = npcChar;
-			end
-			dialog:InteractRequest(shopInteractConfig);
-		end)
+		dialog:AddChoice("shop_noRatShop");
 		dialog:AddChoice("general_mean");
 	end 
 end

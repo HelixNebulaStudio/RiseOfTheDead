@@ -224,6 +224,7 @@ function npcPackage.Spawning(npcClass: NpcClass)
                         plaqueModel.PrimaryPart = newPlaque;
 
                         local newPlaqueDestructible: DestructibleInstance = bodyDestructiblesComp:Create(plaqueName, plaqueModel);
+						newPlaqueDestructible.OwnerStatusCompLink = true;
 
                         newPlaqueDestructible.HealthComp:SetMaxHealth(baseHealth * 0.1);
                         newPlaqueDestructible.HealthComp:Reset();

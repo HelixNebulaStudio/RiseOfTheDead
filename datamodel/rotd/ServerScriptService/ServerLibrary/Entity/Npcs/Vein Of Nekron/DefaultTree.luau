@@ -91,6 +91,7 @@ function treePackage.PlantSpore(npcClass: NpcClass)
 
         local sporeDestructible: DestructibleInstance = bodyDestructiblesComp:Create(sporeModel.Name, sporeModel);
         sporeDestructible.Properties.DestroyModel = false;
+        sporeDestructible.OwnerStatusCompLink = true;
         
         local nekronSporeObject = modNekronSpore.spawn(attackOrigin, targetPart, {
             SporeDestructible = sporeDestructible;

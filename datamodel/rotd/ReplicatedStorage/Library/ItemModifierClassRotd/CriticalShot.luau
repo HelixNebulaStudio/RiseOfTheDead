@@ -20,11 +20,15 @@ function modifierPackage.Binds.WeaponShotDamageDataNew(modifier: ItemModifierIns
     if RunService:IsClient() then return end;
 
     if modifier.EquipmentClass == nil then return end;
+    if damageData.ToolHandler == nil or modifier.EquipmentClass ~= damageData.ToolHandler.EquipmentClass then
+        return;
+    end
+
     local configurations = modifier.EquipmentClass.Configurations;
 
     local critChance = configurations.CritChance or 0;
 
-    local characterClass: CharacterClass? = modifier.WieldComp and modifier.WieldComp.CompOwner or nil;
+    local characterClass: CharacterClass? = modifier.WieldComp and modifier.WieldComp.CompOwner :: CharacterClass;
     if characterClass and characterClass.Properties and characterClass.Properties.CritBoost then
         critChance = critChance + (characterClass.Properties.CritBoost.Amount/100);
     end
