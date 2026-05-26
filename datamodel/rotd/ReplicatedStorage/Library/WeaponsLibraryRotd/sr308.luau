@@ -77,6 +77,8 @@ local toolPackage = {
 		Penetration=modWeaponAttributes.PenetrationTable.Rifle;
 		-- Physics
 		KillImpulseForce=20;
+		
+		HasFlashlight = true;
 	};
 
 	Properties={};

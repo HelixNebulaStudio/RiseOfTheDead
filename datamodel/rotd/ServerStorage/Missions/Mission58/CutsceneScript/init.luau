@@ -1484,7 +1484,6 @@ return function(CutsceneSequence)
 			modConfigurations.Set("DisableHealthbar", false);
 			modConfigurations.Set("DisableMissions", false);
 			modConfigurations.Set("DisablePinnedMission", false);
-			modConfigurations.Set("DisableWorkbench", false);
 			modConfigurations.Set("DisableReportMenu", false);
 			modConfigurations.Set("DisableMasteryMenu", false);
 			modConfigurations.Set("DisableExperiencebar", false);
@@ -1570,6 +1569,9 @@ return function(CutsceneSequence)
 							Name = "Patrick";
 							CFrame = spawnPatrick == 2 and spawnAtt.WorldCFrame or playerClass:GetCFrame();
 							Player = player;
+							Properties = {
+								InSafehome = true;
+							};
 							BindSetup = function(npcClass: NpcClass)
 								npcClass.HealthComp:SetHealth(10);
 							end;

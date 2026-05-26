@@ -1368,7 +1368,7 @@ function library.onRequire()
 	library:Add{
 		Id = "thornmod";
 		Name = "Thorn Plating";
-		Desc = "When taking melee damage with armor > 0, attacker takes reflected damage based on a percent of their health. Reflected damage only affects basic enemies. Minimum reflected damage is 10.";
+		Desc = "When taking melee damage with armor > 0, attacker takes reflected damage based on a percent of their health. Reflected damage scales based on enemie's thorn resistance. Minimum reflected damage is 10.";
 		Icon = "http://www.roblox.com/asset/?id=5720010211";
 		BaseTier = 1;
 		Tier = 1;

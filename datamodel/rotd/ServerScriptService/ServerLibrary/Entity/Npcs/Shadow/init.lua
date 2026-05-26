@@ -25,6 +25,7 @@ local npcPackage = {
 
         KnockbackResistant = 1;
         SkipMoveInit = true;
+        ThornResist = 0.9;
     };
 
     AddComponents = {

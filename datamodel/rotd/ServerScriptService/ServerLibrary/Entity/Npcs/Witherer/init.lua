@@ -33,6 +33,7 @@ local npcPackage = {
         KnockbackResistant = 1;
         SkipMoveInit = true;
         SkipNpcAnimatorInit = true;
+        ThornResist = 1;
     };
 
     AddComponents = {

@@ -27,6 +27,7 @@ local npcPackage = {
 
         MovementFrequency = 50;
         AltReduction = 0;
+        ThornResist = 0.95;
     };
 
     AddComponents = {

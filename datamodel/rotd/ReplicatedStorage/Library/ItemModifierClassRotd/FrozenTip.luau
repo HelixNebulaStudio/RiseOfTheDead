@@ -25,6 +25,10 @@ if RunService:IsServer() then
             return;
         end
 
+		if damageTo.ClassName == "NpcClass" and (damageTo :: NpcClass).Properties.MeleeImmunity >= 1 then
+			return;
+		end
+
 		if modifier.WieldComp == nil or modifier.WieldComp.CompOwner == nil then return end;
 		local characterClass: CharacterClass = modifier.WieldComp.CompOwner :: CharacterClass;
 

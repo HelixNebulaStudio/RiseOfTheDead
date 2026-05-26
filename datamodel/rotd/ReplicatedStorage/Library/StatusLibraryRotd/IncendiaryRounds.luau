@@ -44,7 +44,7 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
     local finalDamage = stackedDamage;
 
     local curHpRatio = 1 /100; -- 1%
-    local chargeUp = math.clamp(stacks/10, 0, 1);
+    local chargeUp = math.clamp( ((stacks or 0)+1) /10, 0, 1);
     finalDamage = finalDamage + math.max(math.ceil(healthComp.CurHealth * curHpRatio * chargeUp), 1);
 
     if stackedDamage <= 0 then return; end

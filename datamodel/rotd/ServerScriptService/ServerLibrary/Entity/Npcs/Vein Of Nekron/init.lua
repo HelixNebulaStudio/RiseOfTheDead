@@ -29,6 +29,8 @@ local npcPackage = {
 
         SporeCount = 0;
         VeinLaunched = 0;
+		
+        ThornResist = 0.95;
     };
 
     AddComponents = {
@@ -121,17 +123,17 @@ function npcPackage.Spawning(npcClass: NpcClass)
     local bodyDestructiblesComp = npcClass:GetComponent("BodyDestructibles");
 
 	--MARK: Plaque Spread
-    function properties.Spread(part)
+    function properties.Spread(spawnOnPart)
         if healthComp.IsDead then return end;
         
-		if part.Anchored == false then return end;
+		if spawnOnPart.Anchored == false then return end;
 
-		local isInfectedTick = part:GetAttribute("VeinOfNekronInfected");
+		local isInfectedTick = spawnOnPart:GetAttribute("VeinOfNekronInfected");
 		if isInfectedTick and tick()-isInfectedTick < 60 then return end
-		if part.Size.Magnitude >= 200 then return end;
+		if spawnOnPart.Size.Magnitude >= 200 then return end;
 		
-		part:SetAttribute("VeinOfNekronInfected", tick());
-		table.insert(taggedObjects, part);
+		spawnOnPart:SetAttribute("VeinOfNekronInfected", tick());
+		table.insert(taggedObjects, spawnOnPart);
 		
 		if #taggedObjects >= 16 then
 			local part = table.remove(taggedObjects, 1);
@@ -147,14 +149,14 @@ function npcPackage.Spawning(npcClass: NpcClass)
 			end
 		end
 		
-		local size = part.Size.Magnitude;
+		local size = spawnOnPart.Size.Magnitude;
 		
 		for _, side in pairs(Enum.NormalId:GetEnumItems()) do
 			local newTexture = MOLD_TEXTURE:Clone();
 			newTexture.Name = "VeinOfNekronSpread";
 			
 			newTexture.Face = side;
-			newTexture.Parent = part;
+			newTexture.Parent = spawnOnPart;
 			
 			task.spawn(function()
 				for t=1, 0.35, -((1-0.35)/10) do
@@ -170,8 +172,8 @@ function npcPackage.Spawning(npcClass: NpcClass)
 		local timelapsed = (tick()-npcClass.SpawnTime);
 		if timelapsed <= 10 then return end;
 
-		if part.ClassName == "Part" and part.Shape == Enum.PartType.Block and size >= 5 then
-			local axis = {Vector3.xAxis; Vector3.zAxis; -Vector3.xAxis; -Vector3.zAxis; Vector3.yAxis;}; ---Vector3.yAxis;
+		if spawnOnPart.ClassName == "Part" and spawnOnPart.Shape == Enum.PartType.Block and size >= 5 then
+			local axis = {Vector3.xAxis; Vector3.zAxis; -Vector3.xAxis; -Vector3.zAxis; Vector3.yAxis; -Vector3.yAxis;};
 			
 			for p=1, #axis do
 				local randomAxis = axis[p];
@@ -179,117 +181,153 @@ function npcPackage.Spawning(npcClass: NpcClass)
 				local surfaceSize;
 				
 				if randomAxis.X ~= 0 then
-					surfaceSize = Vector3.new(part.Size.Z, part.Size.Y, 0);
+					surfaceSize = Vector3.new(spawnOnPart.Size.Z, spawnOnPart.Size.Y, 0);
 					
 				elseif randomAxis.Y ~= 0 then
-					surfaceSize = Vector3.new(part.Size.Z, part.Size.X, 0);
+					surfaceSize = Vector3.new(spawnOnPart.Size.Z, spawnOnPart.Size.X, 0);
 					
 				elseif randomAxis.Z ~= 0 then
-					surfaceSize = Vector3.new(part.Size.X, part.Size.Y, 0);
+					surfaceSize = Vector3.new(spawnOnPart.Size.X, spawnOnPart.Size.Y, 0);
 					
 				end
 				
 				local ratio = math.max(surfaceSize.X/surfaceSize.Y, surfaceSize.Y/surfaceSize.X);
 				
-				if ratio <= 4 and size >= 7 and surfaceSize.X >= 4 and surfaceSize.Y >= 4 then
-					-- pick this randomAxis;
+				if not (ratio <= 4 and size >= 7 and surfaceSize.X >= 4 and surfaceSize.Y >= 4) then continue end;
+				-- pick this randomAxis;
 
-					local visibleRayParam = RaycastParams.new();
-					visibleRayParam.FilterType = Enum.RaycastFilterType.Include;
-					visibleRayParam.FilterDescendantsInstances = {workspace.Environment;};
-					
-					local rngCFrame = part.CFrame * CFrame.new(part.Size/2 * randomAxis);
-					local surfaceCenterCFrame = CFrame.lookAt(rngCFrame.p, 
-						(rngCFrame * CFrame.new(randomAxis*100)).Position, rngCFrame.UpVector);
-					
-					local lookVec = surfaceCenterCFrame.LookVector;
-					local raycastResult = workspace:Raycast(surfaceCenterCFrame.p, lookVec*4, visibleRayParam);
-					
-					if raycastResult == nil then
-						local zSize = math.clamp((surfaceSize.X+surfaceSize.Y)/20, 1, 10);
+				local visibleRayParam = RaycastParams.new();
+				visibleRayParam.IncludeInstances = {workspace.Environment; workspace.Terrain};
+				local excludeList = {};
+				visibleRayParam.ExcludeInstances = excludeList;
+
+				local surfaceCf = spawnOnPart.CFrame * CFrame.new(spawnOnPart.Size/2 * randomAxis);
+
+				local isSurfaceVisible = false;
+				for _, player in pairs(game.Players:GetPlayers()) do
+					if player.Character == nil then continue end;
+
+					for a=1, 8 do
+						local tarPos = player.Character:GetPivot().Position + Vector3.new(0, 1.5, 0);
+						local checkDir = (surfaceCf.Position-tarPos);
+
+						local ray = Ray.new(surfaceCf.Position, checkDir);
+						local raycastResult = workspace:Raycast(ray.Origin, ray.Direction, visibleRayParam);
 						
-						properties.VeinLaunched = properties.VeinLaunched +1;
-						
-						local plaqueName = `Nekros Plaque{properties.VeinLaunched}`;
-                        local plaqueModel = Instance.new("Model");
-                        plaqueModel.Name = plaqueName;
-                        plaqueModel.Parent = veinModel;
-						table.insert(plaqueObjects, plaqueModel);
+						-- local dbRay = Debugger:Ray(
+						-- 	ray, 
+						-- 	raycastResult and raycastResult.Instance,
+						-- 	raycastResult and raycastResult.Position,
+						-- 	raycastResult and raycastResult.Normal
+						-- );
+						-- dbRay.Parent = workspace;
+						-- Debugger:Expire(dbRay, 5);
 
-						local newPlaque = PLAQUE_PREFAB:Clone();
-						newPlaque.Name = "PrimaryPart";
-						newPlaque.Parent = plaqueModel;
-						newPlaque.CFrame = surfaceCenterCFrame * CFrame.new(lookVec);
-						newPlaque.Size = surfaceSize;
-                        plaqueModel.PrimaryPart = newPlaque;
-
-                        local newPlaqueDestructible: DestructibleInstance = bodyDestructiblesComp:Create(plaqueName, plaqueModel);
-						newPlaqueDestructible.OwnerStatusCompLink = true;
-
-                        newPlaqueDestructible.HealthComp:SetMaxHealth(baseHealth * 0.1);
-                        newPlaqueDestructible.HealthComp:Reset();
-
-						newPlaqueDestructible:SetupHealthbar{
-							Size = UDim2.new(1.2, 0, 0.25, 0);
-							Distance = 64;
-							OffsetWorldSpace = Vector3.new(0, 1, 0);
-							ShowLabel = false;
-						};
-						newPlaqueDestructible:SetHealthbarEnabled(true);
-                        
-                        newPlaqueDestructible.HealthComp.OnHealthChanged:Connect(function(curHealth, oldHealth, damageData)
-							if newPlaqueDestructible.HealthComp.IsDead then return end;
-							if curHealth == oldHealth then return end;
-							if damageData.Damage == nil then return end;
-
-							damageData = damageData:Clone();
-							damageData.HideBubble = true;
-
-							healthComp:TakeDamage(damageData);
-                        end)
-
-                        newPlaqueDestructible.OnDestroy:Connect(function()
-                            Debugger.Expire(plaqueModel, 2);
-                            
-                            newPlaque.Color = Color3.fromRGB(48, 30, 30);
-                            modAudio.Play("NekronHurt", newPlaque).PlaybackSpeed = math.random(50, 60)/100;
-                            
-                            local amount = baseHealth * 0.35;
-												
-							local fireStatues = npcClass.StatusComp:ListStatusWithTags{"Fire"};
-							if #fireStatues > 0 then
-								amount += baseHealth * 0.25;
+						if raycastResult == nil or raycastResult.Instance == spawnOnPart then
+							isSurfaceVisible = true;
+							break;
+						else
+							local hitPart = raycastResult.Instance;
+							if hitPart.Size.Magnitude <= 64 then
+								table.insert(excludeList, hitPart);
+								visibleRayParam.ExcludeInstances = excludeList;
+								task.wait();
+							else
+								break;
 							end
-                            
-                            healthComp:TakeDamage(DamageData.new{
-                                Damage = amount;
-                                TargetPart = newPlaque;
-                            });
-							for a=#plaqueObjects, 1, -1 do
-								if plaqueObjects[a] == plaqueModel then
-									table.remove(plaqueObjects, a);
-								end
-							end
-                        end)
-                        
-						task.spawn(function()
-							local step = 0.1;
-							local t = size/10 * step;
-							
-							local oCf = newPlaque.CFrame;
-							local eSize = surfaceSize + Vector3.new(0, 0, zSize);
-							for a=0, 1, step do
-								newPlaque.CFrame = oCf:Lerp(surfaceCenterCFrame, a);
-								newPlaque.Size = surfaceSize:Lerp(eSize, a);
-								task.wait(t);
-								if healthComp.IsDead then return end;
-							end
-						end)
-						
+						end
+					end
+				end
+
+				if not isSurfaceVisible then continue end;
+				
+				local surfaceCenterCFrame = CFrame.lookAt(
+					surfaceCf.p, 
+					(surfaceCf * CFrame.new(randomAxis*100)).Position, 
+					surfaceCf.UpVector
+				);
+				
+				local lookVec = surfaceCenterCFrame.LookVector;
+				local zSize = math.clamp((surfaceSize.X+surfaceSize.Y)/20, 1, 10);
+				
+				properties.VeinLaunched = properties.VeinLaunched +1;
+				
+				local plaqueName = `Nekros Plaque{properties.VeinLaunched}`;
+				local plaqueModel = Instance.new("Model");
+				plaqueModel.Name = plaqueName;
+				plaqueModel.Parent = veinModel;
+				table.insert(plaqueObjects, plaqueModel);
+
+				local newPlaque = PLAQUE_PREFAB:Clone();
+				newPlaque.Name = "PrimaryPart";
+				newPlaque.Parent = plaqueModel;
+				newPlaque.CFrame = surfaceCenterCFrame * CFrame.new(lookVec);
+				newPlaque.Size = surfaceSize;
+				plaqueModel.PrimaryPart = newPlaque;
+
+				local newPlaqueDestructible: DestructibleInstance = bodyDestructiblesComp:Create(plaqueName, plaqueModel);
+				newPlaqueDestructible.OwnerStatusCompLink = true;
+
+				newPlaqueDestructible.HealthComp:SetMaxHealth(baseHealth * 0.1);
+				newPlaqueDestructible.HealthComp:Reset();
+
+				newPlaqueDestructible:SetupHealthbar{
+					Size = UDim2.new(1.2, 0, 0.25, 0);
+					Distance = 64;
+					OffsetWorldSpace = Vector3.new(0, 1, 0);
+					ShowLabel = false;
+				};
+				newPlaqueDestructible:SetHealthbarEnabled(true);
+				
+				newPlaqueDestructible.HealthComp.OnHealthChanged:Connect(function(curHealth, oldHealth, damageData)
+					if newPlaqueDestructible.HealthComp.IsDead then return end;
+					if curHealth == oldHealth then return end;
+					if damageData.Damage == nil then return end;
+
+					damageData = damageData:Clone();
+					damageData.HideBubble = true;
+
+					healthComp:TakeDamage(damageData);
+				end)
+
+				newPlaqueDestructible.OnDestroy:Connect(function()
+					Debugger.Expire(plaqueModel, 2);
+					
+					newPlaque.Color = Color3.fromRGB(48, 30, 30);
+					modAudio.Play("NekronHurt", newPlaque).PlaybackSpeed = math.random(50, 60)/100;
+					
+					local amount = baseHealth * 0.35;
+										
+					local fireStatues = npcClass.StatusComp:ListStatusWithTags{"Fire"};
+					if #fireStatues > 0 then
+						amount += baseHealth * 0.25;
 					end
 					
-					break;
-				end
+					healthComp:TakeDamage(DamageData.new{
+						Damage = amount;
+						TargetPart = newPlaque;
+					});
+					for a=#plaqueObjects, 1, -1 do
+						if plaqueObjects[a] == plaqueModel then
+							table.remove(plaqueObjects, a);
+						end
+					end
+				end)
+				
+				task.spawn(function()
+					local step = 0.1;
+					local t = size/10 * step;
+					
+					local oCf = newPlaque.CFrame;
+					local eSize = surfaceSize + Vector3.new(0, 0, zSize);
+					for a=0, 1, step do
+						newPlaque.CFrame = oCf:Lerp(surfaceCenterCFrame, a);
+						newPlaque.Size = surfaceSize:Lerp(eSize, a);
+						task.wait(t);
+						if healthComp.IsDead then return end;
+					end
+				end)
+
 			end
 		end
     end

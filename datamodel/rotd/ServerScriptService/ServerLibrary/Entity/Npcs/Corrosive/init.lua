@@ -24,6 +24,7 @@ local npcPackage = {
         MoneyReward = NumberRange.new(15, 20);
 
         KnockbackResistant = 1;
+        ThornResist = 0.84;
     };
 
     AddComponents = {

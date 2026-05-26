@@ -32,6 +32,7 @@ local npcPackage = {
         SpeedRatio = 1;
 
         KnockbackResistant = 1;
+        ThornResist = 0.95;
     };
 
     Audio = {};

@@ -2,22 +2,20 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClassRotd);
 
 local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 
 local modifierPackage = {
-	Name = "Damage Reflection";
+	Name = "Thorn Plating";
 	
 	Tags = {};
 	Binds = {};
 };
 --==
+
 function modifierPackage.onRequire()
 	if RunService:IsClient() then return end;
-	if modBranchConfigurations.IsWorld("Slaughterfest") then return end;
 
 	function modifierPackage.Binds.CharacterClassTakenDamage(modifier: ItemModifierInstance, damageData: DamageData)
 		local initDamage = damageData.InitDamage;
@@ -26,16 +24,14 @@ function modifierPackage.onRequire()
 		local damageType = damageData.DamageType;
 		if damageType == "Thorn" then return end;
 
+		local damageBy: CharacterClass? = damageData.DamageBy :: CharacterClass;
+		if damageBy == nil or damageBy.ClassName ~= "NpcClass" then return end;
+		
 		local damageTo: CharacterClass? = damageData.DamageTo :: CharacterClass;
-		if damageTo == nil or damageTo.ClassName ~= "NpcClass" then return end;
-
-		if damageTo.Properties.BasicEnemy ~= true then return end;
+		if damageTo == nil then return end;
 
 		local healthCompTo: HealthComp = damageTo.HealthComp;
 		if healthCompTo.CurArmor <= 0 then return end;
-
-		local damageBy: CharacterClass? = damageData.DamageBy :: CharacterClass;
-		if damageBy == nil then return end;
 
 		if damageData.DamageCate ~= DamageData.DamageCategory.Melee then return end;
 
@@ -48,7 +44,14 @@ function modifierPackage.onRequire()
 		local healthCompBy: HealthComp = damageBy.HealthComp;
 		if healthCompBy.IsDead then return end;
 		
-		local reflectedDmg = math.max(healthCompBy.CurHealth * conDamageReflection, 10);
+		local thornResist = (damageBy.Properties.ThornResist or 1);
+		local isBasicEnemy = damageBy.Properties.BasicEnemy == true;
+		if isBasicEnemy and damageBy.Properties.ThornResist == nil then
+			thornResist = 0;
+		end
+
+		local reflect = conDamageReflection * math.clamp(1-thornResist, 0, 1);
+		local reflectedDmg = math.max(healthCompBy.CurHealth * reflect, 10);
 
 		local thornDmgData = DamageData.new{
 			Damage = reflectedDmg;

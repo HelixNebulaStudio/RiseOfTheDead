@@ -820,7 +820,6 @@ return function(CutsceneSequence)
 			modConfigurations.Set("DisableHotbar", true);
 			modConfigurations.Set("DisableInventory", true);
 			modConfigurations.Set("DisableHealthbar", true);
-			modConfigurations.Set("DisableWorkbench", true);
 			modConfigurations.Set("DisableExperiencebar", true);
 			modConfigurations.Set("DisableGeneralStats", true);
 			modConfigurations.Set("DisableHotbar", true);

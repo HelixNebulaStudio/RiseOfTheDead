@@ -55,7 +55,10 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	if not modBranchConfigurations.IsWorld("Safehome") and not RunService:IsStudio() then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
+	if shared.WorldName ~= "Safehome" and not RunService:IsStudio() then 
+		Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); 
+		return;
+	end;
 	
 	CutsceneSequence:Initialize(function()
 		local hostPlayer = CutsceneSequence:GetPlayers()[1];
@@ -129,6 +132,11 @@ return function(CutsceneSequence)
 							"BlinkTeleport";
 							"CrateReward";
 						};
+						Properties = {
+							TargetableDistance = 4096;
+							CrateId = "zenithcrate";
+							CoopId = {GroupId=factionTag; MissionId=MISSION_ID;};
+						};
 						BindSetup = function(npcClass: NpcClass)
 							npcClass.Name = "Zenith ".. tostring(pickBossName);
 
@@ -136,16 +144,12 @@ return function(CutsceneSequence)
 							configuration.BaseValues.AttackDamage = 1;
 
 							local properties = npcClass.Properties;
-							properties.TargetableDistance = 4096;
-							properties.CrateId = "zenithcrate";
-							properties.CoopId = {GroupId=factionTag; MissionId=MISSION_ID;};
-
 
 							local npcChar = npcClass.Character;
 							npcChar:SetAttribute("Soundtrack", "Soundtrack:StadiumOfDreams");
 							npcChar:SetAttribute("EntityHudHealth", true);
 
-							local maxHpVal = 5000000;
+							local maxHpVal = 5_000_000;
 							npcClass.HealthComp:SetMaxHealth(maxHpVal);
 							npcClass.HealthComp:Reset();
 							

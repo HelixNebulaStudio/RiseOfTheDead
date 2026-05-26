@@ -25,6 +25,7 @@ local npcPackage = {
 
         KnockbackResistant = 1;
         HasElectronics = true;
+        ThornResist = 0.92;
     };
 
     AddComponents = {

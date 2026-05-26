@@ -24,6 +24,7 @@ local npcPackage = {
 
         WeakPointHidden = true;
         ThreatSenseHidden = true;
+        ThornResist = 0.78;
     };
 
     AddComponents = {

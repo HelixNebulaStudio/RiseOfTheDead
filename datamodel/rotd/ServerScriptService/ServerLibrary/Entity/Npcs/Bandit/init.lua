@@ -12,6 +12,7 @@ local npcPackage = {
         ExperiencePool = 40;
         IsHostile = false;
         DropRewardId = "bandit";
+        ThornResist = 0.7;
     };
 
     Chatter = {

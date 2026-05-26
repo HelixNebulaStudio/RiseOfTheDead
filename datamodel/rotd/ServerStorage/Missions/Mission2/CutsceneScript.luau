@@ -318,7 +318,6 @@ return function(CutsceneSequence)
 		modConfigurations.Set("DisableHotbar", true);
 		modConfigurations.Set("DisableInventory", true);
 		modConfigurations.Set("DisableHealthbar", true);
-		modConfigurations.Set("DisableWorkbench", true);
 		modConfigurations.Set("DisableExperiencebar", true);
 		modConfigurations.Set("DisableGeneralStats", true);
 		modConfigurations.Set("DisableHotbar", true);
@@ -418,7 +417,6 @@ return function(CutsceneSequence)
 		modConfigurations.Set("DisableWaypointers", false);
 		modConfigurations.Set("DisableHotbar", false);
 		modConfigurations.Set("DisableInventory", false);
-		modConfigurations.Set("DisableWorkbench", false);
 		modConfigurations.Set("DisableHealthbar", false);
 		modConfigurations.Set("DisableExperiencebar", false);
 		modConfigurations.Set("DisableGeneralStats", false);

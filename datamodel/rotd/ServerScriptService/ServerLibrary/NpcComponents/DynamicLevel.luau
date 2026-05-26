@@ -35,16 +35,17 @@ end
 
 function Component:__call(callerCharacterClass: CharacterClass)
 	local npcClass: NpcClass = self.NpcClass;
+
+	local configurations: ConfigVariable = npcClass.Configurations;
+	local properties: PropertiesVariable<anydict> = npcClass.Properties;
+
 	local healthComp: HealthComp = npcClass.HealthComp;
 	if healthComp.IsDead then return end;
-	if healthComp.CurHealth < healthComp.MaxHealth then return end;
+	if healthComp.CurHealth < healthComp.MaxHealth and properties.Level then return end;
 
 	local npcPackage = npcClass.NpcPackage;
 	local dynamicLevelScaling = npcPackage.DynamicLevelScaling;
 	if dynamicLevelScaling == nil then return end;
-
-	local configurations: ConfigVariable = npcClass.Configurations;
-	local properties: PropertiesVariable<anydict> = npcClass.Properties;
 
 	local areaDifficulty = properties.AreaDifficulty or 1;
 	if properties.Level == nil and areaDifficulty == nil then
@@ -84,6 +85,7 @@ function Component:__call(callerCharacterClass: CharacterClass)
 	local level = properties.Level;
 	local maxLevel = math.round(modGlobalVars.MaxLevels/10);
 
+
 	local lvlMoveSpeed = dynamicLevelScaling.WalkSpeed;
 	if lvlMoveSpeed then
 		if type(lvlMoveSpeed) == "function" then
@@ -93,11 +95,13 @@ function Component:__call(callerCharacterClass: CharacterClass)
 		npcClass.Move:SetMoveSpeed("set", "default", lvlMoveSpeed);
 	end
 	
+
 	local lvlHealth = dynamicLevelScaling.MaxHealth;
 	if type(lvlHealth) == "function" then
 		lvlHealth = lvlHealth(level, maxLevel);
 	end
 	configurations.BaseValues.MaxHealth = lvlHealth;
+
 
 	local lvlAttackDamage = dynamicLevelScaling.AttackDamage;
 	if type(lvlAttackDamage) == "function" then
@@ -105,11 +109,13 @@ function Component:__call(callerCharacterClass: CharacterClass)
 	end
 	configurations.BaseValues.AttackDamage = lvlAttackDamage;
 
+
 	local lvlImmunity = dynamicLevelScaling.Immunity;
 	if type(lvlImmunity) == "function" then
 		lvlImmunity = lvlImmunity(level, maxLevel);
 	end
 	configurations.BaseValues.Immunity = lvlImmunity;
+
 
 	local lvlCripplingHit = dynamicLevelScaling.CripplingHit;
 	if type(lvlCripplingHit) == "function" then

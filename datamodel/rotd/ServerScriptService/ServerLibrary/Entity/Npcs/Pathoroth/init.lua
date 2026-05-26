@@ -26,6 +26,7 @@ local npcPackage = {
         ExperiencePool = 200;
         MoneyReward = {Min = 1500; Max = 1700};
         DropRewardId = "pathoroth";
+        ThornResist = 0.95;
     };
 
     Audio = {};

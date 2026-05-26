@@ -124,8 +124,15 @@ function treePackage.PlantSpore(npcClass: NpcClass)
             modAudio.Play("TicksZombieExplode", sporePart).PlaybackSpeed = math.random(50, 60)/100;
 
             if damageData == nil then return end;
+
+            local damage = sporeMaxHealth * 2;
+            local fireStatues = npcClass.StatusComp:ListStatusWithTags{"Fire"};
+            if #fireStatues > 0 then
+                damage += damage * 0.5;
+            end
+            
             npcClass.HealthComp:TakeDamage(DamageData.new{
-                Damage = sporeMaxHealth * 2;
+                Damage = damage;
                 TargetPart = sporePart;
             });
         end)

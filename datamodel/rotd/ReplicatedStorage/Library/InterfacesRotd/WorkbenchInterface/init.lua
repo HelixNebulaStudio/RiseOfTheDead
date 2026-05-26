@@ -92,19 +92,15 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	quickButton.LayoutOrder = 15;
 	interface:ConnectQuickButton(quickButton, "KeyWindowWorkbench");
 
-	task.spawn(function()
-		while modData.Profile == nil do task.wait() end;
-		interface:BindConfigKey("DisableWorkbench", {workbenchWindow}, nil, function()
-			return modData.Profile == nil 
-				or modData.Profile.GamePass == nil 
-				or modData.Profile.GamePass.PortableWorkbench == nil;
-		end)
+	interface.Scheduler.OnStepped:Connect(function(tickData: TickData)
+		if tickData.ms1000 ~= true then return end;
+
+		if modData.Profile and modData.Profile.GamePass and modData.Profile.GamePass.PortableWorkbench then
+			quickButton.Visible = true;
+		else
+			quickButton.Visible = false;
+		end
 	end)
-	interface:BindConfigKey("DisableWorkbench", {workbenchWindow}, nil, function()
-		return modData.Profile == nil 
-			or modData.Profile.GamePass == nil 
-			or modData.Profile.GamePass.PortableWorkbench == nil;
-	end);
 	workbenchWindow:AddCloseButton(workbenchFrame);
 
 	

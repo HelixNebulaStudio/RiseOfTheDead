@@ -36,6 +36,7 @@ local npcPackage = {
         ExperiencePool = 1000;
         MoneyReward = NumberRange.new(1500, 1700);
         DropRewardId = "heavy";
+        ThornResist = 0.95;
     };
 
     Audio = {

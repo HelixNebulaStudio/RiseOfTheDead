@@ -24,6 +24,7 @@ local npcPackage = {
         MoneyReward = NumberRange.new(15, 20);
 
         KnockbackResistant = 1;
+        ThornResist = 0.86;
     };
 
     Audio={
@@ -45,7 +46,7 @@ end
 
 function npcPackage.Spawning(npcClass: NpcClass)
     local configurations: ConfigVariable = npcClass.Configurations;
-    local properties: PropertiesVariable<{}> = npcClass.Properties;
+    local properties: PropertiesVariable<anydict> = npcClass.Properties;
 
     local level = math.max(properties.Level, 0);
 

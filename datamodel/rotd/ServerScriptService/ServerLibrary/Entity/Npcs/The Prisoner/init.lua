@@ -20,6 +20,7 @@ local npcPackage = {
         Level = 1;
         ExperiencePool = 20;
         MoneyReward = NumberRange.new(15, 20);
+        ThornResist = 0.8;
     };
 
     AddComponents = {
