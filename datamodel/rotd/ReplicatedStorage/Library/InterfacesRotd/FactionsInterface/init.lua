@@ -4,6 +4,7 @@ local RunService = game:GetService("RunService");
 local TweenService = game:GetService("TweenService");
 local TextService = game:GetService("TextService");
 local UserInputService = game:GetService("UserInputService");
+local GuiService = game:GetService("GuiService");
 
 local localPlayer = game.Players.LocalPlayer;
 
@@ -458,7 +459,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		clearMissionPage();
 
 		if missionMenuPage == "ActiveMission1" or missionMenuPage == "ActiveMission2" or missionMenuPage == "ActiveMission3" then
-			local missionIndex = missionMenuPage == "ActiveMission1" and 1 or missionMenuPage == "ActiveMission2" and 2 or missionMenuPage == "ActiveMission3" and 3
+			local missionIndex = missionMenuPage == "ActiveMission1" and 1
+							  or missionMenuPage == "ActiveMission2" and 2
+							  or missionMenuPage == "ActiveMission3" and 3;
 
 			local missionInfo = missionData.Active[missionIndex];
 			if missionInfo then
@@ -1478,8 +1481,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		end)
 	end
 	
-	interface.Garbage:Tag(centerMissionsFrame.PublicMissions.Content1.InputBegan:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+	local content1 = centerMissionsFrame.PublicMissions.Content1;
+	interface.Garbage:Tag(content1.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 
+		or input.UserInputType == Enum.UserInputType.Touch then
 			interface:PlayButtonClick();
 			missionMenuPage = "ActiveMission1";
 			updateMissionPage();
@@ -1487,8 +1492,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 		end
 	end))
+
+	local content2 = centerMissionsFrame.PublicMissions.Content2;
 	interface.Garbage:Tag(centerMissionsFrame.PublicMissions.Content2.InputBegan:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		if input.UserInputType == Enum.UserInputType.MouseButton1 
+		or input.UserInputType == Enum.UserInputType.Touch then
 			interface:PlayButtonClick();
 			missionMenuPage = "ActiveMission2";
 			updateMissionPage();
@@ -1496,8 +1504,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 		end
 	end))
+
+	local content3 = centerMissionsFrame.PublicMissions.Content3;
 	interface.Garbage:Tag(centerMissionsFrame.PublicMissions.Content3.InputBegan:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		if input.UserInputType == Enum.UserInputType.MouseButton1 
+		or input.UserInputType == Enum.UserInputType.Touch then
 			interface:PlayButtonClick();
 			missionMenuPage = "ActiveMission3";
 			updateMissionPage();
@@ -1505,17 +1516,70 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 		end
 	end))
-
+	
 	interface.Garbage:Tag(centerMissionsFrame.InputBegan:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-			if centerFrameState ~= centerMissionsFrame.Name then
-				centerFrameState = centerMissionsFrame.Name;
+		if input.UserInputType == Enum.UserInputType.MouseButton1 
+		or input.UserInputType == Enum.UserInputType.Touch then
+			if centerFrameState == centerMissionsFrame.Name then return end;
+			centerFrameState = centerMissionsFrame.Name;
 
-				interface:PlayButtonClick();
+			interface:PlayButtonClick();
 
-				expandMissionFrame();
-				updateMissionPage();
+			expandMissionFrame();
+			updateMissionPage();
+		end
+	end))
+
+	interface.Garbage:Tag(UserInputService.InputBegan:Connect(function(inputObject: InputObject)
+		if not interface.isPreferringGamepad() then return end;
+
+		if inputObject.KeyCode ~= Enum.KeyCode.ButtonA then return end;
+		
+		local selectionObj = GuiService.SelectedObject;
+		
+		local factionData = modData.FactionData;
+		if factionData and factionData.Missions then 
+			local missionData = factionData.Missions;
+
+			if selectionObj == content1 and missionData.Active[1] == nil then
+				selectionObj = centerMissionsFrame;
+			elseif selectionObj == content2 and missionData.Active[2] == nil then
+				selectionObj = centerMissionsFrame;
+			elseif selectionObj == content3 and missionData.Active[3] == nil then
+				selectionObj = centerMissionsFrame;
 			end
+		else
+			selectionObj = centerMissionsFrame;
+		end;
+
+		if selectionObj == content1 then
+			interface:PlayButtonClick();
+			missionMenuPage = "ActiveMission1";
+			updateMissionPage();
+			onActiveMissionSelect(1);
+
+		elseif selectionObj == content2 then
+			interface:PlayButtonClick();
+			missionMenuPage = "ActiveMission2";
+			updateMissionPage();
+			onActiveMissionSelect(2);
+
+		elseif selectionObj == content3 then
+			interface:PlayButtonClick();
+			missionMenuPage = "ActiveMission3";
+			updateMissionPage();
+			onActiveMissionSelect(3);
+
+		end 
+		
+		if selectionObj == centerMissionsFrame then
+			if centerFrameState == centerMissionsFrame.Name then return end;
+			centerFrameState = centerMissionsFrame.Name;
+
+			interface:PlayButtonClick();
+
+			expandMissionFrame();
+			updateMissionPage();
 		end
 	end))
 
@@ -2065,11 +2129,18 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local mouseEventForButtons = {bannerNavMenuButton; bannerNavChatButton; bannerNavLeaderboardsButton; bannerNavSettingsButton;};
 	for a=1, #mouseEventForButtons do
 		local imageButton = mouseEventForButtons[a];
-		imageButton.MouseEnter:Connect(function()
-			imageButton.ImageColor3 = branchColor;
-		end)
-		imageButton.MouseLeave:Connect(function()
-			imageButton.ImageColor3 = Color3.fromRGB(255,255,255);
+		-- imageButton.MouseEnter:Connect(function()
+		-- 	imageButton.ImageColor3 = branchColor;
+		-- end)
+		-- imageButton.MouseLeave:Connect(function()
+		-- 	imageButton.ImageColor3 = Color3.fromRGB(255,255,255);
+		-- end)
+		imageButton:GetPropertyChangedSignal("GuiState"):Connect(function()
+			if imageButton.GuiState == Enum.GuiState.Hover then
+				imageButton.ImageColor3 = branchColor;
+			else
+				imageButton.ImageColor3 = Color3.fromRGB(255,255,255);
+			end
 		end)
 	end
 
@@ -2115,9 +2186,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 	local function memberFrameMouseEnter() mouseOnMemberFrame = true; binds.MemberFrameLayout() end
 	local function memberFrameMouseLeave() mouseOnMemberFrame = false; binds.MemberFrameLayout() end
-	memberFrame.MouseEnter:Connect(memberFrameMouseEnter)
-	memberFrame.MouseMoved:Connect(memberFrameMouseEnter)
-	memberFrame.MouseLeave:Connect(memberFrameMouseLeave);
+	memberFrame:GetPropertyChangedSignal("GuiState"):Connect(function()
+		if memberFrame.GuiState == Enum.GuiState.Hover then
+			memberFrameMouseEnter();
+		else
+			memberFrameMouseLeave();
+		end
+	end)
 
 	remoteFactionService.OnClientInvoke = function(action, ...)
 		if action == "sync" then
@@ -2322,7 +2397,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					radialBarLabel.ImageColor3 = BAR_COLORS.Green;
 				end
 					
-				if UserInputService.TouchEnabled then
+				if UserInputService.TouchEnabled or interface.isPreferringGamepad() then
 					statLabel.Visible = true;
 				else
 					radialBarLabel.MouseEnter:Connect(function()

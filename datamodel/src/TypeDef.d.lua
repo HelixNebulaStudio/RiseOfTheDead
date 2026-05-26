@@ -71,14 +71,15 @@ export type MODIFIER_BIND_KEY<U> = U
     | "CharacterClassTakenDamage" -- After CC has taken damage <params> damageData: DamageData
     | "CharacterClassIsSlidingChanged"
     | "CharacterClassIsFocusedChanged"
-    | "DeathHandler"
+    | "DeathHandler" -- [C/S] <params> npcClass: NpcClass, damageData: DamageData
+    | "GunPullTrigger" -- [C/S] Before rpm calc <params> changeRef: anydict
+    | "MeleeDamageDataNew" -- [C/S] <params> damageData: DamageData
     | "WeaponRenderStepped" -- [C] <params> toolHud: anydict
     | "WeaponShotDamageDataNew" -- [S] <params> damageData: DamageData
     | "WeaponShotPreProcess" -- [C/S] Before shot&ammo is processed <params> shotPacket: anydict
     | "WeaponShotBulletHit" -- [C/S] <params> bulletData: BulletHitData
     | "WeaponShotProjectileNew" -- [S] On projectile instance <params> projectile: ProjectileInstance
     | "WeaponShotProjectileHit" -- [S] On arc tracer contact <params> projectile: ProjectileInstance, arcPoint: ArcPoint
-    | "GunPullTrigger" -- [C/S] Before rpm calc <params> changeRef: anydict
     ; 
 
 --MARK: shared
@@ -742,6 +743,7 @@ export type AnimationController = {
 --MARK: NpcClasses
 export type NpcClasses = {
     -- @static
+    HumanoidTypesList: {string};
     ActiveNpcClasses: {NpcClass};
     NpcBaseConstructors: anydict;
     Octree: Octree<NpcClass>;
@@ -883,7 +885,7 @@ export type NpcClass = CharacterClass & {
     -- @dev
     GetImmunity: (NpcClass, damageType: string?, damageCategory: string?) -> number; 
     Status: any;
-    CustomHealthbar: anydict;
+    
     KnockbackResistant: any;
     BleedResistant: any;
     SpawnTime: number;
@@ -1038,6 +1040,7 @@ export type Interface = {
         OnNewButton: anyfunc?;
     }, newButtonTemplate: GuiObject?) -> DropdownList;
     beautifyNumber: (number) -> string;
+    isPreferringGamepad: () -> boolean;
 
     -- @properties;
     ActiveScale: number;
@@ -1070,6 +1073,11 @@ export type Interface = {
 
         IsSpectating: boolean;
         IsDeathScreen: boolean;
+
+        TopClosableWindow: InterfaceWindow?;
+
+        LeftThumbstick: Vector2;
+        RightThumbstick: Vector2;
     }>;
 
     Colors: {
@@ -1520,6 +1528,7 @@ export type DestructibleInstance = {
     DestructibleOwner: Instance?;
     
     DebrisName: string;
+    OwnerStatusCompLink: boolean;
 
     PathfindingModifier: PathfindingModifier;
     HealthbarHud: BillboardGui;
@@ -1911,6 +1920,7 @@ export type HealthComp = {
     LastReset: number?;
     FirstDamageTaken: number?;
     LastDamagedBy: EntityClass?;
+    LastDamageData: DamageData?;
     
     LastDamageTaken: number;
     LastArmorDamageTaken: number;
@@ -1982,7 +1992,6 @@ export type WieldComp = {
         Mouse1Down: boolean;
         [string]: boolean;
     };
-    TargetableTags: {[string]: boolean};
 
     ToolHandler: ToolHandlerInstance?;
     StorageItem: StorageItem?;
@@ -2017,6 +2026,16 @@ export type WieldComp = {
     -- @signal
     OnWieldEvent: EventSignal<string>;
 }
+
+export type ToolInputData = {
+	Siid: string;
+	InputState: ("Begin" | "End");
+	InputObject: InputObject;
+	KeyIds: {[string]: boolean};
+	KeyCode: Enum.KeyCode;
+
+    Values: anydict;
+};
 
 --MARK: ZScript
 export type ZScript = {

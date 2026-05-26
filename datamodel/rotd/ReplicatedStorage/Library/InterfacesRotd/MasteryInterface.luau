@@ -3,6 +3,8 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local RunService = game:GetService("RunService");
 local TextService = game:GetService("TextService");
 local UserInputService = game:GetService("UserInputService");
+local TweenService = game:GetService("TweenService");
+local GuiService = game:GetService("GuiService");
 
 local localPlayer = game.Players.LocalPlayer;
 
@@ -79,24 +81,36 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     local isDragging = false;
     local dragStartVector = Vector2.new();
     local treeFrameOffset = Vector2.new();
-
+    local HideDescription;
 
     --==
     local treeTypesButtons = {treeFrame.offensive; treeFrame.defensive; treeFrame.synergy};
     for _, button in pairs(treeTypesButtons) do
-        button.MouseMoved:Connect(function()
-            for a=1, #treeTypesButtons do
-                local b = treeTypesButtons[a];
-                local buttonColor = b.Name == "offensive" and Color3.fromRGB(255, 60, 60)
-                                    or b.Name == "defensive" and Color3.fromRGB(27, 106, 23)
-                                    or b.Name == "synergy" and Color3.fromRGB(54, 104, 241)
-                b.ImageColor3 = b==button and buttonColor or Color3.fromRGB(255, 255, 255);
-                b.TextLabel.Visible = b==button;
+        button:GetPropertyChangedSignal("GuiState"):Connect(function()
+            if button.GuiState == Enum.GuiState.Hover then
+                for a=1, #treeTypesButtons do
+                    local b = treeTypesButtons[a];
+                    local buttonColor = b.Name == "offensive" and Color3.fromRGB(255, 60, 60)
+                                        or b.Name == "defensive" and Color3.fromRGB(27, 106, 23)
+                                        or b.Name == "synergy" and Color3.fromRGB(54, 104, 241)
+                    b.ImageColor3 = b==button and buttonColor or Color3.fromRGB(255, 255, 255);
+                    b.TextLabel.Visible = b==button;
+                end
+                
+                if interface.isPreferringGamepad() then
+                    if HideDescription then HideDescription(); end;
+
+                    local offset = treeFrame.Center.AbsolutePosition - button.AbsolutePosition;
+                    TweenService:Create(treeFrame, TweenInfo.new(0.1), {
+                        Position = UDim2.new(0.5, offset.X, 0.5, offset.Y);
+                    }):Play();
+                end
+
+            else
+                button.ImageColor3 = Color3.fromRGB(255, 255, 255);
+                button.TextLabel.Visible = false;
+
             end
-        end)
-        button.MouseLeave:Connect(function()
-            button.ImageColor3 = Color3.fromRGB(255, 255, 255);
-            button.TextLabel.Visible = false;
         end)
     end
 
@@ -178,7 +192,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     local SkillButton = {};
     SkillButton.__index = SkillButton;
 
-    local function HideDescription()
+    HideDescription = function()
         descriptionFrame.Visible = false;
         SkillButton.DescId = nil;
         for a=1, #TreeMenu do
@@ -387,7 +401,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             
             local holdDownDelete = false;
             deleteButton.InputBegan:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                if input.UserInputType == Enum.UserInputType.MouseButton1 
+                or input.UserInputType == Enum.UserInputType.Touch
+                or (input.KeyCode == Enum.KeyCode.ButtonA and GuiService.SelectedObject == deleteButton) then
                     holdDownDelete = true;
                     
                     local startTick = tick();
@@ -408,12 +424,19 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                         new:Destroy(); --templatePageOption
                         window:Update();
                         LoadDropDown();
+                        
+                        if interface.isPreferringGamepad() then
+                            GuiService.SelectedObject = dropDownButton;
+                        end
+
                         debounce = false;
                     end
                 end
             end)
             deleteButton.InputEnded:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                if input.UserInputType == Enum.UserInputType.MouseButton1 
+                or input.UserInputType == Enum.UserInputType.Touch
+                or input.KeyCode == Enum.KeyCode.ButtonA then
                     holdDownDelete = false;
                 end
             end)
@@ -448,6 +471,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             window:Update();
             LoadDropDown();
             pageList.Visible = false;
+
+            if interface.isPreferringGamepad() then
+                GuiService.SelectedObject = dropDownButton;
+            end
+
             debounce = false;
         end)
         
@@ -487,11 +515,20 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     --		TogglePageButtons();
     --	end)
         
-        self.Button.MouseMoved:Connect(function()
-            selectedId = lib.Id;
-            if SkillButton.DescId ~= selectedId then
-                SkillButton.DescId = selectedId;
-                UpdateDescription(self.Button);
+        self.Button:GetPropertyChangedSignal("GuiState"):Connect(function()
+            if self.Button.GuiState == Enum.GuiState.Hover then
+                selectedId = lib.Id;
+                if SkillButton.DescId ~= selectedId then
+                    SkillButton.DescId = selectedId;
+                    UpdateDescription(self.Button);
+                end
+
+                if interface.isPreferringGamepad() then
+                    local offset = treeFrame.Center.AbsolutePosition - self.Button.AbsolutePosition;
+                    TweenService:Create(treeFrame, TweenInfo.new(0.1), {
+                        Position = UDim2.new(0.5, offset.X, 0.5, offset.Y);
+                    }):Play();
+                end
             end
         end)
         
@@ -530,7 +567,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         end
         
         
-        if UserInputService.TouchEnabled then
+        if UserInputService.TouchEnabled or interface.isPreferringGamepad() then
             local plus = true;
             self.Button.MouseButton1Click:Connect(function()
                 if descriptionFrame and descriptionFrame.Visible and selectedId == lib.Id then
@@ -604,12 +641,25 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             local disabled = playerLevel < lib.Level;
             
             local newSkillButton = SkillButton.new(lib, disabled);
+            local button: ImageButton = newSkillButton.Button;
+
             if lib.Id == selectedId then
-                UpdateDescription(newSkillButton.Button);
+                UpdateDescription(button);
             end
             table.insert(TreeMenu, newSkillButton);
-            newSkillButton.Button.Name = lib.Id;
-            newSkillButton.Node = nodeMenu:NewNode(newSkillButton.Button, lib.Id, lib.Link or treeType, index);
+            button.Name = lib.Id;
+            newSkillButton.Node = nodeMenu:NewNode(button, lib.Id, lib.Link or treeType, index);
+            
+            if index == 1 and treeType == "Endurance" then
+                button.NextSelectionRight = treeFrame.defensive;
+                treeFrame.defensive.NextSelectionLeft = button;
+            elseif index == 1 and treeType == "Authority" then
+                button.NextSelectionUp = treeFrame.offensive;
+                treeFrame.offensive.NextSelectionDown = button;
+            elseif index == 1 and treeType == "Synergy" then
+                button.NextSelectionLeft = treeFrame.synergy;
+                treeFrame.synergy.NextSelectionRight = button;
+            end
         end
         
         for a=1, #authTreeList do
@@ -621,7 +671,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         for a=1, #syneTreeList do
             generateTreeNode("Synergy", syneTreeList[a], a);
         end
-        
+
         nodeMenu:UpdateNodeTree();
         local hiddenLinkFrames = {authPointNode.LinkFrame; enduPointNode.LinkFrame; synePointNode.LinkFrame; authNode.LinkFrame; enduNode.LinkFrame; syneNode.LinkFrame;};
         for a=1, #hiddenLinkFrames do if hiddenLinkFrames[a] and hiddenLinkFrames[a].Visible then hiddenLinkFrames[a].Visible = false; end end;

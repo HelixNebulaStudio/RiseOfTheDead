@@ -1526,7 +1526,7 @@ MissionLibrary.New{
 	Persistent=true;
 	Progression={
 		"Talk to Mike to travel to Wrighton Dale Prison";
-		"Complete survival waves";
+		"Reach Wave 5 in Survival: The Prison";
 		"Search for the lucky coin in every jail cells";
 		"Bring it back to Mike";
 	};
