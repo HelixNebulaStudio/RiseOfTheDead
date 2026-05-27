@@ -64,8 +64,8 @@ function WorldCore.InitGameController()
     function newGameController:BindWorldCoreEnemySpawn(npcClass: NpcClass)
         local npcChar = npcClass.Character;
         if npcChar.Name ~= "Zombie"
-            and npcChar.Name ~= "Leaper Zombie"
-            and npcChar.Name ~= "Heavy Zombie" then return end;
+            and npcChar.Name ~= "Leaper"
+            and npcChar.Name ~= "Heavy" then return end;
         
         local shirtList = {
             "rbxassetid://2240854863";

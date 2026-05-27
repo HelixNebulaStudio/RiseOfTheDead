@@ -74,6 +74,7 @@ function toolPackage.inherit(packet)
 				StoragePresetId = "lootcrate";
 
 				EmptyLabel = "Empty Chest";
+				ExpireDuration = 150;
 			};
 		end
 	end)

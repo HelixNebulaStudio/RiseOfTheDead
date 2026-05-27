@@ -340,6 +340,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 local _enemySort = {
                     ["Zombie"]=1;
                     ["Leaper Zombie"]=2;
+                    ["Leaper"]=2;
                     ["Ticks Zombie"]=3;
                     ["Ticks"]=3;
                     ["Heavy Zombie"]=4;

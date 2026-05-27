@@ -6,13 +6,13 @@ local modCrateLibrary = shared.require(game.ReplicatedStorage.Library.CrateLibra
 function modCrateLibrary.onRequire()
 	-- MARK: Test
 	modCrateLibrary.New{
-		Id="donation";
-		Name="The Void Crate";
-		PrefabName="Crate";
-		RewardsId={
+		Id = "donation";
+		Name = "The Void Crate";
+		PrefabName = "Crate";
+		RewardsId = {
 			{ItemId="largemedkit"; Chance=100;};
 		};
-		Configurations={
+		Configurations = {
 			Persistent=false;
 			Settings={
 				DepositOnly=true;
@@ -22,217 +22,235 @@ function modCrateLibrary.onRequire()
 	};
 
 	modCrateLibrary.New{
-		Id="raresunkencrate";
-		Name="Eaten Sunken Crate";
-		PrefabName="Raresunkenchest";
-		RewardsId="empty";
-		StoragePresetId="lootcrate";
+		Id = "raresunkencrate";
+		Name = "Eaten Sunken Crate";
+		PrefabName = "Raresunkenchest";
+		RewardsId = "empty";
+		StoragePresetId = "lootcrate";
 	
-		EmptyLabel="Empty Crate";
+		EmptyLabel = "Empty Crate";
 	};
 
 	-- MARK: Crate Rewards
 	modCrateLibrary.New{
-		Id="prisoner";
-		Name="The Prisoner Crate";
-		PrefabName="Crate";
-		RewardsId="prisoner";
-		StoragePresetId="rewardcrate";
+		Id = "prisoner";
+		Name = "The Prisoner Crate";
+		PrefabName = "Crate";
+		RewardsId = "prisoner";
+		StoragePresetId = "rewardcrate";
+		ExpireDuration = 150;
 	};
 	
 	modCrateLibrary.New{
-		Id="tanker";
-		Name="The Tanker Crate";
-		PrefabName="Crate";
-		RewardsId="tanker";
-		StoragePresetId="rewardcrate";
+		Id = "tanker";
+		Name = "The Tanker Crate";
+		PrefabName = "Crate";
+		RewardsId = "tanker";
+		StoragePresetId = "rewardcrate";
+		ExpireDuration = 150;
 	};
 	
 	modCrateLibrary.New{
-		Id="fumes";
-		Name="The Fumes Crate";
-		PrefabName="Crate";
-		RewardsId="fumes";
-		StoragePresetId="rewardcrate";
+		Id = "fumes";
+		Name = "The Fumes Crate";
+		PrefabName = "Crate";
+		RewardsId = "fumes";
+		StoragePresetId = "rewardcrate";
+		ExpireDuration = 150;
 	};
 	
 	modCrateLibrary.New{
-		Id="corrosive";
-		Name="The Corrosive Crate";
-		PrefabName="Crate";
-		RewardsId="corrosive";
-		StoragePresetId="rewardcrate";
+		Id = "corrosive";
+		Name = "The Corrosive Crate";
+		PrefabName = "Crate";
+		RewardsId = "corrosive";
+		StoragePresetId = "rewardcrate";
+		ExpireDuration = 150;
 	};
 	
 	modCrateLibrary.New{
-		Id="zpider";
-		Name="The Zpider Crate";
-		PrefabName="Crate";
-		RewardsId="zpider";
-		StoragePresetId="rewardcrate";
+		Id = "zpider";
+		Name = "The Zpider Crate";
+		PrefabName = "Crate";
+		RewardsId = "zpider";
+		StoragePresetId = "rewardcrate";
+		ExpireDuration = 150;
 	};
 	
 	modCrateLibrary.New{
-		Id="shadow";
-		Name="The Shadow Crate";
-		PrefabName="Crate";
-		RewardsId="shadow";
-		StoragePresetId="rewardcrate";
+		Id = "shadow";
+		Name = "The Shadow Crate";
+		PrefabName = "Crate";
+		RewardsId = "shadow";
+		StoragePresetId = "rewardcrate";
+		ExpireDuration = 150;
 	};
 	
 	modCrateLibrary.New{
-		Id="zomborg";
-		Name="The Zomborg Crate";
-		PrefabName="Crate";
-		RewardsId="zomborg";
-		StoragePresetId="rewardcrate";
+		Id = "zomborg";
+		Name = "The Zomborg Crate";
+		PrefabName = "Crate";
+		RewardsId = "zomborg";
+		StoragePresetId = "rewardcrate";
+		ExpireDuration = 150;
 	};
 	
 	modCrateLibrary.New{
-		Id="billies";
-		Name="The Billies Crate";
-		PrefabName="Crate2";
-		RewardsId="billies";
-		StoragePresetId="rewardcrate";
+		Id = "billies";
+		Name = "The Billies Crate";
+		PrefabName = "Crate2";
+		RewardsId = "billies";
+		StoragePresetId = "rewardcrate";
+		ExpireDuration = 150;
 	};
 	
 	modCrateLibrary.New{
-		Id="hectorshot";
-		Name="Hector Shot Crate";
-		PrefabName="Crate2";
-		RewardsId="hectorshot";
+		Id = "hectorshot";
+		Name = "Hector Shot Crate";
+		PrefabName = "Crate2";
+		RewardsId = "hectorshot";
 		
-		EmptyLabel="Empty";
-		StoragePresetId="rewardcrate";
+		EmptyLabel = "Empty";
+		StoragePresetId = "rewardcrate";
+		ExpireDuration = 150;
 	};
 	
 	modCrateLibrary.New{
-		Id="zomborgprime";
-		Name="Zomborg Prime Crate";
-		PrefabName="Crate2";
-		RewardsId="zomborgprime";
+		Id = "zomborgprime";
+		Name = "Zomborg Prime Crate";
+		PrefabName = "Crate2";
+		RewardsId = "zomborgprime";
 	
-		EmptyLabel="Empty";
-		StoragePresetId="rewardcrate";
+		EmptyLabel = "Empty";
+		StoragePresetId = "rewardcrate";
+		ExpireDuration = 150;
 	};
 
 	modCrateLibrary.New{
-		Id="zricera";
-		Name="The Zricera Crate";
-		PrefabName="Crate2";
-		RewardsId="zricera";
-		StoragePresetId="rewardcrate";
+		Id = "zricera";
+		Name = "The Zricera Crate";
+		PrefabName = "Crate2";
+		RewardsId = "zricera";
+		StoragePresetId = "rewardcrate";
+		ExpireDuration = 150;
 	};
 	
 	modCrateLibrary.New{
-		Id="vexeron";
-		Name="The Vexeron Crate";
-		PrefabName="Crate2";
-		RewardsId="vexeron";
-		StoragePresetId="rewardcrate";
+		Id = "vexeron";
+		Name = "The Vexeron Crate";
+		PrefabName = "Crate2";
+		RewardsId = "vexeron";
+		StoragePresetId = "rewardcrate";
+		ExpireDuration = 150;
 	};
 	
 	modCrateLibrary.New{
-		Id="mothena";
-		Name="Mothena Crate";
-		PrefabName="Crate2";
-		RewardsId="mothena";
-		StoragePresetId="rewardcrate";
+		Id = "mothena";
+		Name = "Mothena Crate";
+		PrefabName = "Crate2";
+		RewardsId = "mothena";
+		StoragePresetId = "rewardcrate";
+		ExpireDuration = 150;
 	};
 	
 	modCrateLibrary.New{
-		Id="pathoroth";
-		Name="Pathoroth Crate";
-		PrefabName="Crate2";
-		RewardsId="pathoroth";
-		StoragePresetId="rewardcrate";
+		Id = "pathoroth";
+		Name = "Pathoroth Crate";
+		PrefabName = "Crate2";
+		RewardsId = "pathoroth";
+		StoragePresetId = "rewardcrate";
+		ExpireDuration = 150;
 	};
 	
 	modCrateLibrary.New{
-		Id="banditheli";
-		Name="The Bandit Helicopter Crate";
-		PrefabName="Crate2";
-		RewardsId="banditheli";
-		StoragePresetId="rewardcrate";
+		Id = "banditheli";
+		Name = "The Bandit Helicopter Crate";
+		PrefabName = "Crate2";
+		RewardsId = "banditheli";
+		StoragePresetId = "rewardcrate";
+		ExpireDuration = 150;
 	};
 	
 	modCrateLibrary.New{
-		Id="veinofnekron";
-		Name="Vein Of Nekron Crate";
-		PrefabName="Crate2";
-		RewardsId="veinofnekron";
-		StoragePresetId="rewardcrate";
+		Id = "veinofnekron";
+		Name = "Vein Of Nekron Crate";
+		PrefabName = "Crate2";
+		RewardsId = "veinofnekron";
+		StoragePresetId = "rewardcrate";
+		ExpireDuration = 150;
 	};
 
 	modCrateLibrary.New{
-		Id="zenithcrate";
-		Name="Zeniths Reward Crate";
-		PrefabName="Crate4";
-		RewardsId="zenithcrate";
-		StoragePresetId="rewardcrate";
-		EmptyLabel="Empty Crate";
+		Id = "zenithcrate";
+		Name = "Zeniths Reward Crate";
+		PrefabName = "Crate4";
+		RewardsId = "zenithcrate";
+		StoragePresetId = "rewardcrate";
+		EmptyLabel = "Empty Crate";
+		ExpireDuration = 150;
 	};
 
 	modCrateLibrary.New{
-		Id="wintertreelum";
-		Name="Winter Treelum Crate";
-		PrefabName="WinterCrate";
-		RewardsId="wintertreelum";
+		Id = "wintertreelum";
+		Name = "Winter Treelum Crate";
+		PrefabName = "WinterCrate";
+		RewardsId = "wintertreelum";
 	
-		EmptyLabel="Empty";
-		StoragePresetId="rewardcrate";
+		EmptyLabel = "Empty";
+		StoragePresetId = "rewardcrate";
+		ExpireDuration = 150;
 	};
 	
 
 	-- MARK: Safehouse Gifts
 	modCrateLibrary.New{
-		Id="sundaysGift";
-		Name="Sunday's Gift";
-		PrefabName="Crate";
-		RewardsId="sundaysGift";
-		StoragePresetId="giftcrate";
+		Id = "sundaysGift";
+		Name = "Sunday's Gift";
+		PrefabName = "Crate";
+		RewardsId = "sundaysGift";
+		StoragePresetId = "giftcrate";
 	};
 
 	modCrateLibrary.New{
-		Id="underbridgeGift";
-		Name="Underbridge's Gift";
-		PrefabName="Crate";
-		RewardsId="underbridgeGift";
-		StoragePresetId="giftcrate";
+		Id = "underbridgeGift";
+		Name = "Underbridge's Gift";
+		PrefabName = "Crate";
+		RewardsId = "underbridgeGift";
+		StoragePresetId = "giftcrate";
 	};
 
 	modCrateLibrary.New{
-		Id="mallGift";
-		Name="Mall's Gift";
-		PrefabName="Crate";
-		RewardsId="mallGift";
-		StoragePresetId="giftcrate";
-	};
-
-
-	modCrateLibrary.New{
-		Id="clinicGift";
-		Name="Clinic's Gift";
-		PrefabName="Crate";
-		RewardsId="clinicGift";
-		StoragePresetId="giftcrate";
+		Id = "mallGift";
+		Name = "Mall's Gift";
+		PrefabName = "Crate";
+		RewardsId = "mallGift";
+		StoragePresetId = "giftcrate";
 	};
 
 
 	modCrateLibrary.New{
-		Id="harborGift";
-		Name="Harbor's Gift";
-		PrefabName="Crate";
-		RewardsId="harborGift";
-		StoragePresetId="giftcrate";
+		Id = "clinicGift";
+		Name = "Clinic's Gift";
+		PrefabName = "Crate";
+		RewardsId = "clinicGift";
+		StoragePresetId = "giftcrate";
+	};
+
+
+	modCrateLibrary.New{
+		Id = "harborGift";
+		Name = "Harbor's Gift";
+		PrefabName = "Crate";
+		RewardsId = "harborGift";
+		StoragePresetId = "giftcrate";
 	};
 	
 	modCrateLibrary.New{
-		Id="residentialGift";
-		Name="Residential's Gift";
-		PrefabName="Crate";
-		RewardsId="residentialGift";
-		StoragePresetId="giftcrate";
+		Id = "residentialGift";
+		Name = "Residential's Gift";
+		PrefabName = "Crate";
+		RewardsId = "residentialGift";
+		StoragePresetId = "giftcrate";
 	};
 end
 

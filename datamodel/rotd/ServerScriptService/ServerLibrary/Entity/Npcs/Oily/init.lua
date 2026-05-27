@@ -139,6 +139,7 @@ function npcPackage.Spawning(npcClass: NpcClass)
         if damageData.DamageType == "Fire" then return end;
         if properties.Ignited == true then return end;
         properties.Ignited = true;
+        properties.Immunity = nil;
 
         for _, obj in pairs(npcClass.Character:GetChildren()) do
 			if obj:GetAttribute("BodyLayer") ~= true then continue end;

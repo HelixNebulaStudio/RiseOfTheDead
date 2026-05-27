@@ -621,7 +621,7 @@ function Survival:NewWaveSelect()
 				if rewardInfo.Wave ~= self.Wave then continue end;
 
 				local cloneRewardInfo = table.clone(rewardInfo);
-				cloneRewardInfo.Chance = 1;
+				cloneRewardInfo.Chance = 2;
 				cloneRewardInfo.DropTableId = dropTableId;
 				table.insert(customRewardsTable, cloneRewardInfo);
 			end
@@ -966,7 +966,7 @@ function Survival:StartWave(wave)
 	end
 
 	local hazardTitle = (newHazard and newHazard.Title or "None");
-	shared.Notify(game.Players:GetPlayers(), "Wave ".. self.Wave ..", Objective: ".. newObjective.Title ..", Hazard: ".. hazardTitle, "Important");
+	shared.Notify(game.Players:GetPlayers(), `Wave {self.Wave}, Objective: {newObjective.Title}, Hazard: {hazardTitle}`, "Important");
 
 	self:Hud{
 		HeaderText = `Wave {self.Wave}`;
@@ -1089,7 +1089,7 @@ function Survival:StartWave(wave)
 						local profile = shared.modProfile:Get(player);
 						local storages = profile:GetCacheStorages();
 						
-						local storage: Storage = storages[player] or self.Storages[player];
+						local storage: Storage = storages[STORAGE_ID] or self.Storages[player];
 						if storage == nil then
 							storage = shared.modStorage.new(STORAGE_ID, "rewardcrate", player, "Survival Rewards");
 							storage.Properties.ItemSpawn = true;

@@ -26,9 +26,9 @@ function WorldCore.InitGameController()
 
     newGameController.EnemiesList = {
         {Name="Zombie"; Chance=100;};
-        {Name="Ticks Zombie"; Chance=50; Fmod=2;};
-        {Name="Leaper Zombie"; Chance=25; Fmod=3;};
-        {Name="Heavy Zombie"; Chance=15; Fmod=4;};
+        {Name="Ticks"; Chance=50; Fmod=2;};
+        {Name="Leaper"; Chance=25; Fmod=3;};
+        {Name="Heavy"; Chance=15; Fmod=4;};
         {Name="Bloater"; Chance=10; Fmod=5;};
         {Name="Growler"; Chance=10; Fmod=6;};
         {Name="Dr. Sinister"; Chance=10; Fmod=7;};
@@ -135,8 +135,8 @@ function WorldCore.InitGameController()
         
         -- Change any other enemies' shirt
         if charModel.Name ~= "Zombie"
-            and charModel.Name ~= "Leaper Zombie"
-            and charModel.Name ~= "Heavy Zombie" then return end;
+            and charModel.Name ~= "Leaper"
+            and charModel.Name ~= "Heavy" then return end;
         
         local shirtList = {
             "rbxassetid://5664380223";

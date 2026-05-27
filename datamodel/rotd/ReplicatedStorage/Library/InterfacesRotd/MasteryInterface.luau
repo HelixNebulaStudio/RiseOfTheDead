@@ -794,7 +794,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             interface:PlayButtonClick();
             window:Close();
         end)
-        masteryFrame:WaitForChild("HelpButton").Visible = false;
     end
 
     --MARK: OnToggle
