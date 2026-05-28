@@ -66,7 +66,7 @@ Dialogues.Nick.DialogueStrings = {
 	};
 	["whereAmI_howToRefill"]={
 		Say="Oh, not yet, where do I refill my gun?"; 
-		Reply="The store behind me, click on Inventory and select your weapon and purchase ammo.";
+		Reply="Go to the shop behind Dr. Deniski, click on Inventory and select your weapon and purchase ammo.";
 	};
 	["whereAmI_firstTask"]={
 		Say="Yes, I refilled the gun."; 
@@ -159,6 +159,11 @@ if RunService:IsServer() then
 										mission.ProgressionPoint = 5;
 									end;
 								end)
+
+								task.spawn(function()
+									task.wait(3);
+									modStatusEffects.DirectCamera(player, Vector3.new(11.464, 57.691, -37.268), 3.5);
+								end)
 							end)
 						end)
 					end)
@@ -209,6 +214,11 @@ if RunService:IsServer() then
 									if mission.ProgressionPoint < 8 then
 										mission.ProgressionPoint = 8
 									end;
+								end)
+
+								task.spawn(function()
+									task.wait(3);
+									modStatusEffects.DirectCamera(player, Vector3.new(61, 60.2, -28.7), 3.5);
 								end)
 							end)
 							dialog:AddChoice("whereAmI_denyTask", function(dialog)

@@ -238,11 +238,11 @@ return function(CutsceneSequence)
 					masonNpcClass:UseInteractable("bedroomdoorMain");
 					task.wait(0.5);
 					
-					masonNpcClass.Move:MoveTo(Vector3.new(16.5800056, 57.6597404, -32.6719055));
+					masonNpcClass.Move:MoveTo(Vector3.new(10.159, 57.741, 6.948)); -- Vector3.new(16.5800056, 57.6597404, -32.6719055));
 					masonNpcClass.Move.OnMoveToEnded:Wait(3);
 
 					if mission.ProgressionPoint >= 4 then return end;
-					masonNpcClass.Move:Face(Vector3.new(10.5800047, 57.6597404, -28.6719055));
+					masonNpcClass.Move:Face(Vector3.new(7.914, 57.691, 0.237)); -- Vector3.new(10.5800047, 57.6597404, -28.6719055));
 					
 					masonNpcClass.Chat(masonNpcClass.Player, "Talk to Dr. Deniski");
 					masonNpcClass:ToggleInteractable(true);
@@ -252,13 +252,13 @@ return function(CutsceneSequence)
 
 				elseif mission.ProgressionPoint == 4 then
 					
-					masonNpcClass:SetCFrame(CFrame.new(15.9152822, 57.6004868, -31.9428711, -0.521899104, 0, 0.853007257, 0, 1, 0, -0.853007257, 0, -0.521899104));
+					masonNpcClass:SetCFrame( CFrame.new(10.159, 57.741, 6.948) * CFrame.Angles(0, math.rad(4), 0) );--CFrame.new(15.9152822, 57.6004868, -31.9428711, -0.521899104, 0, 0.853007257, 0, 1, 0, -0.853007257, 0, -0.521899104));
 					masonNpcClass.Move:Face(playerClass:GetCFrame().Position);
 					masonNpcClass:ToggleInteractable(true);
 
 				elseif mission.ProgressionPoint == 5 then
 					masonNpcClass.StopAnimation("Lean");
-					task.wait(2);
+					task.wait(4);
 
 					masonNpcClass.Chat(masonNpcClass.Player, "I'll go and try to repair the car now..");
 					masonNpcClass.Move:SetMoveSpeed("set", "default", 10);
@@ -279,7 +279,7 @@ return function(CutsceneSequence)
 				
 			elseif mission.Type == 3 then -- OnComplete
 				masonNpcClass.Properties.CutsceneActive = false;
-				masonNpcClass:SetCFrame(CFrame.new(15.9152822, 57.6004868, -31.9428711, -0.521899104, 0, 0.853007257, 0, 1, 0, -0.853007257, 0, -0.521899104));
+				masonNpcClass:SetCFrame(CFrame.new(48.28, 57.849, 38.01));
 				masonNpcClass.StopAnimation("Lean", 0.5);
 
 			end
