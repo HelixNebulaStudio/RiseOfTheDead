@@ -188,8 +188,8 @@ MissionLibrary.New{
 		{Text="Add the mod to your weapon by selecting the weapon on the workbench";};
 	};
 	Objectives={
-		["Item1"]={Index=1; Description="$Amount Metal Scraps"; Type="RequireItem"; ItemId="metal"; Amount=10;};
-		["Item2"]={Index=1; Description="$$Amount"; Type="RequireStat"; StatName="Money"; Amount=60;};
+		["Item1"]={Index=1; Description="$Amount Metal Scraps from Zombies"; Type="RequireItem"; ItemId="metal"; Amount=10;};
+		["Item2"]={Index=1; Description="$$Amount from selling items in shop"; Type="RequireStat"; StatName="Money"; Amount=60;};
 	};
 	GuideText="Talk to Mason to learn how to upgrade your weapons";
 	Rewards={

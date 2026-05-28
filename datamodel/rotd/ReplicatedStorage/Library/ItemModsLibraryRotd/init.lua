@@ -864,7 +864,7 @@ function library.onRequire()
 	library:Add{
 		Id="flamethrowerflameburstmod";
 		Name="Flamethrower Flame Burst";
-		Desc="Converts projectile from liquid flame to gas flame. Increases impact damge by <b>x5 impact damage, x0.5 burn tick damage</b> and applys knockback on impact. Burn time last for 25 seconds and can be extended with <b>Everlast</b>.";
+		Desc="Converts projectile from liquid flame to gas flame. Increases output damge by <b>x5 damage, burn tick damage is 50% of damage per stack</b> and applys knockback on impact. Burn time last for 25 seconds and can be extended with <b>Everlast</b>.";
 		Icon="http://www.roblox.com/asset/?id=14286986692";
 		BaseTier=3;
 		Tier=3;

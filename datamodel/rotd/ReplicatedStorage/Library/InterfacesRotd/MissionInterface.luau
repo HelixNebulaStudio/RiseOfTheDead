@@ -2315,6 +2315,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					modMarkers.SetMarker("PinMissionMarker", missionWorld, modBranchConfigurations.GetWorldDisplayName(missionWorld), modMarkers.MarkerTypes.Travel);
 				end
 				modMarkers.SetColor("PinMissionMarker", markInfo.Color or missionMarkerColor);
+				modMarkers.SetGlowing("PinMissionMarker", true);
 			end
 
 			if pinnedMissionLib and pinnedMission.Type == 2 then -- Available
@@ -2325,15 +2326,16 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					if npcModel then
 						modMarkers.SetMarker("PinMissionMarker", npcModel.PrimaryPart, pinnedMissionLib.From, modMarkers.MarkerTypes.Npc);
 						modMarkers.SetColor("PinMissionMarker", missionMarkerColor);
+						modMarkers.SetGlowing("PinMissionMarker", true);
 
 					else
 						local npcLib = modNpcProfileLibrary:Find(pinnedMissionLib.From);
 						local npcWorld = pinnedMissionLib.NpcWorld or (npcLib and npcLib.World) or nil;
 
 						if npcWorld ~= modBranchConfigurations.WorldName then
-
 							modMarkers.SetMarker("PinMissionMarker", npcWorld, modBranchConfigurations.GetWorldDisplayName(npcWorld), modMarkers.MarkerTypes.Travel);
 							modMarkers.SetColor("PinMissionMarker", missionMarkerColor);
+							modMarkers.SetGlowing("PinMissionMarker", true);
 						else
 							modMarkers.ClearMarker("PinMissionMarker");
 						end

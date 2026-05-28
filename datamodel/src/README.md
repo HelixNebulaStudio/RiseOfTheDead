@@ -2,6 +2,7 @@ Revive Engine source code is located here and is closed source.
 
 
 Recent changes to code in Engine codebase:
+- Added TextSizes ref for interface auto scale.
 - Fixed locked out Npcs (e.g. Frank & Jesse) from certain doors.
 - Fixed Instrument Interface. [#1135] [#1136]
 - Fixed April Fool's initial dialogue spam. [#1130] [#1111]

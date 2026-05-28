@@ -1144,6 +1144,13 @@ export type InterfaceInstance = {
         [string]: GuiObject;
     };
 
+    TextSizes: {
+        P: number;
+        H1: number;
+        H2: number;
+        H3: number;
+    };
+
     -- @properties
     Package: anydict;
 } & Interface;
@@ -1167,7 +1174,7 @@ export type InterfaceWindow = {
 
     Binds: anydict;
     Properties: PropertiesVariable<anydict>;
-    
+
     ReturnPageStack: {any};
 
     UseTween: boolean;
