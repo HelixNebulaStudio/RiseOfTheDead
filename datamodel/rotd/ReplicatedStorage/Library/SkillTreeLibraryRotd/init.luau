@@ -9,6 +9,10 @@ function modSkillTreeLibrary.onRequire()
         treeLibrary:Sort(function(A, B) return A.Level < B.Level end);
         modSkillTreeLibrary[ms.Name] = treeLibrary;
     end
+
+    if game:GetService("RunService"):IsServer() then
+        shared.require(game.ServerScriptService.ServerLibrary.SkillTree):Init();
+    end
 end
 
 return modSkillTreeLibrary;

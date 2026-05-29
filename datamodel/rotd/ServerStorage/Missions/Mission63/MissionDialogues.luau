@@ -10,7 +10,7 @@ local Dialogues = {
 	Jason={};
 };
 
-local missionId = 63;
+local MISSION_ID = 63;
 --==
 
 -- MARK: Patrick Dialogues
@@ -138,7 +138,7 @@ if RunService:IsServer() then
 				dialog:AddChoice("theRecruit_settleB", function(dialog)
 					dialog:AddChoice("theRecruit_settle2B", function(dialog)
 						dialog:AddChoice("theRecruit_zark1", function(dialog)
-							modMission:StartMission(player, missionId);
+							modMission:StartMission(player, MISSION_ID);
 						end)
 					end)
 				end);
@@ -160,7 +160,7 @@ if RunService:IsServer() then
 				dialog:SetInitiateTag("banditRecruit_banditCampGate");
 				dialog:AddChoice("banditRecruit_recruit1", function(dialog)
 					dialog:AddChoice("banditRecruit_recruit2", function(dialog)
-						modMission:Progress(player, missionId, function(mission)
+						modMission:Progress(player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint <= 2 then
 								mission.ProgressionPoint = 2;
 							end
@@ -171,7 +171,7 @@ if RunService:IsServer() then
 			elseif mission.ProgressionPoint == 2 then
 				dialog:SetInitiate("Well?");
 				dialog:AddChoice("banditRecruit_recruit3", function(dialog)
-					modMission:Progress(player, missionId, function(mission)
+					modMission:Progress(player, MISSION_ID, function(mission)
 						if mission.ProgressionPoint <= 3 then
 							mission.ProgressionPoint = 3;
 						end
@@ -196,11 +196,12 @@ if RunService:IsServer() then
 					
 					dialog:SetInitiateTag("theRecruit_init");
 					dialog:AddChoice("theRecruit_wait", function(dialog)
-						modMission:Progress(player, missionId, function(mission)
+						modMission:Progress(player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint < 6 then
 								mission.ProgressionPoint = 6;
 							end;
 						end)
+						dialog:SetExpireTime(workspace:GetServerTimeNow()+2);
 					end);
 	
 				end
@@ -223,7 +224,7 @@ if RunService:IsServer() then
 								shared.Notify(player, "2 Nekron Particulate Cache removed from your Inventory.", "Negative");
 							end
 	
-							modMission:CompleteMission(player, missionId);
+							modMission:CompleteMission(player, MISSION_ID);
 							
 							shared.Notify(player, "You have unlockabled Bandit's Market. Talk to Loran to check it out.", "Positive");
 						end)
@@ -249,11 +250,12 @@ if RunService:IsServer() then
 					dialog:SetInitiateTag("theRecruit_zarkInit");
 					dialog:AddChoice("theRecruit_recruit1", function(dialog)
 						dialog:AddChoice("theRecruit_recruit2", function(dialog)
-							modMission:Progress(player, 63, function(mission)
+							modMission:Progress(player, MISSION_ID, function(mission)
 								if mission.ProgressionPoint <= 10 then
 									mission.ProgressionPoint = 10;
 								end
 							end)
+							dialog:SetExpireTime(workspace:GetServerTimeNow()+3);
 						end)
 					end)
 					
@@ -262,12 +264,13 @@ if RunService:IsServer() then
 					dialog:AddChoice("theRecruit_recruit3", function(dialog)
 						dialog:AddChoice("theRecruit_recruit4", function(dialog)
 							dialog:AddChoice("theRecruit_recruit5", function(dialog)
-								modMission:Progress(player, 63, function(mission)
+								modMission:Progress(player, MISSION_ID, function(mission)
 									if mission.ProgressionPoint <= 12 then
 										mission.ProgressionPoint = 12;
 									end
 								end)
 								
+								dialog:SetExpireTime(workspace:GetServerTimeNow()+5);
 								task.wait(5);
 								modServerManager:Travel(player, "TheMall");
 

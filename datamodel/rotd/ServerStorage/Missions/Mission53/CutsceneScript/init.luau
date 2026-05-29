@@ -20,17 +20,19 @@ if RunService:IsServer() then
 		shared.modEventService:OnInvoked("Players_BindWieldEvent", function(event: EventPacket, ...) 
 			local action: string, toolHandler: ToolHandlerInstance = ...;
 
-			local playerClass: PlayerClass = toolHandler.CharacterClass :: PlayerClass;
-			local player: Player = (playerClass :: PlayerClass):GetInstance();
+			task.spawn(function()
+				local playerClass: PlayerClass = toolHandler.CharacterClass :: PlayerClass;
+				local player: Player = (playerClass :: PlayerClass):GetInstance();
 
-			if action ~= "Equip" then return end;
-			if toolHandler.StorageItem.ItemId ~= "entityleash" then return end;
+				if action ~= "Equip" then return end;
+				if toolHandler.StorageItem.ItemId ~= "entityleash" then return end;
 
-			modMission:Progress(player, MISSION_ID, function(mission)
-				if mission.Type ~= 1 then return end;
-				if mission.ProgressionPoint <= 4 then
-					mission.ProgressionPoint = 5;
-				end
+				modMission:Progress(player, MISSION_ID, function(mission)
+					if mission.Type ~= 1 then return end;
+					if mission.ProgressionPoint <= 4 then
+						mission.ProgressionPoint = 5;
+					end
+				end)
 			end)
 		end)
 

@@ -75,7 +75,7 @@ local toolPackage = {
 		-- Physics
 		KillImpulseForce=5;
 
-		HasFlashlight = true;
+		HasFlashlight = CFrame.identity;
 	};
 
 	Properties={};

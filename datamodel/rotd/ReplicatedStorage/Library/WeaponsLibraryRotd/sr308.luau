@@ -78,7 +78,7 @@ local toolPackage = {
 		-- Physics
 		KillImpulseForce=20;
 		
-		HasFlashlight = true;
+		HasFlashlight = CFrame.Angles(0, math.rad(90), 0);
 	};
 
 	Properties={};

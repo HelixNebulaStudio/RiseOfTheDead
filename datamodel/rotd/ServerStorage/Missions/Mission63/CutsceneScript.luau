@@ -116,9 +116,6 @@ return function(CutsceneSequence)
 				game.Players:SetAttribute("AutoRespawn", false);
 
 				local player = playerClass:GetInstance();
-				modMission:Progress(player, MISSION_ID, function(mission)
-					mission.ProgressionPoint = 3;
-				end)
 				modServerManager:Teleport(player, "BanditsRecruitment");
 			end)
 
@@ -595,6 +592,7 @@ return function(CutsceneSequence)
 						cutsceneTracks.L1 = animationL1;
 						cutsceneTracks.S1 = animationS1;
 						
+						modStatusEffects.DirectCamera(player, loranNpcClass.Head.Position, 1);
 						strangerANpcClass.Chat(player, "Help!!!");
 
 						modMission:Progress(player, MISSION_ID, function(mission)
@@ -812,7 +810,7 @@ return function(CutsceneSequence)
 								local distFromPos = playerClass:DistanceFrom(standPos);
 
 								Debugger:StudioLog(`Distance from safe pos: {distFromPos}`);
-								if distFromPos > 20 then
+								if distFromPos > 40 then
 									break;
 								end
 							end
