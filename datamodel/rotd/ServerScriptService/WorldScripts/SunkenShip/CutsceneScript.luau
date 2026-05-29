@@ -34,7 +34,7 @@ if RunService:IsServer() then
 
 	shared.modEventService:OnInvoked("Destructibles_BindDestroyed", function(eventPacket: EventPacket, ...)
 		local players = eventPacket.Players;
-		local destructible: DestructibleInstance = ...;
+		local destructible: DestructibleInstance, damageData: DamageData = ...;
 		if destructible == nil then return end;
 
 		task.spawn(function()

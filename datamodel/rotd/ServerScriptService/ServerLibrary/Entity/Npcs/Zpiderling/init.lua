@@ -18,7 +18,7 @@ local npcPackage = {
         TargetableDistance = 75;
 
         Level = 1;
-        ExperiencePool = 10;
+        ExperiencePool = 5;
         MoneyReward = NumberRange.new(15, 20);
 
         Immortal = 1;
@@ -43,7 +43,7 @@ end
 
 function npcPackage.Spawning(npcClass: NpcClass)
     local configurations: ConfigVariable = npcClass.Configurations;
-    local properties: PropertiesVariable<{}> = npcClass.Properties;
+    local properties: PropertiesVariable<anydict> = npcClass.Properties;
 
     local level = math.max(properties.Level, 0);
 

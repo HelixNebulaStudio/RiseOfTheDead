@@ -20,7 +20,7 @@ function WorldCore.onRequire()
         end, 999);
 
         shared.modEventService:OnInvoked("Destructibles_BindDestroyed",  function(event: EventPacket, ...)
-            local destructible: DestructibleInstance = ...;
+            local destructible: DestructibleInstance, damageData: DamageData = ...;
             local cframe = destructible.Model:GetPivot();
 
             if destructible.Id == "key2Shelf" then

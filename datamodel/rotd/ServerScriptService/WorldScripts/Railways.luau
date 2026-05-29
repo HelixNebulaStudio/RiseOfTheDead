@@ -188,7 +188,7 @@ function WorldCore.InitMapLogic(gameController)
 
     --MARK: Destructibles_BindDestroyed
     shared.modEventService:OnInvoked("Destructibles_BindDestroyed", function(event: EventPacket, ...)
-        local destructible: DestructibleInstance = ...;
+        local destructible: DestructibleInstance, damageData: DamageData = ...;
 
         local player = event.Player;
         local playerClass: PlayerClass? = player and shared.modPlayers.get(player) or nil;

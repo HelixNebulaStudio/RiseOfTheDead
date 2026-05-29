@@ -25,7 +25,7 @@ if RunService:IsServer() then
 	
 	if modBranchConfigurations.IsWorld("TheMall") then
 		shared.modEventService:OnInvoked("Destructibles_BindDestroyed", function(event: EventPacket, ...) 
-			local destructible: DestructibleInstance = ...;
+			local destructible: DestructibleInstance, damageData: DamageData = ...;
 			if destructible.Properties.MissionIdTag ~= MISSION_ID then return; end
 			if destructible.NetworkOwners == nil then return end;
 

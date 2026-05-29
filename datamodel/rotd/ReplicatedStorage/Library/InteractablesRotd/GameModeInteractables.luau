@@ -107,7 +107,7 @@ function interactablePackage.init(super) -- Server/Client
 			and modGameModeLibrary.GameModes[mode]
 			and modGameModeLibrary.GameModes[mode].Stages[stage]
 			and modGameModeLibrary.GameModes[mode].Stages[stage].Disabled then
-				Debugger:Log("Work In Progress");
+				interactable.Label = `Enter {mode}: {stage} (Studio Only WIP)`;
 				return;
 			end
 			interactable.CanInteract = false;

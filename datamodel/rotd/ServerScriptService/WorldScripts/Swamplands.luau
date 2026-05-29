@@ -50,7 +50,7 @@ function WorldCore.InitGameController()
     newGameController.HazardsList = {
         {Type="PotArmor"; Chance=1/2; Fmod=4;};
         {Type="ContagiousTicks"; Chance=1/4; Fmod=4;};
-        {Type="VexSpitter"; Chance=1/5; Fmod=3;};
+        {Type="ZpiderEggs"; Chance=1/5; Fmod=3;};
         {Type="Fog"; Chance=1/3; Fmod=4;};
     };
 
@@ -77,15 +77,15 @@ function WorldCore.onRequire()
 
         task.spawn(function()
             while true do
-                task.wait(1);
+                task.wait(0.5);
                 if playerClass.Character == nil or playerClass.HealthComp.IsDead then continue end;
 
                 local cf = playerClass:GetCFrame();
                 if cf.Position.Y > -2 then continue end;
 
                 playerClass.StatusComp:Apply("RedCrowToxin", {
-                    Expires = workspace:GetServerTimeNow() + 1.2;
-                    Duration = 1.2;
+                    Expires = workspace:GetServerTimeNow() + 0.6;
+                    Duration = 0.6;
                 });
             end
         end)

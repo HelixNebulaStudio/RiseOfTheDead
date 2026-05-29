@@ -667,6 +667,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                     if info.Type == "Rpm" then
                         strVal = modFormatNumber.Beautify(math.ceil(60/statValue))
                     elseif info.Type == "int"
+                        or info.Type == "1dp"
                         or info.Type == "2dp"
                         or info.Type == "3dp"
                         or info.Type == "4dp" then

@@ -369,7 +369,7 @@ GameModeLibrary.GameModes={
 			};
 			["Swamplands"]={
 				WorldId = "Swamplands";
-				ExitSpawn = "sectorDToRes";
+				ExitSpawn = "swampToHarbor";
 				TitleImage = "rbxassetid://78769778825277";
 				MaxPlayers = 5;
 				-- RewardsId = "sectordcrate";
@@ -385,6 +385,8 @@ GameModeLibrary.GameModes={
 
 				HardModeEnabled = true;
 				MapItemId = "swamplandsmap";
+				
+				Disabled=true;
 			};
 			["CommunityWaySide"]={
 				WorldId="CommunityWaySide";
@@ -570,8 +572,9 @@ GameModeLibrary.GameModes={
 				RewardsIds={"sunkenchest";};
 
 				Soundtrack="Soundtrack:Kingdom2Dirge";
-				Disabled=true;
 				EnableStopwatch=true;
+
+				Disabled=true;
 			};
 		};
 	};
