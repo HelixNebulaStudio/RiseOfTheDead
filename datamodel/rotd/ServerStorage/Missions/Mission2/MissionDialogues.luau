@@ -11,7 +11,7 @@ local Dialogues = {
 	["Dr. Deniski"]={};
 };
 
-local missionId = 2;
+local MISSION_ID = 2;
 --==
 
 -- !outline: Mason Dialogues
@@ -127,7 +127,7 @@ if RunService:IsServer() then
 				
 				dialog:AddChoice("whereAmI_deniski", function(dialog)
 					dialog:AddChoice("whereAmI_canHeal", function(dialog)
-						modMission:Progress(player, missionId, function(mission)
+						modMission:Progress(player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint < 2 then
 								mission.ProgressionPoint = 2
 							end;
@@ -154,7 +154,7 @@ if RunService:IsServer() then
 					dialog:AddChoice("whereAmI_found", function(dialog)
 						dialog:AddChoice("whereAmI_apocalypse", function(dialog)
 							dialog:AddChoice("whereAmI_talkToNick", function(dialog)
-								modMission:Progress(player, missionId, function(mission)
+								modMission:Progress(player, MISSION_ID, function(mission)
 									if mission.ProgressionPoint < 5 then
 										mission.ProgressionPoint = 5;
 									end;
@@ -193,7 +193,7 @@ if RunService:IsServer() then
 						task.spawn(function()
 							modStatusEffects.DirectCamera(player, Vector3.new(-9.7, 61.0, 18.5), 3.5);
 						end)
-						modMission:Progress(player, missionId, function(mission)
+						modMission:Progress(player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint < 6 then
 								mission.SaveData.Kills = 10;
 								mission.ProgressionPoint = 6
@@ -203,14 +203,14 @@ if RunService:IsServer() then
 				end);
 
 			elseif checkpoint == 6 or checkpoint == 7 then
-				if modMission:GetData(player, missionId, "accept") == nil then
+				if modMission:GetData(player, MISSION_ID, "accept") == nil then
 					dialog:SetInitiateTag("whereAmI_refill");
 					
 					if checkpoint == 7 then
 						local function taskOffer(dialog)
 							dialog:AddChoice("whereAmI_acceptTask", function(dialog)
-								modMission:SetData(player, missionId, "accept", 1);
-								modMission:Progress(player, missionId, function(mission)
+								modMission:SetData(player, MISSION_ID, "accept", 1);
+								modMission:Progress(player, MISSION_ID, function(mission)
 									if mission.ProgressionPoint < 8 then
 										mission.ProgressionPoint = 8
 									end;
@@ -222,7 +222,7 @@ if RunService:IsServer() then
 								end)
 							end)
 							dialog:AddChoice("whereAmI_denyTask", function(dialog)
-								modMission:SetData(player, missionId, "accept", 0);
+								modMission:SetData(player, MISSION_ID, "accept", 0);
 							end)
 							dialog:AddChoice("whereAmI_why", taskOffer);
 						end
@@ -244,18 +244,18 @@ if RunService:IsServer() then
 					}
 					
 					dialog:AddChoice("whereAmI_reacceptTask", function(dialog)
-						modMission:SetData(player, missionId, "accept", 1);
+						modMission:SetData(player, MISSION_ID, "accept", 1);
 						
-						modMission:Progress(player, missionId, function(mission)
+						modMission:Progress(player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint < 8 then
 								mission.ProgressionPoint = 8
 							end;
 						end)
 					end)
 					dialog:AddChoice("whereAmI_redenyTask", function(dialog)
-						modMission:SetData(player, missionId, "accept", 0);
+						modMission:SetData(player, MISSION_ID, "accept", 0);
 						
-						modMission:CompleteMission(player, missionId);
+						modMission:CompleteMission(player, MISSION_ID);
 						modAnalyticsService:LogOnBoarding{
 							Player = player;
 							OnBoardingStep = modAnalyticsService.OnBoardingSteps.Mission2_Complete;
@@ -272,7 +272,7 @@ if RunService:IsServer() then
 				
 				if checkpoint == 10 then
 					dialog:AddChoice("whereAmI_taskComplete", function(dialog)
-						modMission:CompleteMission(player, missionId);
+						modMission:CompleteMission(player, MISSION_ID);
 						modAnalyticsService:LogOnBoarding{
 							Player = player;
 							OnBoardingStep = modAnalyticsService.OnBoardingSteps.Mission2_Complete;

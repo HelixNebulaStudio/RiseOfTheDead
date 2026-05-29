@@ -62,13 +62,14 @@ function treePackage.HasEnemy(npcClass: NpcClass)
         if not isTargettable then return false end;
 
         if properties.HordeAggression and targetEntityClass.HumanoidType == "Player" then return true; end;
-        if npcClass.HealthComp.LastDamagedBy and npcClass.HealthComp.LastDamageTaken+25 > curServerTime then return true end;
+        if npcClass.HealthComp.LastDamagedBy and npcClass.HealthComp.LastDamageTaken+25 > curServerTime then return true; end;
 
         local isInRange = (targetData.Distance <= properties.TargetableDistance);
         if not isInRange then return false end;
 
         if targetEntityClass.ClassName ~= "Destructible" then
             local isInVision = targetData.Model.PrimaryPart and npcClass:IsInVision(targetData.Model.PrimaryPart, 75) or false;
+            targetData.IsInVision = isInVision;
             if not isInVision then return false end;
         end
 
@@ -79,6 +80,7 @@ function treePackage.HasEnemy(npcClass: NpcClass)
         return true;
     end);
 
+    local prevTargetData = properties.PrevEnemyTargetData;
     if enemyTargetData ~= nil then
         local lockOnExpireDuration = math.random(1, 3);
         if properties.LockOnExpireDuration then
@@ -86,6 +88,16 @@ function treePackage.HasEnemy(npcClass: NpcClass)
         end
         properties.EnemyTargetData = enemyTargetData;
         properties.LastEnemyLockOn = tick() + lockOnExpireDuration;
+
+        if prevTargetData ~= enemyTargetData or (properties.LastPrevEnemyChange and tick() > properties.LastPrevEnemyChange) then
+            properties.PrevEnemyTargetData = enemyTargetData;
+            properties.LastPrevEnemyChange = tick() + math.max(enemyTargetData.Distance/50, 0.5);
+
+            local isInVision = enemyTargetData.Model.PrimaryPart 
+                           and npcClass:IsInVision(enemyTargetData.Model.PrimaryPart, 75) or false;
+            enemyTargetData.IsInVision = isInVision;
+        end
+
         return true;
 
     elseif properties.CanForgetTargets ~= false then

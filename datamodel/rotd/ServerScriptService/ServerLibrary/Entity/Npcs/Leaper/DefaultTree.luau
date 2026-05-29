@@ -19,7 +19,7 @@ function treePackage.onRequire()
 	arcTracer.IncludeInstances = {workspace.Terrain; workspace.Environment; workspace.Clips};
 	arcTracer.RayRadius = 1.5;
 	arcTracer.Acceleration = Vector3.new(0, -workspace.Gravity, 0);
-	arcTracer.Delta = 1/7;
+	arcTracer.Delta = 1/10;
 
     treePackage.LeapArcTracer = arcTracer;
 end
@@ -31,6 +31,7 @@ function treePackage.Leap(npcClass: NpcClass)
     if properties.IsMoving == false then return false; end;
     if enemyTargetData == nil then return false; end;
     if npcClass.Humanoid.FloorMaterial == Enum.Material.Air then return false; end;
+    if enemyTargetData.IsInVision == false then return false; end; 
     
     local dist = enemyTargetData.Distance;
     if dist < 16 then return false; end;

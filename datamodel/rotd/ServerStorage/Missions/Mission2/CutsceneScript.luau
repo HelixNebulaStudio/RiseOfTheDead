@@ -7,6 +7,7 @@ local localPlayer = game.Players.LocalPlayer;
 
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 --== Variables;
@@ -255,6 +256,11 @@ return function(CutsceneSequence)
 					masonNpcClass:SetCFrame( CFrame.new(10.159, 57.741, 6.948) * CFrame.Angles(0, math.rad(4), 0) );--CFrame.new(15.9152822, 57.6004868, -31.9428711, -0.521899104, 0, 0.853007257, 0, 1, 0, -0.853007257, 0, -0.521899104));
 					masonNpcClass.Move:Face(playerClass:GetCFrame().Position);
 					masonNpcClass:ToggleInteractable(true);
+						
+					task.spawn(function()
+						task.wait(1);
+						modStatusEffects.DirectCamera(player, masonNpcClass.Head.Position, 2.5);
+					end)
 
 				elseif mission.ProgressionPoint == 5 then
 					masonNpcClass.StopAnimation("Lean");
