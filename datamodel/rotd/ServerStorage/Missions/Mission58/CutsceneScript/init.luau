@@ -715,6 +715,9 @@ return function(CutsceneSequence)
 						mainBanditGoon.Move:Face(mainRatGoon:GetCFrame().Position);
 
 						task.wait(4);
+						task.spawn(function()	
+							mainBanditGoon.Move:Face(mainRatGoon:GetCFrame().Position);
+						end)
 						zarkNpcClass.Chat(player, "You made the right choice agreeing to the offer.");
 						task.wait(6);
 						revasNpcClass.Chat(player, "You made quite a compelling offer..");

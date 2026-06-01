@@ -668,7 +668,7 @@ function Survival:NewWaveSelect()
 
 	local rewardPicksList = {};
 	if #customRewardsTable > 0 then
-		Debugger:StudioLog(self.Wave, "customRewardsTable", customRewardsTable);
+		Debugger:Warn(self.Wave, "customRewardsTable", customRewardsTable);
 		local loopkill = 0;
 		local rewardOptions = self.IsHard and 3 or 2;
 		if self.Wave > 10 then
@@ -881,7 +881,7 @@ function Survival:BreakTime()
 		shared.Notify(game.Players:GetPlayers(), "A supply station has been discovered!", "Reward");
 	end;
 
-	if not self.IsHard and self.Wave%15 == 0 then
+	if self.Wave%15 == 0 then
 		breakLength += 15;
 		statusStr = `{statusStr} [Loot Available]`;
 

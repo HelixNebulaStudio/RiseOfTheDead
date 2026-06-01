@@ -2,7 +2,6 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 
 local MissionLogic = {};
 local RunService = game:GetService("RunService");
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modGuiHighlight = shared.require(game.ReplicatedStorage.Library.UI.GuiHighlight);
 
 if RunService:IsClient() then
@@ -10,20 +9,29 @@ if RunService:IsClient() then
 	local playerGui = localPlayer.PlayerGui;
 	modGuiHighlight.HideBackground = true;
 
-	function MissionLogic.ProgressionPoint2()
+	function MissionLogic.Checkpoint2()
 		local highlight = modGuiHighlight.Set("MainInterface", "MissionPinHud");
 	end
 
-	function MissionLogic.ProgressionPoint3()
+	function MissionLogic.Checkpoint3()
 		modGuiHighlight.FrameWorldObject(workspace.Interactables:WaitForChild("Mission1Pickup"));
 		local highlight = modGuiHighlight.Set("MainInterface", "Mission1Pickup");
 	end
 
-	function MissionLogic.ProgressionPoint4()
-		local highlight = modGuiHighlight.Set("MainInterface", "Hotbar", "search:p250", "p250");
+	function MissionLogic.Checkpoint4()
+		RunService.Heartbeat:Wait();
+
+		local highlight = modGuiHighlight.Set("MainInterface", "Hotbar", "1");
+
+		highlight.ContainerTextInfo = {
+			["1"] = {
+				Text = `Press [1] / <font family="rbxasset://LuaPackages/Packages/_Index/BuilderIcons/BuilderIcons/BuilderIcons.json">Left Bumper</font> to equip pistol`;
+				TextLayout = "TCO";
+			};
+		}
 	end
 
-	function MissionLogic.ProgressionPoint5()
+	function MissionLogic.Checkpoint5()
 		local highlight = modGuiHighlight.Set("MainInterface", "MissionPinHud");
 	end
 

@@ -39,7 +39,7 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	if modBranchConfigurations.IsWorld("MainMenu") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
+	if shared.WorldName == "MainMenu" then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
 	
 	CutsceneSequence:Initialize(function()
 		local players = CutsceneSequence:GetPlayers();
@@ -76,6 +76,15 @@ return function(CutsceneSequence)
 							BindSetup = function(npcClass: NpcClass)
 								npcClass.Properties.MissionId = MISSION_ID;
 								npcClass.Properties.Seed = (mission.SaveData.Seed or 1);
+
+								npcClass.OnThink:Connect(function()
+									if game.Players:IsAncestorOf(player) then return end;
+									
+									if strangerNpcClass and strangerNpcClass.Character then
+										strangerNpcClass.Character:Destroy();
+										strangerNpcClass = nil;
+									end
+								end)
 							end;
 						};
 						if strangerNpcClass then
@@ -97,6 +106,7 @@ return function(CutsceneSequence)
 							strangerNpcClass.HealthComp.OnIsDeadChanged:Connect(function(isDead)
 								if not isDead then return end;
 								if mission.ProgressionPoint ~= 2 then return end;
+								if not game.Players:IsAncestorOf(player) then return end;
 								
 								modMission:FailMission(player, MISSION_ID, `The stranger was killed.`);
 							end)

@@ -29,7 +29,7 @@ return function(event: EventPacket, profile: Profile, points: number?, reason: s
         local unixTime = DateTime.now().UnixTimestamp;
         local bpLib = modBattlePassLibrary:Find(activeId);
         
-        if bpLib.EndUnixTime == nil or unixTime > bpLib.EndUnixTime then return end
+        if bpLib == nil or bpLib.EndUnixTime == nil or unixTime > bpLib.EndUnixTime then return end
        
 		local activeInventory = profile.ActiveInventory;
         if activeInventory == nil then return end;

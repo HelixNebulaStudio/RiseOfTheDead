@@ -564,7 +564,15 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                         end
                         new.MouseButton1Click:Connect(function()
                             if playerName ~= localPlayer.Name then return end;
-                            if playerData.Achievements[lib.Id] == nil then return end;
+                            if playerData.Achievements[lib.Id] == nil then
+
+                                if lib.Id == "gromem" then
+                                    game:GetService("GroupService"):PromptJoinAsync(4573862);
+                                end
+
+                                return
+                            end;
+                            
                             if equipTitleDebounce then return end
                             equipTitleDebounce = true;
                             setTitleClick();

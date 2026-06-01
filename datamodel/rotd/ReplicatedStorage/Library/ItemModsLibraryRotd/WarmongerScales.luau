@@ -49,7 +49,7 @@ if RunService:IsServer() then
 			local add = statusClass.Values.HealthPerKill;
 
 			local oldPool = (statusClass.Values.Pool or 0);
-			statusClass.Values.Pool = math.clamp(oldPool + add, 0, statusClass.Values.Max);
+			statusClass.Values.Pool = math.clamp(oldPool + (add or 0), 0, statusClass.Values.Max);
 			statusClass.Values.LastDeduct = tick()+1;
 
 			if statusClass.Values.Pool > oldPool then
