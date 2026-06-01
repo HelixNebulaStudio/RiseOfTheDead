@@ -160,7 +160,7 @@ function Component:__call(damagedata: DamageData)
 
 				local weaponLevel = storageItem:GetValues("L") or 0;
 				local expPool = rawProperties.ExperiencePool or 20;
-				local expGain = math.clamp(expPool - weaponLevel, 1, expPool);
+				local expGain = math.clamp((expPool - weaponLevel) * damageRatio, 1, expPool);
 
 				if storageItem.StorageId == "portableautoturret" then
 					expGain = math.ceil(expGain * 0.25);
