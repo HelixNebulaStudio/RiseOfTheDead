@@ -77,7 +77,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         goldMenuFrame.Position = UDim2.new(0.5, 0, 0.5, 0);
         goldMenuFrame.Size = UDim2.new(1, 0, 1, 0);
         goldMenuFrame:WaitForChild("UICorner"):Destroy();
-        goldMenuFrame:WaitForChild("closeButton").Visible = false;
 
 	else
 		goldShopWindow:SetClosePosition(UDim2.new(0.5, 0, -1.5, 0), UDim2.new(0.5, 0, 0.5, -35));

@@ -415,7 +415,6 @@ end
 
 --==
 return function(CutsceneSequence)
-	--if not modBranchConfigurations.IsWorld("TheWarehouse") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
 	local gameFolder = workspace:WaitForChild("Environment"):WaitForChild("Game");
 
 	local patrolBandit: NpcClass;
@@ -479,7 +478,7 @@ return function(CutsceneSequence)
 				inventory:Remove(storageItemId);
 				modMission:FailMission(player, MISSION_ID, "Stan's blood samples were destroyed.");
 
-				if modBranchConfigurations.IsWorld("MedicalBreakthrough") then
+				if shared.WorldName == "MedicalBreakthrough" then
 					modServerManager:Travel(player, profile.PreviousWorldName);
 				end
 			end

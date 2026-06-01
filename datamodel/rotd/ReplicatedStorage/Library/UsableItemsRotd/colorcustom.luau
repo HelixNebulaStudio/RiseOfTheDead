@@ -1,3 +1,4 @@
+local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
@@ -35,6 +36,8 @@ function UsablePreset:ServerUse(player, inputStorageItem)
 	storage:Remove(storageItem.ID, 1);
 
     remoteHudNotification:FireClient(player, "Unlocked", {Name=`a new color!`});
+
+	flags:Get("CustomColors"); -- To check for huescollector achievement.
 end
 
 return UsablePreset;

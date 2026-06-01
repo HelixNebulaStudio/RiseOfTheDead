@@ -615,15 +615,30 @@ function Survival:NewWaveSelect()
 		local rewardLib = modRewardsLibrary:Find(dropTableId);
 
 		if rewardLib.WaveBased then
+			local highestWaveReward = nil;
 			for a=1, #rewardLib.Rewards do
 				local rewardInfo = rewardLib.Rewards[a];
 
+				if highestWaveReward == nil or rewardInfo.Wave > highestWaveReward then
+					highestWaveReward = rewardInfo.Wave;
+				end
 				if rewardInfo.Wave ~= self.Wave then continue end;
 
 				local cloneRewardInfo = table.clone(rewardInfo);
 				cloneRewardInfo.Chance = 2;
 				cloneRewardInfo.DropTableId = dropTableId;
 				table.insert(customRewardsTable, cloneRewardInfo);
+			end
+			if self.Wave > highestWaveReward then
+				-- Drop random components if no more wave based rewards;
+				local compRewardLib = modRewardsLibrary:Find("components");
+            	local compReward = modDropRateCalculator.RollDrop(compRewardLib);
+				if compReward then
+					local cloneRewardInfo = table.clone(compReward[1]);
+					cloneRewardInfo.Chance = 2;
+					cloneRewardInfo.DropTableId = dropTableId;
+					table.insert(customRewardsTable, cloneRewardInfo);
+				end
 			end
 
 		elseif rewardLib and rewardLib.Rewards then
@@ -642,7 +657,7 @@ function Survival:NewWaveSelect()
 	local waveBonusChance = math.clamp(math.floor(self.Wave/5)/12, 0, 1)/2;
 	for a=1, #customRewardsTable do
 		local rewardInfo = customRewardsTable[a];
-		if (rewardInfo.Chance + waveBonusChance) > 1 then
+		if #customRewardsTable > 1 and (rewardInfo.Chance + waveBonusChance) > 1 then
 			rewardInfo.BonusChance = -waveBonusChance/2; -- reduce chance of common items
 			rewardInfo.Chance = 1 +rewardInfo.BonusChance;
 		else

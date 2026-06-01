@@ -1510,6 +1510,23 @@ function library.onRequire()
 			end
 		end
 	end
+
+	--== Components Droptable
+	local componentsDropTable = {};
+	modItemsLibrary.Library:ListByMatchFunc(function(itemLib)
+		if itemLib.Type ~= modItemsLibrary.Types.Component then return end;
+		
+		table.insert(componentsDropTable, {
+			ItemId = itemLib.Id;
+			Quantity = 1;
+			Chance = 1;
+		});
+	end)
+	library:Add{
+		Id = "components";
+		Name = "Components";
+		Rewards = componentsDropTable;
+	};
 end
 
 return library;

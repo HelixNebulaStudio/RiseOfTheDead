@@ -82,7 +82,7 @@ function treePackage.HasEnemy(npcClass: NpcClass)
 
     local prevTargetData = properties.PrevEnemyTargetData;
     if enemyTargetData ~= nil then
-        local lockOnExpireDuration = math.random(1, 3);
+        local lockOnExpireDuration = math.random(2, 5);
         if properties.LockOnExpireDuration then
             lockOnExpireDuration = math.random(properties.LockOnExpireDuration.Min, properties.LockOnExpireDuration.Max);
         end
@@ -159,10 +159,9 @@ function treePackage.LookAtEnemy(npcClass: NpcClass)
             npcClass.PlayAnimation("Aggro");
             return true;
 
-        elseif properties.LookAtEnemyTick > curTick then
+        elseif properties.LookAtEnemyTick > curTick and not npcClass.Move.IsMoving then
             npcClass.Move:Face(enemyCharClass.RootPart);
             return true;
-
         end
     end
 

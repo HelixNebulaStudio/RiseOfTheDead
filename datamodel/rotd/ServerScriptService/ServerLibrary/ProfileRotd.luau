@@ -3,6 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local modGlobalVars = shared.require(game.ReplicatedStorage.GlobalVariables);
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
+local modColorPicker = shared.require(game.ReplicatedStorage.Library.UI.ColorPicker);
 
 local modProfile = shared.require(game.ServerScriptService.ServerLibrary.Profile);
 local modTraderProfile = shared.require(game.ServerScriptService.ServerLibrary.TraderProfile);
@@ -29,6 +30,32 @@ shared.coreBind(modProfile, "_new", function(profile: ProfileRotd, player: Playe
         FactionIcon="9890634236";
         FactionColor="c8c8c8";
     }
+
+	profile.Flags:HookGet("CustomColors", function(customColorsData)
+		if customColorsData == nil then return end;
+		
+		task.spawn(function()
+			local colorDict = table.clone(modColorPicker.getColorsList());
+
+			for cId, color: Color3 in pairs(colorDict) do
+				if customColorsData.Unlocked[color:ToHex()] then
+					colorDict[cId] = nil;
+				end
+			end
+
+			if next(colorDict) then
+				Debugger:StudioLog(`Colors that are still locked:`, colorDict);
+				return
+			end;
+
+			Debugger:StudioLog(`All colors unlocked`);
+			
+			local playerSave = profile:GetActiveSave();
+			playerSave:AwardAchievement("huescollector", true);
+		end)
+
+		return customColorsData;
+	end)
 end)
 
 shared.coreBind(modProfile, "_key_load", function(profile: ProfileRotd, key: string, data: any, loadOverwrite: anydict?)

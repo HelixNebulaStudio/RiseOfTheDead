@@ -24,7 +24,7 @@ local function leaf(index, data)
 end
 
 function library.onRequire()
-	library.Active = "frostivus2024";
+	library.Active = "";
 
 	-- Event pass Token shop
 	-- library.GiftShop = {
@@ -477,7 +477,7 @@ function library.onRequire()
 		};
 	};
 	
-	library:Add{
+	library:Add{ -- kept for titles
 		Id="slaughterfest2024";
 
 		Title="Slaughterfest 2024";
@@ -485,7 +485,7 @@ function library.onRequire()
 		Icon="rbxassetid://129368759663555";
 	};
 
-	library:Add{
+	library:Add{ -- kept for titles
 		Id="slaughterfest2025";
 
 		Title="Slaughterfest 2025";
@@ -613,6 +613,30 @@ function library.onRequire()
 		};
 	};
 
+
+	-- MARK: rotd3
+	library:Add{
+		Id="rotd3";
+		EndUnixTime=1790726400;
+
+		Title="Revived 3.0";
+		Icon="rbxassetid://79371010030621";
+		Desc="Unlock the Revived 3.0 Event Pass to claim more rewards!";
+
+		Tree = newTree{
+			leaf(0, {
+				Reward={ItemId="santahat";};
+			});
+			--
+			leaf(3, {
+				Reward={ItemId="p250toygun";};
+			});
+			leaf(7, {
+				Reward={ItemId="xmassweater";};
+			});
+			
+		};
+	};
 end
 
 return library;

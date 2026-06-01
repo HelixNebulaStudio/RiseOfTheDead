@@ -66,7 +66,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 		else
 			if colorPickerObj then
-				colorPickerObj.Frame.Visible = false;
+				colorPickerObj:Destroy();
+				colorPickerObj = nil;
 			end
 
 		end
@@ -274,11 +275,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						
 						colorButton.MouseButton1Click:Connect(function()
 							interface:PlayButtonClick();
-								
-							if colorPickerObj == nil then
-								colorPickerObj = modColorPicker.new(interface);
-								colorPickerObj.Parent = windowFrame;
+							
+							if colorPickerObj then
+								colorPickerObj:Destroy();
+								colorPickerObj = nil;
 							end
+							colorPickerObj = modColorPicker.new(interface);
+							colorPickerObj.Frame.Parent = windowFrame;
 
 							local customColors = modData:GetFlag("CustomColors");
 							colorPickerObj:SetUnlocked(customColors and customColors.Unlocked);
@@ -289,7 +292,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 							if modConfigurations.CompactInterface then
 								colorPickerObj.Frame.Size = UDim2.new(1,0,1,0);
 							else
-								colorPickerObj.Frame.Size = UDim2.new(0,300,0,300);
+								colorPickerObj.Frame.Size = UDim2.new(0.5,0,1,0);
 							end
 							
 							function colorPickerObj:OnColorSelect(selectColor)

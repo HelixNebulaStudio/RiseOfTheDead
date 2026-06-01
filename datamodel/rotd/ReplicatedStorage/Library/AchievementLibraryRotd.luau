@@ -217,5 +217,22 @@ library:Add{
 	Hidden=true;
 }
 
+library:Add{
+	Id = "rotd3";
+	Tier = Tiers.Bloodmetal;
+	BadgeId = 2937346212348630;
+	Announce = "$PlayerName survived Revived 3.0.";
+	Hidden = true;		
+	-- if profile.FirstJoined > 1777507200 then return end; -- Start of may 2026
+	-- 	-- playerSave:AwardAchievement("rotd3");
+}
+
+library:Add{
+	Id = "huescollector";
+	Tier = Tiers.Diamond;
+	BadgeId = 3611019434782737;
+	Announce = "Achievement Unlocked: Unlocked all colors on the color palette.";
+}
+
 library.Tiers = Tiers;
 return library;

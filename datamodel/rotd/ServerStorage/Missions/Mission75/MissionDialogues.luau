@@ -196,10 +196,10 @@ if RunService:IsServer() then
 				end
 				
 				inventory:Add("bloodsample", {
-					CustomName="Stan's Blood Samples";
-					Values={
-						Health=100;
-						MaxHealth=100;
+					CustomName = "Stan's Blood Samples";
+					Values = {
+						Health = 100;
+						MaxHealth = 100;
 					};
 				}, function(queueEvent, storageItem)
 					mission.SaveData.SampleId = storageItem.ID;
@@ -208,7 +208,7 @@ if RunService:IsServer() then
 				end);
 				
 				modMission:Progress(player, MISSION_ID, function(mission)
-					if modBranchConfigurations.IsWorld("MedicalBreakthrough") then
+					if shared.WorldName == "MedicalBreakthrough" then
 						mission.ProgressionPoint = 4;
 					else
 						mission.ProgressionPoint = 2;

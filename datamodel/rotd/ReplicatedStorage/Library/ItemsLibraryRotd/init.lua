@@ -613,6 +613,14 @@ function modItemsLibrary.onRequire()
                 data.Name = (data.Prefix and `<font color='#ff3c3c'>{data.Prefix}</font> ` or ``)..`{itemLib.Name} Parts`;
                 data.Description = `Parts used to create the {itemLib.Name} and mods.`;
             end
+
+            local idIndex = data.Id:sub(#data.Id, #data.Id);
+            if tonumber(idIndex) and data.Prefix then
+                local pf = data.Prefix:gsub("%U", "");
+                data.OverlayIcons={
+                    {Text=`<font color='#ff9b9b'>#{pf}</font>`};
+                };
+            end
         end;
     }
 

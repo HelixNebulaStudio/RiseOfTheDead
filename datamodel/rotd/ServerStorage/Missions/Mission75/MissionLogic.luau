@@ -17,8 +17,8 @@ if RunService:IsServer() then
 			if mission.Type == 2 then -- OnAvailable
 
 			elseif mission.Type == 1 then -- OnActive
-				if mission.ProgressionPoint == 2 then
-					if modBranchConfigurations.IsWorld("TheMall") then
+				if mission.ProgressionPoint > 1 and mission.ProgressionPoint <= 11 and shared.WorldName ~= "MedicalBreakthrough" then
+					if mission.ProgressionPoint == 2 and shared.WorldName == "TheMall" then
 						if clinicLoop == false then
 							clinicLoop = true;
 							
@@ -40,7 +40,17 @@ if RunService:IsServer() then
 						end
 					end
 					
-				elseif mission.ProgressionPoint >= 4 and mission.ProgressionPoint <= 11 and not modBranchConfigurations.IsWorld("MedicalBreakthrough") then
+					local profile = shared.modProfile:Get(player);
+					local inventory = profile.ActiveInventory;
+					local _, bloodSamplesList = inventory:ListQuantity("bloodsample", 1);
+
+					if bloodSamplesList == nil or #bloodSamplesList <= 0 then
+						clinicLoop = false;
+						modMission:FailMission(player, MISSION_ID, "Stan's blood samples were destroyed.");
+						return;
+					end
+
+				elseif mission.ProgressionPoint >= 4 and mission.ProgressionPoint <= 11 and shared.WorldName ~= "MedicalBreakthrough" then
 					modMission:Progress(player, MISSION_ID, function(mission)
 						mission.ProgressionPoint = 3;
 					end);

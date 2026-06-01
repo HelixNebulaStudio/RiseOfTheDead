@@ -51,6 +51,7 @@ function WorldCore.InitGameController()
         {Type="PotArmor"; Chance=1/2; Fmod=4;};
         {Type="ContagiousTicks"; Chance=1/4; Fmod=4;};
         {Type="ZpiderEggs"; Chance=1/5; Fmod=3;};
+        {Type="LocustSwarm"; Chance=1/4; Fmod=3;};
         {Type="Fog"; Chance=1/3; Fmod=4;};
     };
 
