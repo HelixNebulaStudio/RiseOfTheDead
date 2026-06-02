@@ -836,7 +836,7 @@ function Survival:SpawnCrate()
 	cratePrefab.Name = "WavePassCrate";
 	cratePrefab:PivotTo(rewardSpawnAtt.WorldCFrame);
 
-	local interactConfig = modInteractables.createInteractable("Storage");
+	local interactConfig = modInteractables.createInteractable("StorageRotd");
 	interactConfig:SetAttribute("StorageId", "survivalrewards");
 	interactConfig:SetAttribute("StorageName", "Survival Rewards");
 	interactConfig:SetAttribute("StoragePresetId", "rewardcrate");
@@ -914,6 +914,24 @@ function Survival:BreakTime()
 	end
 end
 
+
+function Survival:GetSurvivalStorage(player)
+	local profile = shared.modProfile:Get(player);
+	local cachedStorages = profile:GetCacheStorages();
+	
+	local storage: Storage = self.Storages[player];
+	if storage == nil then
+		storage = shared.modStorage.new(STORAGE_ID, "rewardcrate", player, "Survival Rewards");
+		storage.Properties.ItemSpawn = true;
+
+		storage:SetPermissions("CanRemove", false);
+		self.Storages[player] = storage;
+	end
+
+	cachedStorages[STORAGE_ID] = storage;
+
+	return storage;
+end
 
 -- MARK: StartWave
 function Survival:StartWave(wave)
@@ -1099,23 +1117,10 @@ function Survival:StartWave(wave)
 					task.spawn(function() 
 						if rewardOption == nil then return end;
 
-						local STORAGE_ID = "survivalrewards";
-
-						local profile = shared.modProfile:Get(player);
-						local storages = profile:GetCacheStorages();
-						
-						local storage: Storage = storages[STORAGE_ID] or self.Storages[player];
-						if storage == nil then
-							storage = shared.modStorage.new(STORAGE_ID, "rewardcrate", player, "Survival Rewards");
-							storage.Properties.ItemSpawn = true;
-
-							storage:SetPermissions("CanRemove", false);
-							self.Storages[player] = storage;
-						end
-						storages[STORAGE_ID] = storage;
-
+						local storage: Storage = self:GetSurvivalStorage(player);
 						storage:Add(rewardOption.ItemId, {Quantity=rewardOption.DropQuantity;});
 						storage:Sync(player);
+
 						Debugger:Warn(`Added {rewardOption.ItemId} x {rewardOption.DropQuantity} to ({player.Name}) {storage.Id}`);
 					end)
 				end
@@ -1207,21 +1212,10 @@ function Survival:StartWave(wave)
 					task.spawn(function() 
 						if rewardInfo == nil then return end;
 
-						local profile = shared.modProfile:Get(player);
-						local storages = profile:GetCacheStorages();
-						
-						local storage: Storage = storages[player] or self.Storages[player];
-						if storage == nil then
-							storage = shared.modStorage.new(STORAGE_ID, "rewardcrate", player, "Survival Rewards");
-							storage.Properties.ItemSpawn = true;
-
-							storage:SetPermissions("CanRemove", false);
-							self.Storages[player] = storage;
-						end
-						storages[STORAGE_ID] = storage;
-
+						local storage: Storage = self:GetSurvivalStorage(player);
 						storage:Add(rewardInfo.ItemId, {Quantity=rewardInfo.DropQuantity;});
 						storage:Sync(player);
+
 						Debugger:Warn(`WaveSelect OptionPick ({player.Name}) picked {rewardInfo.ItemId} x {rewardInfo.DropQuantity}`);
 					end)
 				end

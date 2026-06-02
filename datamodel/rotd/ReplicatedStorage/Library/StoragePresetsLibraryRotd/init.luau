@@ -106,8 +106,8 @@ modStoragePresetsLibrary:Add{
 	Id = "rewardcrate"; -- Multi user crate
     Name = "Reward Crate";
     Configuration = {
-        Persistent=false;
-        Settings={
+        Persistent = false;
+        Settings = {
             WithdrawalOnly = true;
             ScaleByContent = true;
         }

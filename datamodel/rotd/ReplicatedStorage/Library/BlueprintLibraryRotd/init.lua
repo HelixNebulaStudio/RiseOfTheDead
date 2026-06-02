@@ -1389,6 +1389,50 @@ function BlueprintLibrary.onRequire()
 	};
 
 	BlueprintLibrary.New{
+		Id = "fermentationvatbp";
+		Name = "Fermentation Vat Blueprint";
+		Product = "fermentationvat";
+		Duration = 60;
+		SellPrice = 100;
+		Requirements = {
+			{Type="Item"; ItemId="metal"; Amount=50;};
+			{Type="Item"; ItemId="lightbulb"; Amount=1;};
+			{Type="Item"; ItemId="toxiccontainer"; Amount=1;};
+		};
+		Category = "Commodities";
+	};
+
+	BlueprintLibrary.New{
+		Id = "hydroponiccapsulebp";
+		Name = "Hydroponic Capsule Blueprint";
+		Product = "hydroponiccapsule";
+		Duration = 60;
+		SellPrice = 100;
+		Requirements = {
+			{Type="Item"; ItemId="glass"; Amount=25;};
+			{Type="Item"; ItemId="metalpipes"; Amount=1;};
+			{Type="Item"; ItemId="toxiccontainer"; Amount=1;};
+			{Type="Item"; ItemId="tires"; Amount=1;};
+		};
+		Category = "Commodities";
+	};
+
+	BlueprintLibrary.New{
+		Id = "pulleymechanicsbp";
+		Name = "Pulley Mechanics Blueprint";
+		Product = "pulleymechanics";
+		Duration = 60;
+		SellPrice = 100;
+		Requirements = {
+			{Type="Item"; ItemId="metal"; Amount=50;};
+			{Type="Item"; ItemId="gears"; Amount=1;};
+			{Type="Item"; ItemId="rope"; Amount=1;};
+			{Type="Item"; ItemId="tires"; Amount=1;};
+		};
+		Category = "Commodities";
+	};
+
+	BlueprintLibrary.New{
 		Id = "biocharkilnbp";
 		Name = "Biochar Kiln Blueprint";
 		Product = "biocharkiln";

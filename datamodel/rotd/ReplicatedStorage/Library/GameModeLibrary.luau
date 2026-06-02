@@ -374,7 +374,7 @@ GameModeLibrary.GameModes={
 				MaxPlayers = 5;
 				RewardsId = "mangrovecrate";
 				RewardsIds = {"mangrovecrate"; "dmangrovecrate"};
-				-- HardRewardId = "corruptedsectordcrate";
+				HardRewardId = "corruptedmangrovecrate";
 				
 				SurvivalEndedTrack = "SectorDSoundtrack";
 				BossKilledTrack = "SectorDBossKilled";

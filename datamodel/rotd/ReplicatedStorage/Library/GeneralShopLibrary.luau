@@ -45,12 +45,12 @@ local SELL_PRICES = {
 	["boombox"] = 2300; -- buy $3k
 	["gps"] = 650; -- buy $1k
 	["rcetablet"] = 5000; -- buy $10k
-	["walkietalkie"] = 9100;
-	["musicbox"] = 7000;
-	["wateringcan"] = 1000;
-	["disguisekit"] = 3400;
-	["matchbox"] = 2100;
+	["wateringcan"] = 500;
+	["matchbox"] = 800;
+	["disguisekit"] = 800;
 	["ladder"] = 5000;
+	["musicbox"] = 7000;
+	["walkietalkie"] = 9100;
 	
 	["coal"]=12;
 	
@@ -87,9 +87,12 @@ SELL_PRICES["portablestove"] = (SELL_PRICES.metalpipes*2 + SELL_PRICES.igniter) 
 SELL_PRICES["charger"] = (SELL_PRICES.battery*2 + SELL_PRICES.wires) * 4.8; -- 4'800
 SELL_PRICES["handgenerator"] = (SELL_PRICES.wires + SELL_PRICES.battery + SELL_PRICES.motor) * 4.3; -- 4'300
 SELL_PRICES["solarconcentrator"] = (SELL_PRICES.metalpipes + SELL_PRICES.gears) * 4.6; -- 4'600
+SELL_PRICES["fermentationvat"] = (SELL_PRICES.lightbulb + SELL_PRICES.toxiccontainer) * 2.8; -- 4'480
+SELL_PRICES["hydroponiccapsule"] = (SELL_PRICES.metalpipes + SELL_PRICES.toxiccontainer + SELL_PRICES.tires) * 2.3; -- 4'140
+SELL_PRICES["pulleymechanics"] = (SELL_PRICES.gears + SELL_PRICES.tires + SELL_PRICES.rope) * 2; -- 4'800
 
 SELL_PRICES["biocharkiln"] = (SELL_PRICES.gastank + SELL_PRICES.portablestove + SELL_PRICES.radiator) * 2.9; -- 15'428
-SELL_PRICES["bicyclepoweredgenerator"] = (SELL_PRICES.gears + SELL_PRICES.handgenerator + SELL_PRICES.tires) * 2.6; -- 15'340
+SELL_PRICES["bicyclepoweredgenerator"] = (SELL_PRICES.handgenerator + SELL_PRICES.pulleymechanics) * 1.8; -- 16'380
 SELL_PRICES["solarwaterstill"] = (SELL_PRICES.gears + SELL_PRICES.solarconcentrator + SELL_PRICES.metalpipes) * 2.7; -- 15'120
 
 

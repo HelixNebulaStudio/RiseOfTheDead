@@ -207,7 +207,7 @@ function modItemsLibrary.onRequire()
     new(clothingBase, {Id="bunnymanhead"; Name="Bunny Man's Head"; Icon="rbxassetid://4845183167"; Tags={"Head"; "Easter"}; Description="Bunny Man's Headwear.\n\n<b>[Passive] Dead Bunny:</b>  Normal environmental Zombies will ignore you during the Easter event.\nEvent-Active: "..tostring(modConfigurations.SpecialEvent.Easter); Sources={"Obtained from <b>The Bunny Man in Mission: Bunny Man's Eggs</b>";};});
     new(clothingBase, {Id="jackolantern"; Name="Jack o' Lantern"; Icon="rbxassetid://14951707178"; Tags={"Head"; "Slaughterfest";}; Description="Where Jack watches through the jacks o lanterns.";});
     new(clothingBase, {Id="ninjashroud"; Name="Ninja Shroud"; Icon="rbxassetid://88409858365523"; Tags={"Head";}; Description="Comfortable cloth shroud.\n\n<b>[Passive] Ninja Fleet:</b> Sprint button is now a dash button. You automatically sprint when you haven't taken damage to your health for an amount of time. Your base move speed is reduced but sprint speed is increased.";});
-    new(clothingBase, {Id="knightshelmet"; Name="Knight's Helmet"; Icon="rbxassetid://134453328061975"; Tags={"Head"; "Unobtainable"}; Description="";});
+    new(clothingBase, {Id="knightshelmet"; Name="Knight's Helmet"; Icon="rbxassetid://134453328061975"; Tags={"Head";}; Description="The helmet of ser Duncan the big.\n\n<b>[Passive] Helm Overwhelm:</b> When you take armor damage, you heal 10% damage of the damage taken.";});
 
     -- Chest
     new(clothingBase, {Id="greytshirt"; Name="T-Shirt"; Icon="rbxassetid://5756503297"; Tags={"Chest"}; Description="Comfy T-Shirt. Gives you 1 armor point for protection.";});
@@ -370,6 +370,9 @@ function modItemsLibrary.onRequire()
     new(commodityBase, {Id="portablestove"; Name="Portable Stove"; Icon="rbxassetid://123389561214760"; Stackable=false; Equippable=true; Description="<b>Tier 3 Commodity</b>\nIt is useful for cooking outdoors.";});
     new(commodityBase, {Id="handgenerator"; Name="Hand Crank Generator"; Icon="rbxassetid://72027025737751"; Description="<b>Tier 3 Commodity</b>\nYou can generate electricity using this by kinetic motion. Crank that.. generator.";});
     new(commodityBase, {Id="solarconcentrator"; Name="Solar Concentrator"; Icon="rbxassetid://72709422273931"; Description="<b>Tier 3 Commodity</b>\nA dish that concentrates sun light into a point.";});
+    new(commodityBase, {Id="fermentationvat"; Name="Fermentation Vat"; Icon="rbxassetid://140360171734937"; Description="<b>Tier 3 Commodity</b>\nA vat for fermentation.";});
+    new(commodityBase, {Id="hydroponiccapsule"; Name="Hydroponic Capsule"; Icon="rbxassetid://106591639695833"; Description="<b>Tier 3 Commodity</b>\nHydroponic capsule useful for farming without soil.";});
+    new(commodityBase, {Id="pulleymechanics"; Name="Pulley Mechanics"; Icon="rbxassetid://79582560675154"; Description="<b>Tier 3 Commodity</b>\nA mechanic to leverage physics to excert calculated push and pull forces.";});
     
     new(commodityBase, {Id="biocharkiln"; Name="Biochar Kiln"; Icon="rbxassetid://83584229658080"; Description="<b>Tier 4 Commodity</b>\nA system that turns organic waste into biochar, a charcoal alternative, by heating it in high heat.";});
     new(commodityBase, {Id="bicyclepoweredgenerator"; Name="Bicycle Powered Generator"; Icon="rbxassetid://123653056685971"; Description="<b>Tier 4 Commodity</b>\nGenerates electricity by peddling..";});

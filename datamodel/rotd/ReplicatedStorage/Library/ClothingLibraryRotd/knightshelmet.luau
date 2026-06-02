@@ -8,6 +8,8 @@ local attirePackage = {
 	
 	Configurations = {
 		HasFlinchProtection = true;
+		ArmorPoints = 20;
+		Warmth = 2;
 	};
 	Properties = {};
 };
@@ -15,7 +17,11 @@ local attirePackage = {
 function attirePackage.newClass()
 	local equipmentClass = modEquipmentClass.new(attirePackage);
 
-	
+	equipmentClass:AddBaseModifier("HelmOverwhelm", {
+		ArrayValues = {
+			PassiveModifiers = "HelmOverwhelm";
+		};
+	});
 
 	return equipmentClass;
 end
