@@ -1215,35 +1215,6 @@ function BlueprintLibrary.onRequire()
 
 	--== MARK: Commodity
 	BlueprintLibrary.New{
-		Id="chargerbp";
-		Name="Charger Blueprint";
-		Product="charger";
-		Duration=60;
-		SellPrice=200;
-		Requirements={
-			{Type="Item"; ItemId="metal"; Amount=20;};
-			{Type="Item"; ItemId="battery"; Amount=2;};
-			{Type="Item"; ItemId="wires"; Amount=1;};
-		};
-		Category="Commodities";
-	};
-
-	BlueprintLibrary.New{
-		Id="portablestovebp";
-		Name="Portable Stove Blueprint";
-		Product="portablestove";
-		Duration=60;
-		SellPrice=100;
-		Requirements={
-			{Type="Item"; ItemId="metal"; Amount=50;};
-			{Type="Item"; ItemId="wood"; Amount=5;};
-			{Type="Item"; ItemId="metalpipes"; Amount=2;};
-			{Type="Item"; ItemId="igniter"; Amount=1;};
-		};
-		Category="Commodities";
-	};
-
-	BlueprintLibrary.New{
 		Id="lanternbp";
 		Name="Lantern Blueprint";
 		Product="lantern";
@@ -1253,21 +1224,6 @@ function BlueprintLibrary.onRequire()
 			{Type="Item"; ItemId="metal"; Amount=30;};
 			{Type="Item"; ItemId="igniter"; Amount=1;};
 			{Type="Item"; ItemId="gastank"; Amount=1;};
-		};
-		Category="Commodities";
-	};
-
-	BlueprintLibrary.New{
-		Id="handgeneratorbp";
-		Name="Hand Crank Generator Blueprint";
-		Product="handgenerator";
-		Duration=60;
-		SellPrice=100;
-		Requirements={
-			{Type="Item"; ItemId="metal"; Amount=50;};
-			{Type="Item"; ItemId="wires"; Amount=1;};
-			{Type="Item"; ItemId="battery"; Amount=1;};
-			{Type="Item"; ItemId="motor"; Amount=1;};
 		};
 		Category="Commodities";
 	};
@@ -1366,11 +1322,115 @@ function BlueprintLibrary.onRequire()
 		Duration=60;
 		SellPrice=100;
 		Requirements={
-			{Type="Item"; ItemId="steelfragments"; Amount=20;};
+			{Type="Item"; ItemId="steelfragments"; Amount=5;};
 		};
 		Sources={"Obtained from <b>David in The Harbor</b>";};
 		Category="Commodities";
 	};
+
+	--== MARK: Manufacturing
+	BlueprintLibrary.New{
+		Id="chargerbp";
+		Name="Charger Blueprint";
+		Product="charger";
+		Duration=60;
+		SellPrice=200;
+		Requirements={
+			{Type="Item"; ItemId="metal"; Amount=20;};
+			{Type="Item"; ItemId="battery"; Amount=2;};
+			{Type="Item"; ItemId="wires"; Amount=1;};
+		};
+		Category="Commodities";
+	};
+
+	BlueprintLibrary.New{
+		Id="portablestovebp";
+		Name="Portable Stove Blueprint";
+		Product="portablestove";
+		Duration=60;
+		SellPrice=100;
+		Requirements={
+			{Type="Item"; ItemId="metal"; Amount=50;};
+			{Type="Item"; ItemId="wood"; Amount=5;};
+			{Type="Item"; ItemId="metalpipes"; Amount=2;};
+			{Type="Item"; ItemId="igniter"; Amount=1;};
+		};
+		Category="Commodities";
+	};
+
+	BlueprintLibrary.New{
+		Id="handgeneratorbp";
+		Name="Hand Crank Generator Blueprint";
+		Product="handgenerator";
+		Duration=60;
+		SellPrice=100;
+		Requirements={
+			{Type="Item"; ItemId="metal"; Amount=50;};
+			{Type="Item"; ItemId="wires"; Amount=1;};
+			{Type="Item"; ItemId="battery"; Amount=1;};
+			{Type="Item"; ItemId="motor"; Amount=1;};
+		};
+		Category="Commodities";
+	};
+
+	BlueprintLibrary.New{
+		Id = "solarconcentratorbp";
+		Name = "Solar Concentrator Blueprint";
+		Product = "solarconcentrator";
+		Duration = 60;
+		SellPrice = 100;
+		Requirements = {
+			{Type="Item"; ItemId="metal"; Amount=50;};
+			{Type="Item"; ItemId="glass"; Amount=25;};
+			{Type="Item"; ItemId="metalpipes"; Amount=1;};
+			{Type="Item"; ItemId="gears"; Amount=1;};
+		};
+		Category = "Commodities";
+	};
+
+	BlueprintLibrary.New{
+		Id = "biocharkilnbp";
+		Name = "Biochar Kiln Blueprint";
+		Product = "biocharkiln";
+		Duration = 300;
+		SellPrice = 100;
+		Requirements = {
+			{Type="Item"; ItemId="wood"; Amount=50;};
+			{Type="Item"; ItemId="gastank"; Amount=1;};
+			{Type="Item"; ItemId="portablestove"; Amount=1;};
+			{Type="Item"; ItemId="radiator"; Amount=1;};
+		};
+		Category = "Commodities";
+	};
+
+	BlueprintLibrary.New{
+		Id = "bicyclepoweredgeneratorbp";
+		Name = "Bicycle Powered Generator Blueprint";
+		Product = "bicyclepoweredgenerator";
+		Duration = 300;
+		SellPrice = 100;
+		Requirements = {
+			{Type="Item"; ItemId="gears"; Amount=1;};
+			{Type="Item"; ItemId="handgenerator"; Amount=1;};
+			{Type="Item"; ItemId="tires"; Amount=1;};
+		};
+		Category = "Commodities";
+	};
+
+	BlueprintLibrary.New{
+		Id = "solarwaterstillbp";
+		Name = "Solar Water Still Blueprint";
+		Product = "solarwaterstill";
+		Duration = 300;
+		SellPrice = 100;
+		Requirements = {
+			{Type="Item"; ItemId="gears"; Amount=1;};
+			{Type="Item"; ItemId="solarconcentrator"; Amount=1;};
+			{Type="Item"; ItemId="metalpipes"; Amount=1;};
+		};
+		Category = "Commodities";
+	};
+
 
 
 	--== MARK: Summons
@@ -1386,7 +1446,6 @@ function BlueprintLibrary.onRequire()
 		};
 		Category="Summons";
 	};
-
 
 	--== MARK: Structures
 	BlueprintLibrary.New{

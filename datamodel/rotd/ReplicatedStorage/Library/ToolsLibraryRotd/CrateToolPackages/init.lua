@@ -144,7 +144,7 @@ function toolPackage.init(super)
 	toolPackage.inherit({
 		ItemId = "corruptedsectordcrate";
 	});
-
+	
 	-- residentials
 	toolPackage.inherit({
 		ItemId = "sectordcrate";
@@ -169,6 +169,14 @@ function toolPackage.init(super)
 	-- harbor
 	toolPackage.inherit({
 		ItemId = "sunkenchest";
+	});
+
+	toolPackage.inherit({
+		ItemId = "mangrovecrate";
+	});
+	
+	toolPackage.inherit({
+		ItemId = "dmangrovecrate";
 	});
 	
 	

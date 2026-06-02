@@ -5,15 +5,15 @@ local ShopLibrary = {
 };
 
 --
-ShopLibrary.SellPrice = {
+local SELL_PRICES = {
 	["Tier1"]=300;
 	
-	["metal"]=10;
-	["glass"]=10;
-	["wood"]=10;
-	["cloth"]=10;
-	["screws"]=10;
-	["adhesive"]=10;
+	["metal"]=1;
+	["glass"]=1;
+	["wood"]=1;
+	["cloth"]=1;
+	["screws"]=1;
+	["adhesive"]=1;
 	
 	["cannedbeans"]=48;
 	["chocobar"]=48;
@@ -21,58 +21,59 @@ ShopLibrary.SellPrice = {
 	["sandwich"]=120;
 	["ziphoningserum"]=2000;
 	
-	["metalpipes"]=200;
-	["igniter"]=200;
-	["gastank"]=200;
+	["metalpipes"] = 200;
+	["igniter"] = 200;
+	["gastank"] = 200;
+	["wires"] = 200;
+
+	["battery"] = 400;
+	["motor"] = 400;
 	
-	["wires"]=400;
-	["battery"]=400;
-	["motor"]=400;
+	["circuitboards"] = 800;
+	["lightbulb"] = 800;
+	["radiator"] = 800;
+	["toxiccontainer"] = 800;
+	["gears"] = 800;
+	["rope"] = 800;
+	["tires"] = 800;
 	
-	["circuitboards"]=800;
-	["lightbulb"]=800;
-	["radiator"]=800;
-	["toxiccontainer"]=800;
-	["gears"]=800;
-	["rope"]=800;
-	["tires"]=800;
+	-- util
+	["binoculars"] = 400; -- buy $500
+	["lantern"] = 600; -- buy $1.6k
 	
-	["binoculars"]=400;
-	["lantern"]=1000;
-	["charger"]=4700;
-	["portablestove"]=3300;
-	["handgenerator"]=13050;
+	["spotlight"] = 1000; -- buy $5k
+	["boombox"] = 2300; -- buy $3k
+	["gps"] = 650; -- buy $1k
+	["rcetablet"] = 5000; -- buy $10k
+	["walkietalkie"] = 9100;
+	["musicbox"] = 7000;
+	["wateringcan"] = 1000;
+	["disguisekit"] = 3400;
+	["matchbox"] = 2100;
+	["ladder"] = 5000;
 	
-	["walkietalkie"]=9100;
-	["spotlight"]=16030;
-	["musicbox"]=7000;
-	["boombox"]=2300;
-	["wateringcan"]=3000;
-	["disguisekit"]=3400;
-	["gps"]=650;
-	["matchbox"]=2100;
-	["ladder"]=5000;
-	["rcetablet"]=5000;
+	["coal"]=12;
 	
-	["coal"]=64;
-	
-	["purplelemon"]=6500;
-	["fotlcardgame"]=14000;
+	["purplelemon"]=500;
+	["fotlcardgame"]=4000;
 	
 	-- Weapon parts;
-	["tacticalbowparts"]=2000;
-	["at4parts"]=3000;
-	["sr308parts"]=4000;
-	["vectorxparts"]=5000;
-	["rusty48parts"]=5000;
-	["arelshiftcrossparts"]=5000;
-	["deagleparts"]=4000;
-	["grandgarandparts1"]=6000;
-	["grandgarandparts2"]=6000;
-	["grandgarandparts3"]=6000;
-	["rechamber1216parts1"]=6000;
-	["rechamber1216parts2"]=6000;
-	["rechamber1216parts3"]=6000;
+	["tacticalbowparts"]=500;
+	["at4parts"]=600;
+	["sr308parts"]=700;
+	["vectorxparts"]=800;
+	["rusty48parts"]=1000;
+	["arelshiftcrossparts"]=1000;
+	["deagleparts"]=1200;
+	["grandgarandparts1"]=1400;
+	["grandgarandparts2"]=1400;
+	["grandgarandparts3"]=1400;
+	["rechamber1216parts1"]=1600;
+	["rechamber1216parts2"]=1600;
+	["rechamber1216parts3"]=1600;
+	["dualuziparts1"]=1600;
+	["dualuziparts2"]=1600;
+	["dualuziparts3"]=1600;
 
 	--
 	["wantedposter"]=1000;
@@ -80,6 +81,17 @@ ShopLibrary.SellPrice = {
 	-- Events
 	["halloweencandy"]=5;
 };
+ShopLibrary.SellPrice = SELL_PRICES;
+
+SELL_PRICES["portablestove"] = (SELL_PRICES.metalpipes*2 + SELL_PRICES.igniter) * 7.2; -- 4'320
+SELL_PRICES["charger"] = (SELL_PRICES.battery*2 + SELL_PRICES.wires) * 4.8; -- 4'800
+SELL_PRICES["handgenerator"] = (SELL_PRICES.wires + SELL_PRICES.battery + SELL_PRICES.motor) * 4.3; -- 4'300
+SELL_PRICES["solarconcentrator"] = (SELL_PRICES.metalpipes + SELL_PRICES.gears) * 4.6; -- 4'600
+
+SELL_PRICES["biocharkiln"] = (SELL_PRICES.gastank + SELL_PRICES.portablestove + SELL_PRICES.radiator) * 2.9; -- 15'428
+SELL_PRICES["bicyclepoweredgenerator"] = (SELL_PRICES.gears + SELL_PRICES.handgenerator + SELL_PRICES.tires) * 2.6; -- 15'340
+SELL_PRICES["solarwaterstill"] = (SELL_PRICES.gears + SELL_PRICES.solarconcentrator + SELL_PRICES.metalpipes) * 2.7; -- 15'120
+
 
 ShopLibrary.AmmunitionPrice = {
 	["p250"]=0;

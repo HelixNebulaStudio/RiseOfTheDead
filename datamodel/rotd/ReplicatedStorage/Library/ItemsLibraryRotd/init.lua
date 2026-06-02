@@ -237,7 +237,7 @@ function modItemsLibrary.onRequire()
     new(clothingBase, {Id="brownleatherboots"; Name="Leather Boots"; Icon="rbxassetid://89716224000012"; Tags={"Shoes"}; Description="These look great on you.\n<b>[Passive] Bull Leaping:</b> Slide jumping adds 10 units/sec launch speed.";});
     new(clothingBase, {Id="militaryboots"; Name="Military Boots"; Icon="rbxassetid://17022087037"; Tags={"Shoes"}; Description="Military grade boots.\n<b>[Passive] Firm Footing:</b> Reduces movement impairment debuffs by 20%.";});
     new(clothingBase, {Id="divingfins"; Name="Diving Fins"; Icon="rbxassetid://10334749462"; Tags={"Shoes"; "Diving Gear"}; Description="Swim like a fish.\n<b>[Passive] Dolphin Stride:</b> Improves underwater mobility.";});
-    new(clothingBase, {Id="greavesandsabatons"; Name="Greaves and Sabatons"; Icon="rbxassetid://101266147153196"; Tags={"Shoes"; "Unobtainable"}; Description="Polished metal plating wrapped around your legs and feet. <b>[Passive] Chivalrous Kick:</b> Sliding allows you to go through enemies and knocks them away.";});
+    new(clothingBase, {Id="greavesandsabatons"; Name="Greaves and Sabatons"; Icon="rbxassetid://101266147153196"; Tags={"Shoes";}; Description="Polished metal plating wrapped around your legs and feet. <b>[Passive] Chivalrous Kick:</b> Sliding allows you to go through enemies and knocks them away.";});
 
     -- Misc Wear
     new(clothingBase, {Id="brownbelt"; Name="Tactical Belt"; Icon="rbxassetid://4789684750"; Tags={"Belt"; "Utility Wear";}; Description="A tactical belt. Adds an extra hot bar slot.";});
@@ -295,6 +295,8 @@ function modItemsLibrary.onRequire()
     new(crateBase, {Id="ggenesiscrate"; Icon="rbxassetid://16791016380"; GameMode={Mode="Coop"; Stage="Genesis"; HardPrefix="Golden";}});
     new(crateBase, {Id="sunkenchest"; Icon="rbxassetid://10971583849"; GameMode={Mode="Coop"; Stage="SunkenShip"; CrateSynonym="Chest";}});
     new(crateBase, {Id="abandonedbunkercrate"; Icon="rbxassetid://13495111655"; GameMode={Mode="Raid"; Stage="Abandoned Bunker"}});
+    new(crateBase, {Id="mangrovecrate"; Icon="rbxassetid://89583678864591"; GameMode={Mode="Survival"; Stage="Swamplands"}});
+    new(crateBase, {Id="dmangrovecrate"; Icon="rbxassetid://71675901045992"; GameMode={Mode="Survival"; Stage="Swamplands"; HardPrefix="Deadly"}});
 
     -- Corrupted
     local corruptedCrateBase = table.clone(crateBase);
@@ -351,10 +353,7 @@ function modItemsLibrary.onRequire()
         Stackable = 10;
     };
 
-    new(commodityBase, {Id="charger"; Name="Charger"; Icon="rbxassetid://3598937412"; Description="It is useful for charging electrical devices.";});
-    new(commodityBase, {Id="portablestove"; Name="Portable Stove"; Icon="rbxassetid://3610224355"; Stackable=false; Equippable=true; Description="It is useful for cooking outdoors.";});
     new(commodityBase, {Id="lantern"; Name="Lantern"; Icon="rbxassetid://3681206568"; Stackable=false; Equippable=true; Description="It is used to light up the dark.";});
-    new(commodityBase, {Id="handgenerator"; Name="Hand Crank Generator"; Icon="rbxassetid://3681209212"; Description="You can generate electricity using this by kinetic motion. Crank that.. generator.";});
     new(commodityBase, {Id="walkietalkie"; Name="Walkie Talkie"; Icon="rbxassetid://4578978755"; Stackable=false; Equippable=true; Description="Long distance communication.";});
     new(commodityBase, {Id="spotlight"; Name="Spotlight"; Icon="rbxassetid://4578977602"; Stackable=false; Equippable=true; Description="A strong beam of light useful for spoting in the dark.";});
     new(commodityBase, {Id="musicbox"; Name="Music Box"; Icon="rbxassetid://4706460063"; Stackable=false; Equippable=true; Description="Something to help with sanity.";});
@@ -366,6 +365,15 @@ function modItemsLibrary.onRequire()
     new(commodityBase, {Id="fotlcardgame"; Name="Fall of the Living: Card Game"; Tags={"Tool";}; Icon="rbxassetid://10862651147"; Equippable=true; Stackable=false; Tradable=modItemsLibrary.Tradable.PremiumOnly; Description="Card game called Fall of the Living.. Play safe by not bluffing or take risks and bluff to gain an advantage.\n\n<b>Actions:</b>\nScavenging might yield 0-2 resources.\nAttacking with 10 resources is unblockable. \n\n<b>Card:</b>\n<font color='#8c5252'>Rouge</font>: Attack using 4 resources\n<font color='#78476f'>Rat</font>: Scavenge 3 resources\n<font color='#634335'>Bear</font>: Raid others for 2 resources\n<font color='#31564c'>Rabbit</font>: Pick 2 random card and switch cards\n<font color='#52622a'>Zombie</font>: Blocks rouge attacks.\n\nPlayers starts with 2 cards, if they have a card, they can perform the card's action legitimately. If they don't have the card, they can bluff their actions.";});
     new(commodityBase, {Id="rcetablet"; Name="RCE Tablet"; Tags={"Tool";}; Icon="rbxassetid://14405843549"; Stackable=false; Equippable=true; Tradable=modItemsLibrary.Tradable.PremiumOnly; Description="Revive Command Executor tablet, a portable computer that has built in capabilities to hack other devices.";});
 
+    --MARK: MANUFACTURING
+    new(commodityBase, {Id="charger"; Name="Charger"; Icon="rbxassetid://131629225855443"; Description="<b>Tier 3 Commodity</b>\nIt is useful for charging electrical devices.";});
+    new(commodityBase, {Id="portablestove"; Name="Portable Stove"; Icon="rbxassetid://123389561214760"; Stackable=false; Equippable=true; Description="<b>Tier 3 Commodity</b>\nIt is useful for cooking outdoors.";});
+    new(commodityBase, {Id="handgenerator"; Name="Hand Crank Generator"; Icon="rbxassetid://72027025737751"; Description="<b>Tier 3 Commodity</b>\nYou can generate electricity using this by kinetic motion. Crank that.. generator.";});
+    new(commodityBase, {Id="solarconcentrator"; Name="Solar Concentrator"; Icon="rbxassetid://72709422273931"; Description="<b>Tier 3 Commodity</b>\nA dish that concentrates sun light into a point.";});
+    
+    new(commodityBase, {Id="biocharkiln"; Name="Biochar Kiln"; Icon="rbxassetid://83584229658080"; Description="<b>Tier 4 Commodity</b>\nA system that turns organic waste into biochar, a charcoal alternative, by heating it in high heat.";});
+    new(commodityBase, {Id="bicyclepoweredgenerator"; Name="Bicycle Powered Generator"; Icon="rbxassetid://123653056685971"; Description="<b>Tier 4 Commodity</b>\nGenerates electricity by peddling..";});
+    new(commodityBase, {Id="solarwaterstill"; Name="Solar Water Still"; Icon="rbxassetid://137792789461517"; Description="<b>Tier 4 Commodity</b>\nA water purifier that uses the sun's energy to evaporate dirty water into clean water.";});
 
     --MARK: STRUCTURE
     --=========================================================[[ STRUCTURE ]]==========================================================--

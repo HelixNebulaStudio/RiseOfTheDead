@@ -134,10 +134,10 @@ MissionLibrary.New{
 	GuideText="Talk to Stephanie to start";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Side};
-		{Type="Mission"; Id=9};
+		{Type="Mission"; Id=3};
 	};
 	StartRequirements={
-		Level=3;
+		Level=2;
 	};
 	
 };
@@ -159,7 +159,7 @@ MissionLibrary.New{
 	GuideText="Talk to Dr. Deniski to start";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Side};
-		{Type="Mission"; Id=8};
+		{Type="Mission"; Id=3};
 	};
 	StartRequirements={
 		Level=2;

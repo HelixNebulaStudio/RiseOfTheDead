@@ -372,8 +372,8 @@ GameModeLibrary.GameModes={
 				ExitSpawn = "swampToHarbor";
 				TitleImage = "rbxassetid://78769778825277";
 				MaxPlayers = 5;
-				-- RewardsId = "sectordcrate";
-				-- RewardsIds = {"sectordcrate"; "ucsectordcrate"};
+				RewardsId = "mangrovecrate";
+				RewardsIds = {"mangrovecrate"; "dmangrovecrate"};
 				-- HardRewardId = "corruptedsectordcrate";
 				
 				SurvivalEndedTrack = "SectorDSoundtrack";

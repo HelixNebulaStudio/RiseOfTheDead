@@ -2029,6 +2029,20 @@ function library.onRequire()
 		Unlocked = true;
 	};
 
+
+	--MARK: knightshelmet
+	library:Add{
+		Id="knightshelmet";
+		ItemId="knightshelmet";
+		Name="Default";
+		DefaultPackage=true;
+		SurfaceAppearanceParent=script;
+		
+		SurfaceAppearance={
+			ColorMap="rbxassetid://129525905596936";
+		};
+	};
+	
 end
 
 return library;

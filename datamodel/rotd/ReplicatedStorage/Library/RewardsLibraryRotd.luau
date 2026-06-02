@@ -1013,7 +1013,7 @@ function library.onRequire()
 	-- MARK: railwayscrate : 260
 	library:Add{
 		Id="railwayscrate";
-		Level=260;
+		Level=80;
 		Rewards={
 			{Index=1; ItemId="coal"; Quantity={Min=30; Max=60}; Chance=1;};
 			
@@ -1104,7 +1104,7 @@ function library.onRequire()
 	-- MARK: ucsectorfcrate
 	library:Add{
 		Id="ucsectorfcrate";
-		Level=220;
+		Level=180;
 		Rewards={
 			{Index=1; ItemId="crowbar"; Level=0; Recyclable=true; Quantity=1; Chance=1;};
 			{Index=1; ItemId="subdmgcalibremod"; Level=30; Recyclable=true; Quantity=1; Chance=9/10;};
@@ -1142,7 +1142,7 @@ function library.onRequire()
 	-- MARK: prisoncrate : 140
 	library:Add{
 		Id="prisoncrate";
-		Level=140;
+		Level=80;
 		Rewards={
 			{Index=1; ItemId="advmedkit"; Level=0; Quantity=1; Chance=1;};
 
@@ -1159,13 +1159,13 @@ function library.onRequire()
 	-- MARK: nprisoncrate
 	library:Add{
 		Id="nprisoncrate";
-		Level=300;
+		Level=240;
 		Rewards={
 			{Index=1; ItemId="motor"; Level=0; Quantity={Min=1; Max=2}; Chance=1;};
 
-			{Index=2; ItemId="smgcritmultimod"; Recyclable=true; Quantity=1; Chance=9/10;};
-			{Index=2; ItemId="thornmod"; Recyclable=true; Quantity=1; Chance=8/10;};
-			{Index=2; ItemId="pyroeverlastmod"; Recyclable=true; Quantity=1; Chance=7/10;};
+			{Index=2; ItemId="smgcritmultimod"; Level=30; Recyclable=true; Quantity=1; Chance=9/10;};
+			{Index=2; ItemId="thornmod"; Level=50; Recyclable=true; Quantity=1; Chance=8/10;};
+			{Index=2; ItemId="pyroeverlastmod"; Level=70; Recyclable=true; Quantity=1; Chance=7/10;};
 
 			{Index=3; ItemId="deaglebp"; Recyclable=true; Quantity=1; Chance=6/10;};
 		};
@@ -1197,14 +1197,14 @@ function library.onRequire()
 	-- MARK: sectordcrate
 	library:Add{
 		Id="sectordcrate";
-		Level=240;
+		Level=80;
 		Rewards={
 			{Index=1; ItemId="cannedfish"; Level=0; Quantity={Min=1; Max=2}; Chance=1;};
 			{Index=1; ItemId="mk2grenade"; Level=0; Quantity=1; Chance=1;};
 			
-			{Index=2; ItemId="healthmod"; Level=30; Recyclable=true; Quantity=1; Chance=9/10;};
-			{Index=2; ItemId="vexling"; Level=50; Recyclable=true; Quantity={Min=1; Max=2}; Chance=8/10;};
-			{Index=2; ItemId="bluntknockoutmod"; Level=70; Recyclable=true; Quantity=1; Chance=7/10;};
+			{Index=2; ItemId="healthmod"; Recyclable=true; Quantity=1; Chance=9/10;};
+			{Index=2; ItemId="vexling"; Recyclable=true; Quantity={Min=1; Max=2}; Chance=8/10;};
+			{Index=2; ItemId="bluntknockoutmod"; Recyclable=true; Quantity=1; Chance=7/10;};
 			{Index=2; ItemId="vexgloves"; Recyclable=true; Quantity=1; Chance=5/10;};
 		};
 	};
@@ -1213,14 +1213,14 @@ function library.onRequire()
 	-- MARK: ucsectordcrate
 	library:Add{
 		Id="ucsectordcrate";
-		Level=300;
+		Level=260;
 		Rewards={
 			{Index=1; ItemId="wires"; Level=0; Quantity={Min=1; Max=2}; Chance=1;};
 			{Index=1; ItemId="sandwich"; Level=0; Quantity=1; Chance=1;};
 			
-			{Index=2; ItemId="armwraps"; Level=40; Recyclable=true; Quantity=1; Chance=9/10;};
-			{Index=2; ItemId="riflecritmultimod"; Level=100; Recyclable=true; Quantity=1; Chance=8/10;};
-			{Index=2; ItemId="sr308bp"; Level=200; Recyclable=true; Quantity=1; Chance=7/10;};
+			{Index=2; ItemId="armwraps"; Level=30; Recyclable=true; Quantity=1; Chance=9/10;};
+			{Index=2; ItemId="riflecritmultimod"; Level=50; Recyclable=true; Quantity=1; Chance=8/10;};
+			{Index=2; ItemId="sr308bp"; Level=70; Recyclable=true; Quantity=1; Chance=7/10;};
 			{Index=2; ItemId="hazmathood"; Recyclable=true; Quantity=1; Chance=1/100;};
 		};
 	};
@@ -1248,6 +1248,35 @@ function library.onRequire()
 		WaveBased=true;
 	};
 
+	-- MARK: mangrovecrate
+	library:Add{
+		Id = "mangrovecrate";
+		Level = 100;
+		Rewards = {
+			{Index=1; ItemId="tires"; Level=0; Quantity={Min=1; Max=2}; Chance=1;};
+			{Index=1; ItemId="radiator"; Level=0; Quantity=1; Chance=1;};
+			
+			{Index=2; ItemId="biocharkilnbp"; Recyclable=true; Quantity=1; Chance=9/10;};
+			-- {Index=2; ItemId="vexling"; Recyclable=true; Quantity={Min=1; Max=2}; Chance=8/10;};
+			{Index=2; ItemId="pointguardbulwark"; Recyclable=true; Quantity=1; Chance=7/10;};
+			{Index=2; ItemId="greavesandsabatons"; Recyclable=true; Quantity=1; Chance=5/10;};
+		};
+	};
+	
+	library:Add{
+		Id = "dmangrovecrate";
+		Level = 260;
+		Rewards = {
+			{Index=1; ItemId="motor"; Level=0; Quantity={Min=1; Max=2}; Chance=1;};
+			{Index=1; ItemId="toxiccontainer"; Level=0; Quantity=1; Chance=1;};
+			
+			{Index=2; ItemId="bicyclepoweredgeneratorbp"; Level=30; Recyclable=true; Quantity=1; Chance=9/10;};
+			-- {Index=2; ItemId="vexling"; Level=50; Recyclable=true; Quantity={Min=1; Max=2}; Chance=8/10;};
+			{Index=2; ItemId="frenzydamagemod"; Level=70; Recyclable=true; Quantity=1; Chance=7/10;};
+			{Index=2; ItemId="pouchvest"; Recyclable=true; Quantity=1; Chance=1/100;};
+		};
+	};
+	
 
 	--== Coop;
 	-- MARK: genesiscrate : 220
