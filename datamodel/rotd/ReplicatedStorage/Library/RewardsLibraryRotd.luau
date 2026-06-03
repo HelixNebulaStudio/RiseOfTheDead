@@ -1030,7 +1030,7 @@ function library.onRequire()
 		Id="banditcrate";
 		Level=160;
 		Rewards={
-			{Index=1; ItemId="pulleymechanicbp";  Chance=commodityChance;};
+			{Index=1; ItemId="pulleymechanicsbp";  Chance=commodityChance;};
 			
 			{Index=1; ItemId="plankarmorbp"; Recyclable=true;  Chance=1;};
 			{Index=1; ItemId="pointdamagebp"; Recyclable=true;  Chance=1;};

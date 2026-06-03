@@ -88,6 +88,7 @@ if RunService:IsServer() then
 				local hasSpace = inventory:SpaceCheck{{ItemId="samplereport"}};
 				if not hasSpace then
 					shared.Notify(player, "Inventory is full!", "Negative");
+					bloodMachineInteractable.Config:SetAttribute("_Uses", 1);
 					return;
 				end
 				
@@ -155,6 +156,7 @@ if RunService:IsServer() then
 				local hasSpace = inventory:SpaceCheck{{ItemId="samplereport"}};
 				if not hasSpace then
 					shared.Notify(player, "Inventory is full!", "Negative");
+					bloodMachineInteractable.Config:SetAttribute("_Uses", 1);
 					return;
 				end
 
@@ -213,6 +215,7 @@ if RunService:IsServer() then
 				local hasSpace = inventory:SpaceCheck{{ItemId="samplereport"}};
 				if not hasSpace then
 					shared.Notify(player, "Inventory is full!", "Negative");
+					bloodMachineInteractable.Config:SetAttribute("_Uses", 1);
 					return;
 				end
 
@@ -271,6 +274,7 @@ if RunService:IsServer() then
 				local hasSpace = inventory:SpaceCheck{{ItemId="samplereport"}};
 				if not hasSpace then
 					shared.Notify(player, "Inventory is full!", "Negative");
+					bloodMachineInteractable.Config:SetAttribute("_Uses", 1);
 					return;
 				end
 
@@ -428,7 +432,7 @@ return function(CutsceneSequence)
 		modStorage.RegisterItemName("Stan's Blood Samples Report #4");
 	end
 	
-	if RunService:IsServer() and modBranchConfigurations.IsWorld("MedicalBreakthrough") then
+	if RunService:IsServer() and shared.WorldName == "MedicalBreakthrough" then
 		local jerCan = script:WaitForChild("JerryCanPart"):Clone();
 		local pickupConfig = modInteractables.createInteractable("Pickupable");
 		pickupConfig:SetAttribute("ItemId", "jerrycan");
@@ -512,6 +516,7 @@ return function(CutsceneSequence)
 			
 			playerClass.OnIsDeadChanged:Connect(function(isDead)
 				if not isDead then return end;
+				if not game.Players:IsAncestorOf(player) then return end;
 
 				modMission:FailMission(player, MISSION_ID, "You died and the bandits stole the sample.");
 				modServerManager:Travel(player, profile.PreviousWorldName);
@@ -823,7 +828,7 @@ return function(CutsceneSequence)
 
 			elseif mission.Type == 3 then -- OnComplete
 				
-			elseif mission.Type == 4 then -- OnFail
+			elseif mission.Type == 4 then -- MARK: OnFail
 				Debugger:Warn("On fail");
 				mission.ProgressionPoint = 1;
 				
@@ -843,6 +848,7 @@ return function(CutsceneSequence)
 					end
 					table.clear(mission.SaveData.MissionItems);
 				end
+				
 			end
 		end
 		mission.OnChanged:Connect(OnChanged);

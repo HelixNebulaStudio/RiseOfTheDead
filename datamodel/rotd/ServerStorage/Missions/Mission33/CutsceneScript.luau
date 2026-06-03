@@ -25,7 +25,7 @@ if RunService:IsServer() then
 	modMatchMaking = shared.require(game.ServerScriptService.ServerLibrary.MatchMaking);
 	modRaid = shared.require(game.ServerScriptService.ServerLibrary.GameModeManager.Raid);
 	
-	if modBranchConfigurations.IsWorld("TheMall") then
+	if shared.WorldName == "TheMall" then
 		shared.modEventService:OnInvoked("Interactables_BindButtonInteract", function(eventPacket: EventPacket, ...)
 			local interactable: InteractableInstance = ...;
 			local player: Player? = eventPacket.Player;
@@ -39,7 +39,7 @@ if RunService:IsServer() then
 			end
 		end)
 
-	elseif modBranchConfigurations.IsWorld("AwokenTheBear") then
+	elseif shared.WorldName == "AwokenTheBear" then
 		shared.modEventService:OnInvoked("Generic_BindTrigger", function(eventPacket: EventPacket, ...)
 			local triggerId: string = ...;
 			local player: Player? = eventPacket.Player;
@@ -69,7 +69,7 @@ if RunService:IsServer() then
 			end
 		end)
 
-	elseif modBranchConfigurations.IsWorld("BanditOutpost") then
+	elseif shared.WorldName == "BanditOutpost" then
         shared.modEventService:OnInvoked("GameModeManager_BindGameModeComplete", function(eventPacket: EventPacket, packet)
 			local room = packet.Room;
 			Debugger:Warn("GameModeManager_BindGameModeComplete", room.Type, room.Stage);
@@ -95,7 +95,7 @@ end
 --== Script;
 return function(CutsceneSequence)
 	-- MARK: TheMall
-	if modBranchConfigurations.IsWorld("TheMall") then
+	if shared.WorldName == "TheMall" then
 		local stanNpcProfile = modNpcProfileLibrary:Find("Stan");
 		stanNpcProfile.World = "TheMall";
 
@@ -214,7 +214,7 @@ return function(CutsceneSequence)
 		
 
 	-- MARK: AwokenTheBear
-	elseif modBranchConfigurations.IsWorld("AwokenTheBear") then
+	elseif shared.WorldName == "AwokenTheBear" then
 
 		CutsceneSequence:Initialize(function()
 			local players: {Player} = CutsceneSequence:GetPlayers();
@@ -227,6 +227,8 @@ return function(CutsceneSequence)
 			playerClass.HealthComp:SetCanBeHurtBy(`{playerClass.HealthComp.DefaultCanBeHurtByBoolString}|Jason`);
 			playerClass.OnIsDeadChanged:Connect(function(isDead)
 				if not isDead then return end;
+				if not game.Players:IsAncestorOf(player) then return end;
+
 				modMission:Progress(player, MISSION_ID, function(mission)
 					if mission.ProgressionPoint <= 13 then
 						mission.ProgressionPoint = 4;
@@ -447,6 +449,7 @@ return function(CutsceneSequence)
 
 					elseif mission.ProgressionPoint == 8 then
 					
+						zarkNpcClass:ToggleInteractable(false);
 						zarkNpcClass.WieldComp:Equip{
 							ItemId = "deagle";
 							OnSuccessFunc = function(toolHandler: ToolHandlerInstance)
@@ -464,12 +467,16 @@ return function(CutsceneSequence)
 						stanNpcClass.Properties.Immotal = 0.1;
 
 						task.wait(1);
+						zarkNpcClass:ToggleInteractable(true);
+						task.wait(0.1);
+
 						modDialogueService:InvokeDialogue(player, "talk", {
 							NpcModel = zarkNpcClass.Character;
 						});
 
 					elseif mission.ProgressionPoint == 9 then
 
+						zarkNpcClass:ToggleInteractable(false);
 						zarkNpcClass.Chat(player, "I've answered that question already, I do not know who is Robert!");
 						task.wait(6.5);
 
@@ -492,11 +499,16 @@ return function(CutsceneSequence)
 						zarkNpcClass.Move:HeadTrack(playerClass.Head);
 
 						task.wait(2);
+						zarkNpcClass:ToggleInteractable(true);
+						task.wait(0.1);
+
 						modDialogueService:InvokeDialogue(player, "talk", {
 							NpcModel = zarkNpcClass.Character;
 						});
 
 					elseif mission.ProgressionPoint == 10 then
+
+						zarkNpcClass:ToggleInteractable(false);
 						zarkNpcClass.Chat(player, "That is not a question, last chance..");
 						task.wait(3);
 						
@@ -517,11 +529,16 @@ return function(CutsceneSequence)
 						zarkNpcClass.Move:HeadTrack(playerClass.Head);
 
 						task.wait(2);
+						zarkNpcClass:ToggleInteractable(true);
+						task.wait(0.1);
+
 						modDialogueService:InvokeDialogue(player, "talk", {
 							NpcModel = zarkNpcClass.Character;
 						});
 
 					elseif mission.ProgressionPoint == 11 then
+
+						zarkNpcClass:ToggleInteractable(false);
 						zarkNpcClass.Chat(player, ".. Yes, there was reports of that happening. But oh well.");
 						task.wait(3.5);
 
@@ -567,6 +584,9 @@ return function(CutsceneSequence)
 						task.wait(0.4);
 						
 						task.wait(1);
+						zarkNpcClass:ToggleInteractable(true);
+						task.wait(0.1);
+
 						modDialogueService:InvokeDialogue(player, "talk", {
 							NpcModel = zarkNpcClass.Character;
 						});
@@ -624,8 +644,9 @@ return function(CutsceneSequence)
 							Stage = "BanditOutpost";
 							StageLib = stageLib;
 						});
-						room.Mission=true;
+						room.Mission = true;
 						room:AddPlayer(player);
+						
 						system:Start(room);
 					end
 
@@ -633,6 +654,7 @@ return function(CutsceneSequence)
 					mission.OnChanged:Disconnect(OnChanged);
 				end
 			end
+
 			mission.OnChanged:Connect(OnChanged);
 			OnChanged(true);
 		end)
@@ -696,7 +718,7 @@ return function(CutsceneSequence)
 		
 		
 	--MARK: BanditOutpost
-	elseif modBranchConfigurations.IsWorld("BanditOutpost") then
+	elseif shared.WorldName == "BanditOutpost" then
 		local modGamemodeStronghold;
 		if RunService:IsServer() then
 			modGamemodeStronghold = shared.require(game.ServerScriptService.ServerLibrary.GameModeStronghold);
@@ -714,7 +736,7 @@ return function(CutsceneSequence)
 			local hostageSpawn = workspace.Environment:WaitForChild("Game"):WaitForChild("HostageSpawn");
 
 			local activeController = modGamemodeStronghold.Active;
-			Debugger:StudioLog(`init activeController`, activeController);
+			--Debugger:Log(`init activeController`, activeController);
 
 			local playerClass: PlayerClass = shared.modPlayers.get(player);
 			playerClass.OnCharacterSpawn:Connect(function()
@@ -723,10 +745,14 @@ return function(CutsceneSequence)
 						mission.ProgressionPoint = 13;
 					end
 				end)
+
+				task.wait(0.1);
+				playerClass:SetCFrame(hostageSpawn.CFrame);
 			end)
 
-			playerClass.OnIsDeadChanged:Connect(function()
-				if not playerClass.HealthComp.IsDead then return end;
+			playerClass.OnIsDeadChanged:Connect(function(isDead)
+				if not isDead then return end;
+				if not game.Players:IsAncestorOf(player) then return end;
 
 				Debugger:Warn(`{player.Name} died in mission.`);
 				modMission:FailMission(player, MISSION_ID, "You died.");

@@ -34,7 +34,7 @@ if RunService:IsServer() then
 			end
 		end
 		
-		mission.Changed:Connect(OnChanged);
+		mission.OnChanged:Connect(OnChanged);
 		OnChanged(true);
 	end
 end

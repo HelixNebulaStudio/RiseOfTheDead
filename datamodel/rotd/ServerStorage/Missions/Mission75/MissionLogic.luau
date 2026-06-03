@@ -50,19 +50,20 @@ if RunService:IsServer() then
 						return;
 					end
 
-				elseif mission.ProgressionPoint >= 4 and mission.ProgressionPoint <= 11 and shared.WorldName ~= "MedicalBreakthrough" then
-					modMission:Progress(player, MISSION_ID, function(mission)
-						mission.ProgressionPoint = 3;
-					end);
-					
+					if mission.ProgressionPoint >= 4 and mission.ProgressionPoint <= 11 then
+						clinicLoop = false;
+						modMission:FailMission(player, MISSION_ID, "You lost the samples because you left the lab.");
+						return;
+					end
 				end
+
 			elseif mission.Type == 3 then -- OnComplete
 
 
 			end
 		end
 		
-		mission.Changed:Connect(OnChanged);
+		mission.OnChanged:Connect(OnChanged);
 		OnChanged(true);
 	end
 end

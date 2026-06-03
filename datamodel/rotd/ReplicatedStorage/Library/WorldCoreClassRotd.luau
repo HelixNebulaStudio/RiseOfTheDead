@@ -234,10 +234,7 @@ function modWorldCoreClass:InitGameWorld(gameMode, gameStage)
         while shared.WorldCore == nil or shared.WorldCore.GameController == nil do task.wait() end;
         if worldCoreInit then return end;
         worldCoreInit = true;
-
-        if shared.WorldCore.BindGameControllerInited then
-            shared.WorldCore.BindGameControllerInited(shared.WorldCore.GameController);
-        end
+        
     end)
 end
 

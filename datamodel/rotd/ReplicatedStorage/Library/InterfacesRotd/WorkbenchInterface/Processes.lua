@@ -49,22 +49,27 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 		end
 	end))
 
-	local activeSyncs = {};
-	interface.Garbage:Tag(modSyncTime.GetClock():GetPropertyChangedSignal("Value"):Connect(function()
-		local Time = modSyncTime.GetTime();
-		for a=#activeSyncs, 1, -1 do
-			local sync = activeSyncs[a];
+	local refreshFuncList = {};
+
+	interface.Scheduler.OnStepped:Connect(function(tickData: TickData)
+		if tickData.ms1000 ~= true then return end;
+
+		local curTime = workspace:GetServerTimeNow();
+
+		for a=#refreshFuncList, 1, -1 do
+			local refreshFunc = refreshFuncList[a];
 			local i = a;
-			if type(sync) == "function" then
-				task.spawn(function()
-					local keep = sync(Time);
-					if keep ~= true then
-						table.remove(activeSyncs, i);
-					end
-				end)
-			end
+
+			if typeof(refreshFunc) ~= "function" then continue end;
+
+			task.spawn(function()
+				local keep = refreshFunc(curTime);
+				if keep ~= true then
+					table.remove(refreshFuncList, i);
+				end
+			end)
 		end
-	end))
+	end)
 
 	function WorkbenchClass.new(itemId, library, storageItem)
 		binds.ClearPages("processList");
@@ -149,15 +154,15 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 			local skipCost = 0;
 
 			local bpLib = modBlueprintLibrary.Get(process.Data.ItemId);
-			local function refreshContent(t)
-				t = modSyncTime.GetTime();
+			local function refreshContent(curTime)
+				curTime = workspace:GetServerTimeNow();
 				
 				if not newProcessFrame:IsDescendantOf(interface.ScreenGui) then return end;
 
 				if process.Type == "Building" or process.Type == "BuildComplete" then
 					titleTag.Text = `Build {bpLib.Name}`;
 					
-					local timeLeft = process.Data.BT-t;
+					local timeLeft = process.Data.BT-curTime;
 					local buildPercent = math.clamp(1-(timeLeft/bpLib.Duration), 0, 1);
 					
 					local initTween = progressBar:GetAttribute("initTween");
@@ -208,7 +213,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 					if itemLib then
 						titleTag.Text = `Deconstruct {itemLib.Name}`;
 						
-						local timeLeft = process.Data.T-t;
+						local timeLeft = process.Data.T-curTime;
 						local buildPercent = math.clamp(1-(timeLeft/600), 0, 1);
 
 						local initTween = progressBar:GetAttribute("initTween");
@@ -248,7 +253,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 					if itemLib then
 						titleTag.Text = `Polish {itemLib.Name}`;
 
-						local timeLeft = process.Data.T-t;
+						local timeLeft = process.Data.T-curTime;
 						local buildPercent = math.clamp(1-(timeLeft/modWorkbenchLibrary.PolishDuration), 0, 1);
 
 						local initTween = progressBar:GetAttribute("initTween");
@@ -292,6 +297,8 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 					end
 
 				end
+
+				return true;
 			end
 			
 			local open = false;
@@ -538,7 +545,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 
 			end)
 			
-			table.insert(activeSyncs, refreshContent);
+			table.insert(refreshFuncList, refreshContent);
 			refreshContent();
 			order = order +1;
 		end

@@ -390,7 +390,7 @@ function modStatusEffects.CorruptVision(player: Player, val: boolean, params)
 		if val == true then
 			modCameraGraphics.TintColor:Set("corrupt", params.TintColor or Color3.fromRGB(204, 157, 151), 1);
 
-			local corruptAtmosphere: Atmosphere = script.CorruptAtmosphere;
+			local corruptAtmosphere: Atmosphere = modStatusEffects.Script.CorruptAtmosphere;
 
 			corruptAtmosphere.Density = params.Density or corruptAtmosphere.Density;
 			corruptAtmosphere.Offset = params.Offset or corruptAtmosphere.Offset;

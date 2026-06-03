@@ -109,6 +109,8 @@ return function(CutsceneSequence)
 		
 		playerClass.CharacterGarbage:Tag(playerClass.OnIsDeadChanged:Connect(function(isDead)
 			if not isDead then return end;
+			if not game.Players:IsAncestorOf(player) then return end;
+			
 			modMission:Progress(player, MISSION_ID, function(mission)
 				if mission.ProgressionPoint <= 7 then
 					mission.ProgressionPoint = 2;

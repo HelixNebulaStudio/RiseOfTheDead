@@ -235,7 +235,7 @@ MissionLibrary.New{
 		{Type="Mission"; Id=7};
 	};
 	StartRequirements={
-		Level=3;
+		Level=2;
 	};
 	Markers={
 		[1]={World="TheWarehouse"; Label="Destroy"; Target=Vector3.new(269.352, 62.881, 34.188); Type=modMarkers.MarkerTypes.Waypoint;};
@@ -309,7 +309,7 @@ MissionLibrary.New{
 		{Type="MissionCompleted"; Value={4; 7}};
 	};
 	StartRequirements={
-		Level=7;
+		Level=5;
 	};
 	
 };
@@ -336,7 +336,7 @@ MissionLibrary.New{
 		{Type="MissionCompleted"; Value={3; 7}};
 	};
 	StartRequirements={
-		Level=7;
+		Level=5;
 	};
 	
 };
@@ -514,7 +514,7 @@ MissionLibrary.New{
 		{Type="MissionCompleted"; Value={3, 7, 9, 12};};
 	};
 	StartRequirements={
-		Level=25;
+		Level=20;
 	};
 	
 };
@@ -1057,7 +1057,7 @@ MissionLibrary.New{
 	Checkpoint={
 		{Text="Follow Stan";};
 		{Text="Talk to Patrick";};
-		{Text="Enter the secret door";};
+		{Text="Enter the secret door and climb into the vent";}; --3
 		{Text="Head to the top floor";};
 		{Text="Follow Stan into the room";};
 
@@ -1069,7 +1069,7 @@ MissionLibrary.New{
 
 		{Text="Talk to Zark";};
 		{Text="Unconscious";};
-		{Text="Talk to Patrick";};
+		{Text="Talk to Patrick";}; -- 13
 		{Text="Escape the Bandit Outpost";};
 	};
 	GuideText="Talk to Stan";
@@ -1259,14 +1259,14 @@ MissionLibrary.New{
 
 -- MARK: 38 - Something's Not Right
 MissionLibrary.New{
-	MissionId=38;
+	MissionId = 38;
 	MissionType = MissionLibrary.MissionTypes.Core;
-	Name="Something's Not Right";
-	From="Patrick";
-	Description="You have unfinished business after what happened at the Bandit Camp.";
-	Persistent=true;
-	World={"TheMall", "TheUnderground", "TheResidentials"};
-	Checkpoint={
+	Name = "Something's Not Right";
+	From = "Patrick";
+	Description = "You have unfinished business after what happened at the Bandit Camp.";
+	Persistent = true;
+	World = {"TheMall", "TheUnderground", "TheResidentials"};
+	Checkpoint = {
 		{Text="Head to the train station safehouse to talk to Rachel";};
 		{Text="You hear a familar noise outside, investigate outside";};
 		{Text="Follow Robert";};
@@ -1276,19 +1276,19 @@ MissionLibrary.New{
 		{Text="Talk to Robert";};
 		{Text="Talk to Robert";};
 	};
-	GuideText="Talk to Patrick";
-	Rewards={
+	GuideText = "Talk to Patrick";
+	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Mission"; Id=36};
 		{Type="Mission"; Id=39};
 		{Type="Mission"; Id=52};
 	};
-	LinkNextMission=52;
-	StartRequirements={
+	LinkNextMission = 52;
+	StartRequirements = {
 		Level=25;
 	};
-	Markers={
+	Markers = {
 		[1]={World="TheUnderground"; Label="Rachel"; Target="Rachel"; Type=modMarkers.MarkerTypes.Npc;};
 		[2]={World="TheUnderground"; Label="Investigate"; Target=Vector3.new(345.241, 9.125, -16.083); Type=modMarkers.MarkerTypes.Waypoint;};
 		[3]={World="TheUnderground"; Label="Robert"; Target="Robert"; Type=modMarkers.MarkerTypes.Npc;};
@@ -1298,7 +1298,7 @@ MissionLibrary.New{
 
 		[7]={World="TheResidentials"; Label="Robert"; Target="Robert"; Type=modMarkers.MarkerTypes.Npc;};
 	};
-	CanRedo={};
+	CanRedo = {};
 	
 };
 

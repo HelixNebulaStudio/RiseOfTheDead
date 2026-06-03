@@ -31,7 +31,7 @@ function GameMode:Start(room)
 		
 		return;
 	end
-	
+
 	local accessCode = modServerManager:CreatePrivateServer(self.GameTable.StageLib.WorldId);
 	modServerManager:TeleportToPrivateServer(
 		self.GameTable.StageLib.WorldId, 
@@ -84,7 +84,7 @@ function GameMode:WorldLoad(modeData)
 				modeData.Room.Type = gameType;
 				modeData.Room.Stage = gameStage;
 				
-				gameController:Initialize(modeData.Room);
+				gameController:Initialize(modeData.Room); 
 				gameController.Initiated = true;
 			end)
 		end

@@ -36,11 +36,4 @@ function WorldCore.onRequire()
     WorldCore:InitGameWorld(GAME_MODE, GAME_STAGE);
 end
 
-function WorldCore.BindGameControllerInited(gameController)
-    Debugger:StudioLog(`gameController`, gameController);
-	if gameController.RoomData and gameController.RoomData.Mission then
-        Debugger:StudioLog(`IsinMission`, gameController.RoomData.Mission);
-	end
-end
-
 return WorldCore;

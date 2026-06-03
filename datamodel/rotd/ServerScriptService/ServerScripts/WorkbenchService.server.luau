@@ -11,7 +11,6 @@ local modColorsLibrary = shared.require(game.ReplicatedStorage.Library.ColorsLib
 local modSkinsLibrary = shared.require(game.ReplicatedStorage.Library.SkinsLibrary);
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modBlueprintLibrary = shared.require(game.ReplicatedStorage.Library.BlueprintLibraryRotd) :: any;
-local modSyncTime = shared.require(game.ReplicatedStorage.Library:WaitForChild("SyncTime"));
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
 local modItemUnlockablesLibrary = shared.require(game.ReplicatedStorage.Library.ItemUnlockablesLibrary);
 local modToolTweaks = shared.require(game.ReplicatedStorage.Library.ToolTweaks);
@@ -84,7 +83,7 @@ function remoteWorkbenchService.OnServerInvoke(player, action: string, ...)
 
 		local activeBp = userWorkbench:GetProcess(buildIndex);
 		
-		if activeBp == nil or activeBp.BT-modSyncTime.GetTime() <= 0 then
+		if activeBp == nil or activeBp.BT-workspace:GetServerTimeNow() <= 0 then
 			rPacket.FailMsg = "Invalid process";
 			return rPacket;
 		end
@@ -107,7 +106,7 @@ function remoteWorkbenchService.OnServerInvoke(player, action: string, ...)
 		end
 
 		if showAdResult == Enum.ShowAdResult.ShowCompleted then
-			local timeLeft = activeBp.BT-modSyncTime.GetTime();
+			local timeLeft = activeBp.BT-workspace:GetServerTimeNow();
 			Debugger:StudioLog(`adskip timeLeft = {timeLeft}`);
 
 			activeBp.BT = os.time()+ (timeLeft - shared.Const.Hour);
@@ -308,7 +307,7 @@ function remoteBlueprintHandler.OnServerInvoke(player, action, packet)
 		local processPacket = {
 			Type = userWorkbench.ProcessTypes.Building;
 			ItemId = itemId;
-			BT = modSyncTime.GetTime()+buildDuration;
+			BT = workspace:GetServerTimeNow() + buildDuration;
 			Blueprint = bpStorageItem ~= nil;
 
 			PlayProcessSound = true;
@@ -374,7 +373,7 @@ function remoteBlueprintHandler.OnServerInvoke(player, action, packet)
 		local buildIndex = packet.Index;
 		
 		local activeBp = userWorkbench:GetProcess(buildIndex);
-		if activeBp == nil or activeBp.BT-modSyncTime.GetTime() > 0 then
+		if activeBp == nil or activeBp.BT-workspace:GetServerTimeNow() > 0 then
 			rPacket.FailCode = modWorkbenchLibrary.BlueprintReplies.TooFrequentRequest;
 			return rPacket;
 		end
@@ -408,7 +407,7 @@ function remoteBlueprintHandler.OnServerInvoke(player, action, packet)
 
 		local activeBp = userWorkbench:GetProcess(buildIndex);
 		
-		if activeBp == nil or activeBp.BT-modSyncTime.GetTime() <= 0 then
+		if activeBp == nil or activeBp.BT-workspace:GetServerTimeNow() <= 0 then
 			rPacket.FailMsg = "Invalid process";
 			return rPacket;
 		end
@@ -416,7 +415,7 @@ function remoteBlueprintHandler.OnServerInvoke(player, action, packet)
 		local itemId = activeBp.ItemId;
 		local bpLib = modBlueprintLibrary.Get(itemId);
 
-		local skipCost = modWorkbenchLibrary.GetSkipCost(activeBp.BT-modSyncTime.GetTime());
+		local skipCost = modWorkbenchLibrary.GetSkipCost(activeBp.BT-workspace:GetServerTimeNow());
 		if playerSave:GetStat("Perks") < skipCost then
 			rPacket.GoldShop = true;
 			return rPacket;
@@ -435,7 +434,7 @@ function remoteBlueprintHandler.OnServerInvoke(player, action, packet)
 
 		shared.Notify(player, bpLib.Name.." has finished building.", "Reward");
 
-		activeBp.BT = modSyncTime.GetTime()-1;
+		activeBp.BT = workspace:GetServerTimeNow()-1;
 		userWorkbench:Sync();
 		
 		rPacket.Success = true;
@@ -1165,8 +1164,8 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 					shared.Notify(player, string.gsub("$Item removed from your Inventory.", "$Item", storageItem.CustomName), "Negative");
 				end);
 				
-				local duration = modSyncTime.GetTime()+900;
-				if shared.gameConfig.BranchName == "Dev" then duration = modSyncTime.GetTime()+5; end;
+				local duration = workspace:GetServerTimeNow()+900;
+				if shared.gameConfig.BranchName == "Dev" then duration = workspace:GetServerTimeNow()+5; end;
 				
 				playerSave.Workbench:NewProcess{
 					Type=playerSave.Workbench.ProcessTypes.DeconstructMod;
@@ -1188,8 +1187,8 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 				if levels < 5 then return modWorkbenchLibrary.DeconstructModReplies.InvalidItem; end
 				
 				--local rewardTiers = math.floor(levels/5);
-				local duration = modSyncTime.GetTime()+60;
-				if shared.gameConfig.BranchName == "Dev" then duration = modSyncTime.GetTime()+5; end;
+				local duration = workspace:GetServerTimeNow()+60;
+				if shared.gameConfig.BranchName == "Dev" then duration = workspace:GetServerTimeNow()+5; end;
 				
 				playerSave.Workbench:NewProcess{
 					Type=playerSave.Workbench.ProcessTypes.DeconstructWeapon;
@@ -1218,7 +1217,7 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 	elseif action == 2 then -- MARK: Claim deconstruction
 		local index = arg;
 		local processData = userWorkbench:GetProcess(index);
-		if processData.T-modSyncTime.GetTime() > 0 then return modWorkbenchLibrary.DeconstructModReplies.TooFrequentRequest end;
+		if processData.T-workspace:GetServerTimeNow() > 0 then return modWorkbenchLibrary.DeconstructModReplies.TooFrequentRequest end;
 		
 		local itemId = processData.ItemId;
 		local itemLib = modItemsLibrary:Find(itemId);
@@ -1444,7 +1443,7 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 
 			end
 			
-			local duration = modSyncTime.GetTime() + modWorkbenchLibrary.PolishDuration;
+			local duration = workspace:GetServerTimeNow() + modWorkbenchLibrary.PolishDuration;
 			
 			local newSeed, changeFloat = modItemSkinWear.PolishTool(storageItem);
 			
@@ -1475,7 +1474,7 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 	elseif action == 2 then -- MARK: Claim polished
 		local index = arg;
 		local processData = userWorkbench:GetProcess(index);
-		if processData.T-modSyncTime.GetTime() > 0 then return modWorkbenchLibrary.PolishToolReplies.TooFrequentRequest end;
+		if processData.T-workspace:GetServerTimeNow() > 0 then return modWorkbenchLibrary.PolishToolReplies.TooFrequentRequest end;
 
 		local itemId = processData.ItemId;
 		local itemLib = modItemsLibrary:Find(itemId);
@@ -1561,9 +1560,9 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 
 		local index = arg;
 		local processData = userWorkbench:GetProcess(index);
-		if processData.T-modSyncTime.GetTime() <= 5 then return modWorkbenchLibrary.PolishToolReplies.TooFrequentRequest end;
+		if processData.T-workspace:GetServerTimeNow() <= 5 then return modWorkbenchLibrary.PolishToolReplies.TooFrequentRequest end;
 
-		local skipCost = modWorkbenchLibrary.GetSkipCost(processData.T-modSyncTime.GetTime());
+		local skipCost = modWorkbenchLibrary.GetSkipCost(processData.T-workspace:GetServerTimeNow());
 		
 		if playerSave:GetStat("Perks") < skipCost then
 			return modWorkbenchLibrary.PolishToolReplies.InsufficientPerks;
@@ -1580,7 +1579,7 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 			ItemSKU="SkipPolish";
 		};
 
-		processData.T = modSyncTime.GetTime()-1;
+		processData.T = workspace:GetServerTimeNow()-1;
 		userWorkbench:Sync();
 		
 		return modWorkbenchLibrary.PolishToolReplies.Success;

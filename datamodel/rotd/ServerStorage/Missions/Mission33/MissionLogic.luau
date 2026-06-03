@@ -1,9 +1,10 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
+--==
+local RunService = game:GetService("RunService");
+
+local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 
 local MissionLogic = {};
-local RunService = game:GetService("RunService");
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 
 local MISSION_ID = 33;
 if RunService:IsServer() then
@@ -14,7 +15,7 @@ if RunService:IsServer() then
 
 		local function OnChanged(firstRun)
 			if mission.Type == 2 then -- OnAvailable
-				if modBranchConfigurations.IsWorld("TheMall") then
+				if shared.WorldName == "TheMall" then
 					local patrickPrefab = workspace.Entity:FindFirstChild("Patrick");
 					if patrickPrefab then
 						modReplicationManager.SetClientParent(player, patrickPrefab, workspace.Entity);
@@ -36,14 +37,12 @@ if RunService:IsServer() then
 
 				elseif shared.WorldName ~= "AwokenTheBear" then
 					if mission.ProgressionPoint > 3 and mission.ProgressionPoint < 13 then
-						modMission:Progress(player, MISSION_ID, function(mission)
-							mission.ProgressionPoint = 3;
-						end)
+						Debugger:Warn(`Rewind mission 33 to point 3`);
+						modMission:FailMission(player, MISSION_ID, "You left Stan in the Bandit Camp.");
 
 					elseif mission.ProgressionPoint >= 13 then
-						modMission:Progress(player, MISSION_ID, function(mission)
-							mission.ProgressionPoint = 3;
-						end)
+						Debugger:Warn(`Rewind mission 33 to point 3`);
+						modMission:FailMission(player, MISSION_ID, "You left Stan in the Bandit Camp.");
 
 					end
 
@@ -59,7 +58,6 @@ if RunService:IsServer() then
 				end
 				
 			elseif mission.Type == 3 then -- OnComplete
-
 				if shared.WorldName == "TheMall" then
 					local patrickPrefab = workspace.Entity:FindFirstChild("Patrick");
 					if patrickPrefab then
@@ -75,7 +73,8 @@ if RunService:IsServer() then
 			end
 		end
 		
-		mission.Changed:Connect(OnChanged);
+		mission.OnChanged:Connect(OnChanged);
+		OnChanged(true);
 	end
 end
 

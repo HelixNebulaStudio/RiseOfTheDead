@@ -24,6 +24,7 @@ local function updateVisual()
     pcall(function()
         local mission52 = modData:GetMission(52); -- The Investigation
         if mission52 and mission52.Type == 3 then
+		    Debugger:Log(`Update Robert appearance: mission52`, mission52);
             character:WaitForChild("RightHand").Transparency = 1;
             character:WaitForChild("RightPoint").Transparency = 1;
             character:WaitForChild("RightMiddle").Transparency = 1;

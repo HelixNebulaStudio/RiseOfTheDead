@@ -1460,7 +1460,7 @@ return function(CutsceneSequence)
 				elseif mission.Type == 3 then -- OnComplete
 				end
 			end
-			mission.Changed:Connect(OnChanged);
+			mission.OnChanged:Connect(OnChanged);
 			OnChanged(true);
 		end)
 

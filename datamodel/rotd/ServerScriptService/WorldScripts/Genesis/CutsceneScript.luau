@@ -623,6 +623,8 @@ return function(CutsceneSequence)
 				endExitInteractable.CanInteract = true;
 				endExitInteractable.Label = "Exit Genesis";
 				endExitInteractable:Sync();
+				
+				endDoorInteractConfig:SetAttribute("Locked", false);
 			end
 		end)
 	end)

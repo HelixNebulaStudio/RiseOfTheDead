@@ -158,7 +158,7 @@ return function(CutsceneSequence)
 		end
 
 		local playerClass = shared.modPlayers.get(player);
-		playerClass:Spawn();
+		-- playerClass:Spawn();
 		playerClass:SetCFrame(CFrame.new(3.6, 55.376, -188.5))
 		
 		Debugger:Log("Scene playerSpawns", debug.traceback());
@@ -275,6 +275,8 @@ return function(CutsceneSequence)
 
 		playerClass.CharacterGarbage:Tag(playerClass.OnIsDeadChanged:Connect(function(isDead)
 			if isDead then return end;
+			if not game.Players:IsAncestorOf(player) then return end;
+			
 			playerDied = true;
 			modServerManager:Teleport(player, "TheBeginning");
 		end))

@@ -1468,6 +1468,7 @@ function BlueprintLibrary.onRequire()
 		Duration = 300;
 		SellPrice = 100;
 		Requirements = {
+			{Type="Item"; ItemId="adhesive"; Amount=20;};
 			{Type="Item"; ItemId="gears"; Amount=1;};
 			{Type="Item"; ItemId="solarconcentrator"; Amount=1;};
 			{Type="Item"; ItemId="metalpipes"; Amount=1;};

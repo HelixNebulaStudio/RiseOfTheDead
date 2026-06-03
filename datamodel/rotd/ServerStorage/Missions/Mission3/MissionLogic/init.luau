@@ -35,10 +35,10 @@ if RunService:IsServer() then
 				end
 			end
 			
-			mission.Changed:Disconnect(OnChanged);
+			mission.OnChanged:Disconnect(OnChanged);
 		end
 		
-		mission.Changed:Connect(OnChanged);
+		mission.OnChanged:Connect(OnChanged);
 		OnChanged(true);
 	end
 end

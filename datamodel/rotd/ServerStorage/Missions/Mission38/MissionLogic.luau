@@ -2,15 +2,13 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 
 local RunService = game:GetService("RunService");
 
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 
 local MissionLogic = {};
 
 local MISSION_ID = 38;
 if RunService:IsServer() then
-	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
-	
+
 	function MissionLogic.Init(missionProfile, mission)
 		local player: Player = missionProfile.Player;
 
@@ -37,7 +35,8 @@ if RunService:IsServer() then
 			end
 		end
 		
-		mission.Changed:Connect(OnChanged);
+		mission.OnChanged:Connect(OnChanged);
+		OnChanged(true);
 	end
 end
 

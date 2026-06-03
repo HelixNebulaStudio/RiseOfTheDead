@@ -24,6 +24,9 @@ function WorldCore.onRequire()
             local lib = modMissionLibrary.Get(1);
             modCutscene:LoadScript(lib.Name, lib.CutsceneScript);
             modCutscene.LazyLoader:Load(player, lib.Name);
+            
+            local playerClass = shared.modPlayers.get(player);
+            playerClass:Spawn();
         end)
 
         task.spawn(function()

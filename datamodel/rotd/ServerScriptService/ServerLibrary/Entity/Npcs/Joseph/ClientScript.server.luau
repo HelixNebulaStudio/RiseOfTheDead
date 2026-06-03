@@ -12,6 +12,8 @@ local modData = shared.require(localplayer:WaitForChild("DataModule") :: ModuleS
 local function updateVisual()
     pcall(function()
         local mission52 = modData:GetMission(52); -- The Investigation
+		
+		Debugger:Log(`Update Joseph appearance: mission52`, mission52);
         if mission52 and mission52.Type == 3 then
 			character:WaitForChild("Bandage"):WaitForChild("Handle").Transparency = 0;
 			character:WaitForChild("LeftLowerArm").Transparency = 1;

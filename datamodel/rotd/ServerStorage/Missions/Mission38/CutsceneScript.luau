@@ -38,7 +38,7 @@ end
 --== Script;
 return function(CutsceneSequence)
 	--MARK: TheUnderground
-	if modBranchConfigurations.IsWorld("TheUnderground") then
+	if shared.WorldName == "TheUnderground" then
 
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
@@ -121,7 +121,7 @@ return function(CutsceneSequence)
 
 
 	--MARK: TheResidentials
-	elseif modBranchConfigurations.IsWorld("TheResidentials") then
+	elseif shared.WorldName == "TheResidentials" then
 
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();

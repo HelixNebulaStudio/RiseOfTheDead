@@ -108,6 +108,7 @@ return function(CutsceneSequence)
 			local playerDied = false;
 			playerClass.OnIsDeadChanged:Connect(function(isDead)
 				if not isDead then return end;
+				if not game.Players:IsAncestorOf(player) then return end;
 				playerDied = true;
 
 				Debugger:Warn("Player died");
