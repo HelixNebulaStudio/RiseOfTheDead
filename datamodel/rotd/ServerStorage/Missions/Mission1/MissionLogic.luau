@@ -1,7 +1,10 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
+--==
+local RunService = game:GetService("RunService");
+local UserInputService = game:GetService("UserInputService");
 
 local MissionLogic = {};
-local RunService = game:GetService("RunService");
+
 local modGuiHighlight = shared.require(game.ReplicatedStorage.Library.UI.GuiHighlight);
 
 if RunService:IsClient() then
@@ -23,9 +26,16 @@ if RunService:IsClient() then
 
 		local highlight = modGuiHighlight.Set("MainInterface", "Hotbar", "1");
 
+		local hintText = "Press 1 to equip pistol";
+		if UserInputService.PreferredInput == Enum.PreferredInput.Gamepad then
+			hintText = `Press <font family="rbxasset://LuaPackages/Packages/_Index/BuilderIcons/BuilderIcons/BuilderIcons.json">Left Bumper</font> to equip pistol`;
+		elseif UserInputService.PreferredInput == Enum.PreferredInput.Touch then
+			hintText = `Tap here to equip pistol`;
+		end
+
 		highlight.ContainerTextInfo = {
 			["1"] = {
-				Text = `Press [1] / <font family="rbxasset://LuaPackages/Packages/_Index/BuilderIcons/BuilderIcons/BuilderIcons.json">Left Bumper</font> to equip pistol`;
+				Text = hintText;
 				TextLayout = "TCO";
 			};
 		}

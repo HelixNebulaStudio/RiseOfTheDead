@@ -358,7 +358,7 @@ return function(CutsceneSequence)
 					if modEvents:GetEvent(player, "mission7Money") == nil then
 						modItemDrops.spawn{
 							ItemId = "money";
-							Quantity = 500;
+							Quantity = 2000;
 							SpawnCFrame = CFrame.new(288.96, 72.39, 3.59);
 							Player = {player};
 							DespawnDuration = false;

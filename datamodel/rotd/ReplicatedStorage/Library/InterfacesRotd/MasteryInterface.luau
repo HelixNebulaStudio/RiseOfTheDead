@@ -65,6 +65,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     --==
 
     local window: InterfaceWindow = interface:NewWindow("MasteryMenu", masteryFrame);
+    window.BoolStringWhenActive = {String="!Hotbar"; Priority=2;};
 	window.CompactFullscreen = true;
     window.CloseWithInteract = true;
 	
@@ -72,7 +73,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         masterUIGridLayout.CellSize = UDim2.new(0, 100, 0, 80);
 		window:SetClosePosition(UDim2.new(0.5, 0, -1, 80), UDim2.new(0.5, 0, 0.5, 0));
 	else
-		window:SetClosePosition(UDim2.new(0.5, 0, -1, 80), UDim2.new(0.5, 0, 0.5, -35));
+		window:SetClosePosition(UDim2.new(0.5, 0, -1, 80), UDim2.new(0.5, 0, 0.5, 0));
 	end
 
     --==

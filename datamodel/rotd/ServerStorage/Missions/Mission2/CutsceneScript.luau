@@ -205,6 +205,10 @@ return function(CutsceneSequence)
 					};
 
 					CutsceneSequence:NextScene("wakeUp");
+					task.spawn(function()
+						task.wait(0.5);
+						modStatusEffects.DirectCamera(player, masonNpcClass.Head.Position, 4);
+					end)
 
 				elseif mission.ProgressionPoint == 2 then
 					CutsceneSequence:NextScene("enableInterfaces");

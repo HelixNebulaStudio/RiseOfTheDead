@@ -254,12 +254,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local initMissionPass;
     --MARK: Window
 	local window: InterfaceWindow = interface:NewWindow("Missions", windowFrame);
+	window.BoolStringWhenActive = {String="!Hotbar"; Priority=2;};
 	window.CompactFullscreen = true;
     window.CloseWithInteract = true;
 	if modConfigurations.CompactInterface then
 		window:SetClosePosition(UDim2.new(0.5, 0, 2, 0), UDim2.new(0.5, 0, 0.5, 0));
 	else
-		window:SetClosePosition(UDim2.new(0.5, 0, -1.5, 0), UDim2.new(0.5, 0, 0.5, -35));
+		window:SetClosePosition(UDim2.new(0.5, 0, -1.5, 0), UDim2.new(0.5, 0, 0.5, 0));
 	end
 	
 	local keyId = "KeyWindowMissions";
@@ -386,6 +387,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		end
 	end
 
+	local highlightAnimGradiant = nil;
 
 	--MARK: OnToggle
 	window.OnToggle:Connect(function(visible, action)
@@ -403,6 +405,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			modData:RequestData("GameSave/Missions");
 			
 		else
+			if highlightAnimGradiant then
+				Debugger.Expire(highlightAnimGradiant);
+				highlightAnimGradiant = nil;
+			end
 			itemToolTip.Frame.Visible = false;
 			MissionDisplayFrame:ClearAllChildren();
 			modData:SaveSettings();
@@ -414,6 +420,17 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	end
 
 	function binds.RefreshMissionMap()
+		
+		if not interface.ScreenGui:IsAncestorOf(highlightAnimGradiant) then
+			highlightAnimGradiant = Instance.new("UIGradient");
+			highlightAnimGradiant.Transparency = NumberSequence.new(0, 0.8);
+			TweenService:Create(
+				highlightAnimGradiant, 
+				TweenInfo.new(5, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1), {
+				Rotation = 359;
+			}):Play();
+		end
+
 		local mapTypes = {
 			[modMissionsLibrary.MissionTypes.Core] = 0;
 			[modMissionsLibrary.MissionTypes.Side] = 1;
@@ -597,6 +614,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			
 			local linkNextMission = lib.LinkNextMission;
 			
+			if linkNextMission then
+				mapOutMission(lib.LinkNextMission, newNode);
+			end
+
 			if lib.Rewards then
 				for a=1, #lib.Rewards do
 					local rewardInfo = lib.Rewards[a];
@@ -605,10 +626,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					
 					mapOutMission(rewardInfo.Id, newNode);
 				end
-			end
-			
-			if linkNextMission then
-				mapOutMission(lib.LinkNextMission, newNode);
 			end
 
 			if lib.StorylineSplit then
@@ -692,6 +709,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					if missionData == nil then return end;
 					interface:PlayButtonClick();
 					binds.Select(id);
+
+					local missionMap = MissionDisplayFrame:FindFirstChild("MissionsMap");
+					if missionMap then
+						missionMap:Destroy();
+					end
 				end)
 				newEntry.MouseButton2Click:Connect(function()
 					if missionData == nil then return end;
@@ -706,6 +728,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 					task.wait(modConfigurations.CompactInterface and 1 or 0.5);
 					pinRequestDebounce = false;
+
+					binds.RefreshMissionMap();
 				end)
 
 				if parentNode then
@@ -778,6 +802,16 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					storylineButton.Position = UDim2.new(0, (node.Type+1)*entryXSize, 0, orderPos*entryYSize);
 					storylineButton.Parent = scrollFrame;
 				end
+
+				if lib.MissionType == modMissionsLibrary.MissionTypes.Premium then
+					local premStroke = Instance.new("UIStroke");
+					premStroke.Name = `PremStroke`;
+					premStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
+					premStroke.BorderStrokePosition = Enum.BorderStrokePosition.Inner;
+					premStroke.Color = Color3.fromRGB(182, 152, 0);
+					premStroke.Thickness = 2.6;
+					premStroke.Parent = newEntry;
+				end
 			end
 			
 			
@@ -830,6 +864,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			if pinnedMissionData and pinnedMissionData.Id == node.Id then
 				strokeUI.Color = branchColor;
 				strokeUI.Enabled = true;
+				highlightAnimGradiant.Parent = strokeUI;
 
 			else
 				strokeUI.Enabled = false;
@@ -1759,7 +1794,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				end
 				
 				local timeLapsed = os.time()-missionData.StartTime;
-
 				pinHudData.TitleText = (timeLapsed <= 10 and "New " or "")..missionTypeTitle.." Mission";
 			end
 			binds.UpdatePinnedHud();

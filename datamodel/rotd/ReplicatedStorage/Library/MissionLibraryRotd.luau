@@ -134,7 +134,6 @@ MissionLibrary.New{
 	GuideText="Talk to Stephanie to start";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Side};
-		{Type="Mission"; Id=3};
 	};
 	StartRequirements={
 		Level=2;
@@ -145,23 +144,24 @@ MissionLibrary.New{
 
 -- MARK: 4 - Lend A Hand
 MissionLibrary.New{
-	MissionId=4;
-	MissionType = MissionLibrary.MissionTypes.Side;
-	Name="Lend A Hand";
-	From="Dr. Deniski";
-	Description="Dr. Deniski wants you to find a zombie arm for his experiments.";
-	Persistent=true;
-	World="TheWarehouse";
-	Objectives={
+	MissionId = 4;
+	MissionType = MissionLibrary.MissionTypes.Core;
+	Name = "Lend A Hand";
+	From = "Dr. Deniski";
+	Description = "Dr. Deniski wants you to find a zombie arm for his experiments.";
+	Persistent = true;
+	World = "TheWarehouse";
+	Objectives = {
 		["ArmSearch"]={Index=1; Description="Kill some zombies to look for a zombie arm"; Type="RequireItem"; ItemId="zombiearm"};
 	};
-	ObjectivesCompleteText="Return the zombie arm to Dr. Deniski";
-	GuideText="Talk to Dr. Deniski to start";
-	Rewards={
-		{Type="Perks"; Amount=PerksReward.Side};
-		{Type="Mission"; Id=3};
+	ObjectivesCompleteText = "Return the zombie arm to Dr. Deniski";
+	GuideText = "Talk to Dr. Deniski to start";
+	Rewards = {
+		{Type="Perks"; Amount=PerksReward.Core};
+		{Type="Mission"; Id=15;};
 	};
-	StartRequirements={
+	LinkNextMission = 8;
+	StartRequirements = {
 		Level=2;
 	};
 	
@@ -196,10 +196,9 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Item"; ItemId="pistolfireratebp"; Quantity=1;};
-		{Type="Mission"; Id=3};
-		{Type="Mission"; Id=4};
 		{Type="Mission"; Id=6};
 	};
+	LinkNextMission = 6;
 	StartRequirements={
 		Level=2;
 	};
@@ -232,8 +231,11 @@ MissionLibrary.New{
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=MoneyReward.Core};
+		{Type="Mission"; Id=3};
+		{Type="Mission"; Id=4};
 		{Type="Mission"; Id=7};
 	};
+	LinkNextMission = 7;
 	StartRequirements={
 		Level=2;
 	};
@@ -269,13 +271,14 @@ MissionLibrary.New{
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=MoneyReward.Core};
+		{Type="Mission"; Id=9};
 		{Type="Mission"; Id=11};
 		{Type="Mission"; Id=46;};
-		{Type="Mission"; Id=40;};
 		{Type="Mission"; Id=43;};
 	};
+	LinkNextMission = 11;
 	StartRequirements={
-		Level=3;
+		Level=2;
 	};
 	Markers={
 		[1]={World="TheWarehouse"; Label="Robert"; Target="Robert"; Type=modMarkers.MarkerTypes.Npc;};
@@ -291,24 +294,25 @@ MissionLibrary.New{
 
 -- MARK: 8 - Bandage Up
 MissionLibrary.New{
-	MissionId=8;
-	MissionType = MissionLibrary.MissionTypes.Side;
-	Name="Bandage Up";
-	From="Dr. Deniski";
-	Description="Dr. Deniski has something for you to heal yourself while you're outside. He teaches you how to make medkits.";
-	Persistent=true;
-	World="TheWarehouse";
-	Checkpoint={
+	MissionId = 8;
+	MissionType = MissionLibrary.MissionTypes.Core;
+	Name = "Bandage Up";
+	From = "Dr. Deniski";
+	Description = "Dr. Deniski has something for you to heal yourself while you're outside. He teaches you how to make medkits.";
+	Persistent = true;
+	World = "TheWarehouse";
+	Checkpoint = {
 		{Text="Build the Medkit from the Workbench";};
 	};
-	GuideText="Talk to Dr. Deniski to start";
-	Rewards={
-		{Type="Perks"; Amount=PerksReward.Side};
+	GuideText = "Talk to Dr. Deniski to start";
+	Rewards = {
+		{Type="Perks"; Amount=PerksReward.Core};
 	};
-	AddRequirements={
+	LinkNextMission = 18;
+	AddRequirements = {
 		{Type="MissionCompleted"; Value={4; 7}};
 	};
-	StartRequirements={
+	StartRequirements = {
 		Level=5;
 	};
 	
@@ -330,7 +334,6 @@ MissionLibrary.New{
 	GuideText="Talk to Stephanie to start";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Side};
-		{Type="Mission"; Id=15};
 	};
 	AddRequirements={
 		{Type="MissionCompleted"; Value={3; 7}};
@@ -382,10 +385,12 @@ MissionLibrary.New{
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=MoneyReward.Core};
+		{Type="Mission"; Id=14};
 		{Type="Mission"; Id=49};
 	};
+	LinkNextMission = 49;
 	StartRequirements={
-		Level=5;
+		Level=4;
 	};
 	Markers={
 		[1]={World="TheWarehouse"; Label="Satellite To Repair"; Target=Vector3.new(635.642, 95, -50.283); Type=modMarkers.MarkerTypes.Waypoint;};
@@ -419,11 +424,9 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Mission"; Id=27};
-		{Type="Mission"; Id=13};
-		{Type="Mission"; Id=14};
-		{Type="Mission"; Id=16};
 		{Type="Mission"; Id=18};
 	};
+	LinkNextMission=4;
 	StartRequirements={
 		Level=7;
 		MissionCompleted={49};
@@ -470,23 +473,23 @@ MissionLibrary.New{
 
 -- MARK: 14 - Pigeon Post
 MissionLibrary.New{
-	MissionId=14;
+	MissionId = 14;
 	MissionType = MissionLibrary.MissionTypes.Side;
-	Name="Pigeon Post";
-	From="Nick";
-	Description="Nick learnt that Jane is in another safehouse, and he needs your help with delivering a message.";
-	Persistent=true;
-	World="TheWarehouse";
-	Progression={
+	Name = "Pigeon Post";
+	From = "Nick";
+	Description = "Nick learnt that Jane is in another safehouse, and he needs your help with delivering a message.";
+	Persistent = true;
+	World = "TheWarehouse";
+	Progression = {
 		"Head to Sundays Safehouse";
 		"Talk to Jane";
 		"Return to Nick";
 	};
-	GuideText="Talk to Nick to start";
-	Rewards={
+	GuideText = "Talk to Nick to start";
+	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Side};
 	};
-	StartRequirements={
+	StartRequirements = {
 		Level=9;
 	};
 	
@@ -789,6 +792,7 @@ MissionLibrary.New{
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=MoneyReward.Core};
+		{Type="Mission"; Id=13};
 		{Type="Mission"; Id=29};
 		{Type="Mission"; Id=30};
 		{Type="Mission"; Id=20};
@@ -974,6 +978,7 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Mission"; Id=33};
+		{Type="Mission"; Id=40;};
 	};
 	LinkNextMission=33;
 	StartRequirements={
@@ -1664,7 +1669,9 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=(MoneyReward.Core+1000)};
 		{Type="Mission"; Id=12};
+		{Type="Mission"; Id=16};
 	};
+	LinkNextMission = 12;
 	Markers={
 		[4]={World="TheWarehouse"; Label="Book"; Target=Vector3.new(641.77, 61.36, 243.15); Type=modMarkers.MarkerTypes.Waypoint;};
 		[5]={World="TheWarehouse"; Label="Mason"; Target="Mason"; Type=modMarkers.MarkerTypes.Npc;};

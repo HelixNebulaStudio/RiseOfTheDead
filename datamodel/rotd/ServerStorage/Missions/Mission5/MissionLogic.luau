@@ -12,10 +12,11 @@ local MISSION_ID = 5;
 -- MARK: IsServer()
 if RunService:IsServer() then
 	if not RunService:IsStudio() then
-		if not modBranchConfigurations.IsWorld("TheWarehouse") then return {}; end;
+		if shared.WorldName ~= "TheWarehouse" then return {}; end;
 	end
 
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
+	local modItemDrops = shared.require(game.ServerScriptService.ServerLibrary.ItemDrops);
 	local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 	shared.modEventService:OnInvoked("WorkbenchService_BindInterfaceToggle", function(event: EventPacket, ...)
@@ -132,6 +133,17 @@ if RunService:IsServer() then
 						Player = player;
 						OnBoardingStep = modAnalyticsService.OnBoardingSteps.Mission5_Complete;
 					};
+
+					task.spawn(function()
+						modItemDrops.spawn{
+							ItemId = "xm1014";
+							Quantity = 1;
+							SpawnCFrame = CFrame.new(102.6, 57.65, -37.3);
+							SharedDrop = true;
+							DropIfNotOwned = true;
+							Players = {player;}
+						};
+					end)
 				end;
 			end)
 		end)
@@ -142,7 +154,7 @@ end
 -- MARK: IsClient()
 if RunService:IsClient() then
 	if not RunService:IsStudio() then
-		if not modBranchConfigurations.IsWorld("TheWarehouse") then return {}; end;
+		if shared.WorldName ~= "TheWarehouse" then return {}; end;
 	end
 	
 	local modWaypoint = shared.require(game.ReplicatedStorage.Library.Waypoint);

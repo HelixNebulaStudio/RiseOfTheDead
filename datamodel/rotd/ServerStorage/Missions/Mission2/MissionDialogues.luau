@@ -111,7 +111,7 @@ Dialogues.Nick.DialogueStrings = {
 if RunService:IsServer() then
 	local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
-	-- !outline: Mason Handler
+	-- MARK: Mason Handler
 	Dialogues.Mason.DialogueHandler = function(player, dialog, data, mission)
 		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
