@@ -19,7 +19,7 @@ function attirePackage.newClass()
 
 	equipmentClass:AddBaseModifier("HelmOverwhelm", {
 		ArrayValues = {
-			PassiveModifiers = "HelmOverwhelm";
+			PassiveModifiers = "Helm Overwhelm";
 		};
 	});
 

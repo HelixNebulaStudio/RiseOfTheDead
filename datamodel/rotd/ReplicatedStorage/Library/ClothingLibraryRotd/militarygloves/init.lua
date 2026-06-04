@@ -14,7 +14,18 @@ local attirePackage = {
 };
 
 function attirePackage.newClass()
-	return modEquipmentClass.new(attirePackage);
+	local equipmentClass = modEquipmentClass.new(attirePackage);
+
+	equipmentClass:AddBaseModifier("InstinctiveBullseye", {
+		SetValues = {
+			InstinctiveBullseye = true;
+		};
+		ArrayValues = {
+			PassiveModifiers = "Instinctive Bullseye";
+		};
+	}); 
+
+	return equipmentClass;
 end
 
 return attirePackage;
