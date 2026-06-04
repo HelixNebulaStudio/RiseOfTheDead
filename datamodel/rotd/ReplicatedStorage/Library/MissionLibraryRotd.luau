@@ -83,16 +83,16 @@ MissionLibrary.New{
 	Persistent = true;
 	World = "TheWarehouse";
 	Checkpoint = {
-		{Text="Talk to Mason";};
-		{Text="Exit the bedroom";};
-		{Text="Talk to Dr. Deniski to ask him to heal you";};
-		{Text="Talk to Mason";};
-		{Text="Talk to Nick";};
+		{Text="Talk to Mason"; Notify=true;};
+		{Text="Exit the bedroom"; Notify=true;};
+		{Text="Talk to Dr. Deniski to ask him to heal you"; Notify=true;};
+		{Text="Talk to Mason"; Notify=true;};
+		{Text="Talk to Nick"; Notify=true;};
 		
-		{Text="Go to shop and click your gun to buy ammo";};
+		{Text="Go to shop and click your gun to buy ammo"; Notify=true;};
 		{Text="Return to Nick"; Notify=true;};
-		{Text="Leave the warehouse";};
-		{Text="Kill $Kills zombies";};
+		{Text="Leave the warehouse"; Notify=true;};
+		{Text="Kill $Kills zombies"; Notify=true;};
 		{Text="Return to Nick"; Notify=true;};
 	};
 	SaveData = {Kills=10;};
@@ -158,6 +158,7 @@ MissionLibrary.New{
 	GuideText = "Talk to Dr. Deniski to start";
 	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Core};
+		{Type="Mission"; Id=8;};
 		{Type="Mission"; Id=15;};
 	};
 	LinkNextMission = 8;
@@ -178,14 +179,14 @@ MissionLibrary.New{
 	Persistent=true;
 	World="TheWarehouse";
 	Checkpoint={
-		{Text="Use the workbench in the Warehouse";};
-		{Text="Check the requirements for to build a Pistol Damage Mod";};
-		{Text="Kill Zombies and Sell items to obtain"; CompleteText="Build the Pistol Damage Mod"; Objectives={"Item1"; "Item2"};};
-		{Text="Build the Pistol Damage Mod";};
-		{Text="Wait for the mod to build";};
+		{Text="Use the workbench in the Warehouse"; Notify=true;};
+		{Text="Check the requirements for to build a Pistol Damage Mod"; Notify=true;};
+		{Text="Kill Zombies and Sell items to obtain crafting materials"; CompleteText="Build the Pistol Damage Mod"; Objectives={"Item1"; "Item2"}; Notify=true;};
+		{Text="Build the Pistol Damage Mod"; Notify=true;};
+		{Text="Wait for the mod to build"; Notify=true;};
 
 		{Text="Collect the Pistol Damage Mod from the workbench"; Notify=true;};
-		{Text="Add the mod to your weapon by selecting the weapon on the workbench";};
+		{Text="Add the mod to your weapon by selecting the weapon on the workbench"; Notify=true;};
 	};
 	Objectives={
 		["Item1"]={Index=1; Description="$Amount Metal Scraps from Zombies"; Type="RequireItem"; ItemId="metal"; Amount=10;};
@@ -232,7 +233,6 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Mission"; Id=3};
-		{Type="Mission"; Id=4};
 		{Type="Mission"; Id=7};
 	};
 	LinkNextMission = 7;
@@ -307,8 +307,9 @@ MissionLibrary.New{
 	GuideText = "Talk to Dr. Deniski to start";
 	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Core};
+		{Type="Mission"; Id=49};
 	};
-	LinkNextMission = 18;
+	LinkNextMission = 49;
 	AddRequirements = {
 		{Type="MissionCompleted"; Value={4; 7}};
 	};
@@ -386,9 +387,9 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Mission"; Id=14};
-		{Type="Mission"; Id=49};
+		{Type="Mission"; Id=4};
 	};
-	LinkNextMission = 49;
+	LinkNextMission = 4;
 	StartRequirements={
 		Level=4;
 	};

@@ -206,8 +206,9 @@ return function(CutsceneSequence)
 
 					CutsceneSequence:NextScene("wakeUp");
 					task.spawn(function()
-						task.wait(0.5);
-						modStatusEffects.DirectCamera(player, masonNpcClass.Head.Position, 4);
+						task.wait(6.5);
+						if mission.ProgressionPoint ~= 1 then return end;
+						modStatusEffects.DirectCamera(player, masonNpcClass.Head.Position, 5);
 					end)
 
 				elseif mission.ProgressionPoint == 2 then

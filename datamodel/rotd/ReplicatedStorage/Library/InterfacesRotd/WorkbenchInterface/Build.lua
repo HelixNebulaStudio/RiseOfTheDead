@@ -47,9 +47,10 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 			
 			local productItemLib = modItemLibrary:Find(library.Product);
 			local productLabel = itemListingTemplate:Clone();
-			productLabel.Text = "• "..productItemLib.Name..(library.Amount and " x "..library.Amount or "");
+			productLabel.Text = "• "..`<b>{productItemLib.Name}</b>`..(library.Amount and " x "..library.Amount or "");
 			productLabel.Parent = createsListFrame;
 			productLabel.Visible = true;
+
 			local labels = {};
 			for a=1, #library.Requirements do
 				local listingLabel = itemListingTemplate:Clone();
@@ -67,13 +68,17 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 					end
 				elseif library.Requirements[a].Type == "Item" then
 					local itemLib = modItemLibrary:Find(library.Requirements[a].ItemId);
-					listingLabel.Text = ("• $Requires/$Amount $Name"):gsub("$Requires", `{0}`):gsub("$Amount", amount):gsub("$Name", itemLib.Name);
+					listingLabel.Text = ("• $Requires / $Amount $Name")
+											:gsub("$Requires", `{0}`)
+											:gsub("$Amount", amount)
+											:gsub("$Name", `<b>{itemLib.Name}</b>`);
+				
 				end
 				listingLabel.Parent = requireListFrame;
 				listingLabel.Visible = true;
 				table.insert(labels, listingLabel);
 			end
-			spawn(function()
+			task.spawn(function()
 				local rPacket = remoteBlueprintHandler:InvokeServer("check", {ItemId=itemId;});
 				
 				if rPacket.Success then
@@ -82,17 +87,28 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						local requires = fulfillment[a].Requires or 0;
 						local amount = library.Requirements[a].Amount or 1;
 						local listingLabel = labels[a];
+
+						local isFulfilled = true;
 						if fulfillment[a].Fulfilled then
 							listingLabel.TextColor3 = Color3.fromRGB(147, 255, 135);
+
 						elseif not fulfillment[a].Fulfilled then
+							isFulfilled = false;
 							listingLabel.TextColor3 = Color3.fromRGB(255, 108, 103);
+
 						elseif library.Requirements[a].Ignore then
 							listingLabel.TextColor3 = Color3.fromRGB(70, 70, 70);
+
 						end
 						if library.Requirements[a].Type == "Item" then
 							local itemLib = modItemLibrary:Find(library.Requirements[a].ItemId);
-							listingLabel.Text = ("• $Requires/$Amount $Name"):gsub("$Requires", amount-requires)
-															:gsub("$Amount", amount):gsub("$Name", itemLib.Name);
+
+							local amt = tostring(amount-requires);
+							if not isFulfilled then
+								amt = `<b>{amt}</b>`
+							end
+							listingLabel.Text = ("• $Requires / $Amount $Name"):gsub("$Requires", amt)
+															:gsub("$Amount", amount):gsub("$Name", `<b>{itemLib.Name}</b>`);
 						end
 					end
 				end

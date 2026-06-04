@@ -217,8 +217,8 @@ if RunService:IsServer() then
 								end)
 
 								task.spawn(function()
-									task.wait(3);
-									modStatusEffects.DirectCamera(player, Vector3.new(61, 60.2, -28.7), 3.5);
+									task.wait(2);
+									modStatusEffects.DirectCamera(player, Vector3.new(61, 60.2, -28.7), 2.5);
 								end)
 							end)
 							dialog:AddChoice("whereAmI_denyTask", function(dialog)

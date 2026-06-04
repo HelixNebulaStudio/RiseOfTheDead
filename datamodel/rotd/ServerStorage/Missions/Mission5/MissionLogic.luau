@@ -141,7 +141,8 @@ if RunService:IsServer() then
 							SpawnCFrame = CFrame.new(102.6, 57.65, -37.3);
 							SharedDrop = true;
 							DropIfNotOwned = true;
-							Players = {player;}
+							Players = {player;};
+							DespawnDuration = 300;
 						};
 					end)
 				end;
