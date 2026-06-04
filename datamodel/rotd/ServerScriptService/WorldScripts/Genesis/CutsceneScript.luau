@@ -114,7 +114,7 @@ return function(CutsceneSequence)
 
 			if locationsChecklist["test"] == true then
 			elseif locationsChecklist["Closed-off Train Station"] == true and stageIndex < 8 then
-				gameController:SetStatus("Get the Elevator working");
+				gameController:SetStatus("Get the elevator working");
 				stageIndex = 8;
 
 			elseif locationsChecklist["Abandoned Safehouse"] == true and stageIndex < 6 then
@@ -122,7 +122,7 @@ return function(CutsceneSequence)
 				stageIndex = 6;
 
 			elseif locationsChecklist["Garage"] == true and stageIndex < 3 then
-				gameController:SetStatus("Get the Garage gates open");
+				gameController:SetStatus("Get the garage gates open");
 				stageIndex = 3;
 
 			end
@@ -319,7 +319,7 @@ return function(CutsceneSequence)
 		
 		local debriOrigin = Vector3.new(20.778, 37.657, -235.472);
 		Cache.BlowUpProp:Destroy();
-		gameController:SetStatus("Find a way through th sewers");
+		gameController:SetStatus("Find a way through the sewers");
 		
 		local animationController = Cache.CarRig:WaitForChild("AnimationController");
 		local explosionAnim = animationController:LoadAnimation(cutsceneAssets.ExplosionAnim);
@@ -358,7 +358,7 @@ return function(CutsceneSequence)
 		modParticleSprinkler:Emit(particlePacket);
 		modAudio.Play("Explosion3", Cache.CarRig.PrimaryPart).RollOffMaxDistance = 4096;
 		
-		gameController:SetStatus("Find a way through th sewers");
+		gameController:SetStatus("Find a way through the sewers");
 		stageIndex = 7;
 		task.wait(5);
 		Cache.Jet:Destroy();
@@ -492,14 +492,14 @@ return function(CutsceneSequence)
 		rustyGateInteractConfig:SetAttribute("Locked", false);
 		endDoorInteractConfig:SetAttribute("Locked", false);
 
-		gameController:SetStatus("Escape through the saferoom door");
+		gameController:SetStatus("Escape through the saferoom");
 		stageIndex = 12;
 		
 		--MARK: Game Exit Door
 		local endExitInteractConfig = workspace.Interactables.endExit.Interactable;
 		local endExitInteractable: InteractableInstance = modInteractables.getOrNew(endExitInteractConfig);
 		endExitInteractable.CanInteract = false;
-		endExitInteractable.Label = "Close armored door to end the run";
+		endExitInteractable.Label = "Close the saferoom door to end the run";
 		endExitInteractable:Sync();
 
 		local endDoorDoorConfig = doorObjects.EndArmoredDoor.Door;
@@ -514,7 +514,7 @@ return function(CutsceneSequence)
 					doorCloseGraceTick = nil;
 					if tick() > lastHintedTick then
 						lastHintedTick = tick()+5;
-						shared.Notify(game.Players:GetPlayers(), "Close the exit door to end.", "Inform", "endhint");
+						shared.Notify(game.Players:GetPlayers(), "Gather in the saferoom and close the door to end.", "Inform", "endhint");
 					end
 
 					task.wait(0.1);
