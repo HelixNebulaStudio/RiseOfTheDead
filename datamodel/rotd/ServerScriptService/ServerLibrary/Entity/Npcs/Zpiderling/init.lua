@@ -18,7 +18,7 @@ local npcPackage = {
         TargetableDistance = 75;
 
         Level = 1;
-        ExperiencePool = 5;
+        BaseExperience = 5;
         MoneyReward = NumberRange.new(15, 20);
 
         Immortal = 1;

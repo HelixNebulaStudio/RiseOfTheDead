@@ -19,7 +19,7 @@ local npcPackage = {
         TargetableDistance = 75;
 
         Level = 1;
-        ExperiencePool = 35;
+        BaseExperience = 35;
         MoneyReward = NumberRange.new(15, 20);
         ThornResist = 0.94;
     };

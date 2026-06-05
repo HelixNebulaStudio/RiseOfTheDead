@@ -51,11 +51,11 @@ end
 if RunService:IsClient() then
 	local player = game.Players.LocalPlayer;
 	
-	function MissionLogic.ProgressionPoint1()
+	function MissionLogic.Checkpoint1()
 		local highlight = modGuiHighlight.Set("MainInterface", "QuickButtons", "SocialMenu");
 	end
 
-	function MissionLogic.ProgressionPoint2()
+	function MissionLogic.Checkpoint2()
 		local highlight = modGuiHighlight.Set("MainInterface", "SocialMenu", "RightBackground", "ProfileFrame", "focusLevels");
 	end
 

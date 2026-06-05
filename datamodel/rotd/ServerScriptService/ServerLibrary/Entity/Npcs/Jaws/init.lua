@@ -20,7 +20,7 @@ local npcPackage = {
         Detectable = false;
 
         Level = 1;
-        ExperiencePool = 20;
+        BaseExperience = 20;
         MoneyReward = NumberRange.new(25, 30);
 
         KnockbackResistant = 1;

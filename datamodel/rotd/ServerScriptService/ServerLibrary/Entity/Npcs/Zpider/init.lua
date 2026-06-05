@@ -20,7 +20,7 @@ local npcPackage = {
         TargetableDistance = 75;
 
         Level = 1;
-        ExperiencePool = 40;
+        BaseExperience = 40;
         MoneyReward = NumberRange.new(15, 20);
 
         KnockbackResistant = 1;

@@ -1,7 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 
-local modPlayers = shared.require(game.ReplicatedStorage.Library.Players);
+local modGlobalVars = shared.require(game.ReplicatedStorage.GlobalVariables);
 local modWeaponsLibrary = shared.require(game.ReplicatedStorage.Library.WeaponsLibrary);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
@@ -19,6 +19,38 @@ local Experience = {
 --==
 function Experience.onRequire()
 	remoteHudNotification = modRemotesManager:Get("HudNotification");
+
+	shared.modEventService:OnInvoked("Mission_BindMissionComplete", function(event: EventPacket, ...)
+		local player = event.Player;
+		if player == nil then return end;
+
+		local mission = ...;
+		task.spawn(function()
+			if mission == nil then return end;
+			local missionLib = mission.Library;
+
+			local duration = 60;
+			
+			if missionLib.Tier then
+				if missionLib.Tier == "Easy" then
+					duration = 60;
+				elseif missionLib.Tier == "Normal" then
+					duration = 150;
+				elseif missionLib.Tier == "Hard" then
+					duration = 300;
+				else
+					duration = 600;
+				end
+			end
+
+			local playerClass: PlayerClass = shared.modPlayers.get(player);
+			
+			playerClass.StatusComp:Apply("XpConfidence", {
+				Expires = workspace:GetServerTimeNow() + duration;
+				Duration = duration;
+			})
+		end)
+	end)
 end
 
 function Experience.CalculateExpGoal(itemLevel, weaponLib)
@@ -39,22 +71,41 @@ end
 function Experience.Add(storageItem: StorageItem, exp: number)
 	if modConfigurations.DisableExperienceGain then Debugger:Warn("Experience gain is disabled."); return end;
 
+	local initialExp = exp;
 	local itemId = storageItem.ItemId;
 	local weaponLib = modWeaponsLibrary[itemId];
 
 	local player = storageItem.Player;
 	if player == nil then return end;
 
-	local playerClass: PlayerClass = modPlayers.GetByName(player.Name);
-	local playerProfile = player and modProfile:Get(player);
+	local playerClass: PlayerClass = shared.modPlayers.get(player);
+	local configurations = playerClass.Configurations;
+
+	local playerProfile = modProfile:Get(player);
 	local gameSave: GameSaveRotd = playerProfile and playerProfile:GetActiveSave() or nil;
 	local playerKey = tostring(player.UserId);
 	
+
+	local playerLevel = gameSave and gameSave:GetStat("Level") or 0;
+	if playerLevel > 0 then
+		local lvlBonusRatio = math.clamp(playerLevel/modGlobalVars.MaxLevels, 0, 1)^(1/2);
+
+		local bonusLvlExp = math.floor(initialExp * lvlBonusRatio);
+		exp += bonusLvlExp;
+	end
+	
+	local xpConfidenceStatus: StatusClassInstance = playerClass.StatusComp:GetOrDefault("XpConfidence");
+	if xpConfidenceStatus then
+		local xpRatio = math.clamp((xpConfidenceStatus.Expires - workspace:GetServerTimeNow())/xpConfidenceStatus.Duration, 0, 1);
+		exp += math.ceil(initialExp * xpRatio);
+	end
+
 	local xpBoostStatus: StatusClassInstance = playerClass.StatusComp:GetOrDefault("XpBoost");
 	if xpBoostStatus then
 		exp = exp *2;
 	end
-	
+
+
 	if weaponLib == nil then
 		return;
 	end
@@ -63,8 +114,9 @@ function Experience.Add(storageItem: StorageItem, exp: number)
 	
 	local itemLevel = storageItem:GetValues("L") or 0;
 	local currentExp = (storageItem:GetValues("E") or 0);
+	
 	local experienceGoal = Experience.CalculateExpGoal(itemLevel, weaponLib);
-	local remaindingExp = math.clamp(math.ceil(currentExp+exp-experienceGoal), 0, math.huge);
+	local remainingExp = math.clamp(math.ceil(currentExp+exp-experienceGoal), 0, math.huge);
 	
 	local function AddExp(addExp)
 		addExp = math.floor(addExp);
@@ -80,21 +132,23 @@ function Experience.Add(storageItem: StorageItem, exp: number)
 				
 				remoteHudNotification:FireClient(player, "WeaponLevelup", {StorageItem=storageItem; Level=itemLevel;});
 				
+				remainingExp = math.clamp(math.ceil(currentExp+addExp-experienceGoal), 0, math.huge);
+
 				experienceGoal = Experience.CalculateExpGoal(itemLevel, weaponLib);
 				currentExp = 0;
-				remaindingExp = math.clamp(math.ceil(currentExp+addExp-experienceGoal), 0, math.huge);
-				if remaindingExp > 0 then
-					AddExp(remaindingExp);
+
+				if remainingExp > 0 then
+					AddExp(remainingExp);
 				end
 
 			else
 				currentExp = experienceGoal;
-				remaindingExp = 0;
+				remainingExp = 0;
 
 			end
 		else
 			currentExp = currentExp+addExp;
-			remaindingExp = 0;
+			remainingExp = 0;
 
 		end
 	end

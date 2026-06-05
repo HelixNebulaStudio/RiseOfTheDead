@@ -102,13 +102,14 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
     --MARK: Window
 	local window: InterfaceWindow = interface:NewWindow("SocialMenu", menuFrame);
+    window.BoolStringWhenActive = {String="!Hotbar"; Priority=2;};
 	window.CompactFullscreen = true;
     window.CloseWithInteract = true;
 
 	if modConfigurations.CompactInterface then
 		window:SetClosePosition(UDim2.new(0.5, 0, -1, 0), UDim2.new(0.5, 0, 0.5, 0));
 	else
-		window:SetClosePosition(UDim2.new(0.5, 0, -1, 0), UDim2.new(0.5, 0, 0.5, -35));
+		window:SetClosePosition(UDim2.new(0.5, 0, -1, 0), UDim2.new(0.5, 0, 0.5, 0));
 	end
     
 	local quickButton = interface:NewQuickButton("SocialMenu", "Social", "rbxassetid://3256270238");
@@ -374,9 +375,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                     
                     local statKey = tostring(lib and lib.Name or k) or "";
                     local statValue = tostring(v) or "";
+
+                    if typeof(v) == "number" then
+                        statValue = interface.beautifyNumber(v);
+                    end
                     
-                    local s = statKey..": "..statValue;
-                    --(("$Stat: $Value"):gsub("$Stat", statKey):gsub("$Value", statValue)); -- invalid use of '%' in replacement string
+                    local s = `<b>{statKey}</b>: <font size="12">{statValue}</font>`;
 
                     if lib then
                         table.insert(statCache, {Index=(lib and lib.Index or 999); String=s});
@@ -392,7 +396,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                                                         profileDisplayList.statsProfile.label.TextSize,
                                                         profileDisplayList.statsProfile.label.Font,
                                                         Vector2.new(415, 2000));
-                profileDisplayList.statsProfile.Size = UDim2.new(1, 0, 0, textSize.Y+55);
+                profileDisplayList.statsProfile.Size = UDim2.new(1, 0, 0, textSize.Y+100);
             else
                 modLevelBadge:Update(profileLevelLabel, 0);
             end
@@ -422,6 +426,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                     local label = barFrame:WaitForChild("amountLabel");
                     barFrame.Parent = focusLevelFrame;
                     
+                    local sizeConstraint = Instance.new("UISizeConstraint");
+                    sizeConstraint.MinSize = Vector2.new(40, 0);
+                    sizeConstraint.Parent = barFrame;
+
                     local killsNeeded = focusAmount-math.fmod(levelKills, focusAmount);
                     totalKills = totalKills + killsNeeded;
                     label.Text = ("L$focusLevel: $killsNeeded"):gsub("$focusLevel",tostring(lvl)):gsub("$killsNeeded", killsNeeded);
@@ -431,6 +439,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 end
                 table.sort(barFrames, function(A, B) return A.Amount < B.Amount end)
                 table.sort(levelSort, function(A, B) return A.Level > B.Level end)
+
+                
                 for a=1, #barFrames do
                     local barFrame = barFrames[a].Bar;
                     
@@ -482,7 +492,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                                                                 profileDisplayList.collectionProfile.notfoundLabel.Font,
                                                                 Vector2.new(250, 1000))
                 local ySize = txtBoundFound.Y > txtBoundUnfound.Y and txtBoundFound.Y or txtBoundUnfound.Y;
-                profileDisplayList.collectionProfile.Size = UDim2.new(1, 0, 0, ySize+95);
+                profileDisplayList.collectionProfile.Size = UDim2.new(1, 0, 0, ySize+130);
             else
                 profileDisplayList.collectionProfile.Visible = false;
             end
@@ -611,14 +621,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 end
                 pcall(function()
                     task.spawn(function()
-                        profileDisplayList.achievements.Size = UDim2.new(1, 0, 0, profileDisplayList.achievements.ScrollingFrame.UIGridLayout.AbsoluteContentSize.Y+80);
-    --				if profileDisplayList.achievements.ScrollingFrame.UIGridLayout.AbsoluteContentSize.Y > 79 then
-    --					profileDisplayList.achievements.Size = UDim2.new(1, 0, 0, 240);
-    --				else
-    --					profileDisplayList.achievements.Size = UDim2.new(1, 0, 0, 160);
-    --				end
-    --				profileDisplayList.achievements.ScrollingFrame.CanvasSize = UDim2.new(0, 
-    --					0, 0, profileDisplayList.achievements.ScrollingFrame.UIGridLayout.AbsoluteContentSize.Y+5)
+                        profileDisplayList.achievements.Size = UDim2.new(
+                            1, 
+                            0, 
+                            0, 
+                            profileDisplayList.achievements.ScrollingFrame.UIGridLayout.AbsoluteContentSize.Y+130
+                        );
                     end)
                 end)
             else
@@ -646,7 +654,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                                                         profileDisplayList.gameStatistics.label.TextSize,
                                                         profileDisplayList.gameStatistics.label.Font,
                                                         Vector2.new(415, 10000));
-                profileDisplayList.gameStatistics.Size = UDim2.new(1, 0, 0, textSize.Y+55);
+                profileDisplayList.gameStatistics.Size = UDim2.new(1, 0, 0, textSize.Y+100);
             else
                 profileDisplayList.gameStatistics.Visible = false;
             end

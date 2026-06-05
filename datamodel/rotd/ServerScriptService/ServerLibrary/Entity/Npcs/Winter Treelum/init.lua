@@ -22,7 +22,7 @@ local npcPackage = {
 		KnockbackResistant = 1;
 
         Level = 1;
-        ExperiencePool = 20;
+        BaseExperience = 20;
         MoneyReward = NumberRange.new(1500, 1700);
     };
 

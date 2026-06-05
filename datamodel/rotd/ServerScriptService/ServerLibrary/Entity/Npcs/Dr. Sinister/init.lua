@@ -25,7 +25,7 @@ local npcPackage = {
         TargetableDistance = 70;
 
         Level = 1;
-        ExperiencePool = 50;
+        BaseExperience = 50;
     };
 
     Audio = {};

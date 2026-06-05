@@ -22,7 +22,7 @@ local npcPackage = {
         LockOnExpireDuration = NumberRange.new(5, 8);
 
         Level = 1;
-        ExperiencePool = 30;
+        BaseExperience = 30;
         DropRewardId = "leaper";
     };
 

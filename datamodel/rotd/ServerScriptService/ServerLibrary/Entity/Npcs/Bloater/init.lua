@@ -25,7 +25,7 @@ local npcPackage = {
         LockOnExpireDuration = NumberRange.new(1, 3);
 
         Level = 1;
-        ExperiencePool = 35;
+        BaseExperience = 35;
         DropRewardId = "bloater";
     };
 

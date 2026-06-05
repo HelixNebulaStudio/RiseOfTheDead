@@ -23,7 +23,7 @@ local npcPackage = {
         TargetableDistance = 128;
 
         Level = 1;
-        ExperiencePool = 200;
+        BaseExperience = 200;
         MoneyReward = {Min = 1500; Max = 1700};
         DropRewardId = "pathoroth";
         ThornResist = 0.95;

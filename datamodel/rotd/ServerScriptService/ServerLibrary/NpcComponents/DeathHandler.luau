@@ -69,6 +69,8 @@ function Component:__call(damagedata: DamageData)
 		);
 	end
 
+	local playerBonusExp = {};
+
 	local npcLevel = rawProperties.Level;
 	for a=1, #playerTags do
 		local playerTag = playerTags[a];
@@ -119,6 +121,8 @@ function Component:__call(damagedata: DamageData)
 			local levelKills = gameSave:GetStat(levelKey) or 0;
 			local playerLevel = gameSave:GetStat("Level") or 0;
 			if levelKills > 0 and math.fmod(levelKills, modGlobalVars.GetFocusLevel(playerLevel, npcLevel)) == 0 then
+				playerBonusExp[player.Name] = true;
+
 				if gameSave:AddStat("Perks", 1) > 0 then
 					modAnalytics.RecordResource(player.UserId, 1, "Source", "Perks", "Gameplay", "FocusKills");
 					modAnalyticsService:Source{
@@ -156,19 +160,23 @@ function Component:__call(damagedata: DamageData)
 			
 			for siid, weaponData in pairs(logData) do
 				local storageItem: StorageItem = weaponData.StorageItem;
+				local itemOwner = storageItem.Player;
 				local damageRatio = math.clamp(weaponData.Damage/totalDamage, 0, 1);
 
 				local weaponLevel = storageItem:GetValues("L") or 0;
-				local expPool = rawProperties.ExperiencePool or 20;
-				local expGain = math.clamp((expPool - weaponLevel) * damageRatio, 1, expPool);
+				local baseExp = rawProperties.BaseExperience or 20;
+
+				local expGain = math.clamp((baseExp - weaponLevel) * damageRatio, 1, baseExp);
+
+				if itemOwner and playerBonusExp[itemOwner.Name] then
+					expGain += math.clamp(baseExp * damageRatio, 1, baseExp);
+				end
 
 				if storageItem.StorageId == "portableautoturret" then
 					expGain = math.ceil(expGain * 0.25);
 				end
 
 				modExperience.Add(storageItem, expGain);
-
-				storageItem:Sync({"L"; "E"; "EG"});
 			end
 		end
 

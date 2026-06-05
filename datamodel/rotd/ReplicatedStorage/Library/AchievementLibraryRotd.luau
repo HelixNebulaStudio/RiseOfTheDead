@@ -222,7 +222,7 @@ library:Add{
 	Tier = Tiers.Bloodmetal;
 	BadgeId = 2937346212348630;
 	Announce = "$PlayerName survived Revived 3.0.";
-	Hidden = true;		
+	Hidden = true;
 	-- if profile.FirstJoined > 1777507200 then return end; -- Start of may 2026
 	-- 	-- playerSave:AwardAchievement("rotd3");
 }

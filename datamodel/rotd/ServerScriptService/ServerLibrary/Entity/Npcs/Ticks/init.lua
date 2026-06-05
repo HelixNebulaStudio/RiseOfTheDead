@@ -22,7 +22,7 @@ local npcPackage = {
         LockOnExpireDuration = NumberRange.new(2, 3);
 
         Level = 1;
-        ExperiencePool = 15;
+        BaseExperience = 15;
         DropRewardId = "ticks";
     };
 

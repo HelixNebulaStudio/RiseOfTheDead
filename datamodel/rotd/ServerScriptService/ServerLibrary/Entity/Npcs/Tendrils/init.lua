@@ -23,7 +23,7 @@ local npcPackage = {
         LockOnExpireDuration = NumberRange.new(1, 2);
 
         Level = 1;
-        ExperiencePool = 45;
+        BaseExperience = 45;
         DropRewardId = "tendrils";
 
         MeleeImmunity = 1;

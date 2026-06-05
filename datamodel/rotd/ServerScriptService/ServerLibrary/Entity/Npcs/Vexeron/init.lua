@@ -25,7 +25,7 @@ local npcPackage = {
         LockOnExpireDuration = NumberRange.new(100, 120);
 
         Level = 1;
-        ExperiencePool = 1000;
+        BaseExperience = 1000;
         MoneyReward = NumberRange.new(2000, 3500);
 
         ContactDamage = 10;

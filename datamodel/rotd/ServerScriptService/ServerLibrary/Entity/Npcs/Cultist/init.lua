@@ -17,7 +17,7 @@ local npcPackage = {
         TargetableDistance = 256;
 
         Level = 1;
-        ExperiencePool = 40;
+        BaseExperience = 40;
     };
 
     AddComponents = {

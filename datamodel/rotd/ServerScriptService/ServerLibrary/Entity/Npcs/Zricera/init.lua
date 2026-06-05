@@ -33,7 +33,7 @@ local npcPackage = {
         LockOnExpireDuration = NumberRange.new(5, 10);
 
         Level = 1;
-        ExperiencePool = 1000;
+        BaseExperience = 1000;
         MoneyReward = NumberRange.new(1500, 1700);
         DropRewardId = "heavy";
         ThornResist = 0.95;

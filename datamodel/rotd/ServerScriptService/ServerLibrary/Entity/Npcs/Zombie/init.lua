@@ -20,7 +20,7 @@ local npcPackage = {
         TargetableDistance = 50;
 
         Level = 1;
-        ExperiencePool = 20;
+        BaseExperience = 20;
         DropRewardId = "zombie";
     };
 

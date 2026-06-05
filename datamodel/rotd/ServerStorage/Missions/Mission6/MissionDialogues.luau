@@ -49,7 +49,7 @@ if RunService:IsServer() then
 			
 		elseif mission.Type == 1 then -- Active
 			if mission.ProgressionPoint == 1 then
-				dialog:SetInitiate("The barricade is almost destryoed..");
+				dialog:SetInitiate("The barricade is almost destroyed..");
 
 			elseif mission.ProgressionPoint == 2 then
 				dialog:SetInitiate("Please take me somewhere safe.");

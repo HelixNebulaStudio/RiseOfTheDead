@@ -171,14 +171,14 @@ MissionLibrary.New{
 
 -- MARK: 5 - Time To Upgrade
 MissionLibrary.New{
-	MissionId=5;
+	MissionId = 5;
 	MissionType = MissionLibrary.MissionTypes.Core;
-	Name="Time To Upgrade";
-	From="Mason";
-	Description="Mason teaches you how to upgrade your weapons.";
-	Persistent=true;
-	World="TheWarehouse";
-	Checkpoint={
+	Name = "Time To Upgrade";
+	From = "Mason";
+	Description = "Mason teaches you how to upgrade your weapons.";
+	Persistent = true;
+	World = "TheWarehouse";
+	Checkpoint = {
 		{Text="Use the workbench in the Warehouse"; Notify=true;};
 		{Text="Check the requirements for to build a Pistol Damage Mod"; Notify=true;};
 		{Text="Kill Zombies and Sell items to obtain crafting materials"; CompleteText="Build the Pistol Damage Mod"; Objectives={"Item1"; "Item2"}; Notify=true;};
@@ -188,28 +188,28 @@ MissionLibrary.New{
 		{Text="Collect the Pistol Damage Mod from the workbench"; Notify=true;};
 		{Text="Add the mod to your weapon by selecting the weapon on the workbench"; Notify=true;};
 	};
-	Objectives={
+	Objectives = {
 		["Item1"]={Index=1; Description="$Amount Metal Scraps from Zombies"; Type="RequireItem"; ItemId="metal"; Amount=10;};
 		["Item2"]={Index=1; Description="$$Amount from selling items in shop"; Type="RequireStat"; StatName="Money"; Amount=60;};
 	};
-	GuideText="Talk to Mason to learn how to upgrade your weapons";
-	Rewards={
+	GuideText = "Talk to Mason to learn how to upgrade your weapons";
+	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Item"; ItemId="pistolfireratebp"; Quantity=1;};
 		{Type="Mission"; Id=6};
 	};
 	LinkNextMission = 6;
-	StartRequirements={
+	StartRequirements = {
 		Level=2;
 	};
-	Markers={
+	Markers = {
 		[1]={World="TheWarehouse"; Label="Workbench"; Target=Vector3.new(29.8, 60.5, -40.5); Type=modMarkers.MarkerTypes.Waypoint;};
 		[3]={World="TheWarehouse"; Label="Workbench"; Target=Vector3.new(29.8, 60.5, -40.5); Type=modMarkers.MarkerTypes.Waypoint;};
 		[6]={World="TheWarehouse"; Label="Workbench"; Target=Vector3.new(29.8, 60.5, -40.5); Type=modMarkers.MarkerTypes.Waypoint;};
 		[7]={World="TheWarehouse"; Label="Workbench"; Target=Vector3.new(29.8, 60.5, -40.5); Type=modMarkers.MarkerTypes.Waypoint;};
 	};
-	CanRedo={};
+	CanRedo = {};
 	
 };
 
@@ -869,22 +869,22 @@ MissionLibrary.New{
 
 -- MARK: 27 - Focus Levels
 MissionLibrary.New{
-	MissionId=27;
+	MissionId = 27;
 	MissionType = MissionLibrary.MissionTypes.Side;
-	Name="Focus Levels";
-	From="Mason";
-	Description="Mason teaches you which zombies you should focus on killing.";
-	Persistent=true;
-	World="TheWarehouse";
-	Checkpoint={
-		{Text="Open your social menu by pressing [G]";};
+	Name = "Focus Levels";
+	From = "Mason";
+	Description = "Mason teaches you which zombies you should focus on killing.";
+	Persistent = true;
+	World = "TheWarehouse";
+	Checkpoint = {
+		{Text="Open your Social Menu by pressing [G]";};
 		{Text="Kill zombies according to your focus levels to earn a perk";};
 	};
-	GuideText="Talk to Mason";
-	Rewards={
+	GuideText = "Talk to Mason";
+	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Side};
 	};
-	CanRedo={};
+	CanRedo = {};
 	
 };
 

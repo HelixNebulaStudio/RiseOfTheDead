@@ -211,7 +211,7 @@ elseif RunService:IsServer() then -- MARK: Server
 
 			local event: EventPacket = shared.modEventService:ServerInvoke(
 				"Tools_BindFoodTool", 
-				{ReplicateTo = player;}, 
+				{ReplicateTo = {player};}, 
 				"Consume", 
 				handler, 
 				changeRef
