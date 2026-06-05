@@ -166,7 +166,7 @@ function Component:__call(damagedata: DamageData)
 					expGain = math.ceil(expGain * 0.25);
 				end
 
-				modExperience.Add(storageItem, expGain, npcClass.Name);
+				modExperience.Add(storageItem, expGain);
 
 				storageItem:Sync({"L"; "E"; "EG"});
 			end
