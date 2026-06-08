@@ -332,22 +332,22 @@ GameModeLibrary.GameModes={
 				HardModeEnabled = true;
 			};
 			["Prison"]={
-				WorldId="Prison";
-				ExitSpawn="hacClinic1";
-				TitleImage="rbxassetid://5943256940";
-				MaxPlayers=4;
-				RewardsId="prisoncrate";
-				RewardsIds={"prisoncrate"; "nprisoncrate"};
-				HardRewardId="corruptedprisoncrate";
+				WorldId = "Prison";
+				ExitSpawn = "hacClinic1";
+				TitleImage = "rbxassetid://5943256940";
+				MaxPlayers = 4;
+				RewardsId = "prisoncrate";
+				RewardsIds = {"prisoncrate"; "nprisoncrate"};
+				HardRewardId = "corruptedprisoncrate";
 				
-				SurvivalEndedTrack="PrisonSoundtrack";
-				BossKilledTrack="PrisonBossKilled";
-				WaveStartTrack="PrisonWaveStart";
-				WaveEndTrack="PrisonWaveEnd";
+				SurvivalEndedTrack = "PrisonSoundtrack";
+				BossKilledTrack = "PrisonBossKilled";
+				WaveStartTrack = "PrisonWaveStart";
+				WaveEndTrack = "PrisonWaveEnd";
 				
-				LeaderboardDataKey="Waves";
+				LeaderboardDataKey = "Waves";
 
-				HardModeEnabled=true;
+				HardModeEnabled = true;
 			};
 			["Sector D"]={
 				WorldId="SectorD";

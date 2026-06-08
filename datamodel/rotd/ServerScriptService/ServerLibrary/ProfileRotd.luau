@@ -154,6 +154,7 @@ function modProfile.onRequire()
 
 			local joinAsEarlyTester = nil;
 			if not isGameOnline then
+				Debugger:Warn(`JoinAsEarlyTester? {profile.GroupRank}`);
 				if profile == nil or (profile.GroupRank or 0) < 100 then
 					profile:GuiAction("promptwarning", "Servers are currently under maintenance, join our group to be early tester or join dev branch!.", true);
 					return rPacket;

@@ -376,6 +376,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                     local statKey = tostring(lib and lib.Name or k) or "";
                     local statValue = tostring(v) or "";
 
+                    if k == "FotlStats" then
+                        Debugger:StudioLog(`FotlStats`, v);
+                    end
                     if typeof(v) == "number" then
                         statValue = interface.beautifyNumber(v);
                     end

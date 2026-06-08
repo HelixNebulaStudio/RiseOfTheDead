@@ -10,7 +10,7 @@ local attirePackage = {
 	Configurations={
 		TickRepellent = 2;
 		ArmorPoints = 5;
-		Warmth = 7;
+		Warmth = 5;
 	};
 	Properties={};
 };
