@@ -5,6 +5,7 @@ local RunService = game:GetService("RunService");
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 
 if RunService:IsServer() then
+	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
     modGameModeSurvival = shared.require(game.ServerScriptService.ServerLibrary.GameModeSurvival);
     modGameModeManager = shared.require(game.ServerScriptService.ServerLibrary.GameModeManager);
     modGameModeManager.GameWorld = true;
@@ -109,6 +110,15 @@ function WorldCore.onRequire()
             local remoteSetHeadIcon = remotes:WaitForChild("SetHeadIcon");
             remoteSetHeadIcon:FireAllClients(1, "Lennon", "HideAll");
         end)
+
+        Debugger:Warn(`IsGameWorld = {modGameModeManager.IsGameWorld }`);
+        if modGameModeManager.IsGameWorld == true then return end;
+
+        local mission62 = modMission:GetMission(player, 62);
+        if mission62 and mission62.Type == 1 then
+            game.Players:SetAttribute("AutoRespawn", true);
+        end
+
     end, 999);
 end
 

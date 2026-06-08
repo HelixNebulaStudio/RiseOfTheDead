@@ -423,7 +423,7 @@ return function(CutsceneSequence)
 
 
 	-- MARK: SectorF
-	elseif modBranchConfigurations.IsWorld("SectorF") then
+	elseif shared.WorldName == "SectorF" then
 		
 		CutsceneSequence:NewScene("enableInterfaces", function()
 			modConfigurations.Set("DisablePinnedMission", false);

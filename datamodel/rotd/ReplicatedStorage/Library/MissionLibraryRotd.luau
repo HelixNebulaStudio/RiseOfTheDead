@@ -2163,15 +2163,15 @@ MissionLibrary.New{
 
 -- MARK: 62 - Rats Recruitment
 MissionLibrary.New{
-	MissionId=62;
+	MissionId = 62;
 	MissionType = MissionLibrary.MissionTypes.Core;
-	Name="Rats Recruitment";
-	Storyline=StoryLineEnum.Rat;
-	From="Patrick";
-	Description="After the cargo ship disaster, you check up on Patrick to see what's up.";
-	Persistent=true;
-	World={"TheHarbor"; "SectorE"; "SectorF"};
-	Checkpoint={
+	Name = "Rats Recruitment";
+	Storyline = StoryLineEnum.Rat;
+	From = "Patrick";
+	Description = "After the cargo ship disaster, you check up on Patrick to see what's up.";
+	Persistent = true;
+	World = {"TheHarbor"; "SectorE"; "SectorF"};
+	Checkpoint = {
 		{Text="Talk to Revas";};
 		{Text="Talk to Revas to travel";};
 		{Text="Talk to Revas";};
@@ -2190,18 +2190,18 @@ MissionLibrary.New{
 		{Text="Return to Revas";};
 		{Text="Eugene needs these items"; CompleteText="Give the cache to Eugene in Sector E"; Objectives={"Objective1"};};
 	};
-	Objectives={
+	Objectives = {
 		["Objective1"]={Index=1; Description="$Amount Nekron Particulate Cache"; Type="RequireItem"; ItemId="nekronparticulatecache"; Amount=2;};
 	};
-	StartRequirements={
-		MissionCompleted={58};
+	StartRequirements = {
+		MissionCompleted = {58};
 	};
-	GuideText="Talk to Patrick in the Safehome";
-	Rewards={
+	GuideText = "Talk to Patrick in the Safehome";
+	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Core};
 	};
-	SkipDestroyIfAddRequirementsNotMet=true;
-	AddRequirements={
+	SkipDestroyIfAddRequirementsNotMet = true;
+	AddRequirements = {
 		{Type="MissionCompleted"; Value={58;}};
 		{Type="EventFlag"; Key="mission58choice"; 
 			Value=function(eventObj)
@@ -2210,16 +2210,16 @@ MissionLibrary.New{
 			FailMsg="You needed to helped the rats during Mission: Double Cross."
 		};
 	};
-	Markers={
+	Markers = { 
 		[1]={World="TheHarbor"; Label="Revas"; Target="Revas"; Type=modMarkers.MarkerTypes.Npc;};
 		[8]={World="SectorE"; Label="Terminal"; Target=Vector3.new(144.3, -7, -80.4); Type=modMarkers.MarkerTypes.Waypoint;};
 		[15]={World="SectorE"; Label="Eugene"; Target="Eugene"; Type=modMarkers.MarkerTypes.Npc;};
 	};
-	CanRedo={};
-	AddCache={
-		RatsAllied=true;
+	CanRedo = {};
+	AddCache = {
+		RatsAllied = true;
 	};
-	LinkNextMission=80;
+	LinkNextMission = 80;
 };
 
 

@@ -3,6 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local RunService = game:GetService("RunService");
 
 local library = shared.require(game.ReplicatedStorage.Library.UsableItems);
+local modSafehomesLibrary = shared.require(game.ReplicatedStorage.Library.SafehomesLibrary);
 --==
 
 function library.onRequire()
@@ -69,9 +70,8 @@ function library.onRequire()
 	end
 
 	--== Unlock Papers
-	local modSafehomesLibrary = shared.require(game.ReplicatedStorage.Library.SafehomesLibrary);
-	local papersList = modSafehomesLibrary:ListByMatchFunc(function(itemLib)
-		return itemLib.UnlockPapers == true;
+	local papersList = modSafehomesLibrary:ListByMatchFunc(function(safehomeLib)
+		return safehomeLib.UnlockPapers == true;
 	end)
 
 	for a=1, #papersList do

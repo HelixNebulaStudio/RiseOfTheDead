@@ -7,44 +7,44 @@ local modSafehomesLibrary = shared.require(game.ReplicatedStorage.Library.Safeho
 
 local UsablePreset = shared.require(game.ReplicatedStorage.Library.UsableItems.UsablePreset).new();
 
---== MARK: Server
-if RunService:IsClient() then return UsablePreset; end;
+if RunService:IsServer() then
+	function UsablePreset:ServerUse(player, inputStorageItem)
+		local remoteHudNotification = modRemotesManager:Get("HudNotification");
 
-function UsablePreset:ServerUse(player, inputStorageItem)
-    local remoteHudNotification = modRemotesManager:Get("HudNotification");
+		local profile = shared.modProfile:Get(player);
+		local storageItem, storage = shared.modStorage.FindIdFromStorages(inputStorageItem.ID, player);
 
-    local profile = shared.modProfile:Get(player);
-	local storageItem, storage = shared.modStorage.FindIdFromStorages(inputStorageItem.ID, player);
+		if storageItem == nil or storage == nil then return end;
+		local itemLib = storageItem.Library;
+		
+		local safehomeData = profile.Safehome;
+		if safehomeData == nil then return end;
+		
+		local safehomeId = itemLib.UnlockData.Id;
 
-	if storageItem == nil or storage == nil then return end;
-	local itemLib = storageItem.Library;
-	
-	local safehomeData = profile.Safehome;
-	if safehomeData == nil then return end;
-	
-	local safehomeId = itemLib.UnlockData.Id;
+		local safehomeLib = modSafehomesLibrary:Find(safehomeId);
+		
+		if safehomeLib == nil then return end;
 
-	local safehomeLib = modSafehomesLibrary:Find(safehomeId);
-	
-	if safehomeLib == nil then return end;
+		if safehomeLib.UnlockPapers ~= true then
+			shared.Notify(player, safehomeLib.Name .. " Safehome unavailable to unlock!", "Negative");
+			return;
+		end
+		
+		if safehomeData.Homes[safehomeId] ~= nil then
+			shared.Notify(player, safehomeLib.Name .. " Safehome already unlocked!", "Negative");
+			return;
+		end
+		
+		safehomeData.Homes[safehomeId] = {};
+		storage:Remove(storageItem.ID, 1);
 
-    if safehomeLib.UnlockPapers ~= true then
-		shared.Notify(player, safehomeLib.Name .. " Safehome unavailable to unlock!", "Negative");
-        return;
-    end
-	
-	if safehomeData.Homes[safehomeId] ~= nil then
-		shared.Notify(player, safehomeLib.Name .. " Safehome already unlocked!", "Negative");
-		return;
+		profile:Sync("Safehome/Homes/"..safehomeId);
+
+		remoteHudNotification:FireClient(player, "Unlocked", {Name=`{safehomeLib.Name} Safehome`});
+		shared.Notify(player, "Unlocked ".. safehomeLib.Name .. " Safehome!", "Reward");
 	end
-	
-	safehomeData.Homes[safehomeId] = {};
-	storage:Remove(storageItem.ID, 1);
 
-	profile:Sync("Safehome/Homes/"..safehomeId);
-
-    remoteHudNotification:FireClient(player, "Unlocked", {Name=`{safehomeLib.Name} Safehome`});
-	shared.Notify(player, "Unlocked ".. safehomeLib.Name .. " Safehome!", "Reward");
-end
+end;
 
 return UsablePreset;
