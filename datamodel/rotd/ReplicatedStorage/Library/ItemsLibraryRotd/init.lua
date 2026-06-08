@@ -425,7 +425,7 @@ function modItemsLibrary.onRequire()
     new(toolBase, {Id="lasso"; Name="Lasso"; Icon="rbxassetid://4988081716"; Description="\"Y'all need to start running!\" - Hector Shot";});
     new(toolBase, {Id="poster"; Name="Poster"; Icon="rbxassetid://9242720986"; Description="A poster to post decals in the world.";});
     new(toolBase, {Id="envelope"; Name="Envelope"; Icon="rbxassetid://9650288008"; Tags={"Unobtainable"}; Description="A envelope.";});
-    new(toolBase, {Id="ammobox"; Name="Ammobox"; Icon="rbxassetid://12513100692"; Description="A box of ammo, can be placed down to refill ammo for one weapon.";})
+    new(toolBase, {Id="ammobox"; Name="Ammobox"; Icon="rbxassetid://12513100692"; Description="A box of ammo, can be placed down to refill ammo.";})
 
     new(toolBase, {Id="wantedposter"; Name="Wanted Poster"; Icon="rbxassetid://12804897977"; Description="A poster for when you are looking for someone specific. This item can be given to Patrick to guarantee the next survivor in \"Another Survivor\".";
         OnInstantiate=function(storageItem)

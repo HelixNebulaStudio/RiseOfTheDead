@@ -102,7 +102,7 @@ function toolPackage.ActionEvent(handler: ToolHandlerInstance, packet)
 	if sound == nil then
 		sound = Instance.new("Sound");
 		sound.Ended:Connect(function()
-			wait(1);
+			task.wait(1);
 			nextTrack();
 		end)
 	end

@@ -68,10 +68,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                         testDebounce = false;
                         return;
                     end
-                    wait(0.1)
+                    task.wait(0.1)
                 end
                 testButton.buttonText.Text = "Could not load";
-                wait(1);
+                task.wait(1);
                 testButton.buttonText.Text = "Test Sound";
             end 
             
@@ -84,7 +84,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         local inputId = tonumber(inputBox.Text);
         if inputId == nil then
             addButton.buttonText.Text = "Missing input";
-            wait(1);
+            task.wait(1);
             addButton.buttonText.Text = "Add Track";
             return;
         end
@@ -161,7 +161,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             
             buttonText.Text = ("$name: $id"):gsub("$name", songName):gsub("$id", songId);
             new.MouseButton1Click:Connect(function()
-                activeToolHandler.Binds.KeyFire(true, {SongId=songId});
+                activeToolHandler.Binds.KeyFire("Begin", true, {SongId=songId});
                 window:Close();
             end)
             new.Parent = playList;
@@ -204,7 +204,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                         color[4] = ColorSequenceKeypoint.new(1, colorC);
                         gradient.Color = ColorSequence.new(color);
                         
-                        wait(0.2);
+                        task.wait(0.2);
                         window:Update();
                     end
                     if not interface.Properties.PrimaryInputDown or not delButtonDown then

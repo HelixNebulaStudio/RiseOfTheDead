@@ -56,6 +56,7 @@ function Stronghold.new()
             Spawns: {}; 
             Enabled: boolean;
         }});
+		BackupSpawnAttList = {};
 
         Players = {};
         AlivePlayers = ({} :: {PlayerClass});
@@ -70,6 +71,7 @@ function Stronghold.new()
         StageLib = nil;
         RoomData = nil;
 
+		StartTick = nil;
         StopwatchTick = nil;
 
 		Wave = 1;
@@ -132,6 +134,12 @@ function Stronghold:Load()
 
 				end
 
+			elseif object.Name == "BackupSpawns" then
+				for _, child in pairs(object:GetChildren()) do
+					if not child:IsA("Attachment") then continue end;
+					table.insert(self.BackupSpawnAttList, child);
+				end
+			
 			elseif object.Name == "Doors" then
 				for _, child in pairs(object:GetChildren()) do
 					
@@ -292,6 +300,36 @@ function Stronghold:Initialize(roomData)
 						end
 					end
                 end
+
+				local remining = math.max(0, self.EliminateGoal - self.EliminateCount);
+				if remining > 0 and #self.EnemyClasses <= math.ceil(remining/2) and (self.StartTick and tick()-self.StartTick >= 20) then
+					task.spawn(function()
+						local rngPlayer = game.Players:GetPlayers()[math.random(1, #game.Players:GetPlayers())];
+						local rngPlayerClass = shared.modPlayers.get(rngPlayer);
+
+						local closestSpawnDist = math.huge;
+						local closestSpawnAtt = nil;
+						for _, att in ipairs(self.BackupSpawnAttList) do
+							local cdTick = att:GetAttribute("CooldownTick");
+							if cdTick and tick() <= cdTick then continue end;
+
+							local distSqr = modVector.DistanceSqrd(rngPlayerClass:GetCFrame().Position, att.WorldPosition);
+							
+							if closestSpawnAtt == nil or distSqr < closestSpawnDist then
+								closestSpawnDist = distSqr;
+								closestSpawnAtt = att;
+							end
+						end
+						if closestSpawnAtt == nil then return end;
+
+						closestSpawnAtt:SetAttribute("CooldownTick", tick()+math.random(20, 40)/10);
+						
+						self:SpawnEnemy(self:PickEnemy(), {
+							SpawnCFrame = closestSpawnAtt.WorldCFrame;
+						});
+
+					end)
+				end
 
 				task.wait(1);
 			end
@@ -454,23 +492,26 @@ function Stronghold:SpawnEnemy(npcName, paramPacket)
 
 				self.LastKilled = tick();
 
-				local removedFromTable = false;
 				for a=#self.EnemyClasses, 1, -1 do
 					if self.EnemyClasses[a] == npcClass then
 						table.remove(self.EnemyClasses, a);
-						removedFromTable = true;
-						break;
 					end
 				end
 				
 				if self.Status == EnumStatus.InProgress then
-					Debugger:WarnClient(game.Players:GetPlayers(), `Stronghold>>  Killed enemy. Alive: {#self.EnemyClasses}, Eliminated: {self.EliminateCount}, Removed: {removedFromTable}`);
+					if self.StartTick == nil then
+						self.StartTick = tick();
+					end
 					self:BeginCount();
 					
 					self.EliminateCount = self.EliminateCount +1;
 					self.LastEnemyDeathPos = npcClass.RootPart.CFrame.Position;
 
 					local remining = math.max(0, self.EliminateGoal - self.EliminateCount);
+					Debugger:WarnClient(
+						game.Players:GetPlayers(), 
+						`Stronghold>>  Killed enemy. Alive: {#self.EnemyClasses}, Eliminated: {self.EliminateCount}, Remaining: {remining}`
+					);
 
 					self.ObjectiveStatusText = `Eliminate {remining} enemies`;
 					self:Hud({
@@ -686,6 +727,7 @@ function Stronghold:Start()
 		self:LoadSpawnPlatform(spawnPart);
         self.EliminateGoal = self.EliminateGoal + spawnInfo.SpawnAmount;
 	end
+	self.EliminateGoal += math.random(3, 5);
     
 	for a=5, 1, -1 do
 		self:Hud({
