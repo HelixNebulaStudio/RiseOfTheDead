@@ -52,6 +52,7 @@ local toolPackage = {
 
 		HeadshotMultiplier=0.05;
 		EquipLoadTime=0.6;
+		FireAlertRange = 128;
 
 		StandInaccuracy=5.2;
 		FocusInaccuracyReduction=0;

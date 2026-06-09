@@ -89,8 +89,8 @@ function toolPackage.newClass()
 
 	equipmentClass:AddBaseModifier("CriticalShot", {
 		SumValues={
-			CritChance=0.2;
-			CritMulti=1;
+			CritChance = 0.2;
+			CritMulti = 1;
 		};
 		ArrayValues = {
 			PassiveModifiers = "CriticalShot";

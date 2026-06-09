@@ -25,6 +25,7 @@ local toolPackage = {
 		Category = "Blunt";
 		Type="Tool";
 		EquipLoadTime=0.5;
+		FireAlertRange = 24;
 		Damage=200;
 
 		PrimaryAttackSpeed=0.4;

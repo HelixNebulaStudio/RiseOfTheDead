@@ -321,7 +321,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 						modClientGuis.promptDialogBox({
 							Title=`Purchase: {itemLib.Name}`;
-							Desc=`Are you sure you want to purchase <b>{itemLib.Name}</b> for <b>{priceLabel.Text}</b>?\n\n<font size="8">(Right click to enable multi purchase.)</font>`;
+							Desc=`Are you sure you want to purchase <b>{itemLib.Name}</b> for <b>{priceLabel.Text}</b>?\n\n<font size="8">(Right click purchase to enable multi purchase.)</font>`;
 							Icon=itemLib.Icon;
 							Buttons={
 								{

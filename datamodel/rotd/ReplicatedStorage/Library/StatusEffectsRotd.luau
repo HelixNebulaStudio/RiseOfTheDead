@@ -308,7 +308,7 @@ end
 
 function modStatusEffects.CritBoost(player, duration, amount)
 	duration = duration or 60;
-	amount = amount or 10;
+	amount = amount or 0.1;
 
 	local playerClass: PlayerClass = shared.modPlayers.get(player);
 	local statusComp: StatusComp = playerClass.StatusComp;

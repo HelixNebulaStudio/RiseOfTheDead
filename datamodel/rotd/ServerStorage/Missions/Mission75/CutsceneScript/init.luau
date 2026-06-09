@@ -22,7 +22,7 @@ if RunService:IsServer() then
 	modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
 	modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
 
-	if modBranchConfigurations.IsWorld("MedicalBreakthrough") then
+	if shared.WorldName == "MedicalBreakthrough" then
 
 		shared.modEventService:OnInvoked("Generic_BindTrigger", function(eventPacket: EventPacket, ...)
 			local id: string, interactable: InteractableInstance = ...;
@@ -488,7 +488,7 @@ return function(CutsceneSequence)
 			end
 		end)
 
-		if modBranchConfigurations.IsWorld("TheMall") then
+		if shared.WorldName == "TheMall" then
 			player:GetAttributeChangedSignal("Location"):Connect(function()
 				local locationId = player:GetAttribute("Location");
 				if locationId ~= "Clinic Safehouse" then return end;
@@ -501,11 +501,9 @@ return function(CutsceneSequence)
 				end)
 			end)
 
-		elseif modBranchConfigurations.IsWorld("MedicalBreakthrough") then
-			player:GetAttributeChangedSignal("Location"):Connect(function()
-				local locationId = player:GetAttribute("Location");
-				if locationId ~= "Clinic Laboratory" then return end;
+		elseif shared.WorldName == "MedicalBreakthrough" then
 
+			task.spawn(function()
 				modMission:Progress(player, MISSION_ID, function(mission)
 					if mission.Type ~= 1 then return end;
 					if mission.ProgressionPoint <= 3 then
@@ -566,7 +564,7 @@ return function(CutsceneSequence)
 
 				end
 				
-				if not (stage >= 3 and modBranchConfigurations.IsWorld("MedicalBreakthrough")) then
+				if not (stage >= 3 and shared.WorldName == "MedicalBreakthrough") then
 					return;
 				end
 				
@@ -854,7 +852,7 @@ return function(CutsceneSequence)
 		mission.OnChanged:Connect(OnChanged);
 		OnChanged(true);
 		
-		if modBranchConfigurations.IsWorld("MedicalBreakthrough") then
+		if shared.WorldName == "MedicalBreakthrough" then
 			CutsceneSequence:NextScene("enableInterfaces");
 		end
 	end)

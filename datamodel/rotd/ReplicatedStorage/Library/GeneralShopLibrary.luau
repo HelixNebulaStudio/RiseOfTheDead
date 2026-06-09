@@ -38,24 +38,19 @@ local SELL_PRICES = {
 	["tires"] = 800;
 	
 	-- util
+	["matchbox"] = 800;
 	["binoculars"] = 400; -- buy $500
-	["lantern"] = 600; -- buy $1.6k
 	
-	["spotlight"] = 1000; -- buy $5k
-	["boombox"] = 2300; -- buy $3k
 	["gps"] = 650; -- buy $1k
 	["rcetablet"] = 5000; -- buy $10k
 	["wateringcan"] = 500;
-	["matchbox"] = 800;
 	["disguisekit"] = 800;
-	["ladder"] = 5000;
-	["musicbox"] = 7000;
-	["walkietalkie"] = 9100;
+	["ladder"] = 1000;
 	
 	["coal"]=12;
 	
 	["purplelemon"]=500;
-	["fotlcardgame"]=4000;
+	["fotlcardgame"]=3000;
 	
 	-- Weapon parts;
 	["tacticalbowparts"]=500;
@@ -82,6 +77,12 @@ local SELL_PRICES = {
 	["halloweencandy"]=5;
 };
 ShopLibrary.SellPrice = SELL_PRICES;
+
+SELL_PRICES["lantern"] = (SELL_PRICES.igniter + SELL_PRICES.gastank) * 2.5; -- 1'000
+SELL_PRICES["walkietalkie"] = (SELL_PRICES.wires + SELL_PRICES.circuitboards) *2.2; -- 2'200
+SELL_PRICES["musicbox"] = (SELL_PRICES.battery + SELL_PRICES.wires + SELL_PRICES.motor) *2.4; -- 2'400
+SELL_PRICES["spotlight"] = (SELL_PRICES.wires + SELL_PRICES.battery + SELL_PRICES.lightbulb) *1.75; -- 2'450
+SELL_PRICES["boombox"] = (SELL_PRICES.metalpipes + SELL_PRICES.wires + SELL_PRICES.battery) * 2.2; -- 1'760
 
 SELL_PRICES["portablestove"] = (SELL_PRICES.metalpipes*2 + SELL_PRICES.igniter) * 7.2; -- 4'320
 SELL_PRICES["charger"] = (SELL_PRICES.battery*2 + SELL_PRICES.wires) * 4.8; -- 4'800
@@ -226,6 +227,8 @@ ShopLibrary.Pages = {
 		};
 		
 		SummonsPage = {
+			{Type="Product"; Id="zricerahornbp"};
+			{Type="Product"; Id="vexlingbp"};
 			{Type="Product"; Id="nekronparticulatecachebp"};
 		}
 	};
@@ -384,15 +387,18 @@ ShopLibrary.Products:Add{Id="divinggogglesbp"; Currency="Money"; Price=3000;};
 ShopLibrary.Products:Add{Id="binoculars"; Currency="Money"; Price=500;};
 ShopLibrary.Products:Add{Id="gps"; Currency="Money"; Price=1000;};
 ShopLibrary.Products:Add{Id="fireworks"; Currency="Money"; Price=1000;};
-ShopLibrary.Products:Add{Id="lantern"; Currency="Money"; Price=1600;};
-ShopLibrary.Products:Add{Id="boombox"; Currency="Money"; Price=3000;};
-ShopLibrary.Products:Add{Id="spotlight"; Currency="Money"; Price=5000;};
+ShopLibrary.Products:Add{Id="lantern"; Currency="Money"; Price= math.floor(SELL_PRICES["lantern"]*1.5/10)*10; };
+ShopLibrary.Products:Add{Id="boombox"; Currency="Money"; Price= math.floor(SELL_PRICES["boombox"]*1.5/10)*10; };
+ShopLibrary.Products:Add{Id="spotlight"; Currency="Money"; Price= math.floor(SELL_PRICES["spotlight"]*1.5/10)*10; };
 ShopLibrary.Products:Add{Id="rcetablet"; Currency="Money"; Price=10000;};
 
 ShopLibrary.Products:Add{Id="entityleash"; Currency="Perks"; Price=100;};
 
 --== Summons;
-ShopLibrary.Products:Add{Id="nekronparticulatecachebp"; Currency="Money"; Price=20000;};
+
+ShopLibrary.Products:Add{Id="zricerahornbp"; Currency="Money"; Price=4000;};
+ShopLibrary.Products:Add{Id="vexlingbp"; Currency="Money"; Price=8000;};
+ShopLibrary.Products:Add{Id="nekronparticulatecachebp"; Currency="Money"; Price=12000;};
 
 
 --== Mods Blueprints;

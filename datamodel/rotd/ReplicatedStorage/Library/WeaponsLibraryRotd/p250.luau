@@ -55,6 +55,7 @@ local toolPackage = {
 
 		HeadshotMultiplier=0.5;
 		EquipLoadTime=0.5;
+		FireAlertRange = 64;
 
 		StandInaccuracy=2;
 		FocusInaccuracyReduction=0.5;
@@ -83,7 +84,18 @@ local toolPackage = {
 };
 
 function toolPackage.newClass()
-	return modEquipmentClass.new(toolPackage);
+	local equipmentClass = modEquipmentClass.new(toolPackage);
+
+    equipmentClass:AddBaseModifier("WeakPointSense", {
+		SetValues = {
+			WeakPointMultiplier = 0.25;
+		};
+		ArrayValues = {
+			PassiveModifiers = "Weak Point Sense";
+		};
+	});
+
+	return equipmentClass;
 end
 
 return toolPackage;

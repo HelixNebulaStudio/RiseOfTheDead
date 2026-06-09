@@ -100,6 +100,16 @@ function treePackage.Circle(npcClass: NpcClass)
                                     DamageBy = damageData and damageData.DamageBy or nil;
                                 });
                             end)
+                            
+                            local targetHandlerComp = banditNpcClass:GetComponent("TargetHandler");
+                            if targetHandlerComp then
+                                targetHandlerComp.EntityClassPriorities = {
+                                    PlayerClass = 1;
+                                    NpcClass = 2;
+                                    Destructible = 3;
+                                };
+                            end
+                            
                         end
                     });
                 end
@@ -381,6 +391,15 @@ function treePackage.DeployHeavyBandits(npcClass: NpcClass)
                     task.delay(5, function()
                         banditNpcClass:Sit(nil);
                     end)
+
+                    local targetHandlerComp = banditNpcClass:GetComponent("TargetHandler");
+                    if targetHandlerComp then
+                        targetHandlerComp.EntityClassPriorities = {
+                            PlayerClass = 1;
+                            NpcClass = 2;
+                            Destructible = 3;
+                        };
+                    end
                 end
             });
         end

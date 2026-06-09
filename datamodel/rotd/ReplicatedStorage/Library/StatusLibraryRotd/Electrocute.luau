@@ -95,6 +95,7 @@ function statusPackage.BindApply(statusClass: StatusClassInstance)
         });
     end 
 
+    if statusClass.Values.TargetsHit >= statusClass.Values.MaxTargets then return; end;
     statusClass.Values.TargetsHit = statusClass.Values.TargetsHit +1;
     
     if applyBy == nil then return end;

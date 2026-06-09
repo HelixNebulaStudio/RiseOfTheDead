@@ -2,7 +2,6 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
-local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClassRotd);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modPseudoRandom = shared.require(game.ReplicatedStorage.Library.PseudoRandom);
 
@@ -18,22 +17,32 @@ local modifierPackage = {
 
 function modifierPackage.Binds.WeaponShotDamageDataNew(modifier: ItemModifierInstance, damageData: DamageData)
     if RunService:IsClient() then return end;
+    if modifier.WieldComp == nil then return end;
 
-    if modifier.EquipmentClass == nil then return end;
-    if damageData.ToolHandler == nil or modifier.EquipmentClass ~= damageData.ToolHandler.EquipmentClass then
-        return;
+    local equipmentClass;
+
+    if modifier.Tags.StatusMod and damageData.StorageItem then
+        equipmentClass = modifier.WieldComp:GetEquipmentClass(damageData.StorageItem.ID);
+        
+    elseif modifier.Tags.StatusMod ~= true then
+        if modifier.EquipmentClass == nil then return end;
+        if damageData.ToolHandler == nil or modifier.EquipmentClass ~= damageData.ToolHandler.EquipmentClass then
+            return;
+        end
+
+        equipmentClass = modifier.EquipmentClass;
     end
 
-    local configurations = modifier.EquipmentClass.Configurations;
+    if equipmentClass == nil then return end;
+    local configurations = equipmentClass.Configurations;
 
     local critChance = configurations.CritChance or 0;
-
-    local characterClass: CharacterClass? = modifier.WieldComp and modifier.WieldComp.CompOwner :: CharacterClass;
-    if characterClass and characterClass.Properties and characterClass.Properties.CritBoost then
-        critChance = critChance + (characterClass.Properties.CritBoost.Amount/100);
-    end
-    
     if critChance <= 0 then return end;
+
+    if damageData.CriticalShotProcessed then 
+        return;
+    end;
+    damageData.CriticalShotProcessed = true;
 
     if casualRandom == nil then
         casualRandom = modPseudoRandom.new();
@@ -42,6 +51,8 @@ function modifierPackage.Binds.WeaponShotDamageDataNew(modifier: ItemModifierIns
     if critProced == false then return end;
 
     local preModDamage = configurations.PreModDamage;
+    if preModDamage == nil then return end;
+
     local multi = configurations.CritMulti or 1.5;
     local add = (preModDamage * multi);
 
@@ -49,7 +60,7 @@ function modifierPackage.Binds.WeaponShotDamageDataNew(modifier: ItemModifierIns
     damageData.DamageType = "Crit";
 
     local toolHandler: ToolHandlerInstance? = damageData.ToolHandler;
-    local toolModel = toolHandler and toolHandler.Prefabs[1] or nil;
+    local toolModel = toolHandler and toolHandler.MainToolModel;
     if toolModel then
         local critSound = modAudio.Play("CritHit0"..math.random(1, 2) , toolModel.PrimaryPart);
         critSound.PlaybackSpeed = math.random(800, 1200)/1000;

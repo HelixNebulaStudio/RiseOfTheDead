@@ -10,8 +10,10 @@ local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesM
 local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modRewardsLibrary = shared.require(game.ReplicatedStorage.Library.RewardsLibrary);
 
 local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
+local modItemDrops = shared.require(game.ServerScriptService.ServerLibrary.ItemDrops);
 
 local remoteHudNotification;
 --==
@@ -97,6 +99,30 @@ function WorldEvent.Initialize(worldEventsService)
 		end)
 	end)
 
+	shared.modEventService:OnInvoked("NpcComponent_BindDropReward", function(eventPacket: EventPacket, ...)
+		local dropRewardComp, spawnCf = ...;
+		if dropRewardComp == nil then return end;
+		
+		local npcClass: NpcClass = dropRewardComp.NpcClass;
+		if npcClass == nil then return end;
+
+		if npcClass.Properties.SafehomeBreach ~= true then return end;
+
+		local rewardLib = modRewardsLibrary:Find("safehousebreach_default");
+		local chosenDrop = modItemDrops.ChooseDrop(rewardLib);
+		if chosenDrop then
+			modItemDrops.spawn{
+				ItemId = chosenDrop.ItemId;
+				Quantity = chosenDrop.Quantity;
+				ItemValues = chosenDrop.ItemValues;
+				SpawnCFrame = spawnCf;
+				SharedDrop = true;
+				DespawnDuration = 150;
+			};
+		end;
+	end)
+
+
 	return true;
 end
 
@@ -104,7 +130,7 @@ function WorldEvent.Start()
 	WorldEventSystem.NextEventTick = modSyncTime.GetTime() + math.random(600, 900);
 	WorldEvent.LastBreach = tick();
 	
-	local duration = modBranchConfigurations.IsWorld("TheWarehouse") and 120 or 240;
+	local duration = shared.WorldName == "TheWarehouse" and 120 or 240;
 	local startTime = modSyncTime.GetTime();
 	local endTime = startTime + duration;
 	

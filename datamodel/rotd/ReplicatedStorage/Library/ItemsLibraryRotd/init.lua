@@ -75,40 +75,45 @@ function modItemsLibrary.onRequire()
         Tags = {"Gun"; "Weapon"; "Skinnable";};
         SkinWear = true;
         NonPremiumTax = 1000;
-    }
-    new(gunBase, {Id="p250"; Name="P250"; Icon="rbxassetid://17007248915"; Tags={"Pistol"; "Secondary Weapon";}; Description="A handy pistol."; Sources={"Obtained from <b>Mason in The Beginning</b>";};});
-    new(gunBase, {Id="cz75"; Name="CZ75-Auto"; Icon="rbxassetid://17007239643"; Tags={"Pistol"; "Secondary Weapon";}; Description="High fire-rate automatic pistol. Has built in <b>Damage Rev</b>, which does more damage the lower your ammo count is in your magazine.";});
-    new(gunBase, {Id="tec9"; Name="Tec-9"; Icon="rbxassetid://17007237750"; Tags={"Pistol"; "Secondary Weapon";}; Description="High power, high firerate pistol. Has built in <b>Auto Trigger</b>, which sets the firing mode to automatic.";});
-    new(gunBase, {Id="dualp250"; Name="Dual P250"; Icon="rbxassetid://17007236263"; Tags={"Pistol"; "Secondary Weapon";}; Description="Two handy pistols. Is a <b>Dual Wield</b> weapon.";});
+    };
+
+    local PASSIVE_WEAK_POINT_SENSE = `<b>[Passive] Weak Point Sense:</b> Shooting enemies reveals weak points, shooting them deals an additional 25% <b>PreModDamage</b>.`;
+    local PASSIVE_CRITICAL_SHOT = `<b>[Passive] Critical Shot:</b> Has a chance to do a crit which increases damage by a multiplier.`;
+    local PASSIVE_DAMAGE_REV = `<b>[Passive] Damage Rev:</b> Does more damage the less ammo you have in your magazine.`
+
+    new(gunBase, {Id="p250"; Name="P250"; Icon="rbxassetid://17007248915"; Tags={"Pistol"; "Secondary Weapon";}; Description="A handy pistol.\n\n"; Sources={"Obtained from <b>Mason in The Beginning</b>";};});
+    new(gunBase, {Id="cz75"; Name="CZ75-Auto"; Icon="rbxassetid://17007239643"; Tags={"Pistol"; "Secondary Weapon";}; Description=`High fire-rate automatic pistol.\n\n{PASSIVE_DAMAGE_REV}`;});
+    new(gunBase, {Id="tec9"; Name="Tec-9"; Icon="rbxassetid://17007237750"; Tags={"Pistol"; "Secondary Weapon";}; Description="High power, high firerate pistol.\n\n<b>[Passive] Auto Trigger:</b> Sets the firing mode to automatic.";});
+    new(gunBase, {Id="dualp250"; Name="Dual P250"; Icon="rbxassetid://17007236263"; Tags={"Pistol"; "Secondary Weapon";}; Description=`Two handy pistols.\n\n{PASSIVE_WEAK_POINT_SENSE}`;});
     new(gunBase, {Id="m9legacy"; Name="M9 Legacy"; Icon="rbxassetid://3296446616"; Tags={"Pistol"; "Secondary Weapon";}; NonPremiumTax=0; Description="A handy legacy pistol.";});
     new(gunBase, {Id="revolver454"; Name="Revolver 454"; Icon="rbxassetid://2009719243"; Tags={"Pistol"; "Secondary Weapon";}; Description="Also known as the Raging Bull 454, high power, high fire-rate revolver.";});
-    new(gunBase, {Id="deagle"; Name="Desert Eagle"; Icon="rbxassetid://16238188322"; Tags={"Pistol"; "Secondary Weapon";}; Description="The hand cannon. Has built in <b>Focus Charge</b>, which does more damage if you charge your focus by aiming down sights.";}); --rbxassetid://5166288732 
+    new(gunBase, {Id="deagle"; Name="Desert Eagle"; Icon="rbxassetid://16238188322"; Tags={"Pistol"; "Secondary Weapon";}; Description="The hand cannon.\n\n<b>[Passive] Focus Charge:</b> Does more damage if you charge your focus by aiming down sights.";});
 
     new(gunBase, {Id="xm1014"; Name="XM1014"; Icon="rbxassetid://6523762932"; Tags={"Shotgun"; "Primary Weapon";}; Description="Quick fire-rate long barrel shotgun.";});
     new(gunBase, {Id="sawedoff"; Name="Sawed-Off"; Icon="rbxassetid://17007247358"; Tags={"Shotgun"; "Primary Weapon";}; Description="Close range head remover with high multishot.";});
     new(gunBase, {Id="mariner590"; Name="Mariner 590"; Icon="rbxassetid://17007243924"; Tags={"Shotgun"; "Primary Weapon";}; Description="Quick and high damage tactical shotgun.";});
-    new(gunBase, {Id="rusty48"; Name="Rusty 48"; Icon="rbxassetid://10390716871"; Tags={"Shotgun"; "Primary Weapon";}; TradingTax = 4900; Description="Powerful hand made shotgun with built-in <b>Critical Shot</b>.";});
-    new(gunBase, {Id="rechamber1216"; Name="Rechamber 1216"; Icon="rbxassetid://92627722665597"; Tags={"Shotgun"; "Primary Weapon";}; TradingTax = 9900; Description="Military grade mag based shotgun with built-in <b>Knockout Trigger</b> that knocks out enemies on headshots for 2 seconds.";});
+    new(gunBase, {Id="rusty48"; Name="Rusty 48"; Icon="rbxassetid://10390716871"; Tags={"Shotgun"; "Primary Weapon";}; TradingTax = 4900; Description=`Crudely made but powerful shotgun.\n\n{PASSIVE_CRITICAL_SHOT}`;});
+    new(gunBase, {Id="rechamber1216"; Name="Rechamber 1216"; Icon="rbxassetid://92627722665597"; Tags={"Shotgun"; "Primary Weapon";}; TradingTax = 9900; Description="Military grade mag based shotgun.\n\n<b>[Passive] Knockout Trigger:</b> Knocks out enemies on headshots for 2 seconds.";});
 
     new(gunBase, {Id="mp5"; Name="MP5"; Icon="rbxassetid://9960159062"; Tags={"Submachine Gun"; "Primary Weapon";}; Description="Quick fire-rate sub-machine gun.";});
     new(gunBase, {Id="mp7"; Name="MP7"; Icon="rbxassetid://9960161355"; Tags={"Submachine Gun"; "Primary Weapon";}; Description="Good accuracy and damage sub-machine gun.";});
-    new(gunBase, {Id="czevo3"; Name="CZ-Scorpion EVO 3"; Icon="rbxassetid://4814129724"; Tags={"Submachine Gun"; "Primary Weapon";}; Description="Extremely tactical sub-machine gun with a high base damage. Has built in <b>Damage Rev</b>, which does more damage the lower your ammo count is in your magazine.";});
-    new(gunBase, {Id="vectorx"; Name="Vector X"; Icon="rbxassetid://8527896764"; Tags={"Submachine Gun"; "Primary Weapon";}; TradingTax = 4900; Description="Elite sub-machine gun with built-in <b>Critical Shot</b> and suppressor.";});
-    new(gunBase, {Id="dualuzi"; Name="Dual Uzi"; Icon="rbxassetid://70941686222281"; Tags={"Submachine Gun"; "Primary Weapon";}; TradingTax = 9900; Description="Light and versatile dual-wielded smgs built with <b>Dual Targetting</b> sights.";});
+    new(gunBase, {Id="czevo3"; Name="CZ-Scorpion EVO 3"; Icon="rbxassetid://4814129724"; Tags={"Submachine Gun"; "Primary Weapon";}; Description=`Extremely tactical sub-machine gun with a high base damage.\n\n{PASSIVE_DAMAGE_REV}`;});
+    new(gunBase, {Id="vectorx"; Name="Vector X"; Icon="rbxassetid://8527896764"; Tags={"Submachine Gun"; "Primary Weapon";}; TradingTax = 4900; Description=`Elite sub-machine gun with built-in suppressor.\n\n{PASSIVE_CRITICAL_SHOT}`;});
+    new(gunBase, {Id="dualuzi"; Name="Dual Uzi"; Icon="rbxassetid://70941686222281"; Tags={"Submachine Gun"; "Primary Weapon";}; TradingTax = 9900; Description="Light and versatile dual-wielded smgs.\n\n<b>[Passive] Focus Charge:</b>";});
 
     new(gunBase, {Id="m4a4"; Name="M4A4"; Icon="rbxassetid://5166150878"; Tags={"Rifle"; "Primary Weapon";}; Description="Military grade M4 rifle capable of high damage and long range shooting.";});
     new(gunBase, {Id="ak47"; Name="AK-47"; Icon="rbxassetid://5166397129"; Tags={"Rifle"; "Primary Weapon";}; Description="High damage, high magazine capacity, and great fire-rate. Quite a noise maker.";});
     new(gunBase, {Id="fnfal"; Name="FN FAL"; Icon="rbxassetid://17007249959"; Tags={"Rifle"; "Primary Weapon";}; Description="The FN FAL is a high damage rifle with a very high fire rate.";});
-    new(gunBase, {Id="sr308"; Name="SR-308"; Icon="rbxassetid://16570523670"; Tags={"Rifle"; "Primary Weapon";}; Description="Ergonomic Russian battle rifle with built-in <b>Critical Shot</b>.";});
+    new(gunBase, {Id="sr308"; Name="SR-308"; Icon="rbxassetid://16570523670"; Tags={"Rifle"; "Primary Weapon";}; Description=`Ergonomic Russian battle rifle.\n\n{PASSIVE_CRITICAL_SHOT}`;});
 
     new(gunBase, {Id="awp"; Name="AWP"; Icon="rbxassetid://5166454078"; Tags={"Sniper"; "Primary Weapon";}; Description="High Damage, high recoil and long ranged rifle.";});
     new(gunBase, {Id="rec21"; Name="Rec-21"; Icon="rbxassetid://6532745901"; Tags={"Sniper"; "Primary Weapon";}; Description="High power, light weight tactical sniper rifle.";});
-    new(gunBase, {Id="grandgarand"; Name="Grand Garand"; Icon="rbxassetid://118201286435452"; Tags={"Sniper"; "Primary Weapon";}; TradingTax = 9900; Description="The good ol' battle tested semi-automatic m1 garand but has a built-in <b>Ricochet Rifling</b> that allow shots to ricochet to nearby enemies.";});
+    new(gunBase, {Id="grandgarand"; Name="Grand Garand"; Icon="rbxassetid://118201286435452"; Tags={"Sniper"; "Primary Weapon";}; TradingTax = 9900; Description="The good ol' battle tested semi-automatic m1 garand.\n\n<b>[Passive] Ricochet Rifling:</b> Shots will ricochet to nearby enemies.";});
 
     new(gunBase, {Id="minigun"; Name="Minigun"; Icon="rbxassetid://5175211604"; Tags={"Heavy machine gun"; "Primary Weapon";}; Description="It weighs fifty seven kilograms and fires two hundred dollar, custom-tooled cartridges at ten thousand rounds per minute. It costs four hundred thousand dollars to fire this weapon... for twelve seconds.";});
-    new(gunBase, {Id="desolatorheavy"; Name="Desolator Heavy"; Icon="rbxassetid://6244386293"; Tags={"Heavy machine gun"; "Primary Weapon";}; Description="Heavy machine gun that desolates your enemies. Design inspired by the negev LMG, the Desolator Heavy is a high power concentrated machine gun firing heavy rounds with built-in <b>Rapid Fire</b> enabled. Weapon accuracy will increase as the weapon warms up from firing.";});
+    new(gunBase, {Id="desolatorheavy"; Name="Desolator Heavy"; Icon="rbxassetid://6244386293"; Tags={"Heavy machine gun"; "Primary Weapon";}; Description="Heavy machine gun that desolates your enemies. Design inspired by the negev LMG, the Desolator Heavy is a high power concentrated machine gun firing heavy rounds.\n\n<b>[Passive] Rapid Fire:</b> Weapon fire rate and accuracy will increase as the weapon warms up from firing.";});
 
-    new(gunBase, {Id="flamethrower"; Name="Flamethrower"; Icon="rbxassetid://17005466120"; Tags={"Incendiary"; "Launcher"}; Description="Burn zombies, burn!";});
+    new(gunBase, {Id="flamethrower"; Name="Flamethrower"; Icon="rbxassetid://17005466120"; Tags={"Incendiary"; "Launcher"}; Description="Burn zombies, burn!\n\n<b>[Passive] Liquid Flame:</b> Ignites enemies and do burn damage over time.";});
 
     new(gunBase, {Id="grenadelauncher"; Name="Grenade Launcher"; Icon="rbxassetid://17005464588"; Tags={"Explosive"; "Launcher"}; Description="Explosion does area-of-effect damage, meaning the damage is divided by the amount of enemies in the area and overall an amazing killing machine.";});
     new(gunBase, {Id="at4"; Name="AT4 Rocket Launcher"; Icon="rbxassetid://6436980949"; Tags={"Explosive"; "Launcher"}; Description="Perfectly designed to annihilate hordes and hordes of zombies.";});
@@ -186,17 +191,17 @@ function modItemsLibrary.onRequire()
     new(clothingBase, {Id="cowboyhat"; Name="Cowboy Hat"; Icon="rbxassetid://4994923375"; Tags={"Head"}; Description="I will be the one yeeee-haw-ing around here.";});
     new(clothingBase, {Id="gasmask"; Name="Gas Mask"; Icon="rbxassetid://6971981402"; Tags={"Head"}; Description="Hudda hudda huuh! Reduce effects and damage from gas clouds and toxic damages.";});
     new(clothingBase, {Id="nekronmask"; Name="Nekron Mask"; Icon="rbxassetid://5419783427"; Tags={"Head"}; Description="Once you put it on, the mask will start consuming itself and some zombies will start looking like you.. (It will continue to consume even if you take the mask off.)"; Sources={"Obtained in <b>Mission: Vindictive Treasure</b>";};  });
-    new(clothingBase, {Id="cultisthood"; Name="Cultist Hood"; Icon="rbxassetid://5550425398"; Tags={"Head"}; Description="Live in the shadows and pull the strings..\n<b>[Passive] Hoods Pact:</b> When damaged by a zombie, a Cultist will spawn to help you kill the zombie. (Cooldown: 15s)"; Sources={"Obtained in <b>Mission: Vindictive Treasure</b>";};  });
+    new(clothingBase, {Id="cultisthood"; Name="Cultist Hood"; Icon="rbxassetid://5550425398"; Tags={"Head"}; Description="Live in the shadows and pull the strings..\n\n<b>[Passive] Hoods Pact:</b> When damaged by a zombie, a Cultist will spawn to help you kill the zombie. (Cooldown: 15s)"; Sources={"Obtained in <b>Mission: Vindictive Treasure</b>";};  });
     new(clothingBase, {Id="onyxhoodiehood"; Name="OnyxHound Hoodie's Hood"; Icon="rbxassetid://71050005269381"; Tags={"Head"}; Description="Ultra Rare OnyxHound Hood.";});
     new(clothingBase, {Id="disguisekit"; Name="Disguise Kit"; Icon="rbxassetid://5783987908"; Tags={"Head"}; Usable="Disguise"; Description="Disguise yourself as anything available. Right-click to open disguse menu. To unlock new disguises, get kills in order to unlock. Unlock progress only saves on this item, so deleting this item will lose your disguise progression. Trading this item will also lose all kills saved in this item.";});
-    new(clothingBase, {Id="nvg"; Name="Night Vision Goggles"; Icon="rbxassetid://108723648769674"; Tags={"Head"}; Description="Night vision goggles.\n<b>[Passive] Nights Light:</b> Enhances visibility in the dark.";});
+    new(clothingBase, {Id="nvg"; Name="Night Vision Goggles"; Icon="rbxassetid://108723648769674"; Tags={"Head"}; Description="Night vision goggles.\n\n<b>[Passive] Nights Light:</b> Enhances visibility in the dark.";});
     new(clothingBase, {Id="strawhat"; Name="Straw Hat"; Icon="rbxassetid://6416330399"; Tags={"Head"}; Description="It ain't much, but it's honest hard work.";});
     new(clothingBase, {Id="zriceraskull"; Name="Zricera Skull"; Icon="rbxassetid://6806306800"; Tags={"Head"}; Description="Strength of a beast and shield of the skull.";});
     new(clothingBase, {Id="hazmathood"; Name="Hazmat Hood"; Icon="rbxassetid://7021892111"; Tags={"Head"}; Description="Hazmat hood part of the hazmat suit.";});
     new(clothingBase, {Id="tophat"; Name="Top Hat"; Icon="rbxassetid://7558620967"; Tags={"Head"; "Slaughterfest";}; Description="Just like Jack Reap's top hat.";});
     new(clothingBase, {Id="clownmask"; Name="Clown Mask"; Icon="rbxassetid://7558621997"; Tags={"Head"; "Slaughterfest";}; Description="Creepy clown mask.";});
     new(clothingBase, {Id="divinggoggles"; Name="Diving Goggles"; Icon="rbxassetid://10332700358"; Tags={"Head"; "Diving Gear"}; Description="Improves underwater visibility.";});
-    new(clothingBase, {Id="balaclava"; Name="Balaclava"; Icon="rbxassetid://8596749820"; Tags={"Head"}; Description="Balaclava just looks funny.";});
+    new(clothingBase, {Id="balaclava"; Name="Balaclava"; Icon="rbxassetid://8596749820"; Tags={"Head"}; Description="Balaclava just looks funny.\n\n<b>[Passive] Sneaky Beaky:</b> Noise alert range reduced by half.";});
     new(clothingBase, {Id="skullmask"; Name="Skull Mask"; Icon="rbxassetid://11235442025"; Tags={"Head"; "Slaughterfest";}; Description="Spooky, scary skeletons. Send shivers down your spine..";});
     new(clothingBase, {Id="maraudersmask"; Name="Marauder's Mask"; Icon="rbxassetid://11269436198"; Tags={"Head"; "Slaughterfest";}; Description="The silent marauder stalks it's prey at night.";});
     new(clothingBase, {Id="clothbagmask"; Name="Cloth Bag Mask"; Icon="rbxassetid://13985462066"; Tags={"Head";}; Description="Cloth bag mask, great for covering hostages' head and limit vision.";});
@@ -231,12 +236,12 @@ function modItemsLibrary.onRequire()
     new(clothingBase, {Id="leathergloves"; Name="Leather Gloves"; Icon="rbxassetid://16988021003"; Tags={"Gloves"}; Description="Helps reduce pressure on your grips, providing additional 30 max stamina.";});
     new(clothingBase, {Id="armwraps"; Name="Arm Wraps"; Icon="rbxassetid://7068678585"; Tags={"Gloves"}; Description="Everybody was kung fu fightin'.";});
     new(clothingBase, {Id="vexgloves"; Name="Vexeron Gloves"; Icon="rbxassetid://7181328504"; Tags={"Gloves"}; Description="Gloves made with Vexeron skin, providing additional 50 max stamina.";});
-    new(clothingBase, {Id="militarygloves"; Name="Military Gloves"; Icon="rbxassetid://104251726752152"; Tags={"Gloves"}; Description="Standard digital camouflage gloves, handy for holding guns.\n<b>[Passive] Instinctive Bullseye:</b> When landing a shot on an enemy, the first hitscan will be redirected at the enemies' head if they have one.";});
+    new(clothingBase, {Id="militarygloves"; Name="Military Gloves"; Icon="rbxassetid://104251726752152"; Tags={"Gloves"}; Description="Standard digital camouflage gloves, handy for holding guns.\n\n<b>[Passive] Instinctive Bullseye:</b> When landing a shot on an enemy, the first hitscan will be redirected at the enemies' head if they have one.";});
 
     -- Shoes
-    new(clothingBase, {Id="brownleatherboots"; Name="Leather Boots"; Icon="rbxassetid://89716224000012"; Tags={"Shoes"}; Description="These look great on you.\n<b>[Passive] Bull Leaping:</b> Slide jumping adds 10 units/sec launch speed.";});
-    new(clothingBase, {Id="militaryboots"; Name="Military Boots"; Icon="rbxassetid://17022087037"; Tags={"Shoes"}; Description="Military grade boots.\n<b>[Passive] Firm Footing:</b> Reduces movement impairment debuffs by 20%.";});
-    new(clothingBase, {Id="divingfins"; Name="Diving Fins"; Icon="rbxassetid://10334749462"; Tags={"Shoes"; "Diving Gear"}; Description="Swim like a fish.\n<b>[Passive] Dolphin Stride:</b> Improves underwater mobility.";});
+    new(clothingBase, {Id="brownleatherboots"; Name="Leather Boots"; Icon="rbxassetid://89716224000012"; Tags={"Shoes"}; Description="These look great on you.\n\n<b>[Passive] Bull Leaping:</b> Slide jumping adds 10 units/sec launch speed.";});
+    new(clothingBase, {Id="militaryboots"; Name="Military Boots"; Icon="rbxassetid://17022087037"; Tags={"Shoes"}; Description="Military grade boots.\n\n<b>[Passive] Firm Footing:</b> Reduces movement impairment debuffs by 20%.";});
+    new(clothingBase, {Id="divingfins"; Name="Diving Fins"; Icon="rbxassetid://10334749462"; Tags={"Shoes"; "Diving Gear"}; Description="Swim like a fish.\n\n<b>[Passive] Dolphin Stride:</b> Improves underwater mobility.";});
     new(clothingBase, {Id="greavesandsabatons"; Name="Greaves and Sabatons"; Icon="rbxassetid://101266147153196"; Tags={"Shoes";}; Description="Polished metal plating wrapped around your legs and feet. <b>[Passive] Chivalrous Kick:</b> Sliding allows you to go through enemies and knocks them away.";});
 
     -- Misc Wear
@@ -943,9 +948,9 @@ function modItemsLibrary.onRequire()
     local summonsBase = {
         Type = modItemsLibrary.Types.Tool;
         Tradable = modItemsLibrary.Tradable.Tradable;
-        Tags={"Summon"};
+        Tags = {"Summon"};
     };
-    new(summonsBase, {Id="zricerahorn"; Name="Zricera's Horn"; Icon="rbxassetid://6823417180"; Tags={"Summons"}; Description="Equipping this while entering Zricera arena to activate Hard Mode Zricera.\n\nAfter Zricera sees you holding this, it gets really riled up.";});
+    new(summonsBase, {Id="zricerahorn"; Name="Zricera's Horn"; Icon="rbxassetid://6823417180"; Tags={"Summons"}; Description="Equipping this while entering Zricera arena to activate Hard Mode Zricera.\n\nIf Zricera sees you holding this, it gets really riled up.";});
     new(summonsBase, {Id="vexling"; Name="Vexling"; Icon="rbxassetid://7109208351"; Tags={"Summons"}; Description="Equipping this while entering Vexeron arena to activate Hard Mode Vexeron.\n\nVexeron is not going to let you harm one of it's own.";});
     new(summonsBase, {Id="nekronparticulatecache"; Name="Nekron Particulate Cache"; Icon="rbxassetid://11154552175"; Tags={"Summons"}; Description="Equipping this while entering Bandit Helicopter arena to activate Hard Mode Bandit Helicopter.\n\nLooks like the Bandits really want some of this.";});
 

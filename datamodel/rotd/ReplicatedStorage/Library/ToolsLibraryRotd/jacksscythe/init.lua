@@ -27,6 +27,7 @@ local toolPackage = {
 		Category = "Edged";
 		Type="Sword";
 		EquipLoadTime=1.5;
+		FireAlertRange = 24;
 		Damage=280;
 
 		PrimaryAttackSpeed=0.8;

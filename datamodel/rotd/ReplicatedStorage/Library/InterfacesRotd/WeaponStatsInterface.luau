@@ -64,6 +64,8 @@ local statTemplates = {
 		{Key="BleedSlowPercent"; Text="<b>Bleed Slow Percent:</b>    $stat"; Type="percent";};
 
 		{Key="ThrowRange"; Text="<b>Throwing Range:</b>    $stat u"; Type="2dp";};
+		
+		{Key="FireAlertRange"; Text="<b>Impact Alert Range:</b>    $statu"; Type="1dp";};
 
         {Key="DamageBlock"; Text="<b>[Melee Dampening] Additional Damage Block:</b>    $stat"; Type="2dp"; OnlyExpand=true;};
 	};
@@ -114,7 +116,7 @@ local statTemplates = {
 		{Key="ExplosionRadius"; Text="<b>Explosion Radius:</b>    $statu"; Type="int";};
 		{Key="ExplosionStun"; Text="<b>Explosion Stun:</b>    $stats"; Type="2dp";};
 		
-		{Key="FireAlertRange"; Text="<b>Fire Alert Range:</b>    $statu"; Type="int";};
+		{Key="FireAlertRange"; Text="<b>Fire Alert Range:</b>    $statu"; Type="1dp";};
 
 		-- Knockout Trigger
 		{Key="KnockoutDistance"; Text="<b>Knockout Distance:</b>    $statu"; Type="2dp"};
@@ -995,12 +997,20 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             if modifier.Tags.Base then
                 if modifier.EquipmentClass and modifier.EquipmentClass == configOwner then
                     modifierName = `{modifierName} (Base)`;
+                    
                 elseif modifier.EquipmentClass then
                     local itemLib = modItemLibrary:Find(modifier.EquipmentClass.ItemId);
                     modifierName = `{modifierName} ({itemLib and itemLib.Name or "Unknown"})`;
+                    
                 else
                     modifierName = `{modifierName}`;
                 end
+
+            else
+                if modifier.Tags.StatusMod then
+                    modifierName = `{modifierName} (Status)`;
+                end
+                
             end
 
             local modColor = nil;

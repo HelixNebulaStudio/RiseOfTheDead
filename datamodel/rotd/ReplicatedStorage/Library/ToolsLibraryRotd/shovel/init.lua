@@ -27,6 +27,7 @@ local toolPackage = {
 		Type="Tool";
 
 		EquipLoadTime=0.5;
+		FireAlertRange = 24;
 		Damage=400;
 
 		PrimaryAttackSpeed=0.3;

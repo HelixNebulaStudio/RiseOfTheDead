@@ -1,27 +1,42 @@
 local modStatusClass = shared.require(game.ReplicatedStorage.Library.StatusLibrary.StatusClass);
 --==
+local modItemModifierClass = shared.require(game.ReplicatedStorage.Library.ItemModifierClassRotd);
+
 local statusPackage = {
-    Id="CritBoost";
-    Icon="rbxassetid://10368377851";
-    Name="Crit Boost";
-    Description="Boost crit chance by +$Amount%";
-    Buff=true;
-    PresistUntilExpire={"Amount";};
+    Id = "CritBoost";
+    Icon = "rbxassetid://10368377851";
+    Name = "Crit Boost";
+
+    Description = "Boost crit chance by +$Amount%";
+    DescProcess = {
+        ["Amount"]=function(v) 
+            return math.round(v*1000)/10;
+        end
+    };
+
+    Buff = true;
+    PresistUntilExpire = {"Amount";};
 };
 
 function statusPackage.BindApply(statusClass: StatusClassInstance)
     local playerClass = statusClass.StatusOwner :: PlayerClass;
     if playerClass == nil then return end;
 
-    local modifier: ItemModifierInstance = playerClass.Configurations:GetModifier(statusPackage.Id);
-    if modifier == nil then
-        modifier = playerClass.Configurations.newModifier(statusPackage.Id);
+    local statusModifier: ItemModifierInstance = playerClass.Configurations:GetModifier(statusPackage.Id);
+    if statusModifier == nil then
+        local criticalShotModule = game.ReplicatedStorage.Library.ItemModifierClass.CriticalShot;
+        statusModifier = playerClass.WieldComp:InstanceItemModifierClass(statusPackage.Id, criticalShotModule);
+        statusModifier.Priority = 2;
+        statusModifier.Name = `Crit Boost`;
 
-        modifier.Tags.Gun = true;
-        modifier.SumValues.CritBoost = statusClass.Values.Amount;
+        statusModifier.SumValues.CritChance = statusClass.Values.Amount;
+        statusModifier.ArrayValues.PassiveModifiers = "Crit Boost";
+
+        statusModifier.Tags.GunModifier = true;
+        statusModifier.Tags.StatusMod = true;
     end
 
-    playerClass.Configurations:AddModifier(modifier);
+    playerClass.Configurations:AddModifier(statusModifier);
 end
 
 function statusPackage.BindExpire(statusClass: StatusClassInstance)

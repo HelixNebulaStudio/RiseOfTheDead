@@ -1215,6 +1215,32 @@ function BlueprintLibrary.onRequire()
 
 	--== MARK: Commodity
 	BlueprintLibrary.New{
+		Id="wateringcanbp";
+		Name="Watering Can Blueprint";
+		Product="wateringcan";
+		Duration=60;
+		SellPrice=100;
+		Requirements={
+			{Type="Item"; ItemId="metal"; Amount=50;};
+		};
+		Sources={"Obtained from <b>Joseph in Mission: Joseph's Lettuce</b>";};
+		Category="Commodities";
+	};
+
+	BlueprintLibrary.New{
+		Id="ladderbp";
+		Name="Ladder Blueprint";
+		Product="ladder";
+		Duration=60;
+		SellPrice=100;
+		Requirements={
+			{Type="Item"; ItemId="steelfragments"; Amount=5;};
+		};
+		Sources={"Obtained from <b>David in The Harbor</b>";};
+		Category="Commodities";
+	};
+
+	BlueprintLibrary.New{
 		Id="lanternbp";
 		Name="Lantern Blueprint";
 		Product="lantern";
@@ -1299,32 +1325,6 @@ function BlueprintLibrary.onRequire()
 			{Type="Item"; ItemId="battery"; Amount=1;};
 			{Type="Item"; ItemId="wires"; Amount=1;};
 		};
-		Category="Commodities";
-	};
-
-	BlueprintLibrary.New{
-		Id="wateringcanbp";
-		Name="Watering Can Blueprint";
-		Product="wateringcan";
-		Duration=60;
-		SellPrice=100;
-		Requirements={
-			{Type="Item"; ItemId="metal"; Amount=50;};
-		};
-		Sources={"Obtained from <b>Joseph in Mission: Joseph's Lettuce</b>";};
-		Category="Commodities";
-	};
-
-	BlueprintLibrary.New{
-		Id="ladderbp";
-		Name="Ladder Blueprint";
-		Product="ladder";
-		Duration=60;
-		SellPrice=100;
-		Requirements={
-			{Type="Item"; ItemId="steelfragments"; Amount=5;};
-		};
-		Sources={"Obtained from <b>David in The Harbor</b>";};
 		Category="Commodities";
 	};
 
@@ -1480,16 +1480,45 @@ function BlueprintLibrary.onRequire()
 
 	--== MARK: Summons
 	BlueprintLibrary.New{
-		Id="nekronparticulatecachebp";
-		Name="Nekron Particulate Cache Blueprint";
-		Product="nekronparticulatecache";
-		Amount=1;
-		Duration=60;
-		Requirements={
+		Id = "zricerahornbp";
+		Name = "Zricera Horn Blueprint";
+		Product = "zricerahorn";
+		Amount = 2;
+		Duration = 300;
+		SellPrice = 300;
+		Requirements = {
+			{Type="Item"; ItemId="wood"; Amount=20;};
+			{Type="Item"; ItemId="adhesive"; Amount=5;};
+		};
+		Category = "Summons";
+	};
+
+	BlueprintLibrary.New{
+		Id = "vexlingbp";
+		Name = "Vexling Blueprint";
+		Product = "vexling";
+		Amount = 2;
+		Duration = 300;
+		SellPrice = 300;
+		Requirements = {
+			{Type="Item"; ItemId="adhesive"; Amount=10;};
+			{Type="Item"; ItemId="cannedbeans"; Amount=1;};
+		};
+		Category = "Summons";
+	};
+
+	BlueprintLibrary.New{
+		Id = "nekronparticulatecachebp";
+		Name = "Nekron Particulate Cache Blueprint";
+		Product = "nekronparticulatecache";
+		Amount = 2;
+		Duration = 300;
+		SellPrice = 300;
+		Requirements = {
 			{Type="Item"; ItemId="metal"; Amount=50;};
 			{Type="Item"; ItemId="nekronparticulate"; Amount=4;};
 		};
-		Category="Summons";
+		Category = "Summons";
 	};
 
 	--== MARK: Structures
@@ -1671,6 +1700,7 @@ end
 
 local new;
 local blueprintBase;
+local indexCount = 0;
 
 function BlueprintLibrary.New(data)
 	if modConfigurations["DisableScript:"..script.Name] == true then return end;
@@ -1681,6 +1711,9 @@ function BlueprintLibrary.New(data)
 	if library[data.Id] ~= nil then 
 		error("BlueprintLibrary>>  Blueprint ID ("..data.Id..") already exist for ("..data.Name..").");
 	end;
+
+	indexCount += 1;
+	data.Index = indexCount;
 	library[data.Id] = data;
 	library[data.Id].CanUnlock = true;
 	
@@ -1734,14 +1767,14 @@ function BlueprintLibrary.New(data)
 	end
 
 	new(blueprintBase, {
-		Id=data.Id; 
-		Name=data.Name; 
-		Icon=productLib.Icon; 
-		Description=desc;
-		Sources=data.Sources;
-		Tags=data.Tags;
+		Id = data.Id; 
+		Name = data.Name; 
+		Icon = productLib.Icon; 
+		Description = desc;
+		Sources = data.Sources;
+		Tags = data.Tags;
 		RequireDesc = requireDesc;
-		NonPremiumTax=data.TradingTax;
+		NonPremiumTax = data.TradingTax;
 	});
 end
 

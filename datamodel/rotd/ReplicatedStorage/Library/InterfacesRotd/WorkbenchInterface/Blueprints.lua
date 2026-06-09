@@ -34,9 +34,13 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 			for a=1, #idList do
 				local bpId = idList[a];
 				local bpLib = modBlueprintLibrary.Get(bpId);
-				local itemLib = modItem:Find(bpId);
 
-				local newBpListing = listMenu:NewItemButton(bpId);
+				local productItemId = bpLib.Product;
+				local itemLib = modItem:Find(productItemId);
+
+				local newBpListing = listMenu:NewItemButton(productItemId);
+				newBpListing.LayoutOrder = bpLib.Index or 99;
+
 				local quantityTag = newBpListing:WaitForChild("QuantityLabel");
 
 				quantityTag.Text = bpLib.Amount or "";

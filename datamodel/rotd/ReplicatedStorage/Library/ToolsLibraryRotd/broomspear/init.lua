@@ -29,6 +29,7 @@ local toolPackage = {
 		Type="Spear";
 		
 		EquipLoadTime=0.5;
+		FireAlertRange = 8;
 		Damage=240;
 
 		PrimaryAttackSpeed=0.5;

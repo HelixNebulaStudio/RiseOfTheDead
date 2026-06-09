@@ -264,13 +264,18 @@ elseif RunService:IsServer() then -- MARK: Server
 				local statusId = typeof(configurations.StatusId) == "table" 
 							 and configurations.StatusId[math.random(1, #configurations.StatusId)] 
 							  or configurations.StatusId;
-				if modStatusEffects[statusId] and characterClass.ClassName == "PlayerClass" then
-					modStatusEffects[statusId]((characterClass :: PlayerClass):GetInstance(), effectDuration);
+				if modStatusEffects[statusId] and player then
+					local params = {};
+					if configurations.StatusParams then
+						params = table.clone(configurations.StatusParams);
+					end
+
+					modStatusEffects[statusId](player, effectDuration, unpack(params));
+					
 				end
 
 			elseif configurations.EffectType == "Perks" then
-				if characterClass.ClassName == "PlayerClass" then
-					local player = (characterClass :: PlayerClass):GetInstance();
+				if player then
 					local profile = shared.modProfile:Get(player);
 					local playerSave = profile:GetActiveSave();
 

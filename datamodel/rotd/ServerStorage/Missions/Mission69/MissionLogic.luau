@@ -1,9 +1,11 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
-
-local MissionLogic = {};
+--==
 local RunService = game:GetService("RunService");
 
+local MissionLogic = {};
+
 local MISSION_ID = 69;
+
 if RunService:IsServer() then
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
@@ -27,8 +29,8 @@ if RunService:IsServer() then
 		local damageTo: CharacterClass? = damageData.DamageTo :: CharacterClass;
 		if damageTo == nil or damageTo.HumanoidType ~= "Zombie" then return end;
 		
-		local equipmentClass: EquipmentClass? = playerClass.WieldComp.EquipmentClass;
-		if equipmentClass == nil then return end;
+		local equipmentClass: EquipmentClass? = playerClass.WieldComp:GetEquipmentClass(storageItem.ID);
+		if equipmentClass == nil or equipmentClass.Enabled ~= true then return end;
 		if equipmentClass.StorageItem ~= storageItem then return end;
 		if equipmentClass.Package.WeaponClass ~= mission.SaveData.WeaponType then return end;
 

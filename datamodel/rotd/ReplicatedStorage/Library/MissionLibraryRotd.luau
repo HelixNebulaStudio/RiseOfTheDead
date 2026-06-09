@@ -2589,13 +2589,13 @@ MissionLibrary.New{
 
 -- MARK: 75 - Medical Breakthrough
 MissionLibrary.New{
-	MissionId=75;
+	MissionId = 75;
 	MissionType = MissionLibrary.MissionTypes.Side;
-	Name="Medical Breakthrough";
-	From="Rachel";
-	Description="Rachel has an epiphany about Stan and the possibility of his blood.";
-	Persistent=true;
-	Checkpoint={
+	Name = "Medical Breakthrough";
+	From = "Rachel";
+	Description = "Rachel has an epiphany about Stan and the possibility of his blood.";
+	Persistent = true;
+	Checkpoint = {
 		{Text="Talk to Rachel to pick up the blood samples";};
 		{Text="Head to W.D. Mall's Clinic Safehouse without destroying the blood samples"; Notify=true;};
 		{Text="Find the laboratory in the Clinic Safehouse";};
@@ -2616,14 +2616,15 @@ MissionLibrary.New{
 		{Text="Talk to Dr. Deniski in Warehouse Safehouse";};
 		{Text="Return to Rachel with Dr. Deniski's insights";};
 	};
-	StartRequirements={
+	StartRequirements = {
 		MissionCompleted={8;};
 	};
-	GuideText="Talk to Rachel";
-	Rewards={
+	GuideText = "Talk to Rachel";
+	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Side};
 	};
-	Markers={
+	Markers = {
+		[3]={World="TheMall"; Label="Laboratory Entrance"; Target=Vector3.new(498.5, 116.2, -1196.8); Type=modMarkers.MarkerTypes.Waypoint;};
 	};
 	
 };

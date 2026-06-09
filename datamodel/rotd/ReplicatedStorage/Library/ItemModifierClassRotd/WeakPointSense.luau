@@ -23,13 +23,14 @@ if RunService:IsServer() then
         if damageData == nil then return end;
         
         local damageTo: NpcClass = damageData.DamageTo :: NpcClass;
-        if damageTo.ClassName ~= "NpcClass" then return end; -- could be Destructible or PlayerClass
+        if damageTo.ClassName ~= "NpcClass" then return end;
 
         local wieldComp: WieldComp? = modifier.WieldComp;
         if wieldComp == nil then return end;
         if wieldComp.EquipmentClass == nil then return end;
         
-        local preModDamage = wieldComp.EquipmentClass.Configurations.PreModDamage;
+        local weaponConfigurations = wieldComp.EquipmentClass.Configurations;
+        local preModDamage = weaponConfigurations.PreModDamage;
         if preModDamage == nil then return end;
 
         local damageBy: PlayerClass = wieldComp.CompOwner :: PlayerClass;
@@ -38,17 +39,23 @@ if RunService:IsServer() then
         local targetPart: BasePart = damageData.TargetPart;
         if targetPart == nil then return end;
 
-
         local weakPointComp = damageTo:AddComponent("WeakPoint");
         if weakPointComp == nil then return end;
         
         weakPointComp(targetPart, function()
             -- if targetPart is weak point part.
             local damage = damageData.Damage;
-            local wpMulti = damageBy.Configurations.WeakPointMultiplier;
-            local add = preModDamage * wpMulti;
+            local wpMulti = 0;
 
-            damage = damage + add;
+            if weaponConfigurations.WeakPointMultiplier then -- From Weapon
+                wpMulti += weaponConfigurations.WeakPointMultiplier;
+            end
+            if damageBy.Configurations.WeakPointMultiplier then -- From Skilltree
+                wpMulti += damageBy.Configurations.WeakPointMultiplier;
+            end
+            if wpMulti <= 0 then return end;
+            
+            damage += preModDamage * wpMulti;
 
             damageData.Damage = damage;
             damageData.DamageType = "Crit";

@@ -55,6 +55,7 @@ local toolPackage = {
 
 		HeadshotMultiplier=0.02;
 		EquipLoadTime=2;
+		FireAlertRange = 128;
 
 		StandInaccuracy=8;
 		FocusInaccuracyReduction=0.8;
@@ -106,8 +107,8 @@ function toolPackage.newClass()
 	
 	equipmentClass:AddBaseModifier("CriticalShot", {
 		SumValues={
-			CritChance=0.2;
-			CritMulti=0.2;
+			CritChance = 0.2;
+			CritMulti = 0.2;
 		};
 		ArrayValues = {
 			PassiveModifiers = "CriticalShot";

@@ -4,25 +4,26 @@ local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.Equipmen
 --==
 
 local toolPackage = {
-	ItemId=script.Name;
-	Class="Tool";
-	HandlerType="FoodTool";
+	ItemId = script.Name;
+	Class = "Tool";
+	HandlerType = "FoodTool";
 
-	Animations={
+	Animations = {
 		Core={Id=17393100664;};
 		Use={Id=17393103125;};
 	};
-	Audio={};
+	Audio = {};
 	
-	Configurations={
+	Configurations = {
 		EffectDuration = 120;
 		EffectType = "Status";
 		
 		StatusId = "CritBoost";
+		StatusParams = {0.1};
 		
 		UseDuration = 3;
 	};
-	Properties={};
+	Properties = {};
 };
 
 function toolPackage.newClass()

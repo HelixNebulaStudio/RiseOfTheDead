@@ -20,11 +20,23 @@ function library.onRequire()
 		Id = "hordeattack_default";
 		Rewards={
 			{ItemId="scarecrowbp"; Quantity=1; Chance=1/10;};
-			{ItemId="gastankiedbp"; Quantity=1; Chance=1/10;};
+			{ItemId="barbedwoodenbp"; Quantity=1; Chance=1/10;};
 			{ItemId="metalbarricadebp"; Quantity=1; Chance=1/10;};
 			{ItemId="mk2grenade"; Quantity=1; Chance=1/32;};
+			{ItemId="zricerahornbp"; Quantity=1; Chance=1/32;};
 		};
 	};
+
+	library:Add{
+		Id = "safehousebreach_default";
+		Rewards={
+			{ItemId="ticksnaretrapbp"; Quantity=1; Chance=1/10;};
+			{ItemId="barbedmetalbp"; Quantity=1; Chance=1/10;};
+			{ItemId="gastankiedbp"; Quantity=1; Chance=1/10;};
+			{ItemId="vexlingbp"; Quantity=1; Chance=1/32;};
+		};
+	};
+	
 
 	library:Add{
 		Id="RegionDrop:Mall Street";
@@ -711,7 +723,7 @@ function library.onRequire()
 
 			{Index=3; ItemId="sawedoffbp"; Chance=weaponBpChance;};
 
-			{Index=4; ItemId="barbedmetalbp"; HardMode=true; Chance=1;};
+			{Index=4; ItemId="balaclava"; HardMode=true; Chance=1;};
 		};
 	};
 
@@ -847,7 +859,7 @@ function library.onRequire()
 		Level=280;
 		Rewards={
 			{Index=1; ItemId="glass"; Quantity={Min=32; Max=45}; Chance=1;};
-			{Index=1; ItemId="zricerahorn"; Quantity={Min=1; Max=2}; Chance=1;};
+			{Index=1; ItemId="zricerahornbp"; Quantity=1; Chance=1;};
 			
 			{Index=2; ItemId="explosiveradiusmod"; Chance=modBpChance;};
 			{Index=2; ItemId="riflecritmultimod"; Chance=modBpChance;};
@@ -915,7 +927,7 @@ function library.onRequire()
 		Id="mothena";
 		Level=150;
 		Rewards={
-			{Index=1; Weekday="Monday"; ItemId="barbedwoodenbp"; Quantity=1; Chance=1;};
+			{Index=1; Weekday="Monday"; ItemId="nekronparticulatecachebp"; Quantity=1; Chance=1;};
 			{Index=1; Weekday="Tuesday"; ItemId="pacifistamuletmod"; Quantity=1; Chance=1;};
 			{Index=1; Weekday="Wednesday"; ItemId="disguisekit"; Quantity=1; Chance=1;};
 			{Index=1; Weekday="Thursday"; ItemId="pacifistamuletmod"; Quantity=1; Chance=1;};
@@ -1205,7 +1217,7 @@ function library.onRequire()
 			{Index=1; ItemId="gastank"; Level=0; Quantity=1; Chance=1;};
 			
 			{Index=2; ItemId="healthmod"; Recyclable=true; Quantity=1; Chance=9/10;};
-			{Index=2; ItemId="vexling"; Recyclable=true; Quantity={Min=1; Max=2}; Chance=8/10;};
+			{Index=2; ItemId="vexlingbp"; Recyclable=true; Quantity=1; Chance=8/10;};
 			{Index=2; ItemId="bluntknockoutmod"; Recyclable=true; Quantity=1; Chance=7/10;};
 
 			{Index=3; ItemId="vexgloves"; Recyclable=true; Quantity=1; Chance=5/10;};

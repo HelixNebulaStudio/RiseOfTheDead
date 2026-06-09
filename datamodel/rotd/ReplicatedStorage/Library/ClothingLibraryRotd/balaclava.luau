@@ -1,20 +1,31 @@
 local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
 --==
 local attirePackage = {
-	ItemId=script.Name;
-	Class="Clothing";
+	ItemId = script.Name;
+	Class = "Clothing";
 	
-	GroupName="HeadGroup";
+	GroupName = "HeadGroup";
 	
-	Configurations={
+	Configurations = {
 		HasFlinchProtection = true;
 		Warmth = 2;
 	};
-	Properties={};
+	Properties = {};
 };
 
 function attirePackage.newClass()
-	return modEquipmentClass.new(attirePackage);
+	local equipmentClass = modEquipmentClass.new(attirePackage);
+	
+	equipmentClass:AddBaseModifier("SneakyBeaky", {
+		ProductValues = {
+			FireAlertRange = 1/2;
+		};
+		ArrayValues = {
+			PassiveModifiers = "Sneaky Beaky";
+		};
+	}); 
+
+	return equipmentClass;
 end
 
 return attirePackage;

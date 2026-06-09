@@ -30,6 +30,7 @@ local toolPackage = {
 		Type="Boomerang";
 
 		EquipLoadTime=0.2;
+		FireAlertRange = 16;
 		Damage=500;
 
 		PrimaryAttackSpeed=0.45;

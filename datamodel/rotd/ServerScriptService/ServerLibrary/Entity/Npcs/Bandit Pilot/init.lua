@@ -700,7 +700,8 @@ function npcPackage.Spawned(npcClass: NpcClass)
     function properties.DespawnGunmen()
         for _, gunmenNpcClass: NpcClass in pairs(gunmenNpcClasses) do
             if gunmenNpcClass.HealthComp.IsDead then continue end;
-            gunmenNpcClass:Kill();
+            gunmenNpcClass.NetworkOwners = nil;
+            gunmenNpcClass:Destroy();
         end
         table.clear(gunmenNpcClasses);
 
@@ -717,7 +718,8 @@ function npcPackage.Spawned(npcClass: NpcClass)
     function properties.DespawnHeavyBandits()
         for _, heavyBanditNpcClass: NpcClass in pairs(heavyBanditsNpcClasses) do
             if heavyBanditNpcClass.HealthComp.IsDead then continue end;
-            heavyBanditNpcClass:Kill();
+            heavyBanditNpcClass.NetworkOwners = nil;
+            heavyBanditNpcClass:Destroy();
         end
         table.clear(heavyBanditsNpcClasses);
     end
