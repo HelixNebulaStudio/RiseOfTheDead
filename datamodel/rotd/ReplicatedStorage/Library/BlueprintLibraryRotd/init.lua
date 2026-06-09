@@ -1476,6 +1476,21 @@ function BlueprintLibrary.onRequire()
 		Category = "Commodities";
 	};
 
+	BlueprintLibrary.New{
+		Id = "floodlightsbp";
+		Name = "Flood Lights Blueprint";
+		Product = "floodlights";
+		Duration = 300;
+		SellPrice = 100;
+		Requirements = {
+			{Type="Item"; ItemId="metal"; Amount=25;};
+			{Type="Item"; ItemId="gears"; Amount=1;};
+			{Type="Item"; ItemId="metalpipes"; Amount=1;};
+			{Type="Item"; ItemId="spotlight"; Amount=2;};
+		};
+		Category = "Commodities";
+	};
+
 
 
 	--== MARK: Summons

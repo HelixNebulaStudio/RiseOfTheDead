@@ -25,7 +25,7 @@ local tabTemplate = script:WaitForChild("tabTemplate");
 local organizedItemsList;
 local itemToolTip;
 
-local isDevBranch = shared.gameConfig.BranchName == "Dev";
+local isDevBranch = false;-- shared.gameConfig.BranchName == "Dev";
 
 local catInfoLib = {
 	Resource={Order=10; Title="Resources";};
@@ -184,11 +184,11 @@ function PageInterface:Load(interface: Interface, window: InterfaceWindow)
 			
 			if itemUnlocked then
 				unlocked = true;
-				showLockedInfo = false;
+				showLockedInfo = true;
 				
 			else
 				unlocked = false;
-				showLockedInfo = true;
+				showLockedInfo = false;
 				newItemButton.ImageColor3 = Color3.fromRGB(0, 0, 0);
 				
 			end
@@ -232,9 +232,10 @@ function PageInterface:Load(interface: Interface, window: InterfaceWindow)
 
 						local descText = ""
 						if not unlocked then
-							descText = descText.."<b>You have not yet unlocked this item.</b>\n\n\n";
+							descText = descText.."<b>You have not yet unlocked this item.</b>\n\n";
 						end
 
+						descText = descText..`{modItemInterface.Headers.H3O}ItemId:{modItemInterface.Headers.H3C} {itemId}\n`;
 						descText = descText..modItemInterface.Headers.H3O.."Description:"..modItemInterface.Headers.H3C.."\n"..(itemLib.Description or "Missing description").."\n";
 
 						if itemDetails and typeof(itemDetails) == "table" then
@@ -309,9 +310,10 @@ function PageInterface:Load(interface: Interface, window: InterfaceWindow)
 						
 						if itemLib.Tags then
 							descText = descText.. modItemInterface.Headers.H3O.. "\n\nTags: "..modItemInterface.Headers.H3C.."\n"
-							descText = descText.. modRichFormatter.RichFontSize("[".. 
-								table.concat(itemLib.Tags, ", ")..", ".. 
-								itemLib.Id .."]", 12);
+							descText = descText.. modRichFormatter.RichFontSize("["..
+								table.concat(itemLib.Tags, ", ").."]", 
+								12
+							);
 						end
 
 						descLabel.Text = descText;
@@ -332,9 +334,7 @@ function PageInterface:Load(interface: Interface, window: InterfaceWindow)
 			end
 			
 			newItemButton.MouseButton1Click:Connect(function()
-				if itemUnlocked then
-					showLockedInfo = not showLockedInfo;
-				end
+				showLockedInfo = not showLockedInfo;
 				updateTooltip();
 			end)
 			

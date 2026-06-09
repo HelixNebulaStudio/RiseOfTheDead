@@ -95,7 +95,7 @@ SELL_PRICES["pulleymechanics"] = (SELL_PRICES.gears + SELL_PRICES.tires + SELL_P
 SELL_PRICES["biocharkiln"] = (SELL_PRICES.gastank + SELL_PRICES.portablestove + SELL_PRICES.radiator) * 2.9; -- 15'428
 SELL_PRICES["bicyclepoweredgenerator"] = (SELL_PRICES.handgenerator + SELL_PRICES.pulleymechanics) * 1.8; -- 16'380
 SELL_PRICES["solarwaterstill"] = (SELL_PRICES.gears + SELL_PRICES.solarconcentrator + SELL_PRICES.metalpipes) * 2.7; -- 15'120
-
+SELL_PRICES["floodlights"] = (SELL_PRICES.gears + SELL_PRICES.spotlight*2 + SELL_PRICES.metalpipes) * 2.9; -- 17'110
 
 ShopLibrary.AmmunitionPrice = {
 	["p250"]=0;

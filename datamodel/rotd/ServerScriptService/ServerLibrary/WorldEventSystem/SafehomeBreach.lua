@@ -108,7 +108,7 @@ function WorldEvent.Initialize(worldEventsService)
 
 		if npcClass.Properties.SafehomeBreach ~= true then return end;
 
-		local rewardLib = modRewardsLibrary:Find("safehousebreach_default");
+		local rewardLib = modRewardsLibrary:Find("safehomebreach_default");
 		local chosenDrop = modItemDrops.ChooseDrop(rewardLib);
 		if chosenDrop then
 			modItemDrops.spawn{
