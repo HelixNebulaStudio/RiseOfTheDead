@@ -144,6 +144,10 @@ function toolPackage.init(super)
 	toolPackage.inherit({
 		ItemId = "corruptedsectordcrate";
 	});
+
+	toolPackage.inherit({
+		ItemId = "corruptedmangrovecrate";
+	});
 	
 	-- residentials
 	toolPackage.inherit({

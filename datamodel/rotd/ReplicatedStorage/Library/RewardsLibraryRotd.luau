@@ -1295,7 +1295,7 @@ function library.onRequire()
 			
 			{Index=2; ItemId="bicyclepoweredgeneratorbp"; Level=30; Recyclable=true; Quantity=1; Chance=9/10;};
 			{Index=2; ItemId="frenzydamagemod"; Level=50; Recyclable=true; Quantity=1; Chance=7/10;};
-			{Index=2; ItemId="healthreaper"; Level=70; Recyclable=true; Quantity=1; Chance=1/100;};
+			{Index=2; ItemId="healthreaper"; Level=70; Recyclable=true; Quantity=1; Chance=1/10;};
 
 			{Index=3; ItemId="pouchvest"; Level=200; Recyclable=true; Quantity=1; Chance=8/10;};
 		};

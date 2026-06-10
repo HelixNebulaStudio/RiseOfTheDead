@@ -58,10 +58,10 @@ function modItemsLibrary.onRequire()
     new(componentsBase, {Id="radiator"; Name="Radiator"; Icon="rbxassetid://4697683304"; Description="Useful to removing thermal energy.";});
     new(componentsBase, {Id="toxiccontainer"; Name="Toxic Waste Container"; Icon="rbxassetid://4819059189"; Description="Contains 1 kilogram of securely contained toxic waste.";});
     new(componentsBase, {Id="gears"; Name="Gears"; Icon="rbxassetid://10964927455"; Description="Useful for functional mechanisms.";});
-    new(componentsBase, {Id="liquidmetalpolish"; Name="Liquid Metal Polish"; Icon="rbxassetid://12784244819"; Description="Useful for polishing tools and weapons.";});
     new(componentsBase, {Id="rope"; Name="Rope"; Icon="rbxassetid://13265271329"; Description="Useful for tying things together.";});
     new(componentsBase, {Id="tires"; Name="Tires"; Icon="rbxassetid://16836806362"; Description="Sturdy looking tires..";});
-
+    new(componentsBase, {Id="liquidmetalpolish"; Name="Liquid Metal Polish"; Icon="rbxassetid://12784244819"; Description="Useful for polishing tools and weapons.";});
+        
     -- new(componentsBase, {Id="tier2augment"; Name="Tier 2 Augment"; TradingTax = 50; Icon="rbxassetid://16903224330"; Description="An augment to upgrade mods to tier 2."; });
     -- new(componentsBase, {Id="tier3augment"; Name="Tier 3 Augment"; TradingTax = 100; Icon="rbxassetid://16903249001"; Description="An augment to upgrade mods to tier 3."; });
     -- new(componentsBase, {Id="tier4augment"; Name="Tier 4 Augment"; TradingTax = 200; Icon="rbxassetid://16910121022"; Description="An augment to upgrade mods to tier 4."; });
@@ -80,8 +80,9 @@ function modItemsLibrary.onRequire()
     local PASSIVE_WEAK_POINT_SENSE = `<b>[Passive] Weak Point Sense:</b> Shooting enemies reveals weak points, shooting them deals an additional 25% <b>PreModDamage</b>.`;
     local PASSIVE_CRITICAL_SHOT = `<b>[Passive] Critical Shot:</b> Has a chance to do a crit which increases damage by a multiplier.`;
     local PASSIVE_DAMAGE_REV = `<b>[Passive] Damage Rev:</b> Does more damage the less ammo you have in your magazine.`
+    local PASSIVE_DUAL_FOCUS = `<b>[Passive] Dual Focus:</b> When in focus, you instinctively aim each gun at an enemy closest to the center of your screen.`;
 
-    new(gunBase, {Id="p250"; Name="P250"; Icon="rbxassetid://17007248915"; Tags={"Pistol"; "Secondary Weapon";}; Description="A handy pistol.\n\n"; Sources={"Obtained from <b>Mason in The Beginning</b>";};});
+    new(gunBase, {Id="p250"; Name="P250"; Icon="rbxassetid://17007248915"; Tags={"Pistol"; "Secondary Weapon";}; Description=`A handy pistol.\n\n{PASSIVE_WEAK_POINT_SENSE}`; Sources={"Obtained from <b>Mason in The Beginning</b>";};});
     new(gunBase, {Id="cz75"; Name="CZ75-Auto"; Icon="rbxassetid://17007239643"; Tags={"Pistol"; "Secondary Weapon";}; Description=`High fire-rate automatic pistol.\n\n{PASSIVE_DAMAGE_REV}`;});
     new(gunBase, {Id="tec9"; Name="Tec-9"; Icon="rbxassetid://17007237750"; Tags={"Pistol"; "Secondary Weapon";}; Description="High power, high firerate pistol.\n\n<b>[Passive] Auto Trigger:</b> Sets the firing mode to automatic.";});
     new(gunBase, {Id="dualp250"; Name="Dual P250"; Icon="rbxassetid://17007236263"; Tags={"Pistol"; "Secondary Weapon";}; Description=`Two handy pistols.\n\n{PASSIVE_WEAK_POINT_SENSE}`;});
@@ -99,7 +100,7 @@ function modItemsLibrary.onRequire()
     new(gunBase, {Id="mp7"; Name="MP7"; Icon="rbxassetid://9960161355"; Tags={"Submachine Gun"; "Primary Weapon";}; Description="Good accuracy and damage sub-machine gun.";});
     new(gunBase, {Id="czevo3"; Name="CZ-Scorpion EVO 3"; Icon="rbxassetid://4814129724"; Tags={"Submachine Gun"; "Primary Weapon";}; Description=`Extremely tactical sub-machine gun with a high base damage.\n\n{PASSIVE_DAMAGE_REV}`;});
     new(gunBase, {Id="vectorx"; Name="Vector X"; Icon="rbxassetid://8527896764"; Tags={"Submachine Gun"; "Primary Weapon";}; TradingTax = 4900; Description=`Elite sub-machine gun with built-in suppressor.\n\n{PASSIVE_CRITICAL_SHOT}`;});
-    new(gunBase, {Id="dualuzi"; Name="Dual Uzi"; Icon="rbxassetid://70941686222281"; Tags={"Submachine Gun"; "Primary Weapon";}; TradingTax = 9900; Description="Light and versatile dual-wielded smgs.\n\n<b>[Passive] Focus Charge:</b>";});
+    new(gunBase, {Id="dualuzi"; Name="Dual Uzi"; Icon="rbxassetid://70941686222281"; Tags={"Submachine Gun"; "Primary Weapon";}; TradingTax = 9900; Description=`Light and versatile dual-wielded smgs.\n\n{PASSIVE_DUAL_FOCUS}`;});
 
     new(gunBase, {Id="m4a4"; Name="M4A4"; Icon="rbxassetid://5166150878"; Tags={"Rifle"; "Primary Weapon";}; Description="Military grade M4 rifle capable of high damage and long range shooting.";});
     new(gunBase, {Id="ak47"; Name="AK-47"; Icon="rbxassetid://5166397129"; Tags={"Rifle"; "Primary Weapon";}; Description="High damage, high magazine capacity, and great fire-rate. Quite a noise maker.";});
@@ -317,7 +318,9 @@ function modItemsLibrary.onRequire()
     new(corruptedCrateBase, {Id="corruptedsectorfcrate"; Icon="rbxassetid://117966024050544"; GameMode={Mode="Survival"; Stage="Sector F"; HardPrefix="Corrupted"}});
     new(corruptedCrateBase, {Id="corruptedprisoncrate"; Icon="rbxassetid://113661509633295"; GameMode={Mode="Survival"; Stage="Prison"; HardPrefix="Corrupted"}});
     new(corruptedCrateBase, {Id="corruptedsectordcrate"; Icon="rbxassetid://127485210608206"; GameMode={Mode="Survival"; Stage="Sector D"; HardPrefix="Corrupted"}});
+    new(corruptedCrateBase, {Id="corruptedmangrovecrate"; Icon="rbxassetid://100179290715472"; GameMode={Mode="Survival"; Stage="Swamplands"; HardPrefix="Corrupted"}});
 
+        
     -- Misc;
     new(crateBase, {Id="communitycrate"; Name="Community Crate: Alpha"; Icon="rbxassetid://13967718753"; Description="Obtained from community made maps, check gold shop for maps. Open and see what you get!";});
     new(crateBase, {Id="communitycrate2"; Name="Community Crate: Beta"; Icon="rbxassetid://13967726501"; Description="Obtained from community made maps, check gold shop for maps. Open and see what you get!";});

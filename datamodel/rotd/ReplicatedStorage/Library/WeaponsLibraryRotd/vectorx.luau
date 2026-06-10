@@ -52,7 +52,7 @@ local toolPackage = {
 		ReloadTime=3.5;
 		Multishot=1;
 
-		HeadshotMultiplier = 0.01;
+		HeadshotMultiplier = 0.04;
 		EquipLoadTime = 0.3;
 		FireAlertRange = 16;
 

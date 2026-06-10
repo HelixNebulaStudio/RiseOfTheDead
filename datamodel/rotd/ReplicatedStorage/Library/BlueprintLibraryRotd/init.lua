@@ -696,7 +696,7 @@ function BlueprintLibrary.onRequire()
 		Id="grenadelauncherbp";
 		Name="Grenade Launcher Blueprint";
 		Product="grenadelauncher";
-		Duration=600;
+		Duration=400;
 		SellPrice=600;
 		Requirements={
 			{Type="Stat"; Name="Money"; Amount=3600;};
@@ -713,7 +713,7 @@ function BlueprintLibrary.onRequire()
 		Id="dualp250bp";
 		Name="Dual P250 Blueprint";
 		Product="dualp250";
-		Duration=1800;
+		Duration=800;
 		SellPrice=700;
 		Requirements={
 			{Type="Stat"; Name="Money"; Amount=12000;};
@@ -728,7 +728,7 @@ function BlueprintLibrary.onRequire()
 		Id="mariner590bp";
 		Name="Mariner 590 Blueprint";
 		Product="mariner590";
-		Duration=1800;
+		Duration=800;
 		SellPrice=2880;
 		Requirements={
 			{Type="Stat"; Name="Money"; Amount=22000;};
@@ -745,7 +745,7 @@ function BlueprintLibrary.onRequire()
 		Name="Revolver 454 Blueprint";
 		Product="revolver454";
 		Duration=hourSec;
-		SellPrice=900;
+		SellPrice=800;
 		Requirements={
 			{Type="Stat"; Name="Money"; Amount=33000;};
 			{Type="Stat"; Name="Perks"; Amount=10;};
@@ -761,7 +761,7 @@ function BlueprintLibrary.onRequire()
 		Name="CZ Scorpion Evo 3 Blueprint";
 		Product="czevo3";
 		Duration=hourSec;
-		SellPrice=4000;
+		SellPrice=800;
 		Requirements={
 			{Type="Stat"; Name="Money"; Amount=27000;};
 			{Type="Stat"; Name="Perks"; Amount=10;};
@@ -794,7 +794,7 @@ function BlueprintLibrary.onRequire()
 		Name="M9 Legacy Blueprint";
 		Product="m9legacy";
 		Duration=daySec;
-		SellPrice=16000;
+		SellPrice=1600;
 		Requirements={
 			{Type="Stat"; Name="Money"; Amount=20000;};
 			{Type="Stat"; Name="Perks"; Amount=20;};
@@ -809,7 +809,7 @@ function BlueprintLibrary.onRequire()
 		Name="Tactical Bow Blueprint";
 		Product="tacticalbow";
 		Duration=daySec;
-		SellPrice=32000;
+		SellPrice=3000;
 		Requirements={
 			{Type="Stat"; Name="Money"; Amount=55000;};
 			{Type="Stat"; Name="Perks"; Amount=20;};
@@ -827,7 +827,7 @@ function BlueprintLibrary.onRequire()
 		Name="Desolator Heavy Blueprint";
 		Product="desolatorheavy";
 		Duration=hourSec;
-		SellPrice=7200;
+		SellPrice=800;
 		Requirements={
 			{Type="Stat"; Name="Money"; Amount=35000;};
 			{Type="Stat"; Name="Perks"; Amount=10;};
@@ -844,7 +844,7 @@ function BlueprintLibrary.onRequire()
 		Name="Rec-21 Blueprint";
 		Product="rec21";
 		Duration=hourSec;
-		SellPrice=6000;
+		SellPrice=800;
 		Requirements={
 			{Type="Stat"; Name="Money"; Amount=45000;};
 			{Type="Stat"; Name="Perks"; Amount=10;};
@@ -877,7 +877,7 @@ function BlueprintLibrary.onRequire()
 		Name="SR-308 Blueprint";
 		Product="sr308";
 		Duration=daySec;
-		SellPrice=8000;
+		SellPrice=1000;
 		Requirements={
 			{Type="Stat"; Name="Money"; Amount=50000;};
 			{Type="Stat"; Name="Perks"; Amount=20;};
@@ -894,7 +894,7 @@ function BlueprintLibrary.onRequire()
 		Name="Desert Eagle Blueprint";
 		Product="deagle";
 		Duration=daySec;
-		SellPrice=9300;
+		SellPrice=1000;
 		Requirements={
 			{Type="Stat"; Name="Money"; Amount=30000;};
 			{Type="Stat"; Name="Perks"; Amount=20;};
@@ -930,7 +930,7 @@ function BlueprintLibrary.onRequire()
 		Name="Rusty 48 Blueprint";
 		Product="rusty48";
 		Duration=daySec;
-		SellPrice=28800;
+		SellPrice=1200;
 		Requirements={
 			{Type="Stat"; Name="Money"; Amount=30000;};
 			{Type="Stat"; Name="Perks"; Amount=20;};
@@ -951,7 +951,7 @@ function BlueprintLibrary.onRequire()
 		Name="Arelshift Cross Blueprint";
 		Product="arelshiftcross";
 		Duration=daySec;
-		SellPrice=35000;
+		SellPrice=1200;
 		Requirements={
 			{Type="Stat"; Name="Money"; Amount=30000;};
 			{Type="Stat"; Name="Perks"; Amount=100;};
@@ -975,7 +975,7 @@ function BlueprintLibrary.onRequire()
 		Name="Grand Garand Blueprint";
 		Product="grandgarand";
 		Duration=daySec;
-		SellPrice=40000;
+		SellPrice=1500;
 		Requirements={
 			{Type="Stat"; Name="Level"; Amount=500;};
 			{Type="Stat"; Name="Money"; Amount=35000;};
@@ -995,12 +995,12 @@ function BlueprintLibrary.onRequire()
 	};
 
 	BlueprintLibrary.New{
-		Id="rechamber1216bp";
-		Name="Rechamber 1216 Blueprint";
-		Product="rechamber1216";
-		Duration=daySec;
-		SellPrice=40000;
-		Requirements={
+		Id = "rechamber1216bp";
+		Name = "Rechamber 1216 Blueprint";
+		Product = "rechamber1216";
+		Duration = daySec;
+		SellPrice = 1500;
+		Requirements = {
 			{Type="Stat"; Name="Level"; Amount=500;};
 			{Type="Stat"; Name="Money"; Amount=35000;};
 			{Type="Stat"; Name="Perks"; Amount=50;};
@@ -1013,9 +1013,31 @@ function BlueprintLibrary.onRequire()
 			{Type="Item"; ItemId="rechamber1216parts2"; Amount=1;};
 			{Type="Item"; ItemId="rechamber1216parts3"; Amount=1;};
 		};
-		Category="Weapons";
+		Category = "Weapons";
 	};
 
+	BlueprintLibrary.New{
+		Id = "dualuzibp";
+		Name = "Dual Uzi Blueprint";
+		Product = "dualuzi";
+		Duration = daySec;
+		SellPrice = 1500;
+		Requirements = {
+			{Type="Stat"; Name="Level"; Amount=500;};
+			{Type="Stat"; Name="Money"; Amount=35000;};
+			{Type="Stat"; Name="Perks"; Amount=50;};
+			
+			{Type="Item"; ItemId="screws"; Amount=50;};
+			{Type="Item"; ItemId="steelfragments"; Amount=25;};
+			{Type="Item"; ItemId="gears"; Amount=3;};
+			
+			{Type="Item"; ItemId="dualuziparts1"; Amount=1;};
+			{Type="Item"; ItemId="dualuziparts2"; Amount=1;};
+			{Type="Item"; ItemId="dualuziparts3"; Amount=1;};
+		};
+		Category = "Weapons";
+	};
+	
 
 	--== MARK: Melee
 	BlueprintLibrary.New{

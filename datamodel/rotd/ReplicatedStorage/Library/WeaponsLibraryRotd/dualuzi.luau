@@ -2,18 +2,18 @@ local modWeaponAttributes = shared.require(game.ReplicatedStorage.Library.Weapon
 local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
 --==
 local toolPackage = {
-	ItemId=script.Name;
-	Class="Gun";
-	HandlerType="GunTool";
-	WeaponClass="Submachine Gun";
-	Tier=5;
+	ItemId = script.Name;
+	Class = "Gun";
+	HandlerType = "GunTool";
+	WeaponClass = "Submachine Gun";
+	Tier = 5;
 
-	Welds={
-		LeftToolGrip="uzi";
-		RightToolGrip="uzi";
+	Welds = {
+		LeftToolGrip = "uzi";
+		RightToolGrip = "uzi";
 	};
 
-	Animations={
+	Animations = {
 		Core={Id=126034135725918;};
 		Focus={Id=118899371239210; StopOnAction=true;};
 		PrimaryFire={Id=98077776698027; FocusWeight=0.1};
@@ -27,67 +27,78 @@ local toolPackage = {
 		Idle={Id=105622842665881};
 	};
 
-	Audio={
+	Audio = {
 		Load={Id=169799883; Pitch=1.2; Volume=0.4;};
 		PrimaryFire={Id=111641686230503; Pitch=0.8; Volume=1;};
 		Empty={Id=154255000; Pitch=1; Volume=0.5;};
 	};
 
-	Configurations={
+	Configurations = {
 		-- Mechanics
-		BulletMode=modWeaponAttributes.BulletModes.Hitscan;
-		TriggerMode=modWeaponAttributes.TriggerModes.Automatic;
-		ReloadMode=modWeaponAttributes.ReloadModes.Full;
-		WeaponType=modWeaponAttributes.WeaponType.SMG;
+		BulletMode = modWeaponAttributes.BulletModes.Hitscan;
+		TriggerMode = modWeaponAttributes.TriggerModes.Automatic;
+		ReloadMode = modWeaponAttributes.ReloadModes.Full;
+		WeaponType = modWeaponAttributes.WeaponType.SMG;
 		
-		AmmoType="lightammo";
+		AmmoType = "lightammo";
 
-		BulletEject="PistolBullet";
-		BulletEjectOffset=CFrame.Angles(math.rad(-90), 0, 0);
+		BulletEject = "PistolBullet";
+		BulletEjectOffset = CFrame.Angles(math.rad(-90), 0, 0);
 		
 		-- Stats
-		Damage=66;
-		PotentialDamage=552;
+		Damage = 66;
+		PotentialDamage = 555;
 		
-		AmmoLimit=80;
-		MaxAmmoLimit=(80*6);
+		AmmoLimit = 80;
+		MaxAmmoLimit = (80*6);
 	
-		Rpm=700;
-		ReloadTime=3.6;
-		Multishot=1;
+		Rpm = 700;
+		ReloadTime = 3.6;
+		Multishot = 1;
 
-		HeadshotMultiplier=0.05;
-		EquipLoadTime=0.6;
+		HeadshotMultiplier = 0.07;
+		EquipLoadTime = 0.6;
 		FireAlertRange = 32;
 
-		StandInaccuracy=3;
-		FocusInaccuracyReduction=0;
-		CrouchInaccuracyReduction=0.6;
-		MovingInaccuracyScale=2;
+		StandInaccuracy = 3;
+		FocusInaccuracyReduction = 0;
+		CrouchInaccuracyReduction = 0.6;
+		MovingInaccuracyScale = 2;
 
 		-- Recoil
-		XRecoil=0.04;
-		YRecoil=0.06;
+		XRecoil = 0.04;
+		YRecoil = 0.06;
 		-- Dropoff
-		DamageDropoff={
-			MinDistance=48;
-			MaxDistance=100;
+		DamageDropoff = {
+			MinDistance = 48;
+			MaxDistance = 100;
 		};
 		-- UI
-		UISpreadIntensity=4;
+		UISpreadIntensity = 4;
 		-- Body
-		RecoilStregth=math.rad(80);
+		RecoilStregth = math.rad(80);
 		-- Penetration
-		Penetration=modWeaponAttributes.PenetrationTable["Submachine Gun"];
+		Penetration = modWeaponAttributes.PenetrationTable["Submachine Gun"];
 		-- Physics
-		KillImpulseForce=5;
+		KillImpulseForce = 5;
 	};
 
-	Properties={};
+	Properties = {};
 };
 
 function toolPackage.newClass()
-	return modEquipmentClass.new(toolPackage);
+	local equipmentClass = modEquipmentClass.new(toolPackage);
+
+	equipmentClass:AddBaseModifier("DualFocus", {
+		SetValues = {
+			DualFocus = true;
+		};
+		ArrayValues = {
+			PassiveModifiers = "Dual Focus";
+		};
+	});
+
+	return equipmentClass;
 end
 
 return toolPackage;
