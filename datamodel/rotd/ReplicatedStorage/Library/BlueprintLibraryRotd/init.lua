@@ -832,6 +832,7 @@ function BlueprintLibrary.onRequire()
 			{Type="Stat"; Name="Money"; Amount=35000;};
 			{Type="Stat"; Name="Perks"; Amount=10;};
 			{Type="Stat"; Name="Level"; Amount=100;};
+
 			{Type="Item"; ItemId="metal"; Amount=100;};
 			{Type="Item"; ItemId="motor"; Amount=1;};
 			{Type="Item"; ItemId="metalpipes"; Amount=1;};
@@ -849,9 +850,10 @@ function BlueprintLibrary.onRequire()
 			{Type="Stat"; Name="Money"; Amount=45000;};
 			{Type="Stat"; Name="Perks"; Amount=10;};
 			{Type="Stat"; Name="Level"; Amount=400;};
+
 			{Type="Item"; ItemId="metal"; Amount=300;};
 			{Type="Item"; ItemId="metalpipes"; Amount=1;};
-			{Type="Item"; ItemId="glass"; Amount=100;};
+			{Type="Item"; ItemId="lens"; Amount=5;};
 		};
 		Category="Weapons";
 	};
@@ -983,7 +985,7 @@ function BlueprintLibrary.onRequire()
 			
 			{Type="Item"; ItemId="wood"; Amount=50;};
 
-			{Type="Item"; ItemId="screws"; Amount=50;};
+			{Type="Item"; ItemId="lens"; Amount=10;};
 			{Type="Item"; ItemId="steelfragments"; Amount=20;};
 			{Type="Item"; ItemId="gears"; Amount=2;};
 			
@@ -1027,9 +1029,8 @@ function BlueprintLibrary.onRequire()
 			{Type="Stat"; Name="Money"; Amount=35000;};
 			{Type="Stat"; Name="Perks"; Amount=50;};
 			
-			{Type="Item"; ItemId="screws"; Amount=50;};
-			{Type="Item"; ItemId="steelfragments"; Amount=25;};
-			{Type="Item"; ItemId="gears"; Amount=3;};
+			{Type="Item"; ItemId="lens"; Amount=4;};
+			{Type="Item"; ItemId="motor"; Amount=2;};
 			
 			{Type="Item"; ItemId="dualuziparts1"; Amount=1;};
 			{Type="Item"; ItemId="dualuziparts2"; Amount=1;};

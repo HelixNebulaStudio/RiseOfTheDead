@@ -573,6 +573,7 @@ function library.onRequire()
 		Id="heavy";
 		Name="Heavy";
 		Rewards={
+			{Type=ItemDropTypes.Wood; ItemId="wood"; Quantity=quan2m4; Chance=1/2.2;};
 			{Type=ItemDropTypes.Blueprint; ItemId="barbedwoodenbp"; Chance=bpItemDropChance;};
 			{Type=ItemDropTypes.Blueprint; ItemId="explosivedamagebp"; Chance=bpItemDropChance;};
 			{Type=ItemDropTypes.Battery; ItemId="battery"; Quantity={Min=1; Max=1}; Chance=1/100;};
@@ -585,7 +586,7 @@ function library.onRequire()
 		Id="bloater";
 		Name="Bloaters";
 		Rewards={
-			{Type=ItemDropTypes.Glass; ItemId="glass"; Quantity={Min=10; Max=12}; Chance=1/4;};
+			{ItemId="lens"; Quantity={Min=1; Max=2}; Chance=1/4;};
 			{Type=ItemDropTypes.Blueprint; ItemId="stickygrenadebp"; Chance=1/50;};
 			{Type=ItemDropTypes.Igniter; ItemId="igniter"; Quantity={Min=1; Max=1}; Chance=1/100;};
 		};
@@ -595,7 +596,7 @@ function library.onRequire()
 		Id="growler";
 		Name="Growler";
 		Rewards={
-			{Type=ItemDropTypes.Wood; ItemId="wood"; Quantity={Min=10; Max=12}; Chance=1/4;};
+			{Type=ItemDropTypes.Glass; ItemId="glass"; Quantity={Min=10; Max=12}; Chance=1/4;};
 			{Type=ItemDropTypes.Tool; ItemId="molotov"; Chance=1/50;};
 			{Type=ItemDropTypes.NekronScales; ItemId="nekronscales"; Quantity={Min=1; Max=2}; Chance=1/100;};
 			{Type=ItemDropTypes.Battery; ItemId="battery"; Quantity={Min=1; Max=1}; Chance=1/100;};
@@ -844,7 +845,7 @@ function library.onRequire()
 		Id="hectorshot";
 		Level=180;
 		Rewards={
-			{Index=1; ItemId="wood"; Quantity={Min=20; Max=38}; Chance=1;};
+			{Index=1; ItemId="lens"; Quantity={Min=1; Max=2}; Chance=1;};
 			{Index=1; ItemId="tires"; Quantity=1; Chance=1;};
 			
 			{Index=2; ItemId="walkietalkiebp";  Chance=commodityChance;};
@@ -1601,7 +1602,7 @@ function library.onRequire()
 	end)
 	library:Add{
 		Id = "components";
-		Name = "Components";
+		Name = "Components Drop Table";
 		Rewards = componentsDropTable;
 	};
 end

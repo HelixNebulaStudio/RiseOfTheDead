@@ -60,8 +60,9 @@ function modItemsLibrary.onRequire()
     new(componentsBase, {Id="gears"; Name="Gears"; Icon="rbxassetid://10964927455"; Description="Useful for functional mechanisms.";});
     new(componentsBase, {Id="rope"; Name="Rope"; Icon="rbxassetid://13265271329"; Description="Useful for tying things together.";});
     new(componentsBase, {Id="tires"; Name="Tires"; Icon="rbxassetid://16836806362"; Description="Sturdy looking tires..";});
+    new(componentsBase, {Id="lens"; Name="Clear Lens"; Icon="rbxassetid://79648787461338"; Description="Clear lens that can be used to magnify or minify.";});
     new(componentsBase, {Id="liquidmetalpolish"; Name="Liquid Metal Polish"; Icon="rbxassetid://12784244819"; Description="Useful for polishing tools and weapons.";});
-        
+    
     -- new(componentsBase, {Id="tier2augment"; Name="Tier 2 Augment"; TradingTax = 50; Icon="rbxassetid://16903224330"; Description="An augment to upgrade mods to tier 2."; });
     -- new(componentsBase, {Id="tier3augment"; Name="Tier 3 Augment"; TradingTax = 100; Icon="rbxassetid://16903249001"; Description="An augment to upgrade mods to tier 3."; });
     -- new(componentsBase, {Id="tier4augment"; Name="Tier 4 Augment"; TradingTax = 200; Icon="rbxassetid://16910121022"; Description="An augment to upgrade mods to tier 4."; });

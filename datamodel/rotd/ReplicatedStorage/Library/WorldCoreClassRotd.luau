@@ -203,8 +203,10 @@ function modWorldCoreClass:InitGameWorld(gameMode, gameStage)
         };
     };
     modGameModeManager.StudioData = studioLobbyData;
-    if workspace:GetAttribute("DisableGameMode") == true then
-        modGameModeManager.StudioData = nil;
+    if RunService:IsStudio() then
+        if workspace:GetAttribute("DisableGameMode") == true then
+            modGameModeManager.StudioData = nil;
+        end
     end
 
     local waitingforFirstPlayer = true;
