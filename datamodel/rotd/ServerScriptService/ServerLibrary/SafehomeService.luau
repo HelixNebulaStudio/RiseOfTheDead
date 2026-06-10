@@ -292,7 +292,7 @@ function SafehomeClass:SetInspectMode(value: boolean)
         local interactConfig: Configuration = self.InstanceConfigList[a];
         local interactable = modInteractables.getOrNew(interactConfig);
         if interactable == nil then continue end;
-        if interactable.Type == "Door" then continue end;
+        if interactable.Type:sub(1,4) == "Door" then continue end;
 
         interactable.Values.InspectMode = value;
     end

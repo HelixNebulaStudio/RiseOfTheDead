@@ -102,11 +102,11 @@ function interactablePackage.init(super) -- Server/Client
 		local stage = interactable.Values.Stage;
 
 		local stageLib = modGameModeLibrary.GameModes[mode] and modGameModeLibrary.GameModes[mode].Stages[stage];
-		if stageLib == nil or modGameModeLibrary.GameModes[mode].Stages[stage].Disabled then
+		if stageLib == nil or modGameModeLibrary.GameModes[mode].Stages[stage].WIP then
 			if RunService:IsStudio()
 			and modGameModeLibrary.GameModes[mode]
 			and modGameModeLibrary.GameModes[mode].Stages[stage]
-			and modGameModeLibrary.GameModes[mode].Stages[stage].Disabled then
+			and modGameModeLibrary.GameModes[mode].Stages[stage].WIP then
 				interactable.Label = `Enter {mode}: {stage} (Studio Only WIP)`;
 				return;
 			end

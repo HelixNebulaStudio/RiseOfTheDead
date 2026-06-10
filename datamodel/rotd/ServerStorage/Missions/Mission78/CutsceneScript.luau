@@ -3,7 +3,6 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modDamageTag = shared.require(game.ReplicatedStorage.Library.DamageTag);
 
 --== Variables;
@@ -29,7 +28,7 @@ if RunService:IsServer() then
 		"I am the best survivor!";
 	};
 
-	if modBranchConfigurations.IsWorld("Safehome") or modBranchConfigurations.IsWorld("BioXResearch") then
+	if shared.WorldName == "Safehome" or shared.WorldName == "BioXResearch" then
 
 		shared.modEventService:OnInvoked("Npcs_BindDeath", function(eventPacket: EventPacket, ...)
 			local npcClass: NpcClass = ...;

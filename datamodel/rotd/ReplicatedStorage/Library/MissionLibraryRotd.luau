@@ -3032,60 +3032,63 @@ MissionLibrary.New{
 };
 
 -- MARK: 87 - Buyer's Remorse
--- MissionLibrary.New{
--- 	MissionId = 87;
--- 	MissionType = MissionLibrary.MissionTypes.Core;
--- 	Name = "Buyer's Remorse";
--- 	From = "Joseph";
--- 	Description = "Frustrated with the missing deliveries from the Rats, Joseph has decided to take matters into his own hands.";
--- 	Persistent = true;
--- 	Checkpoint = {
--- 		{Text="Talk to Joseph when you are ready";};
--- 		{Text="Follow and defend Joseph";};
--- 		{Text="Talk to Caitlin";};
--- 		{Text="Talk to Joseph";};
--- 		{Text="Talk to Caitlin";};
+MissionLibrary.New{
+	MissionId = 87;
+	MissionType = MissionLibrary.MissionTypes.Core;
+	Name = "Buyer's Remorse";
+	From = "Joseph";
+	Description = "Frustrated with the missing deliveries from the Rats, Joseph has decided to take matters into his own hands.";
+	Persistent = true;
+	Checkpoint = {
+		{Text="Talk to Joseph when you are ready";};
+		{Text="Follow and defend Joseph";};
+		{Text="Look for the walkies";};
+		{Text="Talk to Caitlin";};
+		{Text="Talk to Joseph";};
 
--- 		{Text="Talk to Joseph waiting at the Rat's Headquarters";};
--- 		{Text="Head to The Residentials safehouse with Joseph and Caitlin";}; --7
--- 		{Text="Talk to Caitlin waiting at the Community Safehouse";};
--- 		{Text="Talk to Caitlin when you are ready to go";};
--- 		{Text="Follow Caitlin";};
+		{Text="Talk to Caitlin";};
+		{Text="Talk to Joseph waiting at the Rat's Headquarters";};
+		{Text="Head to The Residentials safehouse with Joseph and Caitlin";}; --8
+		{Text="Talk to Caitlin waiting at the Community Safehouse";};
+		{Text="Talk to Caitlin when you are ready to go";};
 
--- 		{Text="Objectives"; CompleteText="Talk to Caitlin"; Objectives={"PaperBox1"; "PaperBox2"; "PaperBox3";};};
--- 		{Text="Wait for Caitlin";};
--- 		{Text="Enter the library backroom";};
--- 		{Text="Open the box";};
--- 		{Text="Wait for Joseph";};
+		{Text="Follow Caitlin";};
+		{Text="Objectives"; CompleteText="Talk to Caitlin"; Objectives={"PaperBox1"; "PaperBox2"; "PaperBox3";};};
+		{Text="Wait for Caitlin";};
+		{Text="Enter the library backroom";};
+		{Text="Open the box";};
 
--- 		{Text="Leave the library backroom";};
--- 		{Text="Head back to the Residentials Safehouse";}; --17
--- 		{Text="Talk to Caitlin";};
--- 		{Text="Talk to Caitlin";};
--- 		{Text="Talk to Caitlin";};
--- 	};
--- 	Objectives={
--- 		["PaperBox1"]={Index=1; Description="Open the first box";};
--- 		["PaperBox2"]={Index=2; Description="Open the second box";};
--- 		["PaperBox3"]={Index=3; Description="Open the third box";};
--- 	};
--- 	LogEntry = {
--- 	};
--- 	StartRequirements = {
--- 		MissionCompleted={81};
--- 	};
--- 	LinkNextMission=88;
--- 	SaveData = {};
--- 	GuideText = "Talk to Joseph";
--- 	Rewards = {
--- 		{Type="Perks"; Amount=PerksReward.Core};
--- 	};
--- 	Markers = {
--- 		[2]={Label="Joseph"; Target="Joseph"; Type=modMarkers.MarkerTypes.Npc;};
--- 		[12]={World="TheHarbor"; Label="Caitlin"; Target="Caitlin"; Type=modMarkers.MarkerTypes.Npc;};
--- 	};
--- 	CanFastTravelWhenActive=false;
--- };
+		{Text="Wait for Joseph";};
+		{Text="Leave the library backroom";};
+		{Text="Head back to the Residentials Safehouse";}; --18
+		{Text="Talk to Caitlin";};
+		{Text="Talk to Caitlin";};
+		
+		{Text="Talk to Caitlin";};
+	};
+	Objectives={
+		["PaperBox1"]={Index=1; Description="Open the first box";};
+		["PaperBox2"]={Index=2; Description="Open the second box";};
+		["PaperBox3"]={Index=3; Description="Open the third box";};
+	};
+	LogEntry = {
+	};
+	StartRequirements = {
+		MissionCompleted={81};
+	};
+	LinkNextMission=88;
+	SaveData = {};
+	GuideText = "Talk to Joseph";
+	Rewards = {
+		{Type="Perks"; Amount=PerksReward.Core};
+	};
+	Markers = {
+		[2]={Label="Joseph"; Target="Joseph"; Type=modMarkers.MarkerTypes.Npc;};
+		[12]={World="TheHarbor"; Label="Caitlin"; Target="Caitlin"; Type=modMarkers.MarkerTypes.Npc;};
+	};
+	CanFastTravelWhenActive=false;
+	WIP = true;
+};
 
 -- MARK: 88 - Shadows of Trust
 -- MissionLibrary.New{

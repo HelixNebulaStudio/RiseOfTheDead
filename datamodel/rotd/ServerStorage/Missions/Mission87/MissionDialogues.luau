@@ -2,8 +2,6 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
-
 --=
 local Dialogues = {
 	Joseph={};
@@ -207,44 +205,54 @@ if RunService:IsServer() then
 				end)
 
 			elseif mission.ProgressionPoint == 2 then
-				if modBranchConfigurations.IsWorld("TheResidentials") then
+				if shared.WorldName == "TheResidentials" then
 					local josephNpcClass: NpcClass = dialog:GetNpcClass();
 
-					if josephNpcClass:DistanceFromCharacter(Vector3.new(787.386, 41.301, 441.39)) <= 32 then
+					if josephNpcClass:DistanceFrom(Vector3.new(787.386, 41.301, 441.39)) <= 32 then
 						dialog:SetInitiate("Head on in..", "Confident");
 					end
 					
-				elseif modBranchConfigurations.IsWorld("TheHarbor") then
-					local josephNpcClass: NpcClass = dialog:GetNpcClass();
-
-					if josephNpcClass:DistanceFromCharacter(Vector3.new(-271.475, 40.961, 230.21)) <= 32 then
-						dialog:SetInitiate("Okay, let's look for the walkies and get out quick..", "Confident");
-					end
+				elseif shared.WorldName == "TheHarbor" then
 
 				end
 
+			elseif mission.ProgressionPoint == 3 then
+
+				local josephNpcClass: NpcClass = dialog:GetNpcClass();
+
+				if josephNpcClass:DistanceFrom(Vector3.new(-369.467, 40.907, 239.949)) <= 32 then
+					dialog:SetInitiate("Okay, let's look for the walkies and get out quick..", "Confident");
+				else
+					dialog:SetInitiate("We're almost there..");
+				end
+
 			elseif mission.ProgressionPoint == 4 then
-				dialog:SetInitiateTag("buyre_stop5");
-				dialog:SetExpireTime(workspace:GetServerTimeNow() + 5);
+				dialog:SetInitiate("It's gotta be here some where..");
 
 			elseif mission.ProgressionPoint == 5 then
+				dialog:SetInitiateTag("buyre_stop5");
+				dialog:SetExpireTime(workspace:GetServerTimeNow() + 3);
+
+			elseif mission.ProgressionPoint == 6 then
 				dialog:SetInitiate("Hmm..", "Suspicious");
 
 				dialog:AddChoice({"buyre_stop8";}, function(dialog)
 					dialog:SetExpireTime(workspace:GetServerTimeNow() + 5);
 					modMission:Progress(player, MISSION_ID, function()
-						if mission.ProgressionPoint <= 6 then
-							mission.ProgressionPoint = 6;
+						if mission.ProgressionPoint <= 7 then
+							mission.ProgressionPoint = 7;
 						end
 					end)
 				end);
 
-			elseif mission.ProgressionPoint == 6 then
+			elseif mission.ProgressionPoint == 7 then
 				dialog:SetInitiate("Fine, let's get going..", "Suspicious");
 				dialog:AddChoice("buyre_gotoresidentials", function(dialog)
+					dialog:SetExpireTime(workspace:GetServerTimeNow() + 3);
+					
 					modMission:Progress(player, MISSION_ID, function()
-						if mission.ProgressionPoint <= 7 then
-							mission.ProgressionPoint = 7;
+						if mission.ProgressionPoint <= 8 then
+							mission.ProgressionPoint = 8;
 
 							local josephClass = dialog:GetNpcClass();
 							josephClass.Chat(player, "Alright, let's get going..");
@@ -252,18 +260,18 @@ if RunService:IsServer() then
 					end)
 				end)
 
-			elseif mission.ProgressionPoint == 7 then
+			elseif mission.ProgressionPoint == 8 then
 				dialog:SetInitiate("C'mon now $PlayerName", "Bored");
 				
-			elseif mission.ProgressionPoint == 8 then
+			elseif mission.ProgressionPoint == 9 then
 				dialog:SetInitiate("Get her to tell us where to find the walkies.", "Bored");
 
-			elseif mission.ProgressionPoint == 19 then
+			elseif mission.ProgressionPoint == 20 then
 				dialog:SetInitiate("Fine, but not for too long..\n\n$PlayerName, keep an eye on her, I got stuff to do..", "Skeptical");
 				dialog:AddChoice("buyre_keepaneye", function(dialog)
 					modMission:Progress(player, MISSION_ID, function()
-						if mission.ProgressionPoint <= 20 then
-							mission.ProgressionPoint = 20;
+						if mission.ProgressionPoint <= 21 then
+							mission.ProgressionPoint = 21;
 
 							task.wait(2);
 							local caitlinClass = shared.modNpcs.getPlayerNpc(player, "Caitlin");
@@ -279,13 +287,15 @@ if RunService:IsServer() then
 	-- MARK: Caitlin Handler
 	Dialogues.Caitlin.DialogueHandler = function(player, dialog, data, mission)
 		if mission.Type == 1 then
-			if mission.ProgressionPoint == 3 then
+			if mission.ProgressionPoint == 4 then
 				dialog:SetInitiate("Stop right there! You can't just willy-nilly bring strangers here.", "Angry");
 
 				dialog:AddChoice({"buyre_stop1"; "buyre_stop2"; "buyre_stop3"; "buyre_stop4"}, function(dialog)
+					dialog:SetExpireTime(workspace:GetServerTimeNow() + 3);
+
 					modMission:Progress(player, MISSION_ID, function()
-						if mission.ProgressionPoint <= 4 then
-							mission.ProgressionPoint = 4;
+						if mission.ProgressionPoint <= 5 then
+							mission.ProgressionPoint = 5;
 						end
 					end)
 
@@ -294,42 +304,43 @@ if RunService:IsServer() then
 					dialog:TalkTo(josephClass.Character);
 				end)
 
-			elseif mission.ProgressionPoint == 4 then
+			elseif mission.ProgressionPoint == 5 then
 				dialog:SetInitiate("Are you listening?", "Bored");
 
-			elseif mission.ProgressionPoint == 5 then
+			elseif mission.ProgressionPoint == 6 then
 				dialog:SetInitiateTag("buyre_stop6");
 				
 				dialog:AddChoice({"buyre_stop7";}, function(dialog)
-					task.wait(5);
+					dialog:SetExpireTime(workspace:GetServerTimeNow() + 4);
+					task.wait(4);
 					local josephClass = shared.modNpcs.getPlayerNpc(player, "Joseph");
 					dialog:TalkTo(josephClass.Character);
 				end);
 
-			elseif mission.ProgressionPoint == 6 then
+			elseif mission.ProgressionPoint == 7 then
 				dialog:SetInitiate("Are we going or not?", "Bored");
 
-			elseif mission.ProgressionPoint == 7 then
+			elseif mission.ProgressionPoint == 8 then
 				dialog:SetInitiate("What are we doing here?", "Bored");
 
-			elseif mission.ProgressionPoint == 8 then
+			elseif mission.ProgressionPoint == 9 then
 				dialog:SetInitiate("Hmph, not a bad place you got here.", "Confident");
 				
 				dialog:AddChoice({"buyre_walkies1"; "buyre_walkies2";}, function(dialog)
 					modMission:Progress(player, MISSION_ID, function()
-						if mission.ProgressionPoint <= 9 then
-							mission.ProgressionPoint = 9;
+						if mission.ProgressionPoint <= 10 then
+							mission.ProgressionPoint = 10;
 						end
 					end)
 				end);
 
-			elseif mission.ProgressionPoint == 9 then
+			elseif mission.ProgressionPoint == 10 then
 				dialog:SetInitiate("Are you ready to go?", "Confident");
 				
 				dialog:AddChoice({"buyre_library1";}, function(dialog)
 					modMission:Progress(player, MISSION_ID, function()
-						if mission.ProgressionPoint <= 10 then
-							mission.ProgressionPoint = 10;
+						if mission.ProgressionPoint <= 11 then
+							mission.ProgressionPoint = 11;
 						end
 					end)
 					
@@ -339,7 +350,7 @@ if RunService:IsServer() then
 					dialog:TalkTo(caitlinClass.Character);
 				end);
 
-			elseif mission.ProgressionPoint == 19 then
+			elseif mission.ProgressionPoint == 20 then
 				dialog:SetInitiate("Alright, I helped you guys out, can I stay here for a while?", "Oops");
 
 				dialog:AddChoice({"buyre_stay"}, function(dialog)
@@ -347,7 +358,7 @@ if RunService:IsServer() then
 					dialog:TalkTo(josephClass.Character);
 				end)
 
-			elseif mission.ProgressionPoint == 20 then
+			elseif mission.ProgressionPoint == 21 then
 				dialog:SetInitiate("Hmph, not a bad place you got here.", "Oops");
 
 				dialog:AddChoice({"buyre_joseph1";}, function(dialog)

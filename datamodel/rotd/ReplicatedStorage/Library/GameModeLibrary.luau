@@ -386,7 +386,7 @@ GameModeLibrary.GameModes={
 				HardModeEnabled = true;
 				MapItemId = "swamplandsmap";
 				
-				Disabled=true;
+				WIP=true;
 			};
 			["CommunityWaySide"]={
 				WorldId="CommunityWaySide";
@@ -574,7 +574,7 @@ GameModeLibrary.GameModes={
 				Soundtrack="Soundtrack:Kingdom2Dirge";
 				EnableStopwatch=true;
 
-				Disabled=true;
+				WIP=true;
 			};
 		};
 	};

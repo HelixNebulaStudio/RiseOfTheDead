@@ -817,7 +817,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			
 			local titleLabel: TextLabel = newEntry:WaitForChild("Title") :: TextLabel;
 			local dbSuffix = " ("..lib.MissionId..")";
-			titleLabel.Text = lib.Name.. (shared.gameConfig.BranchName == "Dev" and dbSuffix or "");
+			local liveSuffix = "";
+			if lib.WIP then
+				liveSuffix = "\n(Dev Branch Only)";
+			end
+			titleLabel.Text = lib.Name.. (shared.gameConfig.BranchName == "Dev" and dbSuffix or "")
+									..((shared.gameConfig.BranchName == "Live" or RunService:IsStudio()) and liveSuffix or "");
 			
 			local npcLib = modNpcProfileLibrary:Find(lib.From);
 			local avatarLabel: ImageButton = newEntry:WaitForChild("Avatar") :: ImageButton;
