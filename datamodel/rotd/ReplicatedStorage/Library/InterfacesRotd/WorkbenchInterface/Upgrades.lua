@@ -213,9 +213,11 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 			descTag.Text = descText;
 			
 			for b=1, #modLib.Upgrades do
-				if LevelObject[b] ~= nil then LevelObject[b].Update(); continue end;
+				local levelButtonObj = LevelObject[b];
+				if levelButtonObj ~= nil then levelButtonObj.Update(); continue end;
 				
-				LevelObject[b] = {};
+				levelButtonObj = {};
+				LevelObject[b] = levelButtonObj;
 				
 				local upgradeData = modLib.Upgrades[b];
 				local _upgradeName = upgradeData.Name;
@@ -291,9 +293,17 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 					if dataUpgradeLevel >= upgradeMaxLevel then return end;
 					if purchaseUpgradeDebounce then return end;
 					purchaseUpgradeDebounce = true;
+
 					binds:PlayUpgradeSound();
 					local playerStats = modData.GetStats();
 					
+					local nextIsMaxLevel = dataUpgradeLevel+1 >= upgradeMaxLevel;
+					if nextIsMaxLevel and (playerStats.TweakPoints or 0) < 1 then 
+						newLevelButton.Text = "Not enough Tweak Points";
+						task.wait(1);
+						levelButtonObj.Update();
+						return;
+					end
 					if currencyType == "Perks" and (playerStats[currencyType] or 0) < upgradeCost then
 						newLevelButton.Text = "Not enough Perks";
 						task.wait(1);
@@ -340,7 +350,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						task.wait(0.45);
 						if dataUpgradeLevel < upgradeMaxLevel then
 							upgradeCost = modWorkbenchLibrary.CalculateCost(upgradeData, dataUpgradeLevel);
-							newLevelButton.Text = upgradeData.Syntax.." ("..upgradeCost.." "..currencyType..")";
+							levelButtonObj.Update();
 						end
 						
 						self.UpdateModPanel();
@@ -350,16 +360,17 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						
 					else
 						Debugger:Warn("Upgrade Purchase>> Error Code:"..serverReply);
+						
 						newLevelButton.Text = string.gsub(modWorkbenchLibrary.PurchaseReplies[serverReply] or ("Error Code: "..serverReply), "$Currency", currencyType);
 						task.wait(1);
-						newLevelButton.Text = upgradeData.Syntax.." ("..upgradeCost.." "..currencyType..")";
+						levelButtonObj.Update();
 						
 					end
 					purchaseUpgradeDebounce = false;
 				end)
 				
 				
-				LevelObject[b].Update = function()
+				levelButtonObj.Update = function()
 					for _, c in pairs(newLevelList:GetChildren()) do if c:IsA("GuiObject") then c:Destroy() end; end
 					dataUpgradeLevel = math.min(modifierStorageItem.Values[upgradeData.DataTag] or 0, upgradeMaxLevel);
 					upgradeCost = modWorkbenchLibrary.CalculateCost(upgradeData, dataUpgradeLevel);
@@ -425,7 +436,16 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						emptyLevelSlot.LayoutOrder = 99;
 						emptyLevelSlot.Parent = newLevelList;
 						
-						newLevelButton.Text = upgradeData.Syntax.." ("..upgradeCost.." "..currencyType..")";
+						local costList = {
+							`{upgradeCost} {currencyType}`;
+						};
+
+						local nextIsMaxLevel = dataUpgradeLevel+1 >= upgradeMaxLevel;
+						if nextIsMaxLevel then
+							table.insert(costList, `1 Tweak Point`);
+						end
+
+						newLevelButton.Text = `{upgradeData.Syntax} ({table.concat(costList, ", ")})`;
 						
 					else
 						newLevelButton.Text = upgradeData.Syntax.." Maxed";
@@ -433,7 +453,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 					end
 				end
 				
-				LevelObject[b].Update();
+				levelButtonObj.Update();
 			end
 		end
 		

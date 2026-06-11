@@ -118,7 +118,7 @@ function ShopSystem.onRequire()
                     });
                 end
 
-                profile:AddPlayPoints(sellPrice/1000, "Source:Money");
+                profile:AddPlayPoints(sellPrice/300, "Source:Money");
                 modAudio.Play("MoneyPickup", playerClass.Head);
                 
                 return modShopLibrary.PurchaseReplies.Success;
@@ -182,7 +182,7 @@ function ShopSystem.onRequire()
                 ItemSKU=`BuyItem:{itemLib.Id}`;
             };
 
-            profile:AddPlayPoints(price/1000, "Sink:Money");
+            profile:AddPlayPoints(price/300, "Sink:Money");
             modAudio.Play("Purchase", playerClass.Head);
 
             return modShopLibrary.PurchaseReplies.Success;
@@ -315,7 +315,7 @@ function ShopSystem.onRequire()
             Cost = price;
         });
 
-        profile:AddPlayPoints(price/1000, "Sink:Money");
+        profile:AddPlayPoints(price/300, "Sink:Money");
         modAudio.Play("Purchase", playerClass.Head);
         
         shared.Notify(player, `{storageItem.Library.Name} ammunition refilled.`, "Inform");
@@ -373,7 +373,7 @@ function ShopSystem.onRequire()
         local itemLib = modItemsLibrary:Find(storageItem.ItemId);
         shared.Notify(player, itemLib.Name.." repaired.", "Inform");
 
-        profile:AddPlayPoints(repairPrice/1000, "Sink:Money");
+        profile:AddPlayPoints(repairPrice/300, "Sink:Money");
         modAudio.Play("Crafting1", playerClass.Head);
         
         return modShopLibrary.PurchaseReplies.Success;

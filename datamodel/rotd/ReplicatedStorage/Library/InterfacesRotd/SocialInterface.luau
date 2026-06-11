@@ -283,6 +283,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     end
 
 
+    --MARK: Render social profile;
     function binds.SelectPlayer(playerName, refresh)
         playerSelection = playerName;
         profileNameTag.Text = playerName;
@@ -330,6 +331,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                     ZombieKills={Name="Zombie Kills"; Index=31};
                     HumanKills={Name="Human Kills"; Index=32};
                     Death={Name="Death"; Index=40};
+                    TweakPoints={Name="Tweak Points"; Index=49};
                     Perks={Name="Perks"; Index=50};
                     Money={Name="Money"; Index=60};
                     MissionsCompleted={Name="Missions Completed"; Index=70};
@@ -366,8 +368,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 local statStringTable = {};
                 local statCache = {};
                 
+                if RunService:IsStudio() then
+                    table.insert(statCache, {Index=99; String=`<b>Gameplay Points</b>: <font size="12">{interface.beautifyNumber(playerData.PlayPoints)}</font>`});
+                end
+
                 if playerData.Punishment and playerData.Punishment > 0 then
-                    table.insert(statCache, {Index=-5; String="Punished: "..modGlobalVars.Punishments[playerData.Punishment]});
+                    table.insert(statCache, {Index=-5; String=`<b>Punished</b>: <font size="12"> {modGlobalVars.Punishments[playerData.Punishment]}</font>`});
                 end
                 
                 for k, v in pairs(playerData.Stats) do

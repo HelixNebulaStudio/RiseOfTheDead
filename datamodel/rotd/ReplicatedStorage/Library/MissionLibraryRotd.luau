@@ -1169,6 +1169,7 @@ MissionLibrary.New{
 	FactionRewards = {
 		{Type="Resource"; Id="Food"; Value=30;};
 		{Type="Score"; Value=1;};
+		{Type="Money"; Value=8000;};
 	};
 	FactionSuccessCriteria = {
 		SuccessfulAgents=1;
@@ -2062,6 +2063,7 @@ MissionLibrary.New{
 	FactionRewards = {
 		{Type="Resource"; Id="Material"; Value=30;};
 		{Type="Score"; Value=1;};
+		{Type="Money"; Value=4000;};
 	};
 	FactionSuccessCriteria = {
 		SuccessfulAgents=1;
@@ -2120,6 +2122,7 @@ MissionLibrary.New{
 	FactionRewards = {
 		{Type="Resource"; Id="Comfort"; Value=60;};
 		{Type="Score"; Value=1;};
+		{Type="Money"; Value=5000;};
 	};
 	FactionSuccessCriteria = {
 		SuccessfulAgents=1;
@@ -2152,6 +2155,7 @@ MissionLibrary.New{
 	FactionRewards = {
 		{Type="Resource"; Id="Ammo"; Value=60;};
 		{Type="Score"; Value=1;};
+		{Type="Money"; Value=3000;};
 	};
 	FactionSuccessCriteria = {
 		SuccessfulAgents=1;
@@ -2528,36 +2532,36 @@ MissionLibrary.New{
 
 -- MARK: 73 - Deadly Zeniths Strike
 MissionLibrary.New{
-	MissionId=73;
+	MissionId = 73;
 	MissionType = MissionLibrary.MissionTypes.Faction;
 	ExpireTime = FACTION_MISSION_EXPIRE_TIME;
-	Name="Deadly Zeniths Strike";
-	From="Faction";
-	Description="A zenith boss is approaching your faction headquarters. Call up faction members to take down the boss together.";
-	Persistent=true;
-	OneAtATime=true;
-	World={"Safehome"; "BioXResearch"};
-	SaveData={};
-	Checkpoint={
+	Name = "Deadly Zeniths Strike";
+	From = "Faction";
+	Description = "A zenith boss is approaching your faction headquarters. Call up faction members to take down the boss together.";
+	Persistent = true;
+	OneAtATime = true;
+	World = {"Safehome"; "BioXResearch"};
+	SaveData = {};
+	Checkpoint = {
 		{Text="Talk to Patrick";};
 		{Text="Kill Zenith $BossName";};
 	};
-	GuideText="Start by faction";
-	FactionCosts={
+	GuideText = "Start by faction";
+	FactionCosts = {
 		{Type="Resource"; Per="Player"; Id="Food"; Value=8;};
 		{Type="Resource"; Per="Player"; Id="Comfort"; Value=8;};
 		{Type="Resource"; Per="Player"; Id="Ammo"; Value=8;};
 	};
-	FactionRewards={
+	FactionRewards = {
 		{Type="Resource"; Id="Food"; Value=30;};
 		{Type="Resource"; Id="Material"; Value=30;};
 		{Type="Score"; Value=10;};
-		{Type="Gold"; Value=100;};
+		{Type="Money"; Value=8000;};
 	};
-	FactionSuccessCriteria={
-		SuccessfulAgents=4;
+	FactionSuccessCriteria = {
+		SuccessfulAgents = 4;
 	};
-	QuotaLimit=10;
+	QuotaLimit = 10;
 	
 };
 

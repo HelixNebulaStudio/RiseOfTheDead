@@ -142,7 +142,7 @@ function Component:__call(damagedata: DamageData)
 			local killKey = `L{npcLevel}-{npcClass.Name}-Kills`;
 			gameSave.Statistics:AddStat("KillTracker", killKey, 1);
 		end
-		profile:AddPlayPoints(3, "Gameplay:Kill:Enemies");
+		profile:AddPlayPoints(2, "Gameplay:Kill:Enemies");
 
 		shared.Notify(player, table.concat(killNotice, " "), "Reward");
 

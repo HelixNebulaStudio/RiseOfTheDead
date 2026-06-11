@@ -630,9 +630,25 @@ function remotePurchaseUpgrade.OnServerInvoke(player, interactPart, id, dataTag)
 			local upgradeLevel = storageItem.Values[upgradeInfo.DataTag] or 0;
 			local upgradeCost = modWorkbenchLibrary.CalculateCost(upgradeInfo, upgradeLevel);
 			
+			local nextIsMaxLevel = upgradeLevel+1 >= upgradeInfo.MaxLevel;
+
 			if upgradeLevel+1 <= upgradeInfo.MaxLevel then
-				if playerSave and playerSave:GetStat(currencyType) >= upgradeCost then
+				local isCostfulfilled = true;
+
+				if playerSave == nil then
+					isCostfulfilled = false;
+				else
+					if playerSave:GetStat(currencyType) < upgradeCost then
+						isCostfulfilled = false;
+					end
+					if nextIsMaxLevel and playerSave:GetStat("TweakPoints") < 1 then
+						isCostfulfilled = false;
+					end
+				end
+
+				if isCostfulfilled then
 					playerSave:AddStat(currencyType, -upgradeCost);
+					playerSave:AddStat("TweakPoints", -1);
 					
 					storageItem.Values[upgradeInfo.DataTag] = upgradeLevel + 1;
 					if upgradeInfo.SliderTag then
@@ -652,13 +668,18 @@ function remotePurchaseUpgrade.OnServerInvoke(player, interactPart, id, dataTag)
 					storageItem:Sync({upgradeInfo.DataTag});
 					playerSave.AppearanceData:Update(playerSave.Clothing);
 					
-					modAnalytics.RecordResource(player.UserId, upgradeCost, "Sink", "Perks", "Gameplay", "ModUpgrade");
-					
 					modAnalyticsService:Sink{
 						Player = player;
 						Currency = modAnalyticsService.Currency.Perks;
 						Amount = upgradeCost;
 						EndBalance = playerSave:GetStat("Perks");
+						ItemSKU = "ModUpgrade";
+					};
+					modAnalyticsService:Sink{
+						Player = player;
+						Currency = modAnalyticsService.Currency.TweakPoints;
+						Amount = 1;
+						EndBalance = playerSave:GetStat("TweakPoints");
 						ItemSKU = "ModUpgrade";
 					};
 					
@@ -1296,13 +1317,12 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 					
 				else
 					if playerSave:AddStat("TweakPoints", 5) > 0 then
-						modAnalytics.RecordResource(player.UserId, 5, "Source", "TweakPoints", "Gameplay", "Deconstruct");
 						modAnalyticsService:Source{
 							Player=player;
 							Currency=modAnalyticsService.Currency.TweakPoints;
 							Amount=5;
 							EndBalance=playerSave:GetStat("TweakPoints");
-							ItemSKU="Deconstruct";
+							ItemSKU="DeconstructWeapon";
 						};
 
 					end
@@ -1344,7 +1364,7 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 							Currency = modAnalyticsService.Currency.Money;
 							Amount = DECONSTRUCT_WEAPON_MONEY_REWARD;
 							EndBalance = playerSave:GetStat("Money");
-							ItemSKU = "Deconstruct";
+							ItemSKU = "DeconstructWeapon";
 						};
 					end
 
@@ -1361,14 +1381,13 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 				else
 					playerSave:AddStat("Money", 25000, true);
 					shared.Notify(player, "You recieved $25'000 from deconstructing a level "..levels.." "..itemName..".", "Reward");
-					modAnalytics.RecordResource(player.UserId, 25000, "Source", "Money", "Gameplay", "Deconstruct");
-					
+
 					modAnalyticsService:Source{
 						Player=player;
 						Currency=modAnalyticsService.Currency.Money;
 						Amount=25000;
 						EndBalance=playerSave:GetStat("Money");
-						ItemSKU="Deconstruct";
+						ItemSKU="DeconstructWeapon";
 					};
 
 

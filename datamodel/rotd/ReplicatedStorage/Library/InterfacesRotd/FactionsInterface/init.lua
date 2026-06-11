@@ -28,6 +28,7 @@ local modItemInterface = shared.require(game.ReplicatedStorage.Library.UI.ItemIn
 local modRichFormatter = shared.require(game.ReplicatedStorage.Library.UI.RichFormatter);
 local modUIUtil = shared.require(game.ReplicatedStorage.Library.UI.UIUtil);
 local modDropdownList = shared.require(game.ReplicatedStorage.Library.UI.DropdownList);
+local modComponents = shared.require(game.ReplicatedStorage.Library.UI.Components);
 
 
 local RESOURCE_KEYS = {
@@ -75,13 +76,14 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	windowFrame.Parent = interface.ScreenGui;
 
 	local window: InterfaceWindow = interface:NewWindow("FactionsMenu", windowFrame);
+    window.BoolStringWhenActive = {String="!Hotbar"; Priority=2;};
 	window.CompactFullscreen = true;
 	window.CloseWithInteract = true;
 	
 	if modConfigurations.CompactInterface then
 		window:SetClosePosition(UDim2.new(0.5, 0, -1, 0), UDim2.new(0.5, 0, 0, 0));
 	else
-		window:SetClosePosition(UDim2.new(0.5, 0, -1, 0), UDim2.new(0.5, 0, 0.1, 0));
+		window:SetClosePosition(UDim2.new(0.5, 0, -1, 0), UDim2.new(0.5, 0, 0.5, 0));
 	end
 	
 	local quickButton = interface:NewQuickButton("FactionsMenu", "Factions", "rbxassetid://9890634236");
@@ -105,6 +107,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	
 	local bannerGoldStats = bannerFrame:WaitForChild("GoldStats");
 	local bannerGoldLabel = bannerGoldStats:WaitForChild("goldLabel");
+	
+	local bannerMoneyStats = bannerFrame:WaitForChild("MoneyStats");
+	local bannerMoneyLabel = bannerMoneyStats:WaitForChild("moneyLabel");
 
 	local bannerNavMenuButton = bannerNavFrame:WaitForChild("Menu");
 	local bannerNavSettingsButton = bannerNavFrame:WaitForChild("Settings");
@@ -398,7 +403,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	end)
 	
 	
-	local function loadMissionDesc(descLabel, missionLib)
+	local function loadMissionDesc(descLabel, missionLib, activeMissionData)
 		local factionData = modData.FactionData or {};
 		
 		local descStr = missionLib.Description.."\n";
@@ -410,10 +415,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			local reqInfo = factionCosts[a];
 
 			if costStr == nil then costStr = "\n" end;
-			costStr = costStr.."    -".. (reqInfo.Value) .."% ".. (reqInfo.Id) .. " per ".. reqInfo.Per .. "\n";
+			local perName = reqInfo.Per;
+			if perName == "Player" then
+				perName = "Agent";
+			end
+			costStr = costStr.."    -".. (reqInfo.Value) .."% ".. (reqInfo.Id) .. " per ".. perName .. "\n";
 		end
 		
-		descStr = descStr.."\n<b>Mission Costs:</b>"..costStr;
 
 		local rewardsStr;
 
@@ -424,10 +432,17 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			if rewardsStr == nil then rewardsStr = "\n" end;
 
 			if rewardInfo.Type == "Resource" then
-				rewardsStr = rewardsStr.."    " .. (math.sign(rewardInfo.Value) >= 0 and "+" or "-") .. (rewardInfo.Value) .."% ".. (rewardInfo.Id) .. "\n";
+				rewardsStr = rewardsStr.."    " .. (math.sign(rewardInfo.Value) >= 0 and "+ " or "- ") .. (rewardInfo.Value) .."% ".. (rewardInfo.Id) .. "\n";
 
 			elseif rewardInfo.Type == "Score" then
 				rewardsStr = rewardsStr.."    + " .. (rewardInfo.Value) .." Score".. "\n";
+
+			elseif rewardInfo.Type == "Money" then
+				local agentPayout = activeMissionData and activeMissionData.MoneyPayout;
+				local remainingPay = agentPayout and (rewardInfo.Value - agentPayout) or rewardInfo.Value;
+				rewardsStr = rewardsStr..`    + ${remainingPay} For Faction (If Success), + ${agentPayout} For Agent\n`;
+
+				costStr = costStr..`    -${agentPayout or rewardInfo.Value} Per Agent\n`;
 
 			elseif rewardInfo.Type == "Gold" and factionData.TestGoldReward == true then
 				rewardsStr = rewardsStr.."    + " .. (rewardInfo.Value) ..modRichFormatter.GoldText(" Gold").. "\n";
@@ -435,6 +450,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			end
 		end
 
+		descStr = descStr.."\n<b>Mission Costs:</b>"..costStr;
 		descStr = descStr.."\n<b>Mission Rewards:</b>"..rewardsStr;
 		
 		if missionLib.FactionSuccessCriteria then
@@ -463,9 +479,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 							  or missionMenuPage == "ActiveMission2" and 2
 							  or missionMenuPage == "ActiveMission3" and 3;
 
-			local missionInfo = missionData.Active[missionIndex];
-			if missionInfo then
-				local missionLib = modMissionLibrary.Get(missionInfo.Id);
+			local activeMissionData = missionData.Active[missionIndex];
+			if activeMissionData then
+				local missionLib = modMissionLibrary.Get(activeMissionData.Id);
 
 				local new = templateMissionInfo:Clone();
 
@@ -473,13 +489,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				titleLabel.Text = missionLib.Name;
 				
 				local descLabel = new:WaitForChild("Desc");
-				loadMissionDesc(descLabel, missionLib);
+				loadMissionDesc(descLabel, missionLib, activeMissionData);
 
 				local activePanel = new:WaitForChild("ActivePanel");
 				local completePanel = new:WaitForChild("CompletePanel");
 
 				local function refreshPlayerListing(playersPanel, userId, listingFrameTemplate)
-					local playerMissionData = missionInfo.Players[userId];
+					local playerMissionData = activeMissionData.Players[userId];
 					local playerListing = playersPanel:FindFirstChild(userId);
 
 					if playerListing == nil then
@@ -490,14 +506,14 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 							agentToolTip.CustomUpdate = function(self)
 								missionData = factionData.Missions;
-								missionInfo = missionData.Active[missionIndex];
+								activeMissionData = missionData.Active[missionIndex];
 
-								if missionInfo == nil then
+								if activeMissionData == nil then
 									binds.refreshActiveMissionInfo = nil;
 									return;
 								end
 
-								playerMissionData = missionInfo.Players[userId];
+								playerMissionData = activeMissionData.Players[userId];
 
 								self.Frame.Size = UDim2.new(0, 240, 0, 240);
 								self.Frame.custom.Visible = true;
@@ -556,7 +572,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 				end
 
-				if missionInfo.Completed or unixTime >= missionInfo.CompletionTick then
+				if activeMissionData.Completed or unixTime >= activeMissionData.CompletionTick then
 					completePanel.Visible = true;
 
 					local claimButton = completePanel:WaitForChild("claimButton");
@@ -582,7 +598,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 					local playersCount = 0;
 					local successCount, failCount = 0, 0;
-					for userId, playerMissionData in pairs(missionInfo.Players) do
+					for userId, playerMissionData in pairs(activeMissionData.Players) do
 						playersCount = playersCount+1;
 
 						if playerMissionData.MissionStatus == 3 then
@@ -626,8 +642,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					reportText = reportText.."\n    • <b>Sucessful: </b>".. successCount;
 					reportText = reportText.."\n    • <b>Failed: </b>".. failCount;
 
-					reportText = reportText.."\n\n<b>Total Costs: </b>";
-
+					local reportCostStr = "";
 					local costs = missionLib.FactionCosts;
 					for a=1, #costs do
 						local costType = costs[a].Type;
@@ -636,11 +651,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 						if costType == "Resource" then
 							local value = -(costValue * playersCount);
-							reportText = reportText.."\n    • "..costId..": ".. math.ceil(value*100)/100 .."%";
+							reportCostStr = reportCostStr..`\n    • {costId}: {math.ceil(value*100)/100}%`;
 						end
 					end
 
-					reportText = reportText.."\n\n<b>Final Rewards: </b>";
+					local reportRewardStr = "";
 					if missionSuccess then
 						local rewards = missionLib.FactionRewards;
 						for a=1, #rewards do
@@ -649,23 +664,32 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 							local rewardValue = rewards[a].Value;
 
 							if rewardType == "Resource" then
-								reportText = reportText.."\n    • "..rewardId..": ".. rewardValue .."%";
+								reportRewardStr = reportRewardStr.."\n    • "..rewardId..": ".. rewardValue .."%";
 
 							elseif rewardType == "Score" then
-								reportText = reportText.."\n    + ".. rewardValue .." Score";
+								reportRewardStr = reportRewardStr.."\n    + ".. rewardValue .." Score";
+
+							elseif rewardType == "Money" then
+								reportRewardStr = reportRewardStr..`\n    + ${rewardValue} x {successCount} = ${rewardValue * successCount}`;
+								
+								local moneyCost = activeMissionData.MoneyPayout or rewardValue;
+								reportCostStr = reportCostStr..`\n    • -${moneyCost} x {playersCount} = ${moneyCost * playersCount}`;
 
 							elseif rewardType == "Gold" and factionData.TestGoldReward == true then
-								reportText = reportText.."\n    + ".. rewardValue .. modRichFormatter.GoldText(" Gold");
+								reportRewardStr = reportRewardStr.."\n    + ".. rewardValue .. modRichFormatter.GoldText(" Gold");
 
 							end
 						end
 					else
-						reportText = reportText.."\n    • None"
+						reportRewardStr = reportRewardStr.."\n    • None"
 
 					end
 
+					reportText = reportText.."\n\n<b>Total Costs: </b>"..reportCostStr;
+					reportText = reportText.."\n\n<b>Final Rewards: </b>"..reportRewardStr;
+
 					if missionLib.PrintNote then
-						local noteText = missionLib.PrintNote(missionInfo);
+						local noteText = missionLib.PrintNote(activeMissionData);
 						if #noteText > 0 then
 							reportText = reportText.."\n\n<b>Note: </b>".. noteText;
 						end
@@ -689,8 +713,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						unixTime = workspace:GetServerTimeNow();
 						missionData = factionData.Missions;
 						
-						missionInfo = missionData.Active[missionIndex];
-						Debugger:Warn("missionInfo", missionInfo);
+						activeMissionData = missionData.Active[missionIndex];
+						Debugger:Warn("missionInfo", activeMissionData);
 						
 						local packet = {
 							ActiveIndex=missionIndex;
@@ -711,15 +735,15 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 						unixTime = workspace:GetServerTimeNow();
 						missionData = factionData.Missions;
-						missionInfo = missionData.Active[missionIndex];
+						activeMissionData = missionData.Active[missionIndex];
 
-						if missionInfo == nil then
+						if activeMissionData == nil then
 							binds.refreshActiveMissionInfo = nil;
 							return;
 						end
 
 						local playersCount = 0;
-						for userId, playerMissionData in pairs(missionInfo.Players) do
+						for userId, playerMissionData in pairs(activeMissionData.Players) do
 							playersCount = playersCount+1;
 
 							if tostring(userId) == tostring(localPlayer.UserId) then
@@ -735,15 +759,15 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						end
 
 						for _, obj in pairs(playersPanel:GetChildren()) do
-							if obj:IsA("GuiObject") and missionInfo.Players[obj.Name] == nil then
+							if obj:IsA("GuiObject") and activeMissionData.Players[obj.Name] == nil then
 								game.Debris:AddItem(obj, 0);
 							end
 						end
 
-						timerLabel.Text = "Complete In: ".. modSyncTime.ToString(math.max(missionInfo.CompletionTick-unixTime, 0));
-						quotaLabel.Text = "Quota: ".. playersCount .."/".. (missionInfo.QuotaLimit >= 99 and "Max" or missionInfo.QuotaLimit);
+						timerLabel.Text = "Complete In: ".. modSyncTime.ToString(math.max(activeMissionData.CompletionTick-unixTime, 0));
+						quotaLabel.Text = "Quota: ".. playersCount .."/".. (activeMissionData.QuotaLimit >= 99 and "Max" or activeMissionData.QuotaLimit);
 						
-						accessLabel.Text = "Access: [".. missionInfo.AccessType .."] "..table.concat(missionInfo.AccessValue, ", ")
+						accessLabel.Text = "Access: [".. activeMissionData.AccessType .."] "..table.concat(activeMissionData.AccessValue, ", ")
 					end
 					binds.refreshActiveMissionInfo();
 
@@ -917,17 +941,57 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 							selectionListFrame.Parent = availPanel;
 						end)
 
-						local quotaInputBox = availPanel:WaitForChild("QuotaLabel"):WaitForChild("quotaInputBox");
-						local function updateQuotaInput()
-							local num = tonumber(quotaInputBox.Text);
-							if num == nil then return end;
-							
-							local maxMissionQuota = missionLib.QuotaLimit or 99;
-							quotaInputBox.Text = math.clamp(num, 1, maxMissionQuota);
+						local quotaLabel = availPanel:WaitForChild("QuotaLabel");		
+
+						local quotaSlider = modComponents.NewSliderButton() :: TextButton;
+						quotaSlider.AnchorPoint = Vector2.new(1, 0);
+						quotaSlider.Position = UDim2.new(1, 0, 0, 0);
+						quotaSlider.Size = UDim2.new(1, -120, 0, 30);
+						quotaSlider.Parent = quotaLabel;
+
+						local maxMissionQuota = missionLib.QuotaLimit or 99;
+						local curMissionQuota = maxMissionQuota;
+						modComponents.CreateSlider(interface, {
+							Name = "QuotaLabel";
+							Button = quotaSlider;
+							RangeInfo = {Min=1; Max=maxMissionQuota; Default=maxMissionQuota; ValueType="Flat";};
+							SetFunc = function(v)
+								curMissionQuota = v;
+								Debugger:StudioLog(`curMissionQuota = {v}`);
+							end;
+						});
+
+						local moneyLabel = availPanel:WaitForChild("MoneyPayoutLabel");	
+
+						local maxMoneyPayout = nil;
+						for a=1, #missionLib.FactionRewards do
+							local fReward = missionLib.FactionRewards[a];
+							if fReward.Type == "Money" then
+								maxMoneyPayout = fReward.Value;
+							end
 						end
-						quotaInputBox.Text = missionLib.QuotaLimit or 50;
-						quotaInputBox:GetPropertyChangedSignal("Text"):Connect(updateQuotaInput);
-						updateQuotaInput();
+						local curMoneyPayout = maxMoneyPayout;
+						if maxMoneyPayout then
+							moneyLabel.Visible = true;
+
+							local moneySlider = modComponents.NewSliderButton() :: TextButton;
+							moneySlider.AnchorPoint = Vector2.new(1, 0);
+							moneySlider.Position = UDim2.new(1, 0, 0, 0);
+							moneySlider.Size = UDim2.new(1, -120, 0, 30);
+							moneySlider.Parent = moneyLabel;
+
+							modComponents.CreateSlider(interface, {
+								Name = "MoneyLabel";
+								Button = moneySlider;
+								RangeInfo = {Min=0; Max=maxMoneyPayout; Default=maxMoneyPayout; SnapBy=10; ValueType="Flat";};
+								SetFunc = function(v)
+									curMoneyPayout = v;
+									Debugger:StudioLog(`curMoneyPayout = {v}`);
+								end;
+							});
+						else
+							moneyLabel.Visible = false;
+						end
 
 						local startButton = availPanel:WaitForChild("startButton");
 						local defStartText = startButton.Text;
@@ -949,10 +1013,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 							end
 
 							local packet = {
-								AccessType=accessType;
-								AccessValue=checkedOptions;
-								QuotaLimit=quotaInputBox.Text;
-								MissionId=missionData.Available[a].Id;
+								AccessType = accessType;
+								AccessValue = checkedOptions;
+								QuotaLimit = curMissionQuota or 99;
+								MoneyPayout = curMoneyPayout;
+								MissionId = missionData.Available[a].Id;
 							}
 
 							startButton.Text = "Starting Mission..";
@@ -2295,6 +2360,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			
 			bannerGoldStats.Visible = factionData.TestGoldReward == true;
 			bannerGoldLabel.Text = modRichFormatter.GoldText(modFormatNumber.Beautify(factionData.Gold or 0));
+
+			bannerMoneyLabel.Text = modFormatNumber.Beautify(factionData.Money or 0);
 			
 			local rolesConfig = factionData.Roles;
 			-- members list;

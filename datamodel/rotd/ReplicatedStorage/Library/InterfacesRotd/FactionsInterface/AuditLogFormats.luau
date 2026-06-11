@@ -1,3 +1,11 @@
+local modMissionsLibrary = shared.require(game.ReplicatedStorage.Library.MissionLibrary);
+
+local function extractNumber(text, prefix)
+    -- %d+ matches one or more digits directly after the prefix
+    local match = string.match(text, prefix .. "(%d+)")
+    return match and tonumber(match)
+end
+
 return {
 	leave={GetText=function(factionData, values)
 		local members = factionData.Members
@@ -201,6 +209,25 @@ return {
 		local rStr = "";
 
 		rStr = name .." sent a join request.";
+
+		return rStr;
+	end};
+
+	addmoney={GetText=function(factionData, values)
+		local amt = values[1];
+		local reason = values[2];
+		
+		local rStr = "";
+		
+		if reason:sub(1, 7) == "mission" then
+			local missionId = extractNumber(reason, "mission");
+			local missionLib = missionId and modMissionsLibrary.Get(missionId);
+			if missionLib then
+				reason = reason:gsub(`mission{missionId}`,`Mission: {missionLib.Name}`);
+			end
+		end
+
+		rStr = (math.sign(amt) == 1 and "+" or "").. amt .." $: "..reason;
 
 		return rStr;
 	end};
