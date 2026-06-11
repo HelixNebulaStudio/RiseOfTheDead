@@ -1164,21 +1164,20 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 					shared.Notify(player, string.gsub("$Item removed from your Inventory.", "$Item", storageItem.CustomName), "Negative");
 				end);
 				
-				local duration = workspace:GetServerTimeNow()+900;
-				if shared.gameConfig.BranchName == "Dev" then duration = workspace:GetServerTimeNow()+5; end;
+				local duration = workspace:GetServerTimeNow() + shared.Const.Hour;
 				
 				playerSave.Workbench:NewProcess{
-					Type=playerSave.Workbench.ProcessTypes.DeconstructMod;
-					ItemId=modLib.Id;
-					T=duration;
-					Perks=perks;
-					Maxed=isMaxed;
-					Values=storageItem.Values;
+					Type = playerSave.Workbench.ProcessTypes.DeconstructMod;
+					ItemId = modLib.Id;
+					T = duration;
+					Perks = perks;
+					Maxed = isMaxed;
+					Values = storageItem.Values;
 
-					PlayProcessSound=true;
+					PlayProcessSound = true;
 				};
 				
-				profile:AddPlayPoints(10, "Gameplay:Workbench");
+				profile:AddPlayPoints(120, "Gameplay:Workbench");
 				
 				return modWorkbenchLibrary.DeconstructModReplies.Success;
 				
@@ -1186,17 +1185,16 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 				local levels = storageItem.Values and storageItem.Values.L or 0;
 				if levels < 5 then return modWorkbenchLibrary.DeconstructModReplies.InvalidItem; end
 				
-				--local rewardTiers = math.floor(levels/5);
-				local duration = workspace:GetServerTimeNow()+60;
-				if shared.gameConfig.BranchName == "Dev" then duration = workspace:GetServerTimeNow()+5; end;
+				local rewardTiers = 5-math.clamp(math.floor(levels/5), 1, 4);
+				local duration = workspace:GetServerTimeNow() + (shared.Const.Hour/rewardTiers);
 				
 				playerSave.Workbench:NewProcess{
-					Type=playerSave.Workbench.ProcessTypes.DeconstructWeapon;
-					ItemId=itemId;
-					T=duration;
-					Levels=levels;
-					Values=storageItem.Values;
-					ItemName=storageItem.CustomName;
+					Type = playerSave.Workbench.ProcessTypes.DeconstructWeapon;
+					ItemId = itemId;
+					T = duration;
+					Levels = levels;
+					Values = storageItem.Values;
+					ItemName = storageItem.CustomName;
 
 					PlayProcessSound=true;
 				};
@@ -1242,9 +1240,24 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 
 					end
 
-					if processData.Maxed then playerSave:AwardAchievement("thedec"); end
-					shared.Notify(player, (("You recieved $p Perks from deconstructing $name."):gsub("$p", perks):gsub("$name", itemLib.Name)), "Reward");
-					
+					local addTweakStr = "";
+					if processData.Maxed then
+						playerSave:AwardAchievement("thedec");
+
+						local DECONSTRUCT_MOD_TWEAK_REWARD = 3;
+						if playerSave:AddStat("TweakPoints", DECONSTRUCT_MOD_TWEAK_REWARD) > 0 then
+							modAnalyticsService:Source{
+								Player = player;
+								Currency = modAnalyticsService.Currency.TweakPoints;
+								Amount = DECONSTRUCT_MOD_TWEAK_REWARD;
+								EndBalance = playerSave:GetStat("TweakPoints");
+								ItemSKU = "DeconstructMod";
+							};
+						end
+						addTweakStr = ` and {DECONSTRUCT_MOD_TWEAK_REWARD} Tweak Points`;
+					end
+
+					shared.Notify(player, `You recieved {perks} Perks{addTweakStr} from deconstructing {itemLib.Name}.`, "Reward");
 				end
 				
 			end
@@ -1303,20 +1316,19 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 					shared.Notify(player, "You Perks is maxed!", "Negative");
 					
 				else
-					if playerSave:AddStat("Perks", 25) > 0 then
-						modAnalytics.RecordResource(player.UserId, 25, "Source", "Perks", "Gameplay", "Deconstruct");
-					
+					local DECONSTRUCT_WEAPON_PERK_REWARD = 100;
+					if playerSave:AddStat("Perks", DECONSTRUCT_WEAPON_PERK_REWARD) > 0 then
 						modAnalyticsService:Source{
-							Player=player;
-							Currency=modAnalyticsService.Currency.Perks;
-							Amount=25;
-							EndBalance=playerSave:GetStat("Perks");
-							ItemSKU="DeconstructWeapon";
+							Player = player;
+							Currency = modAnalyticsService.Currency.Perks;
+							Amount = DECONSTRUCT_WEAPON_PERK_REWARD;
+							EndBalance = playerSave:GetStat("Perks");
+							ItemSKU = "DeconstructWeapon";
 						};
 
 					end
 
-					shared.Notify(player, "You recieved 25 Perks from deconstructing a level "..levels.." "..itemName..".", "Reward");
+					shared.Notify(player, `You recieved {DECONSTRUCT_WEAPON_PERK_REWARD} Perks from deconstructing a level {levels} {itemName}.`, "Reward");
 				end
 				
 				
@@ -1325,19 +1337,18 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 					shared.Notify(player, "You Money is maxed!", "Negative");
 					
 				else
-					if playerSave:AddStat("Money", 5000) > 0 then
-						modAnalytics.RecordResource(player.UserId, 5000, "Source", "Money", "Gameplay", "Deconstruct");
-					
+					local DECONSTRUCT_WEAPON_MONEY_REWARD = 5000;
+					if playerSave:AddStat("Money", DECONSTRUCT_WEAPON_MONEY_REWARD) > 0 then
 						modAnalyticsService:Source{
-							Player=player;
-							Currency=modAnalyticsService.Currency.Money;
-							Amount=5000;
-							EndBalance=playerSave:GetStat("Money");
-							ItemSKU="Deconstruct";
+							Player = player;
+							Currency = modAnalyticsService.Currency.Money;
+							Amount = DECONSTRUCT_WEAPON_MONEY_REWARD;
+							EndBalance = playerSave:GetStat("Money");
+							ItemSKU = "Deconstruct";
 						};
 					end
 
-					shared.Notify(player, "You recieved $5000 from deconstructing a level "..levels.." "..itemName..".", "Reward");
+					shared.Notify(player, `You recieved ${DECONSTRUCT_WEAPON_MONEY_REWARD} from deconstructing a level {levels} {itemName}.`, "Reward");
 				
 				end
 				
@@ -1365,7 +1376,7 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 			end
 			
 			userWorkbench:RemoveProcess(index);
-			profile:AddPlayPoints(10, "Gameplay:Workbench");
+			profile:AddPlayPoints(60, "Gameplay:Workbench");
 			return modWorkbenchLibrary.DeconstructModReplies.Success;
 		end
 		

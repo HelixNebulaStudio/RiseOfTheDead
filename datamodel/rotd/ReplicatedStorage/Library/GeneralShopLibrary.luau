@@ -196,6 +196,7 @@ ShopLibrary.Pages = {
 			{Type="Product"; Id="cz75bp"};
 			{Type="Product"; Id="xm1014bp"};
 			{Type="Product"; Id="mp5bp"};
+			{Type="Product"; Id="m9legacybp"};
 		};
 		
 		ModBpPage = {
@@ -213,6 +214,9 @@ ShopLibrary.Pages = {
 			{Type="Product"; Id="greytshirtbp"};
 			{Type="Product"; Id="watchbp"};
 			{Type="Product"; Id="divinggogglesbp"};
+			{Type="Product"; Id="brownbeltbp"};
+			{Type="Product"; Id="scraparmorbp"};
+			{Type="Product"; Id="militarybootsbp"};
 		};
 		
 		AccessoriesPage = {
@@ -355,8 +359,10 @@ ShopLibrary.Products = modLibraryManager.new();
 
 --== Weapon Blueprints;
 ShopLibrary.Products:Add{Id="cz75bp"; Currency="Money"; Price=100;};
-ShopLibrary.Products:Add{Id="xm1014bp"; Currency="Money"; Price=600;};--300
-ShopLibrary.Products:Add{Id="mp5bp"; Currency="Money"; Price=1000;};--900
+ShopLibrary.Products:Add{Id="xm1014bp"; Currency="Money"; Price=600;};
+ShopLibrary.Products:Add{Id="mp5bp"; Currency="Money"; Price=1000;};
+ShopLibrary.Products:Add{Id="m9legacybp"; Currency="Money"; Price=45000;};
+
 
 ShopLibrary.Products:Add{Id="tacticalbowbp"; Currency="Perks"; Price=100;};
 ShopLibrary.Products:Add{Id="vectorxbp"; Currency="Perks"; Price=400;};
@@ -382,6 +388,10 @@ ShopLibrary.Products:Add{Id="fnfal"; Currency="Perks"; Price=2000;};
 ShopLibrary.Products:Add{Id="greytshirtbp"; Currency="Money"; Price=600;};
 ShopLibrary.Products:Add{Id="watchbp"; Currency="Money"; Price=1000;};
 ShopLibrary.Products:Add{Id="divinggogglesbp"; Currency="Money"; Price=3000;};
+
+ShopLibrary.Products:Add{Id="brownbeltbp"; Currency="Perks"; Price=25;};
+ShopLibrary.Products:Add{Id="scraparmorbp"; Currency="Perks"; Price=100;};
+ShopLibrary.Products:Add{Id="militarybootsbp"; Currency="Perks"; Price=100;};
 
 --== Accessories;
 ShopLibrary.Products:Add{Id="binoculars"; Currency="Money"; Price=500;};
@@ -430,8 +440,8 @@ ShopLibrary.Products:Add{Id="woodpackagebp"; Currency="Perks"; Price=200;};
 
 
 --== Misc Blueprints
-ShopLibrary.Products:Add{Id="gunpowderbp"; Currency="Perks"; Price=200;};
-ShopLibrary.Products:Add{Id="ammoboxbp"; Currency="Perks"; Price=200;};
+ShopLibrary.Products:Add{Id="gunpowderbp"; Currency="Perks"; Price=25;};
+ShopLibrary.Products:Add{Id="ammoboxbp"; Currency="Perks"; Price=25;};
 
 ShopLibrary.Products:Add{Id="wantedposter"; Currency="Perks"; Price=25;};
 

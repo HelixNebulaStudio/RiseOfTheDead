@@ -28,7 +28,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 		
 		local newDeconFrame = deconFrameTemplate:Clone();
 		local titleLabel = newDeconFrame:WaitForChild("titleTag");
-		titleLabel.Text = "Deconstruct "..library.Name;
+		titleLabel.Text = `Deconstruct {library.Name}`;
 		
 		local buttonFrame = newDeconFrame:WaitForChild("ButtonFrame");
 		local outcomeList = buttonFrame:WaitForChild("OutcomeFrame"):WaitForChild("List");
@@ -36,9 +36,16 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 		local deconstructButton = buttonFrame:WaitForChild("DeconstructButton");
 		
 		function listMenu:Refresh()
-			perks = modWorkbenchLibrary.CalculatePerksSpent(storageItem, library, binds.IsPremium);
-			outcomeItem.Text = ("• $p Perks"):gsub("$p", perks);
-			outcomeItem.TextColor3 = perks > 0 and Color3.fromRGB(147, 255, 135) or Color3.fromRGB(255, 108, 103);
+			local isMaxed = false;
+			perks, isMaxed = modWorkbenchLibrary.CalculatePerksSpent(storageItem, library, binds.IsPremium);
+			
+			local outcomeList = {};
+
+			table.insert(outcomeList, `<font color="{perks > 0 and "#93ff87" or "#ff6c67"}">• {perks} Perks</font>`);
+			table.insert(outcomeList, `<font color="{isMaxed and "#93ff87" or "#ff6c67"}">• 3 Tweak Points</font>`);
+
+			outcomeItem.Text = table.concat(outcomeList, "\n");
+			outcomeItem.TextColor3 = Color3.fromRGB(255, 255, 255);
 			
 		end
 		listMenu:Refresh();
@@ -55,7 +62,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 			else
 				deconstructButton.Text = modWorkbenchLibrary.DeconstructModReplies[serverReply] or ("Error Code: "..serverReply);
 			end
-			wait(1);
+			task.wait(1);
 			deconstructButton.Text = "Deconstruct";
 			actionButtonDebounce = false;
 		end)

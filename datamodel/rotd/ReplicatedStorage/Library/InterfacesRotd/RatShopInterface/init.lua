@@ -1,6 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
+local TweenService = game:GetService("TweenService");
 
 local localPlayer = game.Players.LocalPlayer;
 
@@ -59,6 +60,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local typesFrame = shopFrame:WaitForChild("ShopTypes");
 	local pageFrame = shopFrame:WaitForChild("PageFrame");
 
+	local pageFrameUIListLayout = pageFrame:WaitForChild("UIListLayout");
+	pageFrameUIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+		task.wait();
+		pageFrame.CanvasSize = UDim2.new(0, 0, 0, pageFrameUIListLayout.AbsoluteContentSize.Y);
+	end)
 
     --MARK: Window
 	local window: InterfaceWindow = interface:NewWindow("RatShopWindow", shopFrame);
@@ -301,6 +307,16 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					titleLabel.Text = itemLib.Name;
 					 
 					local desc = info.Desc or itemLib.Description;
+
+					if itemLib.ProductItemId then
+						local productItemLib = modItemsLibrary:Find(itemLib.ProductItemId);
+						if productItemLib then
+							desc = desc..`\n{productItemLib.Description}`;
+						end
+					end
+					if itemLib.RequireDesc then
+						desc = desc..`\n\n<b>Build Requirements:</b>{itemLib.RequireDesc}`;
+					end
 					
 					local modStackCutoffI = string.find(desc, "EffectTrigger:")
 					if modStackCutoffI then
@@ -309,9 +325,15 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					
 					descLabel.Text = desc;
 
-					priceLabel.Text = product.Currency == "Money" and "$"..modFormatNumber.Beautify(product.Price)
-						or modFormatNumber.Beautify(product.Price).." "..product.Currency;
+					priceLabel.Text = product.Currency == "Money" and `${modFormatNumber.Beautify(product.Price)}`
+						or `{modFormatNumber.Beautify(product.Price)} {product.Currency}`;
 
+					if product.Currency == "Money" then
+						priceLabel.UIStroke.Color = Color3.fromRGB(29, 91, 0);
+					elseif product.Currency == "Perks" then
+						priceLabel.UIStroke.Color = Color3.fromRGB(0, 56, 109);
+					end
+					newListing.UIGradient.Color = ColorSequence.new(priceLabel.UIStroke.Color, Color3.new(0,0,0));
 
 					-- MARK: BuyItem
 					local purchaseDebounce = false;
@@ -981,11 +1003,29 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		newListing.MouseButton1Click:Connect(function()
 			interface:PlayButtonClick();
 		end)
-		newListing.MouseMoved:Connect(function()
-			newListing.BackgroundTransparency = 0.6;
-		end)
-		newListing.MouseLeave:Connect(function()
-			newListing.BackgroundTransparency = 0.8;
+
+		local iconLabel = newListing:WaitForChild("iconButton"):WaitForChild("iconLabel");
+
+		newListing:GetPropertyChangedSignal("GuiState"):Connect(function()
+			if newListing.GuiState == Enum.GuiState.Hover then
+				newListing.BackgroundTransparency = 0.6;
+				TweenService:Create(
+					iconLabel, 
+					TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), 
+					{
+						Size = UDim2.new(1.9, 0, 1.9, 0);
+					}
+				):Play();
+			else
+				newListing.BackgroundTransparency = 0.8;
+				TweenService:Create(
+					iconLabel, 
+					TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), 
+					{
+						Size = UDim2.new(1.7, 0, 1.7, 0);
+					}
+				):Play();
+			end
 		end)
 
 		newListing.Parent = pageFrame;

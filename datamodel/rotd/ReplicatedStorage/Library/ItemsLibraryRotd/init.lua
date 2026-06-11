@@ -217,14 +217,14 @@ function modItemsLibrary.onRequire()
     new(clothingBase, {Id="knightshelmet"; Name="Knight's Helmet"; Icon="rbxassetid://134453328061975"; Tags={"Head";}; Description="The helmet of ser Duncan the big.\n\n<b>[Passive] Helm Overwhelm:</b> When you take armor damage, you heal 10% damage of the damage taken.";});
 
     -- Chest
-    new(clothingBase, {Id="greytshirt"; Name="T-Shirt"; Icon="rbxassetid://5756503297"; Tags={"Chest"}; Description="Comfy T-Shirt. Gives you 1 armor point for protection.";});
+    new(clothingBase, {Id="greytshirt"; Name="T-Shirt"; Icon="rbxassetid://5756503297"; Tags={"Chest"}; Description="Comfy T-Shirt. Gives you <b>1 Armor Point</b> for protection.";});
     new(clothingBase, {Id="xmassweater"; Name="Xmas Sweater"; Tradable=modItemsLibrary.Tradable.Tradable; Icon="rbxassetid://6126020940"; Tags={"Chest"; "Christmas"; "Frostivus"}; Description="Xmas Sweater.";});
     new(clothingBase, {Id="prisonshirt"; Name="Prisoner's Shirt"; Icon="rbxassetid://5627570767"; Tags={"Chest"}; Description="The Prisoner's Shirt.";});
     new(clothingBase, {Id="onyxhoodie"; Name="OnyxHound Hoodie"; Icon="rbxassetid://139334359114467"; Tags={"Chest"}; Description="Rare OnyxHound Hoodie.";});
     new(clothingBase, {Id="labcoat"; Name="Lab Coat"; Icon="rbxassetid://4978200934"; Tags={"Chest"}; Description="Protects you from chemicals and gases.\n\n<b>[Passive] Lab Safety:</b> Gain 100 damage protection only for toxic gas damage. Recharge delay 10s, Recharge rate 5/s.";});
-    new(clothingBase, {Id="plankarmor"; Name="Plank Armor"; Icon="rbxassetid://5765969051"; Tags={"Chest"}; Description="Makeshift wooden plank armor.";});
-    new(clothingBase, {Id="scraparmor"; Name="Scrap Armor"; Icon="rbxassetid://6996766551"; Tags={"Chest"}; Description="Makeshift metal scrap armor.";});
-    new(clothingBase, {Id="highvisjacket"; Name="High Visibility Jacket"; Icon="rbxassetid://8488333823"; Tags={"Chest"}; Description="The high visibility jacket provides warmth and armor points.";});
+    new(clothingBase, {Id="plankarmor"; Name="Plank Armor"; Icon="rbxassetid://5765969051"; Tags={"Chest"}; Description="Makeshift wooden plank armor, providing <b>Armor Points</b> and <b>Bullet Protection</b>.";});
+    new(clothingBase, {Id="scraparmor"; Name="Scrap Armor"; Icon="rbxassetid://6996766551"; Tags={"Chest"}; Description="Makeshift metal scrap armor, providing <b>Armor Points</b> and <b>Bullet Protection</b>.";});
+    new(clothingBase, {Id="highvisjacket"; Name="High Visibility Jacket"; Icon="rbxassetid://8488333823"; Tags={"Chest"}; Description="The high visibility jacket providing <b>Warmth</b> and <b>Armor Points</b>.";});
     new(clothingBase, {Id="nekrostrench"; Name="Nekros Trench Coat"; Icon="rbxassetid://14423236705"; Tags={"Chest"}; Description="Trench coat covered in dried Nekron leather, scales and veins.\n\n<b>[Passive] Nekrosis Heal:</b> +2HP/s, The passive will be disabled for 15s if you take any damage.";});
     new(clothingBase, {Id="tirearmor"; Name="Tire Armor"; Icon="rbxassetid://16791518600"; Tags={"Chest"}; Description="Tire armor, made with tires.\n\n<b>[Passive] Melee Dampening:</b> When equipping a melee, grants a chance to block damage from melee attacks. Reduced damage minimum capped at 1.";});
     new(clothingBase, {Id="apron"; Name="Apron"; Icon="rbxassetid://17381982100"; Tags={"Chest"}; Description="The butcher's apron.\n\n<b>[Passive] Splash Reflect:</b> Splash effects from enemies are reflected by 200%, Ticks' detonation does twice the damage and stun duration to surrounding enemies.";});
@@ -248,7 +248,7 @@ function modItemsLibrary.onRequire()
 
     -- Misc Wear
     new(clothingBase, {Id="brownbelt"; Name="Tactical Belt"; Icon="rbxassetid://4789684750"; Tags={"Belt"; "Utility Wear";}; Description="A tactical belt. Adds an extra hot bar slot.";});
-    new(clothingBase, {Id="watch"; Name="Watch"; Icon="rbxassetid://6306934431"; Tags={"Utility Wear";}; Description="Tick-tock-tick-tock. Tells the time.";});
+    new(clothingBase, {Id="watch"; Name="Watch"; Icon="rbxassetid://6306934431"; Tags={"Utility Wear";}; Description="Tick-tock-tick-tock. Tells the time on your hud.";});
     new(clothingBase, {Id="divingsuit"; Name="Diving Suit"; Icon="rbxassetid://10342826622"; Tags={"FullBody"; "Diving Gear"; "Utility Wear";}; Description="Reduces oxygen cost while being underwater and increases oxygen restore rate.";});
     new(clothingBase, {Id="inflatablebuoy"; Name="Inflatable Buoy"; Icon="rbxassetid://10393385339"; Tags={"Utility Wear";}; Description="Helps you float to the top when swimming.";});
     new(clothingBase, {Id="mercskneepads"; Name="Merc's Knee Pads"; Icon="rbxassetid://11026588384"; Tags={"Utility Wear"}; Description="A mercenary's favourite holster and knee pads, tactical holster reducing <b>Equip Time</b>.";});

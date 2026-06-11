@@ -790,18 +790,18 @@ function BlueprintLibrary.onRequire()
 	};
 
 	BlueprintLibrary.New{
-		Id="m9legacybp";
-		Name="M9 Legacy Blueprint";
-		Product="m9legacy";
-		Duration=daySec;
-		SellPrice=1600;
-		Requirements={
+		Id = "m9legacybp";
+		Name = "M9 Legacy Blueprint";
+		Product = "m9legacy";
+		Duration = daySec;
+		SellPrice = 1600;
+		Requirements = {
 			{Type="Stat"; Name="Money"; Amount=20000;};
 			{Type="Stat"; Name="Perks"; Amount=20;};
 			{Type="Stat"; Name="Level"; Amount=60;};
 			{Type="Item"; ItemId="metal"; Amount=80;};
 		};
-		Category="Weapons";
+		Category = "Weapons";
 	};
 
 	BlueprintLibrary.New{
@@ -1762,17 +1762,18 @@ function BlueprintLibrary.New(data)
 		library[data.Id].CanUnlock = false;
 	end
 	
-	local productLib = modItemsLibrary:Find(data.Product);
+	local productItemId = data.Product;
+	local productLib = modItemsLibrary:Find(productItemId);
 	while productLib == nil do
 		task.wait(1);
-		productLib = modItemsLibrary:Find(data.Product);
+		productLib = modItemsLibrary:Find(productItemId);
 		if productLib == nil then
-			Debugger:Warn("Waiting for product (",data.Product,") from bp:", data.Id);
+			Debugger:Warn("Waiting for product (",productItemId,") from bp:", data.Id);
 			Debugger:Warn("find ",modItemsLibrary.Library:GetKeys())
 		end
 	end
 	if productLib == nil then
-		error("BlueprintLibrary>>  Blueprint ID ("..data.Id..") has a unknown product ("..data.Product..").");
+		error("BlueprintLibrary>>  Blueprint ID ("..data.Id..") has a unknown product ("..productItemId..").");
 	end
 	BlueprintLibrary.Identifiers[data.Name] = data.Id;
 	local desc = "Used to build "..productLib.Name..(data.Type == modItemsLibrary.Types.Mod and " Mod" or "").." from the workbench.";
@@ -1812,6 +1813,7 @@ function BlueprintLibrary.New(data)
 		Sources = data.Sources;
 		Tags = data.Tags;
 		RequireDesc = requireDesc;
+		ProductItemId = productItemId;
 		NonPremiumTax = data.TradingTax;
 	});
 end
