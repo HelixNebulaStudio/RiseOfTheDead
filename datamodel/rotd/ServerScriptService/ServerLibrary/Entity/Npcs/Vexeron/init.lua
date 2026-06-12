@@ -369,7 +369,7 @@ function npcPackage.Spawned(npcClass: NpcClass)
             end
 
             if targetPoint then
-                local dist = npcClass:DistanceFromCharacter(targetPoint);
+                local dist = npcClass:DistanceFrom(targetPoint);
                 local lerpIntensity = modMath.MapNum(dist, 0, 400, 0, 1, true);
                 properties.PointTo(targetPoint, lerpIntensity);
             end

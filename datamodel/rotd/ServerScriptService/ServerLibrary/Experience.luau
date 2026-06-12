@@ -29,15 +29,15 @@ function Experience.onRequire()
 			if mission == nil then return end;
 			local missionLib = mission.Library;
 
-			local duration = 60;
+			local duration = 180;
 			
 			if missionLib.Tier then
 				if missionLib.Tier == "Easy" then
-					duration = 60;
+					duration = 180;
 				elseif missionLib.Tier == "Normal" then
-					duration = 150;
-				elseif missionLib.Tier == "Hard" then
 					duration = 300;
+				elseif missionLib.Tier == "Hard" then
+					duration = 600;
 				else
 					duration = 600;
 				end

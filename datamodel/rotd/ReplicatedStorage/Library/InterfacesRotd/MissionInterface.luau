@@ -1054,7 +1054,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					if data.ProgressionPoint > a or data.Type == 3 then --set complete
 						pointColor = Color3.fromRGB(180, 180, 180);
 					elseif data.ProgressionPoint == a then
-						pointColor = Color3.fromRGB(180, 60, 60);
+						pointColor = missionMarkerColor;
 					end
 					
 					local completionBox = newTaskLabel:WaitForChild("CompletionBox");
@@ -1063,8 +1063,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					newTaskLabel.Parent = taskList;
 
 					if checkpointInfo.Objectives then
-						completionBox.BackgroundColor3 = Color3.fromRGB(180, 180, 180);
-						label.Text = `Checkpoint {a}:`;
+						completionBox.BackgroundColor3 = pointColor;
+						label.Text = checkpointInfo.Text or `Checkpoint {a}:`;
 
 						local isCompleted = true;
 						for _, objName in pairs(checkpointInfo.Objectives) do
@@ -1074,7 +1074,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 							local paddingUi = newObjTask:WaitForChild("UIPadding");
 							paddingUi.PaddingLeft = UDim.new(0, 20);
 							local objLabel = newObjTask:WaitForChild("TaskLabel");
-		
+
 							objLabel.Text = loadObjectiveDescription(data, objName, objData);
 		
 							if data.SaveData then
@@ -1103,9 +1103,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 							
 							newObjTask.Parent = taskList;
 						end
-						if isCompleted then
-							completionBox.BackgroundColor3 = Color3.fromRGB(180, 60, 60);
-						end
+						
 					end
 				end
 

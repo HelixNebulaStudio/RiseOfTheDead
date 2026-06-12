@@ -347,7 +347,7 @@ function Coop:Initialize(roomData)
 						for a=1, #self.AlivePlayers do
 							local alivePlayerClass: PlayerClass = self.AlivePlayers[a];
 
-							local dist = npcClass:DistanceFromCharacter(alivePlayerClass:GetCFrame().Position);
+							local dist = npcClass:DistanceFrom(alivePlayerClass:GetCFrame().Position);
 							if dist < closestPlayerDist then
 								closestPlayerDist = dist;
 							end
@@ -473,7 +473,7 @@ function Coop:Initialize(roomData)
 				
 				local removedHorde = 0;
 				for _, npcClass: NpcClass in pairs(self.HordeEnemyClasses) do
-					if npcClass:DistanceFromCharacter(avgPos) <= (Config.SpawnRadius+100) then continue end;
+					if npcClass:DistanceFrom(avgPos) <= (Config.SpawnRadius+100) then continue end;
 
 					npcClass:Destroy();
 					removedHorde = removedHorde +1;

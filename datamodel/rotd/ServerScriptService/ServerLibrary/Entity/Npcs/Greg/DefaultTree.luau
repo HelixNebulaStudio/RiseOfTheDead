@@ -57,7 +57,7 @@ end
 
 function treePackage.Lunch(npcClass: NpcClass)
     local seatPart = workspace.Environment:FindFirstChild(`GregSeat`);
-    if seatPart and not npcClass.Humanoid.Sit and npcClass:DistanceFromCharacter(seatPart.Position) <= 10 then
+    if seatPart and not npcClass.Humanoid.Sit and npcClass:DistanceFrom(seatPart.Position) <= 10 then
         npcClass:Sit(seatPart);
     end
 
@@ -102,7 +102,7 @@ local GREG_CAITLIN_TALK_POS = Vector3.new(-310.98, 63.046, 212.037);
 function treePackage.GoToCaitlin(npcClass: NpcClass)
     local caitlinClass = shared.modNpcs.getByModel(workspace.Entity:FindFirstChild("Caitlin"));
     if caitlinClass then
-        local dist = npcClass:DistanceFromCharacter(caitlinClass.RootPart.Position);
+        local dist = npcClass:DistanceFrom(caitlinClass.RootPart.Position);
 
         if not npcClass.Move:IsAtPosition(GREG_CAITLIN_TALK_POS) then
             npcClass.Move:MoveTo(GREG_CAITLIN_TALK_POS);

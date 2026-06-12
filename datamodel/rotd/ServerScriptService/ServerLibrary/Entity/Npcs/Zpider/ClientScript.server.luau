@@ -95,7 +95,7 @@ raycastParams.FilterDescendantsInstances = {workspace.Environment; workspace.Ter
 
 local STEP_DIST = 4;
 local function onHeartbeat(index)
-	if playerClass:DistanceFromCharacter(rootPart.Position) > 128 then return end;
+	if playerClass:DistanceFrom(rootPart.Position) > 128 then return end;
 
 	local ikData = ikControlData[index or ikCycleIndex];
 	if ikData == nil then

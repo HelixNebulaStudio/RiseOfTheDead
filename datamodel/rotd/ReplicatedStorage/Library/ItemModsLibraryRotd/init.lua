@@ -414,19 +414,19 @@ function library.onRequire()
 	}
 
 	library:Add{
-		Id="shotgunslugmod";
-		Name="Shotgun Slug Rounds";
-		Desc="Increases accuracy by 80% and set multishot to 3 plus an additional <b>Piercing</b>. <b>Damage</b> is rescaled to (Base max multishot)/3.";
-		Icon="http://www.roblox.com/asset/?id=5045673615";
-		BaseTier=1;
-		Tier=1;
-		Stackable=false;
-		Type={"Shotgun"};
-		EffectTrigger=library.EffectTrigger.Passive;
-		Module=script.SlugRounds;
-		Category="Rare Mods";
-		Layer=99;
-		Upgrades={
+		Id = "shotgunslugmod";
+		Name = "Shotgun Slug Rounds";
+		Desc = "Increases accuracy by 80% and set multishot to 3 plus an additional <b>Piercing</b>. <b>Damage</b> is rescaled to (Base max multishot)/3.";
+		Icon = "http://www.roblox.com/asset/?id=5045673615";
+		BaseTier = 1;
+		Tier = 1;
+		Stackable = false;
+		Type = {"Shotgun"};
+		EffectTrigger = library.EffectTrigger.Passive;
+		Module = script.SlugRounds;
+		Category = "Rare Mods";
+		Layer = 99;
+		Upgrades = {
 			{DataTag="P"; Name="Piercing"; Syntax="Add Piercing"; ValueType="Normal"; MaxLevel=1; BaseCost=20; MaxCost=20; BaseValue=0; MaxValue=1; TweakBonus=1; Scaling=library.ScalingStyle.Linear;};
 		};
 	}

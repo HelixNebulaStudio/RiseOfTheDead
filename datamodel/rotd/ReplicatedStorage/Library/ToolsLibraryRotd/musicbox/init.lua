@@ -21,9 +21,9 @@ local toolPackage = {
 	Properties={};
 };
 
-function toolPackage.ActionEvent(handler, packet)
+function toolPackage.ActionEvent(handler: ToolHandlerInstance, packet)
 	local isActive = packet.IsActive;
-	local prefab = handler.Prefabs[1];
+	local prefab = handler.MainToolModel;
 			
 	local music = prefab.PrimaryPart:FindFirstChild("musicBox");
 	if music then
@@ -41,6 +41,15 @@ function toolPackage.ActionEvent(handler, packet)
 		else
 			music:Stop();
 		end
+	end
+end
+
+function toolPackage.ServerUnequip(handler: ToolHandlerInstance)
+	local prefab = handler.MainToolModel;
+	
+	local music = prefab.PrimaryPart:FindFirstChild("musicBox");
+	if music then
+		music:Stop();
 	end
 end
 

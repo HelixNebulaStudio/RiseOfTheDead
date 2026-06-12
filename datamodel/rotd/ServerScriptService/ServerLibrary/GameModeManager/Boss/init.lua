@@ -199,6 +199,7 @@ function GameMode:Start(room)
 					end
 
 					local playerNpcsList = modNpcs.listNpcClasses(function(npcClass: NpcClass)
+						if npcClass.Player == nil then return false; end;
 						return npcClass.Player == player;
 					end)
 					if playerNpcsList then

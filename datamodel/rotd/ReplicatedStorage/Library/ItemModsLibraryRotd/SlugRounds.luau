@@ -29,8 +29,8 @@ function modifierPackage.Update(modifier: ItemModifierInstance)
 	modifier.SetValues.Multishot = 3;
 	modifier.SetValues.InaccuracyReduction = 0.2;
 
-	if math.floor(value) ~= 0 then
-		modifier.MaxValues.Piercing = math.floor(value);
+	if value >= 1 then
+		modifier.SumValues.Piercing = math.floor(value);
 	end
 end
 

@@ -75,6 +75,7 @@ elseif RunService:IsClient() then
 		local targetPart = packet.HitInfo.Part;
 		if targetPart == nil then return end;
 		if targetPart.Name ~= "Head" and targetPart:GetAttribute("IsHead") ~= true then return end;
+		if targetPart.Parent == nil or not targetPart.Parent:HasTag("TargetableEntities") then return end;
 
 		local sbCooldownTick = modifier.Properties.SkullBurstCooldownTick;
 		if sbCooldownTick and tick()-sbCooldownTick <= 0.1 then return end;
