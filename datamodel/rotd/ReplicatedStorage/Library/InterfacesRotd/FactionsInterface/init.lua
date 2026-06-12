@@ -81,7 +81,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	window.CloseWithInteract = true;
 	
 	if modConfigurations.CompactInterface then
-		window:SetClosePosition(UDim2.new(0.5, 0, -1, 0), UDim2.new(0.5, 0, 0, 0));
+		window:SetClosePosition(UDim2.new(0.5, 0, -1, 0), UDim2.new(0.5, 0, 0.5, 0));
 	else
 		window:SetClosePosition(UDim2.new(0.5, 0, -1, 0), UDim2.new(0.5, 0, 0.5, 0));
 	end

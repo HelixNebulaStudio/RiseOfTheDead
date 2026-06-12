@@ -320,6 +320,12 @@ function modGameSave:CalculateLevel()
 				ItemSKU=`LevelMilestone`;
 			};
 		end
+
+		if self.Profile then
+			task.spawn(function()
+				self.Profile:GuiAction("glowquickbutton", "MasteryMenu");
+			end)
+		end
 		remoteHudNotification:FireClient(self.Player, "Levelup", {Level=totalLevels;});
 		
 		self:Sync("Masteries");

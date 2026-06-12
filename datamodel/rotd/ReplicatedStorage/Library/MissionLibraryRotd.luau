@@ -198,6 +198,7 @@ MissionLibrary.New{
 		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Item"; ItemId="pistolfireratebp"; Quantity=1;};
 		{Type="Mission"; Id=6};
+		{Type="Mission"; Id=72};
 	};
 	LinkNextMission = 6;
 	StartRequirements = {
@@ -773,14 +774,14 @@ MissionLibrary.New{
 
 -- MARK: 24 - Missing In Action
 MissionLibrary.New{
-	MissionId=24;
+	MissionId = 24;
 	MissionType = MissionLibrary.MissionTypes.Core;
-	Name="Missing In Action";
-	From="Jane";
-	Description="Robert went missing after leaving the Underbridge safehouse, you need to help search for him.";
-	Persistent=true;
-	World="TheUnderground";
-	Checkpoint={
+	Name = "Missing In Action";
+	From = "Jane";
+	Description = "Robert went missing after leaving the Underbridge safehouse, you need to help search for him.";
+	Persistent = true;
+	World = "TheUnderground";
+	Checkpoint = {
 		{Text="Talk to Lennon in the sewers to ask about Robert";};
 		{Text="Search for clues in the sewers";};
 		{Text="Talk to Carlson about Robert";};
@@ -789,8 +790,8 @@ MissionLibrary.New{
 
 		{Text="Return to Jane";};
 	};
-	GuideText="Talk to Jane to start";
-	Rewards={
+	GuideText = "Talk to Jane to start";
+	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Mission"; Id=13};
@@ -798,18 +799,18 @@ MissionLibrary.New{
 		{Type="Mission"; Id=30};
 		{Type="Mission"; Id=20};
 	};
-	LinkNextMission=30;
-	StartRequirements={
-		Level=13;
+	LinkNextMission = 30;
+	StartRequirements = {
+		Level = 12;
 	};
-	Markers={
+	Markers = {
 		[1]={World="TheUnderground"; Label="Lennon"; Target="Lennon"; Type=modMarkers.MarkerTypes.Npc;};
 		[2]={World="TheUnderground"; Label="Search The Area"; Target=Vector3.new(-80.663, 14.29, -54.408); Type=modMarkers.MarkerTypes.Waypoint;};
 		[3]={World="TheUnderground"; Label="Carlson"; Target="Carlson"; Type=modMarkers.MarkerTypes.Npc;};
 		[4]={World="TheUnderground"; Label="Cave"; Target=Vector3.new(138.553329, 12.2096834, 87.6066055); Type=modMarkers.MarkerTypes.Waypoint;};
 		[6]={World="TheWarehouse"; Label="Jane"; Target="Jane"; Type=modMarkers.MarkerTypes.Npc;};
 	};
-	CanRedo={};
+	CanRedo = {};
 	
 };
 
@@ -954,14 +955,14 @@ MissionLibrary.New{
 
 -- MARK: 30 - Poke The Bear
 MissionLibrary.New{
-	MissionId=30;
+	MissionId = 30;
 	MissionType = MissionLibrary.MissionTypes.Core;
-	Name="Poke The Bear";
-	From="Stan";
-	Description="You encounter another scavenger, he seems to live nearby, he might know something about what happened to Robert.";
-	Persistent=true;
-	World={"TheUnderground", "TheMall"};
-	Checkpoint={
+	Name = "Poke The Bear";
+	From = "Stan";
+	Description = "You encounter another scavenger, he seems to live nearby, he might know something about what happened to Robert.";
+	Persistent = true;
+	World = {"TheUnderground", "TheMall"};
+	Checkpoint = {
 		{Text="Follow Stan";};
 		{Text="Talk to Stan";};
 		{Text="Travel to Wrighton Dale Mall";};
@@ -974,18 +975,18 @@ MissionLibrary.New{
 		{Text="Talk to Stan";};
 		{Text="Follow Stan";};
 	};
-	GuideText="Explore the Train Station";
-	Rewards={
+	GuideText = "Explore the Train Station";
+	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Mission"; Id=33};
 		{Type="Mission"; Id=40;};
 	};
-	LinkNextMission=33;
-	StartRequirements={
-		Level=16;
+	LinkNextMission = 33;
+	StartRequirements = {
+		Level = 14;
 	};
-	Markers={
+	Markers = {
 		[1]={World="TheUnderground"; Label="Stan"; Target="Stan"; Type=modMarkers.MarkerTypes.Npc;};
 		[2]={World="TheUnderground"; Label="Stan"; Target="Stan"; Type=modMarkers.MarkerTypes.Npc;};
 		[3]={World="TheUnderground"; Label="TheMall"; Target="TheMall"; Type=modMarkers.MarkerTypes.Travel;};
@@ -996,7 +997,7 @@ MissionLibrary.New{
 		[8]={World="TheMall"; Label="Patrick"; Target="Patrick"; Type=modMarkers.MarkerTypes.Npc;};
 		[9]={World="TheMall"; Label="Stan"; Target="Stan"; Type=modMarkers.MarkerTypes.Npc;};
 	};
-	CanRedo={};
+	CanRedo = {};
 	
 };
 
@@ -1053,14 +1054,14 @@ MissionLibrary.New{
 
 -- MARK: 33 - Awoken The Bear
 MissionLibrary.New{
-	MissionId=33;
+	MissionId = 33;
 	MissionType = MissionLibrary.MissionTypes.Core;
-	Name="Awoken The Bear";
-	From="Stan";
-	Description="Patrick tells you about how to enter the Bandit Camp.";
-	Persistent=true;
-	World={"TheMall", "AwokenTheBear", "BanditOutpost"};
-	Checkpoint={
+	Name = "Awoken The Bear";
+	From = "Stan";
+	Description = "Patrick tells you about how to enter the Bandit Camp.";
+	Persistent = true;
+	World = {"TheMall", "AwokenTheBear", "BanditOutpost"};
+	Checkpoint = {
 		{Text="Follow Stan";};
 		{Text="Talk to Patrick";};
 		{Text="Enter the secret door and climb into the vent";}; --3
@@ -1078,19 +1079,19 @@ MissionLibrary.New{
 		{Text="Talk to Patrick";}; -- 13
 		{Text="Escape the Bandit Outpost";};
 	};
-	GuideText="Talk to Stan";
-	Rewards={
+	GuideText = "Talk to Stan";
+	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Mission"; Id=54};
 		{Type="Mission"; Id=38};
 		{Type="Mission"; Id=47};
 	};
-	LinkNextMission=38;
-	StartRequirements={
-		Level=20;
+	LinkNextMission = 38;
+	StartRequirements = {
+		Level = 16;
 	};
-	Markers={
+	Markers = {
 		[1]={World="TheMall"; Label="Stan"; Target="Stan"; Type=modMarkers.MarkerTypes.Npc;};
 		[2]={World="TheMall"; Label="Patrick"; Target="Patrick"; Type=modMarkers.MarkerTypes.Npc;};
 		[3]={World="TheMall"; Label="Enter the secret room"; Target=Vector3.new(834.101, 101.01, -713.806); Type=modMarkers.MarkerTypes.Waypoint;};
@@ -1099,7 +1100,7 @@ MissionLibrary.New{
 		[6]={World="AwokenTheBear"; Label="Walk"; Target=Vector3.new(-99.4085159, 194.909668, -36.03228); Type=modMarkers.MarkerTypes.Waypoint;};
 		[14]={World="BanditOutpost"; Label="Exit"; Target=Vector3.new(-20.444, 5.115, 30.344); Type=modMarkers.MarkerTypes.Waypoint;};
 	};
-	CanRedo={};
+	CanRedo = {};
 	
 };
 
@@ -1293,7 +1294,7 @@ MissionLibrary.New{
 	};
 	LinkNextMission = 52;
 	StartRequirements = {
-		Level=25;
+		Level = 18;
 	};
 	Markers = {
 		[1]={World="TheUnderground"; Label="Rachel"; Target="Rachel"; Type=modMarkers.MarkerTypes.Npc;};
@@ -1758,14 +1759,14 @@ MissionLibrary.New{
 
 -- MARK: 52 - The Investigation
 MissionLibrary.New{
-	MissionId=52;
+	MissionId = 52;
 	MissionType = MissionLibrary.MissionTypes.Core;
-	Name="The Investigation";
-	From="Joseph";
-	Description="After finding Robert, something seems to be off about him. Investigate and find out what's going on.";
-	Persistent=true;
-	World={"TheResidentials"; "TheInvestigation"; "TheMall"};
-	Progression={
+	Name = "The Investigation";
+	From = "Joseph";
+	Description = "After finding Robert, something seems to be off about him. Investigate and find out what's going on.";
+	Persistent = true;
+	World = {"TheResidentials"; "TheInvestigation"; "TheMall"};
+	Progression = {
 		"Talk to Nate";
 		"Talk to Robert";
 		"Lure Robert into the basement to trap him";
@@ -1785,12 +1786,12 @@ MissionLibrary.New{
 		"Head to the clinic safehouse";
 		
 		"Convince Molly to help Joseph";
-		"Give Molly an Advance Medkit";
+		"Give Molly an Advance Medkit"; --17
 		"Molly heals Joseph";
 		"Talk to Joseph";
 	};
-	GuideText="Talk to Joseph";
-	Rewards={
+	GuideText = "Talk to Joseph";
+	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Mission"; Id=37};
@@ -1798,8 +1799,11 @@ MissionLibrary.New{
 		{Type="Mission"; Id=51};
 		{Type="Mission"; Id=56};
 	};
-	LinkNextMission=56;
-	Markers={
+	LinkNextMission = 56;
+	StartRequirements = {
+		Level = 20;
+	};
+	Markers = {
 		[1]={World="TheResidentials"; Label="Nate"; Target="Nate"; Type=modMarkers.MarkerTypes.Npc;};
 		[2]={World="TheResidentials"; Label="Robert"; Target="Robert"; Type=modMarkers.MarkerTypes.Npc;};
 		[3]={World="TheResidentials"; Label="Basement"; Target=Vector3.new(1169.292, 50.515, -137.749); Type=modMarkers.MarkerTypes.Waypoint;};
@@ -1808,7 +1812,7 @@ MissionLibrary.New{
 		[16]={World="TheMall"; Label="Molly"; Target="Molly"; Type=modMarkers.MarkerTypes.Npc;};
 		[17]={World="TheMall"; Label="Molly"; Target="Molly"; Type=modMarkers.MarkerTypes.Npc;};
 	};
-	CanRedo={};
+	CanRedo = {};
 	
 };
 
@@ -1919,14 +1923,14 @@ MissionLibrary.New{
 
 -- MARK: 56 - End Of The Line
 MissionLibrary.New{
-	MissionId=56;
+	MissionId = 56;
 	MissionType = MissionLibrary.MissionTypes.Core;
-	Name="End Of The Line";
-	From="Joseph";
-	Description="Ah, here we go again.. Chasing after Robert.";
-	Persistent=true;
-	World={"TheResidentials"; "Genesis"};
-	Checkpoint={
+	Name = "End Of The Line";
+	From = "Joseph";
+	Description = "Ah, here we go again.. Chasing after Robert.";
+	Persistent = true;
+	World = {"TheResidentials"; "Genesis"};
+	Checkpoint = {
 		{Text="Go back to the basement";};
 		{Text="Figure out where Robert went";};
 		{Text="Enter Genesis";};
@@ -1935,20 +1939,23 @@ MissionLibrary.New{
 		
 		{Text="Complete Genesis";};
 	};
-	GuideText="Talk to Joseph";
-	Rewards={
+	GuideText = "Talk to Joseph";
+	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Mission"; Id=58};
 		{Type="Mission"; Id=77};
 	};
-	LinkNextMission=58;
-	Markers={
+	LinkNextMission = 58;
+	StartRequirements = {
+		Level = 22;
+	};
+	Markers = {
 		[1]={World="TheResidentials"; Label="Basement"; Target=Vector3.new(1169.292, 50.515, -137.749); Type=modMarkers.MarkerTypes.Waypoint;};
 		[2]={World="TheResidentials"; Label="Enter"; Target=Vector3.new(1060.251, -20.875, -126.729); Type=modMarkers.MarkerTypes.Waypoint;};
 		
 	};
-	CanRedo={};
+	CanRedo = {};
 	
 };
 
@@ -1983,14 +1990,14 @@ MissionLibrary.New{
 
 -- MARK: 58 - Double Cross
 MissionLibrary.New{
-	MissionId=58;
+	MissionId = 58;
 	MissionType = MissionLibrary.MissionTypes.Core;
-	Name="Double Cross";
-	From="Patrick";
-	Description="Patrick has some bad news";
-	Persistent=true;
-	World={"TheHarbor"; "DoubleCross"; "Safehome"};
-	Checkpoint={
+	Name = "Double Cross";
+	From = "Patrick";
+	Description = "Patrick has some bad news";
+	Persistent = true;
+	World = {"TheHarbor"; "DoubleCross"; "Safehome"};
+	Checkpoint = {
 		{Text="Talk to Caitlin";};
 		{Text="Waiting for Revas's Response";};
 		{Text="Talk to Caitlin";};
@@ -2014,11 +2021,12 @@ MissionLibrary.New{
 		{Text="Give or heal Patrick with a medkit";};
 		{Text="Talk to Patrick";};
 	};
-	StartRequirements={
-		MissionCompleted={56};
+	StartRequirements = {
+		MissionCompleted = {56};
+		Level = 24;
 	};
-	GuideText="Talk to Patrick";
-	Rewards={
+	GuideText = "Talk to Patrick";
+	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Mission"; Id=62};
@@ -2026,17 +2034,17 @@ MissionLibrary.New{
 		{Type="Mission"; Id=75};
 		{Type="Mission"; Id=81};
 	};
-	Markers={
+	Markers = {
 		[1]={World="TheHarbor"; Label="Caitlin"; Target="Caitlin"; Type=modMarkers.MarkerTypes.Npc;};
 		[4]={World="TheHarbor"; Label="Revas's Office"; Target=Vector3.new(-290.606, 107.853, 243.741); Type=modMarkers.MarkerTypes.Waypoint;};
 		[19]={World="DoubleCross"; Label="Escape Dinghy"; Target=Vector3.new(-43.618, 12.253, -62.908); Type=modMarkers.MarkerTypes.Waypoint;};
 	};
-	CanRedo={};
-	StorylineSplit={
+	CanRedo = {};
+	StorylineSplit = {
 		{Storyline="Rat"; NextId=62; Hint="You chose to pull the lever."; Icon="rbxassetid://18930113603"; Title="Rat"; Color=Color3.fromRGB(67, 58, 84);};
 		{Storyline="Bandit"; NextId=63; Hint="You chose not to pull the lever."; Icon="rbxassetid://18930113293"; Title="Bandit"; Color=Color3.fromRGB(84, 58, 40);};
 	};
-	LinkNextMission=81;
+	LinkNextMission = 81;
 }
 
 
@@ -2506,28 +2514,31 @@ MissionLibrary.New{
 };
 
 
--- MARK: 72 - Weapons Expert
---MissionLibrary.New{
---	MissionId=72;
---	MissionType = MissionLibrary.MissionTypes.Core;
---	Name="Weapons Expert";
---	From="Niko";
---	Description="Niko teaches you how to tweak your weapons.";
---	Persistent=true;
---	Cutscene="Weapons Expert";
---	Checkpoint={
---	};
---	StartRequirements={
---		MissionCompleted={};
---	};
---	GuideText="";
---	Rewards={
---		{Type="Perks"; Amount=PerksReward.Core};
---	};
---	Markers={
---	};
---	CanRedo={};
---};
+-- MARK: 72 - Making Weapons
+MissionLibrary.New{
+	MissionId = 72;
+	MissionType = MissionLibrary.MissionTypes.Side;
+	Name = "Making Weapons";
+	From = "Mason";
+	Description = "Mason teaches you how to make a weapon.";
+	Persistent = true;
+	World = "TheWarehouse";
+	Checkpoint = {
+		{Text="Purchase a CZ75-Auto Pistol Blueprint from the shop";};
+		{Text="Use the Workbench to build the CZ75-Auto Pistol"};
+		{Text="Wait for the CZ75-Auto Pistol to build and collect it"};
+		{Text="Collect the CZ75 pistol from the workbench"; Notify=true;};
+	};
+	GuideText = "Talk to Mason";
+	Rewards = {
+		{Type="Perks"; Amount=PerksReward.Side};
+	};
+	Markers = {
+		[2]={World="TheWarehouse"; Label="Workbench"; Target=Vector3.new(29.8, 60.5, -40.5); Type=modMarkers.MarkerTypes.Waypoint;};
+		[3]={World="TheWarehouse"; Label="Workbench"; Target=Vector3.new(29.8, 60.5, -40.5); Type=modMarkers.MarkerTypes.Waypoint;};
+		[4]={World="TheWarehouse"; Label="Workbench"; Target=Vector3.new(29.8, 60.5, -40.5); Type=modMarkers.MarkerTypes.Waypoint;};
+	};
+};
 
 
 -- MARK: 73 - Deadly Zeniths Strike
@@ -2776,13 +2787,13 @@ MissionLibrary.New{
 
 -- MARK: 81 - Fall of the Living
 MissionLibrary.New{
-	MissionId=81;
+	MissionId = 81;
 	MissionType = MissionLibrary.MissionTypes.Core;
-	Name="Fall of the Living";
-	From="Joseph";
-	Description="Joseph made a deal with the Rats for walkie talkies, but they didn't deliver.";
-	Persistent=true;
-	Checkpoint={
+	Name = "Fall of the Living";
+	From = "Joseph";
+	Description = "Joseph made a deal with the Rats for walkie talkies, but they didn't deliver.";
+	Persistent = true;
+	Checkpoint = {
 		{Text="Talk to Rats at The Harbor";};
 		{Text="Talk to David to learn how to play Fall of the Living";};
 		{Text="Win David in Fall of the Living";};
@@ -2797,20 +2808,21 @@ MissionLibrary.New{
 	};
 	StartRequirements = {
 		MissionCompleted={58};
+		Level = 26;
 	};
-	LinkNextMission=87;
-	SaveData={
-		Flags=0;
-		CooperRematch=0;
+	LinkNextMission = 87;
+	SaveData = {
+		Flags = 0;
+		CooperRematch = 0;
 	};
-	GuideText="Talk to Joseph";
-	Rewards={
+	GuideText = "Talk to Joseph";
+	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Core};
 	};
-	AddRequirements={};
-	Markers={
+	AddRequirements = {};
+	Markers = {
 	};
-	CanRedo={};
+	CanRedo = {};
 	
 };
 
@@ -3079,6 +3091,7 @@ MissionLibrary.New{
 	};
 	StartRequirements = {
 		MissionCompleted={81};
+		Level = 28;
 	};
 	LinkNextMission=88;
 	SaveData = {};

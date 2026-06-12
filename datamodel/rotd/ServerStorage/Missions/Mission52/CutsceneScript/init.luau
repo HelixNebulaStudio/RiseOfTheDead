@@ -15,8 +15,10 @@ local MISSION_ID = 52;
 
 if RunService:IsServer() then
 	modNpcs = shared.modNpcs;
+	modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
 	modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
+	modItemDrops = shared.require(game.ServerScriptService.ServerLibrary.ItemDrops);
 
 	if modBranchConfigurations.IsWorld("TheInvestigation") then
 		shared.modEventService:OnInvoked("Interactables_BindButtonInteract", function(eventPacket: EventPacket, ...)
@@ -70,7 +72,7 @@ return function(CutsceneSequence)
 	local remotes = game.ReplicatedStorage:WaitForChild("Remotes");
 	local remoteSetHeadIcon = remotes:WaitForChild("SetHeadIcon");
 	
-	if modBranchConfigurations.IsWorld("TheResidentials") then
+	if shared.WorldName == "TheResidentials" then
 		local assetTheInvestigation = script:WaitForChild("TheInvestigationAssets");
 		local missionWorldTravel = assetTheInvestigation:WaitForChild("TheInvestigationTravel");
 
@@ -146,7 +148,7 @@ return function(CutsceneSequence)
 		end)
 
 
-	elseif modBranchConfigurations.IsWorld("TheInvestigation") then
+	elseif shared.WorldName == "TheInvestigation" then
 		-- MARK: TheInvestigation
 		local waterBarrels = workspace.Environment:WaitForChild("CutsceneBarrels");
 		local cutsceneWallDestroy = workspace.Environment:WaitForChild("cutsceneWallDestroy");
@@ -869,7 +871,7 @@ return function(CutsceneSequence)
 
 
 
-	elseif modBranchConfigurations.IsWorld("TheMall") then
+	elseif shared.WorldName == "TheMall" then
 		-- MARK: TheMall
 	
 		CutsceneSequence:Initialize(function()
@@ -987,6 +989,20 @@ return function(CutsceneSequence)
 						
 					elseif mission.ProgressionPoint == 17 then
 						
+						if modEvents:GetEvent(player, "mission52_freeadvmedkit") == nil then
+							modEvents:NewEvent(player, {Id="mission52_freeadvmedkit"});
+							
+							task.spawn(function()
+								modItemDrops.spawn{
+									ItemId = "advmedkit";
+									Quantity = 1;
+									SpawnCFrame = CFrame.new(522.847, 99.184, -1168.983) * CFrame.Angles(0, math.rad(22), 0);
+									SharedDrop = true;
+									Players = {player;};
+									DespawnDuration = 300;
+								};
+							end)
+						end
 						
 					elseif mission.ProgressionPoint == 18 then
 						

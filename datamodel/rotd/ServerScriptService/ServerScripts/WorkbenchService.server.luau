@@ -648,7 +648,9 @@ function remotePurchaseUpgrade.OnServerInvoke(player, interactPart, id, dataTag)
 
 				if isCostfulfilled then
 					playerSave:AddStat(currencyType, -upgradeCost);
-					playerSave:AddStat("TweakPoints", -1);
+					if nextIsMaxLevel then
+						playerSave:AddStat("TweakPoints", -1);
+					end
 					
 					storageItem.Values[upgradeInfo.DataTag] = upgradeLevel + 1;
 					if upgradeInfo.SliderTag then

@@ -8,6 +8,7 @@ local localPlayer = game.Players.LocalPlayer;
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
+local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 --== Variables;
@@ -169,7 +170,7 @@ return function(CutsceneSequence)
 			modEvents:NewEvent(player, {Id="hasBeginnerP250"});
 		end);
 		
-
+		local tutorialThreatSense=false;
 		local function OnChanged(firstRun)
 			if mission.Type == 2 then -- OnAvailable
 				modMission:StartMission(player, 2);
@@ -286,6 +287,37 @@ return function(CutsceneSequence)
 						p250StorageItem:SetValues("A", 0);
 						p250StorageItem:Sync({"A"});
 					end
+
+				elseif mission.ProgressionPoint == 9 then
+
+					if not tutorialThreatSense then
+						tutorialThreatSense = true;
+						task.spawn(function()
+							local warehouseEntrancePos = Vector3.new(107.057, 56.915, 5.796);
+							local remoteNpcComponent = modRemotesManager:Get("NpcComponent");
+
+							local coolDownList = {};
+							while mission.ProgressionPoint == 9 do
+								if not game.Players:IsAncestorOf(player) then break; end;
+
+        						local nearbyNpcClasses = shared.modNpcs.Octree:RadiusSearch(warehouseEntrancePos, 50);
+								for a=#nearbyNpcClasses, 1, -1 do
+									local npcClass: NpcClass = nearbyNpcClasses[a];
+									if npcClass.Name ~= "Zombie" then continue end;
+									local zombieChar = npcClass.Character;
+									if coolDownList[zombieChar] and tick() < coolDownList[zombieChar] then continue end;
+									coolDownList[zombieChar] = tick();
+									
+									remoteNpcComponent:FireClient(player, "ThreatSense", "threatsense", zombieChar);
+								end
+								
+								task.wait(3);
+							end
+
+							table.clear(coolDownList);
+						end)
+					end
+
 				end
 				
 			elseif mission.Type == 3 then -- OnComplete

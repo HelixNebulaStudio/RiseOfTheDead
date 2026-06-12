@@ -4,15 +4,13 @@ local RunService = game:GetService("RunService");
 
 local localPlayer = game.Players.LocalPlayer;
 
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
-
-local MISSION_ID = 49;
+local MISSION_ID = 72;
 
 local MissionLogic = {};
 --==
 
 function MissionLogic.onRequire()
-	if shared.WorldName ~= "TheWarehouse" then return end;
+	if shared.WorldName ~= "TheWarehouse" and shared.WorldName ~= "BioXResearch" then return end;
 
 	if RunService:IsServer() then
 		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
@@ -24,45 +22,62 @@ function MissionLogic.onRequire()
 			
 			task.spawn(function()
 				if action ~= "BuyItem" then return end;
-				if packet.ItemId ~= "gps" then return end;
+				if packet.ItemId ~= "cz75bp" then return end;
 		
 				if not modMission:Progress(player, MISSION_ID) then return end;
 
 				modMission:Progress(player, MISSION_ID, function(mission)
-					if mission.ProgressionPoint == 1 then
+					if mission.ProgressionPoint <= 2 then
 						mission.ProgressionPoint = 2;
-					end;
+					end
 				end)
 			end)
 		end)
 
-		shared.modEventService:OnInvoked("Interactables_BindCollectibleInteract", function(eventPacket: EventPacket, ...)
-			local player: Player? = eventPacket.Player;
+		shared.modEventService:OnInvoked("WorkbenchService_BindStartBuild", function(eventPacket: EventPacket, ...)
+			local player = eventPacket.Player;
 			if player == nil then return end;
 
-			local interactable: InteractableInstance = ...;
+			local userWorkbench, processPacket = ...;
 
-			if interactable.Id == "vrm" then
+			task.spawn(function()
+				local itemId = processPacket.ItemId;
+				if itemId ~= "cz75bp" then return end;
+				modMission:Progress(player, MISSION_ID, function(mission)
+					if mission.ProgressionPoint <= 3 then
+						mission.ProgressionPoint = 3;
+					end
+				end)
+
+				task.wait(120);
+				if not game.Players:IsAncestorOf(player) then return end;
+				
 				modMission:Progress(player, MISSION_ID, function(mission)
 					if mission.ProgressionPoint <= 4 then
-						mission.ProgressionPoint = 5;
-					end;
+						mission.ProgressionPoint = 4;
+					end
 				end)
-			end
+			end)
+		end)
 		
+		shared.modEventService:OnInvoked("WorkbenchService_BindClaimBuild", function(eventPacket: EventPacket, ...)
+			local player = eventPacket.Player;
+			if player == nil then return end;
+
+			local bpLib = ...;
+
+			task.spawn(function()
+				if bpLib.Product ~= "cz75" then return end;
+				if not modMission:Progress(player, MISSION_ID) then return end
+
+				modMission:CompleteMission(player, MISSION_ID);
+			end)
 		end)
 
 		function MissionLogic.Init(missionProfile, mission)
 			local player = missionProfile.Player;
 			local profile = shared.modProfile:Get(player);
 
-			if mission.Type == 1 then -- OnActive
-				if mission.ProgressionPoint == 4 and profile.Collectibles.vrm == true then
-					modMission:Progress(player, MISSION_ID, function(mission)
-						mission.ProgressionPoint = 5;
-					end)
-				end
-			end
 		end
 
 	elseif RunService:IsClient() then
@@ -84,33 +99,9 @@ function MissionLogic.onRequire()
 			local rootPart = character:WaitForChild("HumanoidRootPart");
 			task.wait(0.5);
 
-			local highlight = modGuiHighlight.Set("MainInterface", "RatShopFrame", "PageFrame", "AccessoriesPage");
-			highlight.Next("MainInterface", "RatShopFrame", "PageFrame", "gps");
+			local highlight = modGuiHighlight.Set("MainInterface", "RatShopFrame", "PageFrame", "WeaponBpPage");
+			highlight.Next("MainInterface", "RatShopFrame", "PageFrame", "cz75bp");
 
-			if modBranchConfigurations.IsWorld("TheWarehouse") then
-				SetWaypoint(modWaypoint.NewWaypoint(rootPart, workspace:WaitForChild("Interactables"):WaitForChild("ShopWaypoint") ));
-			end
-		end
-
-		function MissionLogic.Checkpoint2()
-			task.wait(0.5);
-
-			local highlight = modGuiHighlight.Set("MainInterface", "Inventory", "MainList", "search:gps", "gps");
-			highlight.Next("MainInterface", "GpsInterface", "ScrollingFrame", "w1office");
-			SetWaypoint();
-		end
-
-		function MissionLogic.Checkpoint3()
-			task.wait(0.5);
-
-			local highlight = modGuiHighlight.Set("MainInterface", "Inventory", "MainList", "search:gps", "gps");
-			highlight.Next("MainInterface", "GpsInterface", "ScrollingFrame", "w1office");
-			SetWaypoint();
-		end
-
-		function MissionLogic.Checkpoint4()
-			modGuiHighlight.Set();
-			SetWaypoint();
 		end
 
 		function MissionLogic.Cancel()

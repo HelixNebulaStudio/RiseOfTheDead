@@ -159,14 +159,6 @@ function ShopSystem.onRequire()
                 inventory:Add(itemLib.Id, {Quantity=(productInfo.Amount or 1);}, function(queueEvent, storageItem)
                     shared.Notify(player, "You purchased ".. ((productInfo.Amount or 1) > 1 and productInfo.Amount or "a").." ".. itemLib.Name, "Reward");
                     Debugger:Log("Player (",player.Name,") purchased a",itemLib.Name);
-
-                    if itemLib.Id == "gps" and modMission:Progress(player, 49) then
-                        modMission:Progress(player, 49, function(mission)
-                            if mission.ProgressionPoint == 1 then
-                                mission.ProgressionPoint = 2;
-                            end;
-                        end)
-                    end
                     
                     modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
                 end);
@@ -184,6 +176,11 @@ function ShopSystem.onRequire()
 
             profile:AddPlayPoints(price/300, "Sink:Money");
             modAudio.Play("Purchase", playerClass.Head);
+            
+            shared.modEventService:ServerInvoke("Shop_BindActionEvent", {ReplicateTo={player}}, "BuyItem", {
+                ItemId = itemLib.Id;
+                Cost = price;
+            });
 
             return modShopLibrary.PurchaseReplies.Success;
         else
@@ -485,7 +482,9 @@ function ShopSystem.onRequire()
     function remoteShopService.OnServerInvoke(player, action, ...)
         if remoteShopService:Debounce(player) then return modShopLibrary.PurchaseReplies.TooSoon; end;
         
-        Debugger:Warn(`OnServerInvoke>>`, player, action, ...);
+        if action ~= "iteminfo" then
+            Debugger:Log(`OnServerInvoke>>`, player, action, ...);
+        end
         local handler = ShopActionHandlers[action];
         if handler then
             return handler(player, ...);

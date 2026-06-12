@@ -196,7 +196,7 @@ return function(CutsceneSequence)
 						masonNpcClass.Move:MoveTo(Vector3.new(92.12, 57.62, 66.21));
 
 						local region = Region3.new(Vector3.new(58.35, 56.65, -63.15), Vector3.new(110.45, 61.75, 69.95));
-						local targets = workspace:FindPartsInRegion3WithWhiteList(region, CollectionService:GetTagged("SpawnerRootParts"), 16);
+						local targets = workspace:FindPartsInRegion3WithWhiteList(region, CollectionService:GetTagged("TargetableEntities"), 16);
 						local timeout = tick();
 
 						local targetList = {};

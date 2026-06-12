@@ -30,7 +30,6 @@ function WorldCore.onRequire()
         
         local doorInteractConfig = newRevasDoor:FindFirstChild("Interactable");
         local doorInteractable: InteractableInstance = modInteractables.getOrNew(doorInteractConfig);
-        doorInteractable:SetPermissions("CanInteract", false);
         
         modReplicationManager.ReplicateOut({player}, newRevasDoor);
 

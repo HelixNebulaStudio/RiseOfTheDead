@@ -312,8 +312,7 @@ return function(CutsceneSequence)
 						local revasDoor = modReplicationManager.getReplicated(player, "RevasDoorway")[1];
 
 						local doorInteractConfig = revasDoor:FindFirstChild("Interactable");
-						local doorInteractable: InteractableInstance = modInteractables.getOrNew(doorInteractConfig);
-						doorInteractable:SetUserPermissions(player.Name, "CanInteract", true);
+						doorInteractConfig:SetAttribute("Locked", false);
 
 						revasNpcClass:ToggleInteractable(false);
 						

@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local MissionLogic = {};
 
 local RunService = game:GetService("RunService");
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+
 local modConfigurations = shared.require(game.ReplicatedStorage.Library:WaitForChild("Configurations"));
 local modSyncTime = shared.require(game.ReplicatedStorage.Library:WaitForChild("SyncTime"));
 local modGuiHighlight = shared.require(game.ReplicatedStorage.Library.UI.GuiHighlight);

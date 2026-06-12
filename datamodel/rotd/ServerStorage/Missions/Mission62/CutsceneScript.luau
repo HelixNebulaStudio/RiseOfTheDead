@@ -32,7 +32,7 @@ return function(CutsceneSequence)
 	
 
 	-- MARK: TheHarbor
-	if modBranchConfigurations.IsWorld("TheHarbor") then
+	if shared.WorldName == "TheHarbor" then
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
 			local player: Player = players[1];
@@ -56,8 +56,7 @@ return function(CutsceneSequence)
 						local revasDoor = modReplicationManager.getReplicated(player, "RevasDoorway")[1];
 
 						local revasDoorInteractConfig = revasDoor:FindFirstChild("Interactable");
-						local revasDoorInteractable: InteractableInstance = modInteractables.getOrNew(revasDoorInteractConfig);
-						revasDoorInteractable:SetPermissions("CanInteract", true);
+						revasDoorInteractConfig:SetAttribute("Locked", false);
 						
 						revasNpcClass.PlayAnimation("foldbackhands");
 						revasNpcClass:SetCFrame(CFrame.new(-299.5242, 105.296021, 296.464844, -1, 0, 0, 0, 1, 0, 0, 0, -1));
@@ -71,7 +70,7 @@ return function(CutsceneSequence)
 
 
 	-- MARK: SectorE
-	elseif modBranchConfigurations.IsWorld("SectorE") then
+	elseif shared.WorldName == "SectorE" then
 		
 
 		CutsceneSequence:NewScene("enableInterfaces", function()

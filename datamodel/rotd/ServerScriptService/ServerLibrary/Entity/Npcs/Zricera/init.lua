@@ -49,7 +49,6 @@ local npcPackage = {
         "BodyDestructibles";
         "ZombieBasicMeleeAttack";
         "ThrowTarget";
-        "RbxConfigSync";
     };
     AddBehaviorTrees = {
         "ZombieBossDefaultTree";
@@ -103,15 +102,6 @@ function npcPackage.Spawning(npcClass: NpcClass)
     if isHard == true then
         lvlHealth = 1200300;
     end
-
-    npcClass:GetComponent("RbxConfigSync")(function(configDict)
-        if configDict.MaxHealth then
-            lvlHealth = configDict.MaxHealth;
-        end
-        if configDict.MaxDamage then
-            configurations.BaseValues.MaxDamage = configDict.MaxDamage;
-        end
-    end)
 
     Debugger:Warn("MaxHealth", lvlHealth);
     Debugger:Warn("MaxDamage", configurations.BaseValues.MaxDamage);
