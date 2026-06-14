@@ -17,7 +17,7 @@ local treePackage = {
         RangeTree = "CanFireGun & (RunToFireRange & [FireGun]) | (RunToCover & [ReloadGun])";
 
         IdleTree = "SelfHealTree | [RandomFollow]";
-        SelfHealTree = "IsHurt & [SelfHeal]";
+        SelfHealTree = "IsHurt & & CanHeal [SelfHeal]";
 
         TransformLargeTree = "ShouldTransformLarge & [TransformLarge]";
         InLargeTree = "IsLargePathoroth & (ChargeTree | ZombieDefaultTree)";
@@ -519,6 +519,14 @@ function treePackage.IsHurt(npcClass: NpcClass)
     return isHurt;
 end
 
+function treePackage.CanHeal(npcClass: NpcClass)
+    local properties = npcClass.Properties;
+
+    if properties.HealCooldown and tick() < properties.HealCooldown then return false; end;
+
+    return true;
+end
+
 function treePackage.SelfHeal(npcClass: NpcClass)
     local properties = npcClass.Properties;
     properties.IsHealing = tick();
@@ -533,6 +541,7 @@ function treePackage.SelfHeal(npcClass: NpcClass)
         
     elseif wieldComp.EquipmentClass.ItemId == "medkit" then
         wieldComp:InvokeToolAction("UseRequest");
+        properties.HealCooldown = tick() + math.random(10, 20);
     end
 end
 

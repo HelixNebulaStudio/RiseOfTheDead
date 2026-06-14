@@ -7,6 +7,7 @@ local BuildAdTimeSkipPackage = {
 
 function BuildAdTimeSkipPackage.ProcessReceipt(player: Player, receiptInfo)
     Debugger:Warn(`Process receiptInfo {receiptInfo}`);
+    return Enum.ProductPurchaseDecision.PurchaseGranted;
 end
 
 return BuildAdTimeSkipPackage;

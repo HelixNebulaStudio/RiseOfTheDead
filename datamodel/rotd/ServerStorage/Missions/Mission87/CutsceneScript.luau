@@ -128,6 +128,7 @@ return function(CutsceneSequence)
 				Name = "Joseph";
 				Player = player;
 				CFrame = spawnCf;
+				ReplicateOut = shared.WorldName == "TheResidentials" or shared.WorldName == "TheHarbor";
 			};
 			if josephClass == nil then return end;
 
@@ -162,6 +163,7 @@ return function(CutsceneSequence)
 				Name = "Caitlin";
 				Player = player;
 				CFrame = spawnCf;
+				ReplicateOut = shared.WorldName == "TheResidentials" or shared.WorldName == "TheHarbor";
 			};
 			if caitlinClass == nil then return end;
 

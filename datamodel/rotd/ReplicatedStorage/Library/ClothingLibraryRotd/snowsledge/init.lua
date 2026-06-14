@@ -6,7 +6,7 @@ local attirePackage = {
 	
 	GroupName="UnoverlappableGroup";
 	
-	VehicleWearAnimationId="rbxassetid://112890221559544";
+	VehicleWearAnimationId="rbxassetid://86177342057642";
 
 	Configurations={
 		HasFlinchProtection = true;

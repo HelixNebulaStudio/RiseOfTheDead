@@ -11,7 +11,7 @@ Dialogues.InitStrings = {
 		Reply="Survival of the fittest.. I think I'm pretty fit for this economy..";
 	};
 	["init2"]={
-		Reply="Arrr, like clockworks..";
+		Reply="Arrr, like clockwork..";
 	};
 	["init3"]={
 		Reply="Supply and demand, that's me in the flesh.";

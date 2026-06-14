@@ -346,6 +346,7 @@ local WORLDS = {
     --MARK: Cutscenes;
     TheBeginning = {
         DisplayName = "W.D. Bridge";
+        Icon = "rbxassetid://130814951913643";
         PlaceIds = {
             [LEGACY_GAME_ID] = 464351538;
             [LIVE_GAME_ID] = 464351538;

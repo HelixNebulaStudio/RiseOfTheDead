@@ -1184,7 +1184,7 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 			if itemLib.Type == modItemsLibrary.Types.Mod and modLib then
 				local perks, isMaxed = modWorkbenchLibrary.CalculatePerksSpent(storageItem, modLib, profile.Premium);
 				inventory:Remove(storageItemId, 1, function()
-					shared.Notify(player, string.gsub("$Item removed from your Inventory.", "$Item", storageItem.CustomName), "Negative");
+					shared.Notify(player, `{storageItem.CustomName or itemLib.Name} removed from your Inventory.`, "Negative");
 				end);
 				
 				local duration = workspace:GetServerTimeNow() + shared.Const.Hour;
