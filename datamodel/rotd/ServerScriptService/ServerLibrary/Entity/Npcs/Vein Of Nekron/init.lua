@@ -18,6 +18,7 @@ local npcPackage = {
         IsHostile = true;
         SkipMoveInit = true;
         HordeAggression = true;
+		Detectable = false;
 
         TargetableDistance = 512;
 

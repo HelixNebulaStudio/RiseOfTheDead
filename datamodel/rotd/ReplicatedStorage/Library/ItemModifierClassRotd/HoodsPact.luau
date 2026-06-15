@@ -35,6 +35,9 @@ function modifierPackage.onRequire()
 			Name = "Cultist";
 			CFrame = characterClass:GetCFrame();
 			Player = characterClass.ClassName == "PlayerClass" and (characterClass :: PlayerClass):GetInstance() or nil;
+			Properties = {
+				Detectable = false;
+			};
 			BindSetup = function(npcClass: NpcClass)
 				npcClass.HealthComp:SetCanBeHurtBy("!Player");
 

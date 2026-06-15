@@ -39,13 +39,71 @@ local npcPackage = {
     };
     
     RoutineSchedules = {
-        -- NpcRoutineData.new{
-        --     WorldId = "TheHarbor";
-        --     ClockTime = 2;
-        --     Actions = {
-        --         {Run="Sleep"; CFrame=CFrame.new(-365.327, 63.046, 202.4) * CFrame.Angles(0, math.rad(167), 0);};
-        --     };
-        -- };
+        NpcRoutineData.new{
+            WorldId = "TheResidentials";
+            ClockTime = 2;
+            Actions = {
+                {Run="Sleep"; CFrame=CFrame.new(1267.061, 60.666, 77.769) * CFrame.Angles(0, math.rad(90), 0);};
+            };
+        };
+        NpcRoutineData.new{
+            WorldId = "TheResidentials";
+            ClockTime = 9.5;
+            Actions = {
+                {Run="SetCFrame"; CFrame=CFrame.new(1267.061, 60.666, 77.769) * CFrame.Angles(0, math.rad(90), 0);};
+                {Run="WakeUp";};
+            };
+        };
+
+        
+        NpcRoutineData.new{
+            WorldId = "TheResidentials";
+            ClockTime = 10;
+            Actions = {
+                {CFrame=CFrame.new(1225.898, 57.81, -69.65) * CFrame.Angles(0, math.rad(90), 0);};
+            };
+        };
+        NpcRoutineData.new{
+            WorldId = "TheResidentials";
+            ClockTime = 12.5;
+            Actions = {
+                {CFrame=CFrame.new(1287.713, 56.81, -56.132) * CFrame.Angles(0, math.rad(90), 0);};
+                {Run="Emote"; Ids={"LeanOverInspect"}};
+            };
+        };
+        NpcRoutineData.new{
+            WorldId = "TheResidentials";
+            ClockTime = 15.5;
+            Actions = {
+                {CFrame=CFrame.new(1271.89, 57.839, -72.163) * CFrame.Angles(0, math.rad(-90), 0);};
+                {Run="Emote"; Ids={"LeanOverInspect"}};
+            };
+        };
+        NpcRoutineData.new{
+            WorldId = "TheResidentials";
+            ClockTime = 18.5;
+            Actions = {
+                {CFrame=CFrame.new(1255.481, 57.839, -49.549) * CFrame.Angles(0, math.rad(0), 0);};
+                {Run="Emote"; Ids={"LeanOverInspect"}};
+            };
+        };
+        NpcRoutineData.new{
+            WorldId = "TheResidentials";
+            ClockTime = 20.5;
+            Actions = {
+                {CFrame=CFrame.new(1246.618, 57.839, -74.98) * CFrame.Angles(0, math.rad(90), 0);};
+                {Run="Emote"; Ids={"LeanOverInspect"}};
+            };
+        };
+
+        
+        NpcRoutineData.new{
+            WorldId = "TheResidentials";
+            ClockTime = 23.5;
+            Actions = {
+                {CFrame=CFrame.new(1225.898, 57.81, -69.65) * CFrame.Angles(0, math.rad(90), 0);};
+            };
+        };
     };
 };
 

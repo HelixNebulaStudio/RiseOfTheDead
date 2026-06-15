@@ -29,7 +29,7 @@ if RunService:IsServer() then
 					if mission.ProgressionPoint < 9 then 
 						mission.ProgressionPoint = 9;
 
-					elseif mission.ProgressionPoint < 19 then
+					elseif mission.ProgressionPoint >= 16 and mission.ProgressionPoint < 19 then
 						mission.ProgressionPoint = 19;
 
 					end;
@@ -37,14 +37,14 @@ if RunService:IsServer() then
 
 			elseif interactable.Id == "libraryStaffDoor" then
 				modMission:Progress(player, MISSION_ID, function(mission)
-					if mission.ProgressionPoint <= 15 then
+					if mission.ProgressionPoint >= 14 and mission.ProgressionPoint <= 15 then
 						mission.ProgressionPoint = 15;
 					end
 				end)
 
 			elseif interactable.Id == "libraryStaffDoorExit" then
 				modMission:Progress(player, MISSION_ID, function(mission)
-					if mission.ProgressionPoint <= 18 then
+					if mission.ProgressionPoint >= 16 and mission.ProgressionPoint <= 18 then
 						mission.ProgressionPoint = 18;
 					end
 				end)
@@ -128,6 +128,9 @@ return function(CutsceneSequence)
 				Name = "Joseph";
 				Player = player;
 				CFrame = spawnCf;
+				Properties = {
+					CutsceneActive = true;
+				};
 				ReplicateOut = shared.WorldName == "TheResidentials" or shared.WorldName == "TheHarbor";
 			};
 			if josephClass == nil then return end;
@@ -163,6 +166,9 @@ return function(CutsceneSequence)
 				Name = "Caitlin";
 				Player = player;
 				CFrame = spawnCf;
+				Properties = {
+					CutsceneActive = true;
+				};
 				ReplicateOut = shared.WorldName == "TheResidentials" or shared.WorldName == "TheHarbor";
 			};
 			if caitlinClass == nil then return end;
@@ -175,6 +181,9 @@ return function(CutsceneSequence)
 
 		if shared.WorldName == "TheHarbor" then
 			caitlinClass = modNpcs.getByModel(workspace.Entity:FindFirstChild("Caitlin"));
+
+		elseif shared.WorldName == "TheResidentials" then
+
 		end
 
 		local pp11Active = false;
@@ -188,6 +197,13 @@ return function(CutsceneSequence)
 			end
 
 			if shared.WorldName == "TheResidentials" then
+				if firstRun then
+					if mission.ProgressionPoint > 10 and mission.ProgressionPoint <= 12 then
+						modMission:Progress(player, MISSION_ID, function(mission)
+							mission.ProgressionPoint = 10;
+						end)
+					end
+				end
 
 			elseif shared.WorldName == "TheHarbor" then
 				if firstRun then

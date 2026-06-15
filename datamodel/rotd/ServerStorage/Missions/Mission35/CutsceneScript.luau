@@ -3,7 +3,6 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 
 --== Variables;
@@ -36,6 +35,8 @@ return function(CutsceneSequence)
 			if not modMission:Progress(player, MISSION_ID) then continue end;
 
 			modMission:Progress(player, MISSION_ID, function(mission)
+				if shared.WorldName ~= mission.SaveData.Location then return end;
+
 				if mission.ProgressionPoint == 1 then
 					mission.ProgressionPoint = 2;
 
@@ -57,6 +58,8 @@ return function(CutsceneSequence)
 			if not modMission:Progress(player, MISSION_ID) then continue end;
 
 			modMission:Progress(player, MISSION_ID, function(mission)
+				if shared.WorldName ~= mission.SaveData.Location then return end;
+				
 				if mission.ProgressionPoint < 3 then
 					mission.ProgressionPoint = 3;
 				end
@@ -75,6 +78,7 @@ return function(CutsceneSequence)
 				
 				for _, player in pairs(game.Players:GetPlayers()) do
 					shared.Notify(player, triggerPlayer.Name .." has successfully extracted the food package.", "Reward");
+
 					modMission:Progress(player, MISSION_ID, function(mission)
 						if mission.ProgressionPoint == 3 then
 							local curTime = workspace:GetServerTimeNow();

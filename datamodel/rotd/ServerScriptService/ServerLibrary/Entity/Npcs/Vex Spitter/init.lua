@@ -22,6 +22,7 @@ local npcPackage = {
     Properties = {
         IsHostile = true;
         BasicEnemy = true;
+        Detectable = false;
 
         TargetableDistance = 128;
 

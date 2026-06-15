@@ -235,10 +235,14 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 							progressBar.Size = UDim2.new(1, 0, 1, 0);
 							cancelButton.Visible = false;
 							claimButton.Visible = true;
+							adTimeSkipButton.Visible = false;
+
 						else
 							cancelButton.Visible = true;
 							claimButton.Visible = false;
 							timeTag.Text = modSyncTime.ToString(timeLeft > 0 and timeLeft or 0);
+								
+							adTimeSkipButton.Visible = WorkbenchClass.AdIsAvailable;
 						end
 					else
 						titleTag.Text = "Unknown item id: "..data.ItemId;
@@ -276,6 +280,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 							cancelButton.Visible = false;
 							claimButton.Visible = true;
 							skipButton.Visible = false;
+							adTimeSkipButton.Visible = false;
 
 						else
 							cancelButton.Visible = true;
@@ -461,6 +466,10 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 				if rPacket and rPacket.Success then
 					WorkbenchClass.AdIsAvailable = false;
 					WorkbenchClass.LastAdCheck = tick();
+
+				elseif rPacket and rPacket.FailMsg then
+					modClientGuis.promptWarning(rPacket.FailMsg or "Please try again!");
+
 				end
 			end)
 

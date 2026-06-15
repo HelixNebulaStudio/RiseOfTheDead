@@ -3066,10 +3066,10 @@ MissionLibrary.New{
 		{Text="Talk to Joseph waiting at the Rat's Headquarters";};
 		{Text="Head to The Residentials safehouse with Joseph and Caitlin";}; --8
 		{Text="Talk to Caitlin waiting at the Community Safehouse";};
-		{Text="Talk to Caitlin when you are ready to go";};
+		{Text="Talk to Caitlin when you are ready to go";}; --10
 
 		{Text="Follow Caitlin";};
-		{Text="Objectives"; CompleteText="Talk to Caitlin"; Objectives={"PaperBox1"; "PaperBox2"; "PaperBox3";};};
+		{Text="Objectives"; CompleteText="Talk to Caitlin"; Objectives={"PaperBox1"; "PaperBox2"; "PaperBox3";};}; --12
 		{Text="Wait for Caitlin";};
 		{Text="Enter the library backroom";};
 		{Text="Open the box";};

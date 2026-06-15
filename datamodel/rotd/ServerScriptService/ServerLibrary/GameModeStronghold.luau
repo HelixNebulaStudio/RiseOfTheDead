@@ -301,8 +301,11 @@ function Stronghold:Initialize(roomData)
 					end
                 end
 
-				local remining = math.max(0, self.EliminateGoal - self.EliminateCount);
-				if remining > 0 and #self.EnemyClasses <= math.ceil(remining/2) and (self.StartTick and tick()-self.StartTick >= 20) then
+				local remaining = math.max(0, self.EliminateGoal - self.EliminateCount);
+				if remaining > 0 
+				and #self.EnemyClasses <= math.ceil(remaining/2) 
+				and (self.StartTick and tick()-self.StartTick >= 10) then
+					
 					task.spawn(function()
 						local rngPlayer = game.Players:GetPlayers()[math.random(1, #game.Players:GetPlayers())];
 						local rngPlayerClass = shared.modPlayers.get(rngPlayer);
@@ -331,6 +334,9 @@ function Stronghold:Initialize(roomData)
 					end)
 				end
 
+				if remaining <= 0 then
+					self:CompleteRaid();
+				end
 				task.wait(1);
 			end
         end)
@@ -484,8 +490,6 @@ function Stronghold:SpawnEnemy(npcName, paramPacket)
 			self.EnemiesSpawned = self.EnemiesSpawned + 1;
 			local properties: PropertiesVariable<anydict> = npcClass.Properties;
 			
-			table.insert(self.EnemyClasses, npcClass);
-
 			local healthComp: HealthComp = npcClass.HealthComp;
 			healthComp.OnIsDeadChanged:Connect(function(isDead)
 				if not isDead then return end;
@@ -525,6 +529,8 @@ function Stronghold:SpawnEnemy(npcName, paramPacket)
 				end
 			end)
 
+			table.insert(self.EnemyClasses, npcClass);
+
 			if paramPacket.InfTargeting then
 				local targetHandlerComp = npcClass:GetComponent("TargetHandler");
 				if targetHandlerComp then
@@ -538,6 +544,9 @@ function Stronghold:SpawnEnemy(npcName, paramPacket)
 end
 
 function Stronghold:CompleteRaid()
+	if self.Status ~= EnumStatus.InProgress then return end;
+	self.Status = EnumStatus.Completed;
+
 	workspace:SetAttribute("GameModeComplete", true);
 
 	local runTimeStr = "";
@@ -548,7 +557,6 @@ function Stronghold:CompleteRaid()
 		runTimeStr = ` Run time: {modSyncTime.FormatMs(timeLapse *1000)}!`;
 	end
 
-	self.Status = EnumStatus.Completed;
 	shared.Notify(game.Players:GetPlayers(), `Raid Complete!{runTimeStr}`, "Positive");
 	self:Hud{
 		Status="Raid Complete!";

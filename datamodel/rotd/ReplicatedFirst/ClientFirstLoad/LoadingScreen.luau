@@ -50,7 +50,7 @@ local WORLDS_INFO_LIBRARY = {
 		Images = {"rbxassetid://5959099674"};
 		HeaderTexts = WD_HEADER;
 		TitleTexts = "The Residentials";
-		DescTexts = "Sounds hope and prosperity fighting the challenges of oppression";
+		DescTexts = "Sounds of hope and prosperity fighting the siren of oppression";
 	};
 	["TheHarbor"] = {
 		Images = {"rbxassetid://7368989503"};

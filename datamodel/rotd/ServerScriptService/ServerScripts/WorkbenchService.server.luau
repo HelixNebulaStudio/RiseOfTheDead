@@ -75,29 +75,34 @@ function remoteWorkbenchService.OnServerInvoke(player, action: string, ...)
 		local packet = ...;
 
 		local playerSave = profile:GetActiveSave();
-		local inventory = profile.ActiveInventory;
-		local userBlueprints = playerSave.Blueprints;
 		local userWorkbench = playerSave.Workbench;
 
-		local buildIndex = packet.Index;
-
-		local activeBp = userWorkbench:GetProcess(buildIndex);
+		local processIndex = packet.Index;
+		local activeProcess = userWorkbench:GetProcess(processIndex);
 		
-		if activeBp == nil or activeBp.BT-workspace:GetServerTimeNow() <= 0 then
+		if activeProcess == nil then
 			rPacket.FailMsg = "Invalid process";
 			return rPacket;
 		end
 
-		local itemId = activeBp.ItemId;
-		local bpLib = modBlueprintLibrary.Get(itemId);
+		local timer;
+		if activeProcess.Type ~= playerSave.Workbench.ProcessTypes.Building then
+			timer = activeProcess.T;
+		else
+			timer = activeProcess.BT;
+		end
+		if timer == nil or timer-workspace:GetServerTimeNow() <= 0 then
+			rPacket.FailMsg = "Invalid process";
+			return rPacket;
+		end
 
 		local showAdResult;
 		if not RunService:IsStudio() then
-			local isSuccess = pcall(function()
+			local showSuccessful = pcall(function()
 				local adReward = AdService:CreateAdRewardFromDevProductId(20802461);
 				showAdResult = AdService:ShowRewardedVideoAdAsync(player, adReward);
 			end)
-			if not isSuccess then
+			if not showSuccessful then
 				rPacket.FailMsg = "Could not show Ad";
 				return rPacket;
 			end
@@ -106,10 +111,15 @@ function remoteWorkbenchService.OnServerInvoke(player, action: string, ...)
 		end
 
 		if showAdResult == Enum.ShowAdResult.ShowCompleted then
-			local timeLeft = activeBp.BT-workspace:GetServerTimeNow();
+			local timeLeft = timer-workspace:GetServerTimeNow();
 			Debugger:StudioLog(`adskip timeLeft = {timeLeft}`);
 
-			activeBp.BT = os.time()+ (timeLeft - shared.Const.Hour);
+			if activeProcess.Type == playerSave.Workbench.ProcessTypes.Building then
+			else
+				activeProcess.BT = os.time()+ (timeLeft - shared.Const.Hour);
+			end
+			activeProcess.T = os.time()+ (timeLeft - shared.Const.Hour);
+		
 			userWorkbench:Sync();
 		end
 		
@@ -169,7 +179,7 @@ function CheckBlueprintCost(player, bpId)
 		if #fulfillment < #requirements then
 			for a=0, 5, 0.5 do
 				if done then break; end;
-				wait(0.5);
+				task.wait(0.5);
 			end
 		end;
 		return fulfillment;
@@ -308,6 +318,7 @@ function remoteBlueprintHandler.OnServerInvoke(player, action, packet)
 			Type = userWorkbench.ProcessTypes.Building;
 			ItemId = itemId;
 			BT = workspace:GetServerTimeNow() + buildDuration;
+			T = workspace:GetServerTimeNow() + buildDuration;
 			Blueprint = bpStorageItem ~= nil;
 
 			PlayProcessSound = true;
@@ -697,8 +708,8 @@ function remotePurchaseUpgrade.OnServerInvoke(player, interactPart, id, dataTag)
 		end
 	end
 	
-	debounceCache[player.Name]=nil;
-	spawn(function() clearDebounceCaches() end);
+	debounceCache[player.Name] = nil;
+	task.spawn(function() clearDebounceCaches() end);
 	return;
 end
 
