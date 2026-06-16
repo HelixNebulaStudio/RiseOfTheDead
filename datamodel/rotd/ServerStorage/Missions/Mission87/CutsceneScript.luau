@@ -230,7 +230,6 @@ return function(CutsceneSequence)
 					end
 
 					josephClass:ToggleInteractable(false);
-					josephClass.Properties.CutsceneActive = true;
 					josephClass.Properties.CutsceneWalkTo = Vector3.new(1127.235, 56.218, 113.167);
 					josephClass.Move.OnMoveToEnded:Wait(15);
 
@@ -313,8 +312,6 @@ return function(CutsceneSequence)
 				elseif mission.ProgressionPoint == 9 then
 					spawnLocalCaitlinClass();
 
-					caitlinClass.Properties.CutsceneActive = true;
-					josephClass.Properties.CutsceneActive = true;
 					josephClass:ToggleInteractable(true);
 					caitlinClass:ToggleInteractable(true);
 
@@ -365,13 +362,15 @@ return function(CutsceneSequence)
 					josephClass.Chat(player, "Yeah, this is it.");
 					josephClass:ToggleInteractable(true);
 					caitlinClass:ToggleInteractable(true);
-					caitlinClass.Properties.CutsceneActive = false;
-					josephClass.Properties.CutsceneActive = false;
 
 
 				elseif mission.ProgressionPoint == 10 then
 					spawnLocalCaitlinClass();
 
+					if firstRun then
+						josephClass:SetCFrame(CFrame.new(1128.658, 57.66, 14.02) * CFrame.Angles(0, math.rad(180), 0))
+						caitlinClass:SetCFrame(CFrame.new(1137.93, 57.87, 24.89));
+					end
 					caitlinClass.Move:Face(Vector3.new(955.496, 89.461, -17.857));
 					caitlinClass.PlayAnimation("Point");
 
@@ -379,8 +378,6 @@ return function(CutsceneSequence)
 				elseif mission.ProgressionPoint == 11 then
 					spawnLocalCaitlinClass();
 
-					caitlinClass.Properties.CutsceneActive = true;
-					josephClass.Properties.CutsceneActive = true;
 					caitlinClass:ToggleInteractable(false);
 					josephClass:ToggleInteractable(false);
 
@@ -427,8 +424,6 @@ return function(CutsceneSequence)
 					if pp11Active then return end;
 					pp11Active = true;
 
-					caitlinClass.Properties.CutsceneActive = true;
-					josephClass.Properties.CutsceneActive = true;
 					if firstRun then
 						caitlinClass:SetCFrame(CFrame.new(950.263, 56.695, -10.288));
 					end
@@ -555,8 +550,6 @@ return function(CutsceneSequence)
 						josephClass:SetCFrame(CFrame.new(951.116, 57.7, -17.514));
 					end
 
-					caitlinClass.Properties.CutsceneActive = true;
-					josephClass.Properties.CutsceneActive = true;
 					josephClass.Properties.CutsceneLookAt = nil;
 					caitlinClass.Properties.CutsceneLookAt = nil;
 					caitlinClass:ToggleInteractable(false);
@@ -633,8 +626,6 @@ return function(CutsceneSequence)
 
 
 				elseif mission.ProgressionPoint == 16 then
-					caitlinClass.Properties.CutsceneActive = true;
-					josephClass.Properties.CutsceneActive = true;
 					josephClass.Properties.CutsceneLookAt = nil;
 					caitlinClass.Properties.CutsceneLookAt = nil;
 					caitlinClass:ToggleInteractable(false);
@@ -674,8 +665,6 @@ return function(CutsceneSequence)
 					end)
 
 				elseif mission.ProgressionPoint == 18 then
-					caitlinClass.Properties.CutsceneActive = true;
-					josephClass.Properties.CutsceneActive = true;
 					caitlinClass:ToggleInteractable(false);
 					josephClass:ToggleInteractable(false);
 
@@ -712,8 +701,6 @@ return function(CutsceneSequence)
 
 
 				elseif mission.ProgressionPoint == 19 then
-					caitlinClass.Properties.CutsceneActive = true;
-					josephClass.Properties.CutsceneActive = true;
 					caitlinClass:ToggleInteractable(false);
 					josephClass:ToggleInteractable(false);
 					josephClass.Properties.CutsceneWalkTo = nil;
@@ -735,9 +722,7 @@ return function(CutsceneSequence)
 
 
 				elseif mission.ProgressionPoint == 20 then
-					caitlinClass.Properties.CutsceneActive = true;
-					josephClass.Properties.CutsceneActive = true;
-
+					
 					caitlinClass:ToggleInteractable(false);
 					josephClass:ToggleInteractable(false);
 					josephClass:SetCFrame(CFrame.new(1132.459, 57.839, 26.241) * CFrame.Angles(0, math.rad(-90), 0));
@@ -756,11 +741,9 @@ return function(CutsceneSequence)
 					caitlinClass.Properties.CutsceneLookAt = playerClass:GetCFrame().Position;
 
 				elseif mission.ProgressionPoint == 21 then
-					caitlinClass.Properties.CutsceneActive = true;
 					caitlinClass.Properties.CutsceneWalkTo = Vector3.new(1143.839, 57.916, 28.544);
 					caitlinClass.Properties.CutsceneLookAt = playerClass:GetCFrame().Position;
 					
-					josephClass.Properties.CutsceneActive = true;
 					josephClass.Properties.CutsceneWalkTo = nil;
 					josephClass.Properties.CutsceneLookAt = nil;
 					
@@ -778,7 +761,6 @@ return function(CutsceneSequence)
 			elseif shared.WorldName == "TheHarbor" then
 				--MARK: TheHarbor
 				if mission.ProgressionPoint == 2 then
-					josephClass.Properties.CutsceneActive = true;
 					josephClass:ToggleInteractable(false);
 					josephClass:SetCFrame(CFrame.new(-271.475, 40.961, 230.21) * CFrame.Angles(0, math.rad(90), 0));
 					task.wait(0.5);
@@ -847,9 +829,6 @@ return function(CutsceneSequence)
 
 				elseif mission.ProgressionPoint == 4 then
 					spawnLocalCaitlinClass();
-
-					caitlinClass.Properties.CutsceneActive = true;
-					josephClass.Properties.CutsceneActive = true;
 
 					josephClass.Properties.CutsceneWalkTo = nil;
 					caitlinClass.Properties.CutsceneEquip = "mp7";

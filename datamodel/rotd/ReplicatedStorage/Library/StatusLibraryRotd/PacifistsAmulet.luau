@@ -33,16 +33,16 @@ if RunService:IsServer() then
         end
 
         local modifierInstance: ItemModifierInstance? = characterClass.WieldComp:GetOrDefaultItemModifier(mSiid);
-        if modifierInstance == nil or not modifierInstance.Enabled then
-            return;
-        end
 
-        local maxAddAp = modifierInstance.Properties.AddAp;
-        local addAr = modifierInstance.Properties.AddAr;
+        local maxAddAp = modifierInstance and modifierInstance.Properties.AddAp or 0;
+        local addAr = modifierInstance and modifierInstance.Properties.AddAr or 0;
 
         statusClass.Values.MaxArmorOverCharge = (statusClass.Values.MaxArmorOverCharge or 0);
 
-        if maxAddAp <= 0 then
+        if modifierInstance == nil or not modifierInstance.Enabled then
+            shouldRemove = true;
+
+        elseif maxAddAp <= 0 then
             shouldRemove = true;
 
         else

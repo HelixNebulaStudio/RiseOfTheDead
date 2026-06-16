@@ -505,12 +505,14 @@ GameModeLibrary.GameModes={
 			};
 			
 			["Eighth Street"]={
-				WorldId="EighthStreet";
-				ExitSpawn="communitySh";
-				MaxPlayers=6;
-				TitleImage="rbxassetid://13496701772";
-				RewardsId="abandonedbunkercrate";
-				Soundtrack="Soundtrack:Into The Abyss";
+				WorldId = "EighthStreet";
+				ExitSpawn = "communitySh";
+				MaxPlayers = 6;
+				TitleImage = "rbxassetid://13496701772";
+				RewardsId = "abandonedbunkercrate";
+				Soundtrack = "Soundtrack:Into The Abyss";
+
+				WIP = `Suspicious Looking Door`;
 			};
 		};
 	};

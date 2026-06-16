@@ -25,6 +25,10 @@ function Component:Setup()
 		if hc.IsDead then return end;
 
 		local damageBy: CharacterClass? = damageData.DamageBy :: CharacterClass;
+		local ccPlayer = damageBy and (damageBy :: NpcClass).Player;
+		if ccPlayer then
+			damageBy = shared.modPlayers.get(ccPlayer);
+		end
 		if damageBy and damageBy.ClassName == "PlayerClass" then 
 			self(damageBy);
 		end;
@@ -41,7 +45,7 @@ function Component:__call(callerCharacterClass: CharacterClass)
 
 	local healthComp: HealthComp = npcClass.HealthComp;
 	if healthComp.IsDead then return end;
-	if healthComp.CurHealth < healthComp.MaxHealth and properties.Level then return end;
+	if healthComp.CurHealth < healthComp.MaxHealth then return end;
 
 	local npcPackage = npcClass.NpcPackage;
 	local dynamicLevelScaling = npcPackage.DynamicLevelScaling;

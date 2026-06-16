@@ -17,6 +17,9 @@ if RunService:IsServer() then
 		modNpcs.spawn2{
 			Name = "Joseph";
 			CFrame = CFrame.new(-50.208, -16.75, 23.504);
+			Properties = {
+				CutsceneActive = true;
+			};
 		};
 		modNpcs.spawn2{
 			Name = "Cooper";

@@ -2928,17 +2928,17 @@ MissionLibrary.New{
 
 -- MARK: 85 - Whos that Survivor
 MissionLibrary.New{
-	MissionId=85;
+	MissionId = 85;
 	MissionType = MissionLibrary.MissionTypes.Board;
-	Name="Whos that Survivor";
-	Description="Figure out which survivor to talk to.";
-	Timer=BOARD_TIME_LIMIT; 
-	Persistent=true;
-	Checkpoint={
+	Name = "Whos that Survivor";
+	Description = "Figure out which survivor to talk to.";
+	Timer = BOARD_TIME_LIMIT; 
+	Persistent = true;
+	Checkpoint = {
 		{Text="Talk to $NpcDesc";};
 	};
-	SaveData={
-		NpcName=(function(mission)
+	SaveData = {
+		NpcName = (function(mission)
 			local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.Library.NpcProfileLibrary);
 			local survivorsList = modNpcProfileLibrary:ListByMatchFunc(function(libItem)
 				if libItem.Class == "Survivor" and libItem.Id ~= "Stan" and libItem.Id ~= "Robert" then
@@ -2997,12 +2997,12 @@ MissionLibrary.New{
 			return npcName;
 		end);
 	};
-	GuideText="";
-	Tier="Easy";
-	Rewards={
+	GuideText = "";
+	Tier = "Easy";
+	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Easy};
 	};
-	AddRequirements={
+	AddRequirements = {
 		{Type="Level"; Value=30};
 	};
 };
@@ -3101,7 +3101,7 @@ MissionLibrary.New{
 	};
 	Markers = {
 		[2]={Label="Joseph"; Target="Joseph"; Type=modMarkers.MarkerTypes.Npc;};
-		[12]={World="TheHarbor"; Label="Caitlin"; Target="Caitlin"; Type=modMarkers.MarkerTypes.Npc;};
+		[10]={World="TheResidentials"; Label="Caitlin"; Target="Caitlin"; Type=modMarkers.MarkerTypes.Npc;};
 	};
 	CanFastTravelWhenActive=false;
 	WIP = true;

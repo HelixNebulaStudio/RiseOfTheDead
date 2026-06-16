@@ -205,6 +205,9 @@ return function(CutsceneSequence)
 					Name = "Joseph";
 					CFrame = CFrame.new(38.07024, 176.987366, -44.433876, -1, 0, 0, 0, 1, 0, 0, 0, -1);
 					Player = player;
+					Properties = {
+						CutsceneActive = true;
+					};
 					ReplicateOut = true;
 				};
 				--josephNpcClass.Character:SetAttribute("LookAtClient", false);
@@ -896,6 +899,9 @@ return function(CutsceneSequence)
 					Name = "Joseph";
 					CFrame = CFrame.new(1105.325, 99.074, -578.587);
 					Player = player;
+					Properties = {
+						CutsceneActive = true;
+					};
 					ReplicateOut = true;
 				};
 			end

@@ -5,12 +5,16 @@ local modInteractables = shared.require(game.ReplicatedStorage.Library.Interacta
 
 local treePackage = {
     LogicString = {
-        Default = "InCutscene & Tree";
+        Default = "IsInCutscene & (CutscenePreset & Tree; IsInCutscene)";
         Tree = "GoTo | LookAt";
     };
 }
 
-function treePackage.InCutscene(npcClass: NpcClass)
+function treePackage.IsInCutscene(npcClass: NpcClass)
+    return npcClass.Properties.CutsceneActive == true;
+end
+
+function treePackage.CutscenePreset(npcClass: NpcClass)
     local isInCutscene = npcClass.Properties.CutsceneActive == true;
 
     if not isInCutscene then

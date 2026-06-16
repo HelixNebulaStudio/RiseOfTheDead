@@ -103,15 +103,18 @@ function interactablePackage.init(super) -- Server/Client
 
 		local stageLib = modGameModeLibrary.GameModes[mode] and modGameModeLibrary.GameModes[mode].Stages[stage];
 		if stageLib == nil or modGameModeLibrary.GameModes[mode].Stages[stage].WIP then
-			if RunService:IsStudio()
+			if shared.gameConfig.BranchName == "Dev"
 			and modGameModeLibrary.GameModes[mode]
 			and modGameModeLibrary.GameModes[mode].Stages[stage]
 			and modGameModeLibrary.GameModes[mode].Stages[stage].WIP then
-				interactable.Label = `Enter {mode}: {stage} (Studio Only WIP)`;
+				interactable.Label = `Enter {mode}: {stage} (Dev Branch Only WIP)`;
 				return;
 			end
+
+			local wipStr = modGameModeLibrary.GameModes[mode].Stages[stage].WIP;
+
 			interactable.CanInteract = false;
-			interactable.Label = "Work In Progress";
+			interactable.Label = typeof(wipStr) == "string" and wipStr or "Work In Progress";
 			
 		else
 			if stageLib.IsExtreme then

@@ -1033,7 +1033,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 					local newTaskLabel = taskListingTemplate:Clone();
 					local label = newTaskLabel:WaitForChild("TaskLabel");
-					label.Text = checkpointInfo.Text;
+					label.Text = `[{a}] {checkpointInfo.Text}`;
 					
 					if data.SaveData then
 						for k, v in pairs(data.SaveData) do
@@ -1064,7 +1064,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 					if checkpointInfo.Objectives then
 						completionBox.BackgroundColor3 = pointColor;
-						label.Text = checkpointInfo.Text or `Checkpoint {a}:`;
+						label.Text = `[{a}] {checkpointInfo.Text}` or `[{a}] Checkpoint`;
 
 						local isCompleted = true;
 						for _, objName in pairs(checkpointInfo.Objectives) do
@@ -1808,10 +1808,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				end
 			end
 
+			local isDev = shared.gameConfig.BranchName == "Dev";
 			if missionData.Type == 1 then
 
-				if missionLib.Checkpoint and missionData.ProgressionPoint and missionLib.Checkpoint[missionData.ProgressionPoint] then
-					local checkpointInfo = missionLib.Checkpoint[missionData.ProgressionPoint];
+				local missionStage = missionData.ProgressionPoint;
+				if missionLib.Checkpoint and missionStage and missionLib.Checkpoint[missionStage] then
+					local checkpointInfo = missionLib.Checkpoint[missionStage];
 
 					local incomplete = false;
 
@@ -1849,11 +1851,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 							newTask.Text = "• "..taskStr;
 						end
 
+						
 						if checkpointInfo.Text then
 							if not incomplete then
-								pinHudData.TaskText = `<s>{checkpointInfo.Text}</s>`;
+								pinHudData.TaskText = `<s>{isDev and `[{missionStage}] ` or ``}{checkpointInfo.Text}</s>`;
 							else
-								pinHudData.TaskText = checkpointInfo.Text;
+								pinHudData.TaskText = `{isDev and `[{missionStage}] ` or ``}{checkpointInfo.Text}`;
 							end
 						else
 							pinHudData.TaskText = ``;
@@ -1875,7 +1878,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						
 					else
 						destroyTaskList();
-						pinHudData.TaskText = checkpointInfo.Text;
+						pinHudData.TaskText = `{isDev and `[{missionStage}] ` or ``}{checkpointInfo.Text}`;
 
 						if missionData.SaveData then
 							for k, v in pairs(missionData.SaveData) do
@@ -1886,7 +1889,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 										newVal = modFormatNumber.Beautify(tonumber(newVal));
 									end
 									
-									pinHudData.TaskText = pinHudData.TaskText:gsub("$"..k, newVal);
+									pinHudData.TaskText = `{isDev and `[{missionStage}] ` or ``}{pinHudData.TaskText:gsub("$"..k, newVal)}`;
 								end
 							end
 						end

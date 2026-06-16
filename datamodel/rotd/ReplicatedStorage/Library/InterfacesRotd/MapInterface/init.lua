@@ -717,7 +717,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 	local function updatePlayerPointers()
 		local myTeams = modTeamsManager.getTeamsOfMember(localPlayer.Name);
-
+		if myTeams == nil then return end;
+		
 		for a=1, #myTeams do
 			local team = myTeams[a];
 			

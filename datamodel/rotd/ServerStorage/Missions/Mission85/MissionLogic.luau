@@ -2,9 +2,8 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 
 local MissionLogic = {};
 local RunService = game:GetService("RunService");
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
-local missionId = 85;
+local MISSION_ID = 85;
 
 local dialogsList = {
 	--{Say="Hello, how're you feeling?"; Reply="Not too bad, hope the weather's good today.";};
@@ -181,88 +180,100 @@ local dialogsList = {
 
 if RunService:IsServer() then
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
-	local modDialogueService = shared.require(game.ReplicatedStorage.Library.DialogueService);
-	
-	local dialogueHandlerFunc = function(player, dialog, data)
-		local npcName = dialog.Name;
-		local rng = Random.new(tonumber(os.date("%M")) :: number);
-		local missionProfile = modMission.GetMissions(player.Name);
 
-		local completeMissions = {};
+	function MissionLogic.onRequire()
+		--IsServer
+		shared.modEventService:OnInvoked("Dialogue_BindCustomDialogueHandler", function(eventPacket: EventPacket, ...)
+			local player = eventPacket.Player;
+			if player == nil then return end;
 
-		for a=#missionProfile, 1, -1 do
-			local mission = missionProfile[a];
-			if mission.Type ~= 3 then continue end;
-			table.insert(completeMissions, mission);
+			local dialog, data = ...;
 
-			if #completeMissions >= 30 then break; end;
-		end
+			local mission = modMission:GetMission(player, MISSION_ID);
+			if mission == nil or mission.Type == 3 then return end;
+			
+			local npcName = dialog.Name;
+			local missionNpcName = mission.SaveData.NpcName;
+			if missionNpcName ~= npcName then return end;
 
-		local pickableDialogs = {};
-		for a=1, #completeMissions do
-			local missionLib = completeMissions[a].Library;
-			if not (missionLib.MissionType == 1 or missionLib.MissionType == 2 or missionLib.MissionType == 5) then continue end;
+			local rng = Random.new(tonumber(os.date("%M")) :: number);
+			local missionProfile = modMission.GetMissions(player.Name);
 
-			local missionId = missionLib.MissionId;
+			local completeMissions = {};
+
+			for a=#missionProfile, 1, -1 do
+				local mission = missionProfile[a];
+				if mission.Type ~= 3 then continue end;
+				table.insert(completeMissions, mission);
+
+				if #completeMissions >= 30 then break; end;
+			end
+
+			local pickableDialogs = {};
+			for a=1, #completeMissions do
+				local missionLib = completeMissions[a].Library;
+				if not (missionLib.MissionType == 1 or missionLib.MissionType == 2 or missionLib.MissionType == 5) then continue end;
+
+				local missionId = missionLib.MissionId;
+
+				for b=1, #dialogsList do
+					if dialogsList[b].MissionId ~= missionId then
+						continue;
+					end
+					if dialogsList[b].NpcName and dialogsList[b].NpcName ~= npcName then
+						continue;
+					end
+
+					table.insert(pickableDialogs, dialogsList[b]);
+				end
+			end
 
 			for b=1, #dialogsList do
-				if dialogsList[b].MissionId ~= missionId then
-					continue;
-				end
-				if dialogsList[b].NpcName and dialogsList[b].NpcName ~= npcName then
-					continue;
-				end
+				if dialogsList[b].MissionId then continue end;
+				if dialogsList[b].NpcName and dialogsList[b].NpcName ~= npcName then continue end
 
 				table.insert(pickableDialogs, dialogsList[b]);
 			end
-		end
 
-		for b=1, #dialogsList do
-			if dialogsList[b].MissionId then continue end;
-			if dialogsList[b].NpcName and dialogsList[b].NpcName ~= npcName then continue end
-
-			table.insert(pickableDialogs, dialogsList[b]);
-		end
-
-		for b=#pickableDialogs, 1, -1 do
-			if pickableDialogs[b].ExcludeNpc and table.find(pickableDialogs[b].ExcludeNpc, npcName) then
-				table.remove(pickableDialogs, b);
+			for b=#pickableDialogs, 1, -1 do
+				if pickableDialogs[b].ExcludeNpc and table.find(pickableDialogs[b].ExcludeNpc, npcName) then
+					table.remove(pickableDialogs, b);
+				end
 			end
-		end
 
-		local pickDialog = pickableDialogs[rng:NextInteger(1, #pickableDialogs)];
+			local pickDialog = pickableDialogs[rng:NextInteger(1, #pickableDialogs)];
 
-		local mission = modMission:GetMission(player, missionId);
-		if mission == nil or mission.Type == 3 then return end;
+			local mission = modMission:GetMission(player, MISSION_ID);
+			if mission == nil or mission.Type == 3 then return end;
+			local missionNpcName = mission.SaveData.NpcName;
+			if missionNpcName ~= npcName then return end;
 
-		if pickDialog.Init then
-			dialog:SetInitiate(pickDialog.Init);
-		end
-		dialog:AddDialog({
-			Say=pickDialog.Say;
-			Reply=pickDialog.Reply;
-			MissionId=missionId;
+			if pickDialog.Init then
+				dialog:SetInitiate(pickDialog.Init);
+			end
+			dialog:AddDialog({
+				Say = pickDialog.Say;
+				Reply = pickDialog.Reply;
+				MissionId = MISSION_ID;
 
-		}, function(dialog)
-			modMission:CompleteMission(player, missionId);
-		end);
+			}, function(dialog)
+				modMission:CompleteMission(player, MISSION_ID);
+			end);
+		end)
+
 	end
 
 	function MissionLogic.Init(_, mission)
-
 		local function OnChanged(firstRun)
 			if mission.Type == 1 then -- OnActive
-				local npcName = mission.SaveData.NpcName;
-				if npcName == nil then return end;
-				modDialogueService:AddHandler(npcName, dialogueHandlerFunc);
 
 			elseif mission.Type == 3 then -- OnComplete
 			
 			end
 		end
 		
-		mission.OnChanged:Connect(OnChanged);
-		OnChanged(true);
+		-- mission.OnChanged:Connect(OnChanged);
+		-- OnChanged(true);
 	end
 
 end

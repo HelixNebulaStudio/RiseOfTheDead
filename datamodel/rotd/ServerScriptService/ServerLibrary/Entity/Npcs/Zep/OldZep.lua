@@ -27,12 +27,22 @@ return function(npc, spawnPoint)
 	
 	self.NpcChat = {
 		Nate = {
-			{"Oh umm, Nate, one of the walls have a hole in it, I think we might need to patch that up.."; "Oh I see, I'll work on it when I am free."};
-			{"Nate, how are we doing with connecting the clean water supply from the Cafe?"; "I'm afraid it's taking longer than expected. It's done when it's done. *shrug*"}
+			{
+				"Oh umm, Nate, one of the walls have a hole in it, I think we might need to patch that up.."; 
+				"Oh I see, I'll work on it when I am free."};
+			{
+				"Nate, how are we doing with connecting the clean water supply from the Cafe?"; 
+				"I'm afraid it's taking longer than expected. It's done when it's done. *shrug*"
+			}
 		};
 		Dallas = {
-			{"Hi Dallas, are you heading out today?"; "Probably not, the bandits have been roam a lot more lately, seems a bit too dangerous at the moment."};
-			{"Hey, you look cute in that shirt."; "Gee thanks! You look great too!"};
+			{
+				"Hi Dallas, are you heading out today?"; 
+				"Probably not, the bandits have been roam a lot more lately, seems a bit too dangerous at the moment."
+			};
+			{
+				"Hey, you look cute in that shirt."; "Gee thanks! You look great too!"
+			};
 		};
 	}
 	
