@@ -8,7 +8,7 @@ local attirePackage = {
 	GroupName="FootGroup";
 	
 	Configurations={
-		Warmth = 4;
+		Warmth = 2;
 	};
 	Properties={};
 };

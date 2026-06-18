@@ -347,8 +347,8 @@ function modItemSkinsLibrary.onRequire()
         Icon="rbxassetid://7866873305";
     
         Patterns={
-            {Id="v1"; Name="Colored Static"; Image="rbxassetid://7866772353"; };
-            {Id="v2"; Name="Mono Static"; Image="rbxassetid://7866840036"; };
+            {Id="v1"; Name="Colored Static"; Image="rbxassetid://7866772353"; ScaleRatio=Vector2.new(1, 1); };
+            {Id="v2"; Name="Mono Static"; Image="rbxassetid://76807511469529"; ScaleRatio=Vector2.new(8, 8); };
         };
     };
     

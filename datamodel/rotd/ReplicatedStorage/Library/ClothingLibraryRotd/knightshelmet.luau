@@ -9,7 +9,7 @@ local attirePackage = {
 	Configurations = {
 		HasFlinchProtection = true;
 		ArmorPoints = 20;
-		Warmth = 2;
+		Warmth = 3;
 	};
 	Properties = {};
 };

@@ -4,9 +4,9 @@ local localPlayer = game.Players.LocalPlayer;
 --==
 local statusPackage = {
     Id = "Freezing";
-    Icon = "rbxassetid://10371553364";
+    Icon = "rbxassetid://73626480624020";
     Name = "Freezing";
-    Description = "You are freezing, you will lose mobility and won't be able to perform actions.";
+    Description = "You are freezing, you lose mobility and won't be able to perform actions.";
     Buff = false;
     Tags = {"Mobility"; "Slow";};
     Cleansable = true;

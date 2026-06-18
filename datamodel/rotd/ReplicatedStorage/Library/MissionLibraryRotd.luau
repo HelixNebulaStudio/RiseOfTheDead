@@ -3104,7 +3104,7 @@ MissionLibrary.New{
 		[10]={World="TheResidentials"; Label="Caitlin"; Target="Caitlin"; Type=modMarkers.MarkerTypes.Npc;};
 	};
 	CanFastTravelWhenActive=false;
-	WIP = true;
+	--WIP = true;
 };
 
 -- MARK: 88 - Shadows of Trust

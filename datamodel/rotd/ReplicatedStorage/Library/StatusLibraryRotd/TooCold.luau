@@ -6,9 +6,9 @@ local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 
 local statusPackage = {
     Id = "TooCold";
-    Icon = "rbxassetid://3564119613";
+    Icon = "rbxassetid://73626480624020";
     Name = "Too Cold";
-    Description = "It's too cold. (Below 10°C) Put on more clothes! If you take damage, you might freeze.";
+    Description = "It's too cold. (Below 10°C) If you take damage, you might freeze.\nFreezing: You lose mobility and won't be able to perform actions.";
     Buff = false;
 };
 

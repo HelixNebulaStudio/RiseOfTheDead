@@ -326,7 +326,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 end
                 
                 local statSort = {
-                    Level={Name="Mastery Level"; Index=1};
+                    Level={Name="Mastery Level"; Index=1; MaxKey="MaxLevels"};
                     Kills={Name="Kills"; Index=3};
                     ZombieKills={Name="Zombie Kills"; Index=31};
                     HumanKills={Name="Human Kills"; Index=32};
@@ -382,11 +382,17 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                     local statKey = tostring(lib and lib.Name or k) or "";
                     local statValue = tostring(v) or "";
 
+
                     if k == "FotlStats" then
                         Debugger:StudioLog(`FotlStats`, v);
                     end
                     if typeof(v) == "number" then
                         statValue = interface.beautifyNumber(v);
+
+                        local maxVal = modGlobalVars[lib and lib.MaxKey or `Max{k}`];
+                        if maxVal and v >= maxVal then
+                            statValue = `{statValue} <font size="9"><b>(Maxed)</b></font>`;
+                        end
                     end
                     
                     local s = `<b>{statKey}</b>: <font size="12">{statValue}</font>`;

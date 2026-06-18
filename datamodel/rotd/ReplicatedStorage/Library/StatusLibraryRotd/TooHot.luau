@@ -6,9 +6,9 @@ local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 
 local statusPackage = {
     Id = "TooHot";
-    Icon = "rbxassetid://3479646912";
+    Icon = "rbxassetid://135144625609559";
     Name = "Too Hot";
-    Description = "It's too hot. (Above 40°C) \"Take off your jacket!\" If you take damage, you might ignite.";
+    Description = "It's too hot. (Above 40°C) If you take damage, you might overheat.\Overheating: Moving too fast will blur your vision and affect your aim.";
     Buff = false;
 };
 
@@ -26,18 +26,11 @@ function statusPackage.BindApply(statusClass: StatusClassInstance)
         if newV >= oldV then return end;
         if math.random(1, 3) ~= 1 then return end;
 
-        local damage = math.clamp(characterClass.Properties.Warmth - 40, 0, 10);
-        local duration = 5;
-        local dmgPS = math.ceil(damage/(duration*2));
+        local duration = 10;
         
-        statusComp:Apply("Burn", {
-            ExpiresOnDeath = true;
+        statusComp:Apply("Overheating", {
             Expires = workspace:GetServerTimeNow() + duration;
             Duration = duration;
-
-            Values = {
-                Amount = dmgPS;
-            };
         });
     end
 
