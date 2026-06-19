@@ -306,13 +306,30 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 end
                 marketInfo = MarketplaceService:GetProductInfo(productLib.Id, infoType);
             end)
-            if marketInfo then 
+            if marketInfo then
                 if marketInfo.PriceInRobux then
-                    buttonText.Text = marketInfo.PriceInRobux.." Robux";
+                    buttonText.Text = `{marketInfo.PriceInRobux} Robux`;
                 else
                     buttonText.Text = "Not On Sale";
                 end
                 purchaseText = buttonText.Text;
+
+                local userOwnItem;
+                if productLib.OldThirdPartySale then
+                    local oldTPSaleData = productLib.OldThirdPartySale;
+
+                    pcall(function()
+                        userOwnItem = MarketplaceService:UserOwnsGamePassAsync(localPlayer.UserId, oldTPSaleData.Id);
+                    end)
+                    if userOwnItem == true then
+                        buttonText.Text = "Claim Item";
+                        purchaseText = buttonText.Text;
+                    end
+                end
+
+                if userOwnItem ~= true and modData.Profile.Purchases[productLib.Id] then
+                    
+                end
 
                 if productLib.Type == "ThirdParty" then
                     local userOwnGamePass;
@@ -333,7 +350,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         
         if productLib then
             if productLib.Type == "GamePass" or productLib.Type == "Product" or productLib.Type == "ThirdParty" then
-                spawn(refreshPurchaseButton);
+                task.spawn(refreshPurchaseButton);
                 
             elseif productLib.Type == "Gold" then
                 if lib.NotForSale == true then
@@ -427,6 +444,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         
         local debounce = false;
         purchaseButton.MouseButton1Click:Connect(function()
+	        if productLib.WIP then
+                modClientGuis.promptWarning("This product is not yet available for purchase.");
+                return;
+            end
             if debounce then return end
             debounce = true;
 
@@ -439,7 +460,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 return;
             end
 
-            if shared.gameConfig.BranchName == "Live" or RunService:IsStudio() or not productLib.Disabled or modGlobalVars.IsCreator(localPlayer) or localPlayer.UserId == productLib.CreatorId then
+            if RunService:IsStudio() 
+            or shared.gameConfig.BranchName == "Live" 
+            or not productLib.Disabled 
+            or modGlobalVars.IsCreator(localPlayer) 
+            or (localPlayer.UserId == productLib.CreatorId) then
+
                 if productLib.Type == "GamePass" then
                     MarketplaceService:PromptGamePassPurchase(localPlayer, productLib.Id);
                     

@@ -16,7 +16,7 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
 
 	local sync = false;
 	
-	local characterClass: CharacterClass = statusClass.StatusOwner;
+	local characterClass: CharacterClass = statusClass.StatusOwner :: CharacterClass;
 	local healthComp: HealthComp? = characterClass.HealthComp;
 	if healthComp == nil then return end;
 

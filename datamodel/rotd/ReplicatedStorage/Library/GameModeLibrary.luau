@@ -388,6 +388,8 @@ GameModeLibrary.GameModes={
 				
 				WIP=true;
 			};
+
+			--MARK: Community Survivals
 			["CommunityWaySide"]={
 				WorldId="CommunityWaySide";
 				TitleImage="rbxassetid://10976370766";
@@ -509,7 +511,7 @@ GameModeLibrary.GameModes={
 				ExitSpawn = "communitySh";
 				MaxPlayers = 6;
 				TitleImage = "rbxassetid://13496701772";
-				RewardsId = "abandonedbunkercrate";
+				-- RewardsId = "abandonedbunkercrate";
 				Soundtrack = "Soundtrack:Into The Abyss";
 
 				WIP = `Suspicious Looking Door`;

@@ -188,6 +188,12 @@ return function(CutsceneSequence)
 
 		local pp11Active = false;
 		local function OnChanged(firstRun)
+			if mission.Type == 3 then
+				spawnLocalCaitlinClass();
+
+				caitlinClass:SetCFrame(CFrame.new(1127.165, 55.389, 107.03) * CFrame.Angles(0, math.rad(90), 0));
+				return;
+			end
 			if mission.Type ~= 1 then return end;
 
 			if josephClass == nil then
@@ -202,6 +208,9 @@ return function(CutsceneSequence)
 						modMission:Progress(player, MISSION_ID, function(mission)
 							mission.ProgressionPoint = 10;
 						end)
+					end
+					if mission.ProgressionPoint > 10 then
+						spawnLocalCaitlinClass();
 					end
 				end
 
@@ -365,8 +374,6 @@ return function(CutsceneSequence)
 
 
 				elseif mission.ProgressionPoint == 10 then
-					spawnLocalCaitlinClass();
-
 					if firstRun then
 						josephClass:SetCFrame(CFrame.new(1128.658, 57.66, 14.02) * CFrame.Angles(0, math.rad(180), 0))
 						caitlinClass:SetCFrame(CFrame.new(1137.93, 57.87, 24.89));
@@ -376,8 +383,6 @@ return function(CutsceneSequence)
 
 
 				elseif mission.ProgressionPoint == 11 then
-					spawnLocalCaitlinClass();
-
 					caitlinClass:ToggleInteractable(false);
 					josephClass:ToggleInteractable(false);
 

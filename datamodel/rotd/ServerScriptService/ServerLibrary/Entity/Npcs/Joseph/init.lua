@@ -43,14 +43,14 @@ local npcPackage = {
             WorldId = "TheResidentials";
             ClockTime = 2;
             Actions = {
-                {Run="Sleep"; CFrame=CFrame.new(1303.971, 62.681, 71.457) * CFrame.Angles(0, math.rad(-90), 0);};
+                {Run="Sleep"; CFrame=CFrame.new(1303.971, 62.681, 71.457) * CFrame.Angles(0, math.rad(90), 0);};
             };
         };
         NpcRoutineData.new{
             WorldId = "TheResidentials";
             ClockTime = 9.5;
             Actions = {
-                {Run="SetCFrame"; CFrame=CFrame.new(1303.971, 62.681, 71.457) * CFrame.Angles(0, math.rad(-90), 0);};
+                {Run="SetCFrame"; CFrame=CFrame.new(1303.971, 62.681, 71.457) * CFrame.Angles(0, math.rad(90), 0);};
                 {Run="WakeUp";};
             };
         };

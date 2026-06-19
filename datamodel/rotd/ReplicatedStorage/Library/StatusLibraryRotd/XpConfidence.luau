@@ -2,7 +2,7 @@ local modStatusClass = shared.require(game.ReplicatedStorage.Library.StatusLibra
 --==
 local statusPackage = {
     Id = "XpConfidence";
-    Icon = "rbxassetid://2938848546";
+    Icon = "rbxassetid://104194314402133";
     Name = "Exp Confidence";
     Description = "Gaining bonus experience for completing a mission.";
     Buff = true;

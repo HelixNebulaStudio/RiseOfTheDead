@@ -8,7 +8,7 @@ local statusPackage = {
     Id = "TooHot";
     Icon = "rbxassetid://135144625609559";
     Name = "Too Hot";
-    Description = "It's too hot. (Above 40°C) If you take damage, you might overheat.\Overheating: Moving too fast will blur your vision and affect your aim.";
+    Description = "It's too hot. (Above 40°C) If you take damage, you might overheat.\nOverheating: Moving too fast will blur your vision and affect your aim.";
     Buff = false;
 };
 

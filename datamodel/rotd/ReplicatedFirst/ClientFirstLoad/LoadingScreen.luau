@@ -76,6 +76,7 @@ function LoadingScreen.newLoadingScreen(tpScreenGui, worldName)
 
 	local loadingScreen, newFrame;
 	if tpScreenGui == nil then
+		print(`LoadingScreen>>  New loading screen`);
 		loadingScreen = Instance.new("ScreenGui");
 		loadingScreen.Name = "LoadingScreen";
 		loadingScreen.DisplayOrder = 5;
@@ -88,6 +89,7 @@ function LoadingScreen.newLoadingScreen(tpScreenGui, worldName)
 		task.delay(25, function() loadingScreen:Destroy(); end)
 	
 	else
+		print(`LoadingScreen>>  Use teleport screen`);
 		loadingScreen = tpScreenGui;
 		newFrame = tpScreenGui:WaitForChild("LoadingFrame");
 

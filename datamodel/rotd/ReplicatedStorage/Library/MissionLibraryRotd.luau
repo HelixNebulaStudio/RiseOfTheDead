@@ -2818,6 +2818,7 @@ MissionLibrary.New{
 	GuideText = "Talk to Joseph";
 	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Core};
+		{Type="Mission"; Id=87};
 	};
 	AddRequirements = {};
 	Markers = {

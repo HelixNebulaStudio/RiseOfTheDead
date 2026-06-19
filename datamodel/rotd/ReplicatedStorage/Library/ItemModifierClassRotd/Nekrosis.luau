@@ -16,7 +16,7 @@ function modifierPackage.onRequire()
 	if RunService:IsClient() then return end;
 
 	function modifierPackage.Binds.CharacterClassTakenDamage(modifier: ItemModifierInstance, damageData: DamageData)
-		local characterClass: CharacterClass? = modifier.WieldComp and modifier.WieldComp.CompOwner or nil;
+		local characterClass: CharacterClass? = modifier.WieldComp and modifier.WieldComp.CompOwner :: CharacterClass;
 		if characterClass == nil then return end;
 
 		local statusComp: StatusComp = characterClass.StatusComp;
@@ -35,6 +35,26 @@ function modifierPackage.onRequire()
 		if statusClass then return end;
 
 		playerClass.StatusComp:Apply("Nekrosis", {});
+	end)
+end
+
+function modifierPackage.Instancing(modifier: ItemModifierInstance, isFirstTime: boolean)
+	if RunService:IsClient() then return end;
+
+	modifier.OnEnabledChanged:Connect(function(prevVal: boolean)
+		if modifier.WieldComp == nil then return end;
+
+		if not modifier.Enabled then return end;
+		
+		local characterClass: CharacterClass? = modifier.WieldComp and modifier.WieldComp.CompOwner :: CharacterClass;
+		if characterClass == nil then return end;
+
+		local statusComp: StatusComp = characterClass.StatusComp;
+
+		local statusClass: StatusClassInstance? = statusComp:GetOrDefault("Nekrosis");
+		if statusClass then return end;
+
+		statusComp:Apply("Nekrosis", {});
 	end)
 end
 
