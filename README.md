@@ -23,3 +23,4 @@ To keep up to date with the active development. You can click the commits button
 
 ## Pull Requests (bug fixes, typo corrections..)
 - You can submit small changes for a bug fix or correcting a typo or etc via a pull request. These request will be reviewed and copied to the main private branch so make sure every issue is independent and submit different pull request per issue.
+- You can use github's web vscode here: https://github.dev/HelixNebulaStudio/RiseOfTheDead
