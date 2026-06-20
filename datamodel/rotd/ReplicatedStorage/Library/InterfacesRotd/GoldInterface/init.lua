@@ -10,7 +10,6 @@ local localPlayer = game.Players.LocalPlayer;
 
 local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
 
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumber);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
@@ -67,6 +66,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     goldButton.NextSelectionDown = rScrollFrame;
 
     local goldShopWindow: InterfaceWindow = interface:NewWindow("GoldMenu", goldMenuFrame);
+    goldShopWindow.BoolStringWhenActive = {String="!Hotbar"; Priority=2;};
 	goldShopWindow.CompactFullscreen = true;
     goldShopWindow.DisableInteractables = true;
     goldShopWindow.CloseWithInteract = true;
@@ -79,7 +79,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         goldMenuFrame:WaitForChild("UICorner"):Destroy();
 
 	else
-		goldShopWindow:SetClosePosition(UDim2.new(0.5, 0, -1.5, 0), UDim2.new(0.5, 0, 0.5, -35));
+		goldShopWindow:SetClosePosition(UDim2.new(0.5, 0, -1.5, 0), UDim2.new(0.5, 0, 0.5, 0));
 	end
     local goldMenuCloseButton = goldMenuFrame:WaitForChild("closeButton");
     goldMenuCloseButton.MouseButton1Click:Connect(function()
@@ -252,8 +252,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     end
 
     function goldShopWindow.Binds.LoadProduct(productId)
-        local lib = modGoldShopLibrary.Products:Find(productId);
-        if lib == nil then
+        local productLib = modGoldShopLibrary.Products:Find(productId);
+        if productLib == nil then
             Debugger:Warn("Product",productId,"unavailable.");
             goldShopWindow.Binds.LoadPage(frontPage);
             return;
@@ -293,18 +293,20 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         
         local purchaseButton = new:WaitForChild("purchaseButton");
         local buttonText = purchaseButton:WaitForChild("buttonText");
+
+        local reclaimButton = new:WaitForChild("reclaimButton");
         
         local purchaseText = "Loading Product";
         
-        local productLib = lib.Product;
+        local productInfo = productLib.Product;
         local function refreshPurchaseButton()
+            local infoType = productInfo.Type == "GamePass" and Enum.InfoType.GamePass or Enum.InfoType.Product;
             local marketInfo;
             pcall(function()
-                local infoType = productLib.Type == "GamePass" and Enum.InfoType.GamePass or Enum.InfoType.Product;
-                if productLib.ProductInfoType then
-                    infoType = productLib.ProductInfoType;
+                if productInfo.ProductInfoType then
+                    infoType = productInfo.ProductInfoType;
                 end
-                marketInfo = MarketplaceService:GetProductInfo(productLib.Id, infoType);
+                marketInfo = MarketplaceService:GetProductInfo(productInfo.Id, infoType);
             end)
             if marketInfo then
                 if marketInfo.PriceInRobux then
@@ -315,31 +317,22 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 purchaseText = buttonText.Text;
 
                 local userOwnItem;
-                if productLib.OldThirdPartySale then
-                    local oldTPSaleData = productLib.OldThirdPartySale;
 
+                local oldTPSaleData = productInfo.OldThirdPartySale;
+                if oldTPSaleData then
                     pcall(function()
                         userOwnItem = MarketplaceService:UserOwnsGamePassAsync(localPlayer.UserId, oldTPSaleData.Id);
                     end)
+                    if userOwnItem ~= true and modData.Profile.Purchases[tostring(oldTPSaleData.Id)] then
+                        userOwnItem = true;
+                    end
                     if userOwnItem == true then
-                        buttonText.Text = "Claim Item";
-                        purchaseText = buttonText.Text;
+                        reclaimButton.Visible = true;
                     end
-                end
 
-                if userOwnItem ~= true and modData.Profile.Purchases[productLib.Id] then
-                    
                 end
-
-                if productLib.Type == "ThirdParty" then
-                    local userOwnGamePass;
-                    pcall(function()
-                        userOwnGamePass = MarketplaceService:UserOwnsGamePassAsync(localPlayer.UserId, productLib.Id);
-                    end)
-                    if userOwnGamePass == true then
-                        buttonText.Text = "Claim Item";
-                        purchaseText = buttonText.Text;
-                    end
+                if userOwnItem ~= true and modData.Profile.Purchases[tostring(productInfo.Id)] then
+                    userOwnItem = true;
                 end
 
             else
@@ -348,27 +341,27 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             end
         end
         
-        if productLib then
-            if productLib.Type == "GamePass" or productLib.Type == "Product" or productLib.Type == "ThirdParty" then
+        if productInfo then
+            if productInfo.Type == "GamePass" or productInfo.Type == "Product" or productInfo.Type == "ThirdParty" then
                 task.spawn(refreshPurchaseButton);
                 
-            elseif productLib.Type == "Gold" then
-                if lib.NotForSale == true then
+            elseif productInfo.Type == "Gold" then
+                if productLib.NotForSale == true then
                     purchaseText = "Not On Sale";
                     
                 else
-                    purchaseText = modFormatNumber.Beautify(productLib.Price).." Gold";
+                    purchaseText = modFormatNumber.Beautify(productInfo.Price).." Gold";
                 end
                 
-            elseif productLib.Type == "Battlepass" then
-                purchaseText = modFormatNumber.Beautify(productLib.Price).." Gold";
+            elseif productInfo.Type == "Battlepass" then
+                purchaseText = modFormatNumber.Beautify(productInfo.Price).." Gold";
                 
             end
             
             
-            if productLib.ShowcaseType then
+            if productInfo.ShowcaseType then
                 local modShowcases = shared.require(script:WaitForChild("Showcases"));
-                local newShowcasing = modShowcases.new(productLib.ShowcaseType, interface, showcaseFrame, productLib);
+                local newShowcasing = modShowcases.new(productInfo.ShowcaseType, interface, showcaseFrame, productInfo);
                 if newShowcasing and newShowcasing.Destroy then
                     interface.Garbage:Tag(newShowcasing.Destroy);
                 end
@@ -376,22 +369,22 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         end
         buttonText.Text = purchaseText;
         
-        if lib.TitleImage then
-            titleImage.Image = lib.TitleImage;
+        if productLib.TitleImage then
+            titleImage.Image = productLib.TitleImage;
             titleLabel.Text = "";
             
-        elseif lib.TitleText then
+        elseif productLib.TitleText then
             titleImage.Image = "nil";
-            titleLabel.Text = lib.TitleText;
+            titleLabel.Text = productLib.TitleText;
             
-            if lib.Amount then
-                titleLabel.Text = titleLabel.Text.." x"..lib.Amount;
+            if productLib.Amount then
+                titleLabel.Text = titleLabel.Text.." x"..productLib.Amount;
             end
             
         end
         
-        if lib.LimitedId then
-            local stockLeft = limitedList[lib.LimitedId] or 0;
+        if productLib.LimitedId then
+            local stockLeft = limitedList[productLib.LimitedId] or 0;
             limitedImage.Visible = true;
             descFrame.limitedInfo.Visible = true;
             if stockLeft <= 0 then
@@ -408,34 +401,34 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             
         end
         
-        if lib.Desc then
-            descLabel.Text = lib.Desc;
+        if productLib.Desc then
+            descLabel.Text = productLib.Desc;
         else
             descLabel.Text = "No available description.";
         end
         
-        if productLib and productLib.ItemId then
-            local itemButtonObj = modItemInterface.newItemButton(productLib.ItemId);
+        if productInfo and productInfo.ItemId then
+            local itemButtonObj = modItemInterface.newItemButton(productInfo.ItemId);
             itemButtonObj.ImageButton.Position = iconLabel.Position;
             itemButtonObj.ImageButton.Size = iconLabel.Size;
             itemButtonObj.ImageButton.Selectable = false;
             itemButtonObj.ImageButton.Parent = iconButton;
             itemButtonObj:Update();
             
-            local itemLib = modItemsLibrary:Find(productLib.ItemId);
+            local itemLib = modItemsLibrary:Find(productInfo.ItemId);
             --iconLabel.Image = itemLib.Icon
             iconLabel.Visible = false;
             
-            descLabel.Text = itemLib.Description.."\n"..(productLib.Desc or "");
+            descLabel.Text = itemLib.Description.."\n\n"..(productLib.Desc or productInfo.Desc or "");
             titleImage.Image = "nil";
-            titleLabel.Text = lib.TitleText or itemLib.Name;
-            if lib.Amount then
-                titleLabel.Text = titleLabel.Text.." x"..lib.Amount;
+            titleLabel.Text = productLib.TitleText or itemLib.Name;
+            if productLib.Amount then
+                titleLabel.Text = titleLabel.Text.." x"..productLib.Amount;
             end
             
             
-        elseif lib.Icon then
-            iconLabel.Image = lib.Icon;
+        elseif productLib.Icon then
+            iconLabel.Image = productLib.Icon;
             
         else
             iconLabel.Image = "";
@@ -444,9 +437,15 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         
         local debounce = false;
         purchaseButton.MouseButton1Click:Connect(function()
-	        if productLib.WIP then
-                modClientGuis.promptWarning("This product is not yet available for purchase.");
-                return;
+	        if productInfo.WIP then
+                if not RunService:IsStudio() and modGlobalVars.IsCreator(localPlayer) then
+                    modClientGuis.promptWarning("This product is not yet available for purchase.");
+                    return;
+
+                else
+                    Debugger:Warn(`Purchasing unavailable product.`);
+
+                end
             end
             if debounce then return end
             debounce = true;
@@ -460,57 +459,37 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 return;
             end
 
-            if RunService:IsStudio() 
+            if not (RunService:IsStudio() 
             or shared.gameConfig.BranchName == "Live" 
-            or not productLib.Disabled 
+            or not productInfo.Disabled 
             or modGlobalVars.IsCreator(localPlayer) 
-            or (localPlayer.UserId == productLib.CreatorId) then
+            or (localPlayer.UserId == productInfo.CreatorId)) then
+                debounce = false;
+                modClientGuis.promptWarning("This feature is currently disabled.");
+                return;
+            end
 
-                if productLib.Type == "GamePass" then
-                    MarketplaceService:PromptGamePassPurchase(localPlayer, productLib.Id);
-                    
-                elseif productLib.Type == "Product" then
-                    
-                    if productLib.Gold and productLib.Gold > 0 and (modData.PlayerGold or 0) + productLib.Gold > 1000000 then
-                        modClientGuis.promptWarning("Can not purchase, you will exceed 1 million gold limit.");
-                        return;
-                    end
-                    
-                    MarketplaceService:PromptProductPurchase(localPlayer, productLib.Id);
-                    
-                elseif productLib.Type == "ThirdParty" then
-                    local result = remoteGoldShopPurchase:InvokeServer(lib.Id);
-                    
+            if productInfo.Type == "GamePass" then
+                MarketplaceService:PromptGamePassPurchase(localPlayer, productInfo.Id);
+                
+            elseif productInfo.Type == "Product" then
+                
+                if productInfo.Gold 
+                and productInfo.Gold > 0 
+                and (modData.PlayerGold or 0) + productInfo.Gold > 1000000 then
+                    modClientGuis.promptWarning("Can not purchase, you will exceed 1 million gold limit.");
+                    return;
+                end
+                
+                MarketplaceService:PromptProductPurchase(localPlayer, productInfo.Id);
+                
+            elseif productInfo.Type == "ThirdParty" then
+
+                if productInfo.ProductInfoType == Enum.InfoType.Product then
+                    local result = remoteGoldShopPurchase:InvokeServer("purchase", productLib.Id);
                     if result == 0 then
-                        MarketplaceService:PromptGamePassPurchase(localPlayer, productLib.Id);
-                        buttonText.Text = "Item can be claimed here after purchased.";
-                        task.wait(5);
-                        task.spawn(function()
-                            for a=1, 60 do
-                                task.wait(1);
-                                task.spawn(refreshPurchaseButton);
-                                local result = remoteGoldShopPurchase:InvokeServer(lib.Id);
-                                if result == 1 or result == 4 then
-                                    buttonText.Text = "Thank you for claiming your item!";
-                                    interface:ToggleWindow("Inventory", true);
-                                    break;
-                                end
-                                if goldMenuFrame.Visible == false then break; end;
-                            end
-                        end)
-                        buttonText.Text = purchaseText;
+                        MarketplaceService:PromptProductPurchase(localPlayer, productInfo.Id);
 
-                    elseif result == 1 then
-                        buttonText.Text = "Thank you for claiming your item!";
-                        interface:ToggleWindow("Inventory", true);
-                        task.wait(2);
-                        buttonText.Text = purchaseText;
-
-                    elseif result == 4 then
-                        buttonText.Text = "Already own item!";
-                        task.wait(2);
-                        buttonText.Text = purchaseText;
-                        
                     elseif result == 3 then
                         buttonText.Text = "Inventory full!";
                         task.wait(1);
@@ -522,87 +501,163 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                         buttonText.Text = purchaseText;
                         
                     end
+
+                elseif productInfo.ProductInfoType == Enum.InfoType.GamePass then
+                    MarketplaceService:PromptGamePassPurchase(localPlayer, productInfo.Id);
+
+                end
+
+                -- local result = remoteGoldShopPurchase:InvokeServer("purchase", productLib.Id);
+                -- if result == 0 then
+                --     MarketplaceService:PromptGamePassPurchase(localPlayer, productLib.Id);
+                --     buttonText.Text = "Item can be claimed here after purchased.";
+                --     task.wait(5);
+                --     task.spawn(function()
+                --         for a=1, 60 do
+                --             task.wait(1);
+                --             task.spawn(refreshPurchaseButton);
+                --             local result = remoteGoldShopPurchase:InvokeServer("purchase", lib.Id);
+                --             if result == 1 or result == 4 then
+                --                 buttonText.Text = "Thank you for claiming your item!";
+                --                 interface:ToggleWindow("Inventory", true);
+                --                 break;
+                --             end
+                --             if goldMenuFrame.Visible == false then break; end;
+                --         end
+                --     end)
+                --     buttonText.Text = purchaseText;
+
+                -- elseif result == 1 then
+                --     buttonText.Text = "Thank you for claiming your item!";
+                --     interface:ToggleWindow("Inventory", true);
+                --     task.wait(2);
+                --     buttonText.Text = purchaseText;
+
+                -- elseif result == 4 then
+                --     buttonText.Text = "Already own item!";
+                --     task.wait(2);
+                --     buttonText.Text = purchaseText;
                     
-                elseif productLib.Type == "Gold" then
-                    if lib.NotForSale == true then
-                        return;
+                -- elseif result == 3 then
+                --     buttonText.Text = "Inventory full!";
+                --     task.wait(1);
+                --     buttonText.Text = purchaseText;
+
+                -- else
+                --     buttonText.Text = "An error occured, see chat logs.";
+                --     task.wait(1);
+                --     buttonText.Text = purchaseText;
+                    
+                -- end
+                
+            elseif productInfo.Type == "Gold" then
+                if productLib.NotForSale == true then
+                    return;
+                end
+                
+                buttonText.Text = "Purchasing...";
+                
+                local result = remoteGoldShopPurchase:InvokeServer("purchase", productLib.Id);
+                if result == 0 then
+                    buttonText.Text = "Purchased!";
+
+                    if productInfo and productInfo.ItemId then
+                        interface:ToggleWindow("Inventory", true);
+                    end
+                    if productLib.LimitedId then
+                        task.spawn(function()
+                            fetchProductStock();
+                            goldShopWindow.Binds.LoadProduct(productId);
+                        end);
+                    else
+                        task.wait(1);
+                        buttonText.Text = purchaseText;
                     end
                     
-                    buttonText.Text = "Purchasing...";
+                elseif result == 1 then
+                    buttonText.Text = "Not enough Gold!";
+                    task.wait(1);
+                    goldShopWindow.Binds.LoadPage("GoldPage");
+                    return;
                     
-                    local result = remoteGoldShopPurchase:InvokeServer(lib.Id);
-                    if result == 0 then
-                        buttonText.Text = "Purchased!";
-
-                        if productLib and productLib.ItemId then
-                            interface:ToggleWindow("Inventory", true);
-                        end
-                        if lib.LimitedId then
-                            task.spawn(function()
-                                fetchProductStock();
-                                goldShopWindow.Binds.LoadProduct(productId);
-                            end);
-                        else
-                            task.wait(1);
-                            buttonText.Text = purchaseText;
-                        end
-                        
-                    elseif result == 1 then
-                        buttonText.Text = "Not enough Gold!";
-                        task.wait(1);
-                        goldShopWindow.Binds.LoadPage("GoldPage");
-                        return;
-                        
-                    elseif result == 2 then
-                        buttonText.Text = "Woah there..";
-                        task.wait(1);
-                        buttonText.Text = purchaseText;
-                        
-                    elseif result == 3 then
-                        buttonText.Text = "Inventory full!";
-                        task.wait(1);
-                        buttonText.Text = purchaseText;
-                        
-                    elseif result == 4 then
-                        buttonText.Text = "Internal error..";
-                        task.wait(1);
-                        buttonText.Text = purchaseText;
-
-                    elseif result == 5 then
-                        buttonText.Text = "Out of stock..";
-                        task.wait(3);
-                        buttonText.Text = purchaseText;
-                        
-                    end
+                elseif result == 2 then
+                    buttonText.Text = "Woah there..";
+                    task.wait(1);
+                    buttonText.Text = purchaseText;
                     
-                elseif productLib.Type == "Battlepass" then
+                elseif result == 3 then
+                    buttonText.Text = "Inventory full!";
+                    task.wait(1);
+                    buttonText.Text = purchaseText;
+                    
+                elseif result == 4 then
+                    buttonText.Text = "Internal error..";
+                    task.wait(1);
+                    buttonText.Text = purchaseText;
 
-                    buttonText.Text = "Purchasing...";
-
-                    local result = remoteGoldShopPurchase:InvokeServer(lib.Id);
-                    if result == 0 then
-                        buttonText.Text = "Purchased!";
-                        interface:ToggleWindow("Missions", true);
-
-                    elseif result == 1 then
-                        buttonText.Text = "Not enough Gold!";
-                        task.wait(1);
-                        goldShopWindow.Binds.LoadPage("GoldPage");
-                        return;
-
-                    elseif result == 2 then
-                        buttonText.Text = "Purchase failed!";
-                        
-                    end
+                elseif result == 5 then
+                    buttonText.Text = "Out of stock..";
+                    task.wait(3);
+                    buttonText.Text = purchaseText;
                     
                 end
-            else
-                modClientGuis.promptWarning("This feature is currently disabled.");
+                
+            elseif productInfo.Type == "Battlepass" then
+
+                buttonText.Text = "Purchasing...";
+
+                local result = remoteGoldShopPurchase:InvokeServer("purchase", productLib.Id);
+                if result == 0 then
+                    buttonText.Text = "Purchased!";
+                    interface:ToggleWindow("Missions", true);
+
+                elseif result == 1 then
+                    buttonText.Text = "Not enough Gold!";
+                    task.wait(1);
+                    goldShopWindow.Binds.LoadPage("GoldPage");
+                    return;
+
+                elseif result == 2 then
+                    buttonText.Text = "Purchase failed!";
+                    
+                end
+                
             end
             
             debounce = false;
         end)
         
+        reclaimButton.MouseButton1Click:Connect(function()
+            if debounce then return end
+            debounce = true;
+        
+            interface:PlayButtonClick();
+            
+			local missionData = modData:GetMission(1);
+            if missionData == nil or missionData.Type ~= 3 then
+                modClientGuis.promptWarning("Please complete the first mission of the campaign before using the Gold Shop..");
+                debounce = false;
+                return;
+            end
+
+            local result = remoteGoldShopPurchase:InvokeServer("reclaim", productLib.Id);
+            debounce = false;
+
+            if result == 1 then
+                interface:ToggleWindow("Inventory", true);
+
+            elseif result == 2 then
+                modClientGuis.promptWarning("You already have this.");
+
+            elseif result == 3 then
+                modClientGuis.promptWarning("You do not have inventory space.");
+
+            else
+                modClientGuis.promptWarning("An error occured, see chat logs.");
+
+            end
+        end)
+
         new.Parent = listFrame;
         backButton.Visible = #pageHistory > 0;
     end

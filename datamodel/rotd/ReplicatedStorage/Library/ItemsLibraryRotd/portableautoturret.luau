@@ -10,7 +10,7 @@ local HitListBitFlag;
 
 function itemPackage.GetTurretConfigs()
 	local defaultHitlistBitString = HitListBitFlag.Size; -- all bits =1
-	defaultHitlistBitString = HitListBitFlag:Set(defaultHitlistBitString, "Witherer", false);
+	defaultHitlistBitString = HitListBitFlag:Set(defaultHitlistBitString, "!Witherer", false);
 	
 	return {
 		TargetDistancePriority={
@@ -91,7 +91,7 @@ function itemPackage.Init(itemLib)
 	HitListBitFlag:AddFlag("Growler", 6);
 	HitListBitFlag:AddFlag("Dr. Sinister", 7);
 	HitListBitFlag:AddFlag("Tendrils", 8);
-	HitListBitFlag:AddFlag("Witherer", 9);
+	HitListBitFlag:AddFlag("!Witherer", 9);
 	HitListBitFlag:AddFlag("Bandit", 10);
 	HitListBitFlag:AddFlag("Bosses", 11);
 

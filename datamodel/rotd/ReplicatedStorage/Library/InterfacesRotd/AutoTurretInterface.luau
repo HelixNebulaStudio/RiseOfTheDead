@@ -246,6 +246,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				local hitlistLabel = script:WaitForChild("HitlistLabel");
 				
 				for tag, order in pairs(configHitlistBitFlags.Flags) do
+					if tag:sub(1,1) == "!" then continue end;
 					local newLabel = hitlistLabel:Clone();
 					newLabel.Text = tag;
 					newLabel.LayoutOrder = order;

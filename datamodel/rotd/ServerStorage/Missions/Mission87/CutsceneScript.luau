@@ -187,6 +187,7 @@ return function(CutsceneSequence)
 		end
 
 		local pp11Active = false;
+		local p16Skip = false;
 		local function OnChanged(firstRun)
 			if mission.Type == 3 then
 				spawnLocalCaitlinClass();
@@ -209,7 +210,7 @@ return function(CutsceneSequence)
 							mission.ProgressionPoint = 10;
 						end)
 					end
-					if mission.ProgressionPoint > 10 then
+					if mission.ProgressionPoint >= 10 then
 						spawnLocalCaitlinClass();
 					end
 				end
@@ -644,9 +645,13 @@ return function(CutsceneSequence)
 					josephClass.PlayAnimation("LookAround");
 
 					task.wait(4);
+					if mission.ProgressionPoint ~= 16 then return end;
+
 					josephClass.Properties.CutsceneWalkTo = Vector3.new(840.627, 57.751, -42.472);
 					task.wait(1);
+					
 					josephClass.Chat(player, "Oh, you found the walkies!");
+					p16Skip = true;
 
 					task.wait(3);
 					josephClass.PlayAnimation("CrouchPickup");
@@ -655,13 +660,17 @@ return function(CutsceneSequence)
 					josephClass.Properties.CutsceneEquip = "walkietalkie";
 
 					task.wait(3.3);
+					if mission.ProgressionPoint ~= 16 then return end;
 					josephClass.Properties.CutsceneEquip = nil;
 
 					task.wait(3);
+					if mission.ProgressionPoint ~= 16 then return end;
 
 					josephClass.Properties.CutsceneWalkTo = Vector3.new(853.909, 60.15, -42.522);
 					josephClass.Move.OnMoveToEnded:Wait(3);
 					josephClass:SetCFrame(CFrame.new(868.818, 57.751, -46.898) * CFrame.Angles(0, math.rad(158), 0));
+
+					if mission.ProgressionPoint ~= 16 then return end;
 
 					modMission:Progress(player, MISSION_ID, function()
 						if mission.ProgressionPoint <= 17 then
@@ -677,6 +686,9 @@ return function(CutsceneSequence)
 					josephClass:SetCFrame(CFrame.new(868.818, 57.751, -46.898) * CFrame.Angles(0, math.rad(158), 0));
 					josephClass.Properties.CutsceneWalkTo = Vector3.new(868.818, 57.751, -46.898);
 
+					if p16Skip ~= true then
+						josephClass.Chat(player, "Good, you found the walkies!");
+					end
 					caitlinClass.Chat(player, "I knew it was somewhere around here..");
 
 					task.wait(4);

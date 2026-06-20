@@ -693,11 +693,11 @@ function modItemsLibrary.onRequire()
         end;
     };
 
-    new(mapBase, {Id="klawsmap"; Name="Mr. Klaw's Workshop Map"; Icon="rbxassetid://8388817545"; GameMode={Mode="Coop"; Stage="Mr. Klaw's Workshop"}});
+    new(mapBase, {Id="klawsmap"; Tradable=modItemsLibrary.Tradable.Nontradable; Name="Mr. Klaw's Workshop Map"; Icon="rbxassetid://8388817545"; GameMode={Mode="Coop"; Stage="Mr. Klaw's Workshop"}});
     new(mapBase, {Id="banditoutpostmap"; Tradable=modItemsLibrary.Tradable.Nontradable; Name="Bandit Outpost Map"; Icon="rbxassetid://10037182552"; GameMode={Mode="Raid"; Stage="BanditOutpost"}; Sources={"Obtained from <b>Patrick after mission: Double Cross</b>";}; });
-    new(mapBase, {Id="communitywaysidemap"; Name="Community Way Side Map"; Icon="rbxassetid://10976330229"; GameMode={Mode="Survival"; Stage="CommunityWaySide"}; Tradable=modItemsLibrary.Tradable.Nontradable; Sources={"Obtained from <b>Gold Shop</b>";};});
-    new(mapBase, {Id="communityfissionbaymap"; Name="Community Fission Bay Map"; Icon="rbxassetid://12407594475"; GameMode={Mode="Survival"; Stage="CommunityFissionBay"}; Tradable=modItemsLibrary.Tradable.Nontradable; Sources={"Obtained from <b>Gold Shop</b>";};});
-    new(mapBase, {Id="communityrooftopmap"; Name="Community Rooftops Map"; Icon="rbxassetid://14247432855"; GameMode={Mode="Survival"; Stage="CommunityRooftops"}; Tradable=modItemsLibrary.Tradable.Nontradable; Sources={"Obtained from <b>Gold Shop</b>";};});
+    new(mapBase, {Id="communitywaysidemap"; Name="Community Way Side Map"; Icon="rbxassetid://10976330229"; GameMode={Mode="Survival"; Stage="CommunityWaySide"}; Sources={"Obtained from <b>Gold Shop</b>";};});
+    new(mapBase, {Id="communityfissionbaymap"; Name="Community Fission Bay Map"; Icon="rbxassetid://12407594475"; GameMode={Mode="Survival"; Stage="CommunityFissionBay"}; Sources={"Obtained from <b>Gold Shop</b>";};});
+    new(mapBase, {Id="communityrooftopmap"; Name="Community Rooftops Map"; Icon="rbxassetid://14247432855"; GameMode={Mode="Survival"; Stage="CommunityRooftops"}; Sources={"Obtained from <b>Gold Shop</b>";};});
 
     new(mapBase, {
         Id="abandonedbunkermap"; Name="Abandoned Bunker Map"; Icon="rbxassetid://16485911034"; GameMode={Mode="Raid"; Stage="Abandoned Bunker";};
