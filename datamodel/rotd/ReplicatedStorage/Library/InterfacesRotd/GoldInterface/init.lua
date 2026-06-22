@@ -223,7 +223,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
     --MARK: OnUpdate
     goldShopWindow.OnUpdate:Connect(function()
-        Debugger:Warn(`modData.PlayerGold { modData.PlayerGold}`);
         updateGoldStats(modData.PlayerGold or 0);
     end)
 
@@ -438,7 +437,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         local debounce = false;
         purchaseButton.MouseButton1Click:Connect(function()
 	        if productInfo.WIP then
-                if not RunService:IsStudio() and modGlobalVars.IsCreator(localPlayer) then
+                if not RunService:IsStudio() and not modGlobalVars.IsCreator(localPlayer) then
                     modClientGuis.promptWarning("This product is not yet available for purchase.");
                     return;
 

@@ -44,6 +44,7 @@ function library.onRequire()
 			Gender="M";
 			Clothing={"Brown Leather Jacket"};
 		};
+		SafehomeActive = true;
 	};
 	library:Add{Id="Stephanie"; Class="Survivor"; World="TheWarehouse"; Avatar="rbxassetid://15641528330";
 		Descriptors={
@@ -124,6 +125,7 @@ function library.onRequire()
 			Gender="M";
 			Clothing={"Bandana"; "Military Vest"; "Camo Pants"};
 		};
+		SafehomeActive = true;
 	};
 	library:Add{Id="Alice"; Class="Rat"; World="TheMall";};
 	library:Add{Id="Molly"; Class="Medic"; HeadIcon="Heal"; World="TheMall";};

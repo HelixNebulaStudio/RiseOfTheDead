@@ -66,15 +66,19 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 		if status.Button == nil then
 			status.Button = templateStatusItem:Clone();
-			status.Button.MouseMoved:Connect(function()
-				for k, obj in pairs(listings) do
-					obj.Info.Visible = k == statusId;
+			local button = status.Button;
+			
+			button:GetPropertyChangedSignal("GuiState"):Connect(function()
+				if button.GuiState == Enum.GuiState.Hover then
+					for k, obj in pairs(listings) do
+						obj.Info.Visible = k == statusId;
+					end
+				else
+					status.Info.Visible = false;
 				end
 			end)
-			status.Button.MouseLeave:Connect(function()
-				status.Info.Visible = false;
-			end)
-			status.Button.MouseButton1Click:Connect(function()
+			
+			button.MouseButton1Click:Connect(function()
 				if shared.gameConfig.BranchName == "Dev" then
 					Debugger:Warn("Status id:",statusId,"table:", statusClass);
 				end

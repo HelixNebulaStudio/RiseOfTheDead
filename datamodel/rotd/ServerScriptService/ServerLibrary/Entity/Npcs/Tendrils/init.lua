@@ -27,6 +27,7 @@ local npcPackage = {
         DropRewardId = "tendrils";
 
         MeleeImmunity = 1;
+        BleedResistant = 1;
 
         JointsStrength = {
             RootStump = true; -- true = only breaks on lethal damage

@@ -241,6 +241,7 @@ function LoadingScreen.newLoadingScreen(tpScreenGui, worldName)
 	if tick() < newLoadingScreenCd then return end;
 	newLoadingScreenCd = tick()+1;
 
+	local isTeleportIn = false;
 	local loadingScreen, newFrame;
 	if tpScreenGui == nil then
 		loadingScreen = Instance.new("ScreenGui");
@@ -255,6 +256,7 @@ function LoadingScreen.newLoadingScreen(tpScreenGui, worldName)
 		task.delay(25, function() loadingScreen:Destroy(); end)
 	
 	else
+		isTeleportIn = true;
 		loadingScreen = tpScreenGui;
 		loadingScreen.Parent = playerGui;
 		newFrame = tpScreenGui:WaitForChild("LoadingFrame");
@@ -373,9 +375,12 @@ function LoadingScreen.newLoadingScreen(tpScreenGui, worldName)
 
 	table.insert(loadingTextList, `\n<font size="14">{LOADING_HINTS[math.random(1, #LOADING_HINTS)]}</font>`);
 
-	textLabel.Text = table.concat(loadingTextList, "\n");
 
-	fadeGuiObjects(true);
+	if isTeleportIn == false then
+		textLabel.Text = table.concat(loadingTextList, "\n");
+
+		fadeGuiObjects(true);
+	end
 
 	return {
 		ScreenGui = loadingScreen;
@@ -389,7 +394,7 @@ function LoadingScreen.init(tpScreenGui)
 	ReplicatedFirst:RemoveDefaultLoadingScreen();
 
 	local addDelay = script:GetAttribute("Delay") or 0;
-	task.wait(4 + addDelay);
+	task.wait(3 + addDelay);
 
 	if not game:IsLoaded() then
 		game.Loaded:Wait();

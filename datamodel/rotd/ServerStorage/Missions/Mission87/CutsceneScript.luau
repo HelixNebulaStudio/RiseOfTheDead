@@ -173,9 +173,6 @@ return function(CutsceneSequence)
 			};
 			if caitlinClass == nil then return end;
 
-			if shared.WorldName == "TheHarbor" then
-				modReplicationManager.ReplicateOut(player, caitlinClass.Character);
-			end
 			Debugger:StudioWarn(`Spawned local caitlin {caitlinClass.Id}`);
 		end
 
@@ -198,7 +195,7 @@ return function(CutsceneSequence)
 			if mission.Type ~= 1 then return end;
 
 			if josephClass == nil then
-				if mission.ProgressionPoint >= 2 or shared.WorldName == "TheResidentials" then
+				if mission.ProgressionPoint >= 2 and shared.WorldName == "TheResidentials" then
 					spawnLocalJosephClass();
 				end
 			end

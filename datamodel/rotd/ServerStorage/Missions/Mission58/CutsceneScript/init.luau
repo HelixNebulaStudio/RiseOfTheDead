@@ -1574,8 +1574,12 @@ return function(CutsceneSequence)
 							Properties = {
 								InSafehome = true;
 							};
+							AddComponents = {
+								"SafehomeSurvivor";
+							};
 							BindSetup = function(npcClass: NpcClass)
 								npcClass.HealthComp:SetHealth(10);
+								safehomeClass:AddNpc(npcClass);
 							end;
 						};
 

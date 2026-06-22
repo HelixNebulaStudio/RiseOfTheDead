@@ -19,6 +19,12 @@ SafehomeService.__index = SafehomeService;
 function SafehomeService.onRequire()
     remoteSafehomeRequest = modRemotesManager:Get("SafehomeRequest");
 
+    if RunService:IsClient() then return end;
+    
+	shared.modNpcs.OnNpcSpawn:Connect(function(npcClass: NpcClass)
+        npcClass.Properties.InSafehome = true;
+
+    end);
 end
 
 function SafehomeService.teleportAllPlayersToSpawn()
@@ -47,7 +53,8 @@ function SafehomeClass.new(player: Player?)
         Garbage = modGarbageHandler.new();
 
         SpawnBasePart = nil;
-        InstanceConfigList = {};
+        InteractConfigList = {};
+        DestructConfigList = {};
         NpcClassList = {};
     };
 
@@ -63,7 +70,7 @@ end
 function SafehomeClass:Destroy()
     Debugger:Warn(`SafehomeClass:Destroy()`);
     self.Garbage:Destruct();
-    table.clear(self.InstanceConfigList);
+    table.clear(self.InteractConfigList);
 
     for npcName, npcClass in pairs(self.NpcClassList) do
         npcClass:Destroy();
@@ -84,6 +91,7 @@ function SafehomeClass:ChangeMap(mapId: string)
         return
     end;
     self.MapId = mapId;
+    workspace:SetAttribute("SafehomeMap", mapId);
 
 	local safehomeLib = modSafehomesLibrary:Find(mapId);
 	if safehomeLib == nil then
@@ -92,11 +100,10 @@ function SafehomeClass:ChangeMap(mapId: string)
         return;
     end;
 
-    for a=1, #self.NpcClassList do
-        local npcClass: NpcClass = self.NpcClassList[a];
+    for npcName, npcClass: NpcClass in pairs(self.NpcClassList) do
         npcClass.RootPart.Anchored = true;
     end
-    table.clear(self.InstanceConfigList);
+    table.clear(self.InteractConfigList);
     
     if self.IsSafehomeWorld then
         SafehomeService.teleportAllPlayersToSpawn();
@@ -122,7 +129,12 @@ function SafehomeClass:ChangeMap(mapId: string)
                             
                             local interactConfig = gameChild:FindFirstChild("Interactable", true);
                             if interactConfig and interactConfig:IsA("Configuration") then
-                                table.insert(self.InstanceConfigList, interactConfig);
+                                table.insert(self.InteractConfigList, interactConfig);
+                            end
+
+                            local destructibleConfig = gameChild:FindFirstChild("Destructible", true);
+                            if destructibleConfig and destructibleConfig:IsA("Configuration") then
+                                table.insert(self.DestructConfigList, destructibleConfig);
                             end
                         end
                         self.Garbage:Tag(c);
@@ -162,21 +174,8 @@ function SafehomeClass:ChangeMap(mapId: string)
                     
                     local interactConfig = c:FindFirstChild("Interactable", true);
                     if interactConfig and interactConfig:IsA("Configuration") then
-                        table.insert(self.InstanceConfigList, interactConfig);
+                        table.insert(self.InteractConfigList, interactConfig);
                     end
-
-                    -- if inspectOnly == true then
-                    --     local interactScript = c:FindFirstChild("Interactable", true);
-                        
-                    --     local doorObject = c:FindFirstChild("Door", true);
-                    --     doorObject = doorObject and doorObject:IsA("ModuleScript") and shared.require(doorObject) or nil;
-                    --     if doorObject then
-                    --         doorObject:Toggle(true);
-                    --     end
-                    -- else
-                    --     local interactScript = c:FindFirstChild("Interactable", true);
-                        
-                    -- end
                 end
                 
             elseif obj.Name == "SpawningPlatforms" then
@@ -197,8 +196,8 @@ function SafehomeClass:ChangeMap(mapId: string)
         end
     end
     
-    for a=1, #self.InstanceConfigList do
-        local interactConfig = self.InstanceConfigList[a];
+    for a=1, #self.InteractConfigList do
+        local interactConfig = self.InteractConfigList[a];
 
         local interactable: InteractableInstance = modInteractables.getOrNew(interactConfig);
         if interactable == nil then continue end;
@@ -210,16 +209,12 @@ function SafehomeClass:ChangeMap(mapId: string)
         end
     end
 
-    for a=1, #self.NpcClassList do
-        local npcClass: NpcClass = self.NpcClassList[a];
-
+    for npcName, npcClass: NpcClass in pairs(self.NpcClassList) do
         local npcSpotAtt = self:GetNpcSpot(npcClass.Name);
         npcClass:SetCFrame(npcSpotAtt.WorldCFrame);
 
         npcClass.RootPart.Anchored = false;
     end
-
-    Debugger:StudioLog("ChangedMap self.InstanceConfigList", self.InstanceConfigList);
 
     self.IsLoading = false;
 end
@@ -236,8 +231,12 @@ function SafehomeClass:GetNpcSpot(npcName: string)
 	
 	local npcSpots = {};
 	for _, spawnAtt in pairs(spawnsBasePart:GetChildren()) do
-		if spawnAtt.Name == "NpcSpot" and spawnAtt:GetAttribute("ActiveNpc") == nil then
-			table.insert(npcSpots, spawnAtt);
+		if spawnAtt.Name == "NpcSpot" then
+            if spawnAtt:GetAttribute("ActiveNpc") == npcName then
+                return spawnAtt;
+            elseif spawnAtt:GetAttribute("ActiveNpc") == nil then
+			    table.insert(npcSpots, spawnAtt);
+            end
 		end
 	end
 	
@@ -247,6 +246,11 @@ function SafehomeClass:GetNpcSpot(npcName: string)
 	rngNpcSpot:SetAttribute("ActiveNpc", npcName);
 	
 	return rngNpcSpot;
+end
+
+function SafehomeClass:AddNpc(npcClass: NpcClass)
+    local npcName = npcClass.Name;
+    self.NpcClassList[npcName] = npcClass;
 end
 
 function SafehomeClass:LoadNpcs(namesList)
@@ -288,13 +292,27 @@ function SafehomeClass:SetInspectMode(value: boolean)
 
     self.IsInspectOnly = value;
 
-    for a=1, #self.InstanceConfigList do
-        local interactConfig: Configuration = self.InstanceConfigList[a];
+    for a=1, #self.InteractConfigList do
+        local interactConfig: Configuration = self.InteractConfigList[a];
+
         local interactable = modInteractables.getOrNew(interactConfig);
         if interactable == nil then continue end;
         if interactable.Type:sub(1,4) == "Door" then continue end;
 
-        interactable.Values.InspectMode = value;
+        if value == true then
+            interactConfig:SetAttribute("InspectMode", true);
+        else
+            interactConfig:SetAttribute("InspectMode", nil);
+        end
+    end
+
+    for a=1, #self.DestructConfigList do
+        local destructConfig: Configuration = self.DestructConfigList[a];
+
+        local destructible = modDestructibles.getOrNew(destructConfig);
+        if destructible == nil then continue end;
+
+        destructible.Properties.InspectMode = value;
     end
 end
 

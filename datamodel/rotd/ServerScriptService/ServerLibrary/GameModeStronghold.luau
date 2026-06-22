@@ -357,8 +357,8 @@ function Stronghold:Initialize(roomData)
 
 			else
 				self:Hud{
-					Header="You died!";
-					Status="";
+					HeaderText = "You died!";
+					StatusText = "";
 				};
 			end
 		end)
@@ -517,9 +517,9 @@ function Stronghold:SpawnEnemy(npcName, paramPacket)
 						`Stronghold>>  Killed enemy. Alive: {#self.EnemyClasses}, Eliminated: {self.EliminateCount}, Remaining: {remining}`
 					);
 
-					self.ObjectiveStatusText = `Eliminate {remining} enemies`;
+					self.StatusText = `Eliminate {remining} enemies`;
 					self:Hud({
-						Status=self.ObjectiveStatusText;
+						StatusText = self.StatusText;
 					});
 					
 					if self.EliminateCount >= self.EliminateGoal then
@@ -559,7 +559,7 @@ function Stronghold:CompleteRaid()
 
 	shared.Notify(game.Players:GetPlayers(), `Raid Complete!{runTimeStr}`, "Positive");
 	self:Hud{
-		Status="Raid Complete!";
+		StatusText = "Raid Complete!";
 		PlayMusic=false;
 	};
 
@@ -631,7 +631,7 @@ function Stronghold:DropReward()
 		self.LootPrefab = lootPrefab;
 
 		self:Hud{
-			Status="A reward package has dropped!";
+			StatusText = "A reward package has dropped!";
 		};
 	end
 end
@@ -758,9 +758,9 @@ function Stronghold:Start()
 		Room = self.RoomData;
 	});
 	
-	self.ObjectiveStatusText = `Eliminate {self.EliminateGoal} enemies`;
+	self.StatusText = `Eliminate {self.EliminateGoal} enemies`;
 	self:Hud({
-		Status=self.ObjectiveStatusText;
+		StatusText = self.StatusText;
 	})
     Debugger:StudioLog(`Stronghold:Start self=`, self);
 end
@@ -812,16 +812,25 @@ function Stronghold:Hud(data)
 	if not self.Loaded then return end;
 	data = data or {};
 	
-	if self.HudValues == nil then
-		self.HudValues = {};
+	if data.HeaderText then
+		self.HeaderText = data.HeaderText;
 	end
-	
+	if data.StatusText then
+		self.StatusText = data.StatusText;
+	end
+	if data.RaidMarker then
+		self.RaidMarker = data.RaidMarker;
+	end
+	if data.HookEntity then
+		self.HookEntity = data.HookEntity;
+	end
+
 	remoteGameModeHud:FireAllClients({
 		Action = "Open";
 		Type = self.ModeType;
 		Stage = self.ModeStage;
-		Header = data.Header or `Elimination`;
-		Status = data.Status or "";
+		Header = self.HeaderText or `Elimination`;
+		Status = self.StatusText or "";
 		IsHard = self.IsHard == true;
 		
 		HookEntity=data.HookEntity or false;

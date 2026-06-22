@@ -59,6 +59,7 @@ function interactablePackage.init(super) -- Server/Client
 						interactable:Sync();
 
 						task.wait(5);
+						if not workspace:IsAncestorOf(config) then break; end;
 					end
 				end)
 			end

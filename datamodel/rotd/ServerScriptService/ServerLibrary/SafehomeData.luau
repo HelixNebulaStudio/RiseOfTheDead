@@ -231,10 +231,10 @@ function SafehomeData.onRequire()
 			local safehomeLib = modSafehomesLibrary:Find(safehomeId);
 			if safehomeLib == nil then return {ReplyCode=5;} end;
 			
+			safehomeClass:ChangeMap(safehomeId);
 			if safehomeLib.Unlocked ~= true or safehomeData.Homes[safehomeId] == nil then
 				safehomeClass:SetInspectMode(true);
 			end
-			safehomeClass:ChangeMap(safehomeId);
 			
 
 		elseif actionId == "playSound" and safehomeData.ActiveId ~= "default" then
@@ -428,6 +428,10 @@ function SafehomeData:GetNpc(npcName: string)
 
 	local npcDataMeta = {};
 	function npcDataMeta:__index(k)
+		if k == "Active" then
+			if npcLib.SafehomeActive then return true end;
+		end
+
 		local v = rawget(self, k);
 		if v ~= nil then
 			return v;
@@ -553,7 +557,7 @@ function SafehomeData:Init()
 end
 
 function SafehomeData:RefreshStats()
-	for npcName,_ in pairs(self.Npc) do
+	for npcName, _ in pairs(self.Npc) do
 		if self.Npc[npcName].Active == nil then continue end;
 		local npcData = self:GetNpc(npcName);
 

@@ -70,6 +70,15 @@ return function(CutsceneSequence)
 				Name = "Mason";
 				CFrame = masonSpawnAtt.WorldCFrame;
 				Player = player;
+				Properties = {
+					InSafehome = true;
+				};
+				AddComponents = {
+					"SafehomeSurvivor";
+				};
+				BindSetup = function(npcClass: NpcClass)
+					safehomeClass:AddNpc(npcClass);
+				end
 			};
 		end
 		
