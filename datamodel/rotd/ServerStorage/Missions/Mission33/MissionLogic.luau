@@ -59,11 +59,16 @@ if RunService:IsServer() then
 				
 			elseif mission.Type == 3 then -- OnComplete
 				if shared.WorldName == "TheMall" then
-					local patrickPrefab = workspace.Entity:FindFirstChild("Patrick");
-					if patrickPrefab then
+					local patrickClass = shared.modNpcs.matchNpc(function(npcClass: NpcClass)
+						if npcClass.Player then return end;
+						if npcClass.Name ~= "Patrick" then return end;
+						return true;
+					end);
+
+					if patrickClass then
 						local mission58 = missionProfile:Get(58);
 						if mission.Redo and mission58 and mission58.Type == 3 then
-							modReplicationManager.SetClientParent(player, patrickPrefab, game.ReplicatedStorage);
+							modReplicationManager.SetClientParent(player, patrickClass.Character, game.ReplicatedStorage);
 						end
 					end
 				end

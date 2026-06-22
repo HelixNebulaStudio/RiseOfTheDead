@@ -117,7 +117,7 @@ return function(CutsceneSequence)
 			if josephClass then return end;
 
 			if worldJosephModel then
-				modReplicationManager.UnreplicateFrom(player, worldJosephModel);
+				modReplicationManager.SetClientParent(player, worldJosephModel, game.ReplicatedStorage);
 			end
 
 			local spawnCf = playerClass:GetCFrame();
@@ -155,7 +155,7 @@ return function(CutsceneSequence)
 			if caitlinClass then return end;
 
 			if worldCaitlinModel then
-				modReplicationManager.UnreplicateFrom(player, worldCaitlinModel);
+				modReplicationManager.SetClientParent(player, worldCaitlinModel, game.ReplicatedStorage);
 			end
 
 			local spawnCf = playerClass:GetCFrame();
@@ -177,7 +177,11 @@ return function(CutsceneSequence)
 		end
 
 		if shared.WorldName == "TheHarbor" then
-			caitlinClass = modNpcs.getByModel(workspace.Entity:FindFirstChild("Caitlin"));
+			caitlinClass = modNpcs.matchNpc(function(npcClass: NpcClass)
+				if npcClass.Player then return end;
+				if npcClass.Name ~= "Caitlin" then return end;
+				return true;
+			end);
 
 		elseif shared.WorldName == "TheResidentials" then
 

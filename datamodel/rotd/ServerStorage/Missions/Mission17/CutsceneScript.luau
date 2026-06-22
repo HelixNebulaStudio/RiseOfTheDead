@@ -23,7 +23,11 @@ return function(CutsceneSequence)
 		local mission = modMission:GetMission(player, MISSION_ID);
 		if mission == nil then return end;
 			
-		local jesseNpcClass: NpcClass? = shared.modNpcs.getByModel(workspace.Entity:WaitForChild("Jesse"));
+		local jesseNpcClass: NpcClass? = shared.modNpcs.matchNpc(function(npcClass: NpcClass)
+			if npcClass.Player then return end;
+			if npcClass.Name ~= "Jesse" then return end;
+			return true;
+		end);
 		if jesseNpcClass == nil then return end;
 
 		local cutscenePlayersComp = jesseNpcClass:GetComponent("CutscenePlayers");

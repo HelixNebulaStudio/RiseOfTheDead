@@ -44,7 +44,7 @@ function InitElevator(interactable: InteractableInstance)
             elevatorModel:SetAttribute("IsActive", true);
 
             local distance = (liftBasePart.CFrame.Position-floorCf.Position).Magnitude;
-            local travelTime = distance/15;
+            local travelTime = distance/40;
 
             local travelTweenInfo = TweenInfo.new(travelTime);
             local tween: Tween = TweenService:Create(liftBasePart, travelTweenInfo, {

@@ -50,7 +50,7 @@ Dialogues.Mason.DialogueStrings = {
 	};
 
 	["tpwarehouse"]={
-		Say="Let's go back to the warehouse"; 
+		Say="Let's go back to the warehouse. (Travel to W.D. The Warehouse)"; 
 		Face="Confident";
 		Reply="Alright.";
 	};
@@ -128,12 +128,12 @@ if RunService:IsServer() then
 			end
 			
 		elseif mission.Type == 3 then -- Complete
-			if modBranchConfigurations.IsWorld("Safehome") then
+			if shared.WorldName == "Safehome" then
 				dialog:AddChoice("tpwarehouse", function(dialog)
 					modServerManager:Travel(player, "TheWarehouse");
 				end)
 
-			elseif modBranchConfigurations.IsWorld("TheWarehouse") then
+			elseif shared.WorldName == "TheWarehouse" then
 				dialog:AddChoice("tpsafehome", function(dialog)
 					modServerManager:Travel(player, "Safehome");
 				end)

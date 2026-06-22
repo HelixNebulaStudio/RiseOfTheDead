@@ -160,31 +160,12 @@ function library.onRequire()
                 cost = 0;
             end
             
-            local playerMissions = modMission.GetMissions(player.Name);
-            if playerMissions then
-                for a=1, #playerMissions do
-                    local mission = playerMissions[a];
-                    if mission.Type == 1 then
-                        local library = modMissionLibrary.Get(mission.Id);
-                        
-                        local fastTravelDisabled = false;
-
-                        if library.CanFastTravelWhenActive == false then
-                            fastTravelDisabled = true;
-                        end
-                        if typeof(library.CanFastTravelWhenActive) == "table" then
-                            if table.find(library.CanFastTravelWhenActive, tonumber(mission.ProgressionPoint) or 0) then
-                                fastTravelDisabled = true;
-                            end
-                        end
-                        
-                        if fastTravelDisabled then
-                            shared.Notify(player, ("Can not fast travel when mission \"$missionName\" is active."):gsub("$missionName", library.Name), "Negative");
-                            return 2;
-                        end
-                    end
-                end
-            end
+			local canFastTravel = modMission.canFastTravel(player, function(missionLib)
+				shared.Notify(player, `Can not fast travel when mission "{missionLib.Name}" is active.`, "Negative");
+			end);
+			if canFastTravel == false then
+				return 2;
+			end
             
             if unlock[gpsLib.Id] or gpsLib.UnlockedByDefault == true then
                 mission49Check();

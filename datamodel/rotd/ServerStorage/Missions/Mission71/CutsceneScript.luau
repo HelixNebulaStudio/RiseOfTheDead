@@ -20,7 +20,7 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	if modBranchConfigurations.IsWorld("MainMenu") then return end;
+	if shared.WorldName == "MainMenu" then return end;
 
 	CutsceneSequence:Initialize(function()
 		local players = CutsceneSequence:GetPlayers();
@@ -33,7 +33,11 @@ return function(CutsceneSequence)
 
 		local frankNpcClass: NpcClass;
 		if shared.WorldName == "TheWarehouse" then
-			frankNpcClass = shared.modNpcs.getByModel(workspace.Entity:FindFirstChild("Frank")) :: NpcClass;
+			frankNpcClass = modNpcs.matchNpc(function(npcClass: NpcClass)
+				if npcClass.Player then return end;
+				if npcClass.Name ~= "Frank" then return end;
+				return true;
+			end);
 		end
 
 		local function endMission()

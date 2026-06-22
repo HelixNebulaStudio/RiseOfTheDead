@@ -10,8 +10,6 @@ local MissionLogic = {};
 --==
 
 function MissionLogic.onRequire()
-	if shared.WorldName ~= "TheWarehouse" and shared.WorldName ~= "BioXResearch" then return end;
-
 	if RunService:IsServer() then
 		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
@@ -80,7 +78,10 @@ function MissionLogic.onRequire()
 
 		end
 
-	elseif RunService:IsClient() then
+	end
+	
+	if shared.WorldName ~= "TheWarehouse" and shared.WorldName ~= "BioXResearch" then return end;
+	if RunService:IsClient() then
 		local modGuiHighlight = shared.require(game.ReplicatedStorage.Library.UI.GuiHighlight);
 		local modWaypoint = shared.require(game.ReplicatedStorage.Library.Waypoint);
 

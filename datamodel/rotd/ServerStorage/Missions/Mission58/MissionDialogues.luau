@@ -89,6 +89,11 @@ Dialogues.Patrick.DialogueStrings = {
 		Say="Hey, how's the wound?";
 		Reply="It's getting better.. Oh and I want to give you this..";
 	};
+	["tpthemall"]={
+		Say="I'm going to head back. (Travel to W.D. The Mall)"; 
+		Face="Confident";
+		Reply="Alright.";
+	};
 };
 
 
@@ -164,6 +169,7 @@ if RunService:IsServer() then
 		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 		local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 		local modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
+		local modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
 
 		if mission.Type == 1 then -- Active
 			if mission.ProgressionPoint == 17 then
@@ -290,6 +296,12 @@ if RunService:IsServer() then
 				end)
 
 			end
+			if shared.WorldName == "Safehome" then
+				dialog:AddChoice("tpwarehouse", function(dialog)
+					modServerManager:Travel(player, "TheWarehouse");
+				end)
+			end
+			
 		end
 	end
 	

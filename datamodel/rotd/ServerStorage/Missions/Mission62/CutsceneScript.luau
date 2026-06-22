@@ -121,8 +121,16 @@ return function(CutsceneSequence)
 				revasNpcClass:TeleportHide();
 			end
 
-			local eugeneNpcClass: NpcClass = modNpcs.getByModel(workspace.Entity:FindFirstChild("Eugene"));
-			local stanNpcClass: NpcClass = modNpcs.getByModel(workspace.Entity:FindFirstChild("Stan"));
+			local eugeneNpcClass: NpcClass = modNpcs.matchNpc(function(npcClass: NpcClass)
+				if npcClass.Player then return end;
+				if npcClass.Name ~= "Eugene" then return end;
+				return true;
+			end);
+			local stanNpcClass: NpcClass = modNpcs.matchNpc(function(npcClass: NpcClass)
+				if npcClass.Player then return end;
+				if npcClass.Name ~= "Stan" then return end;
+				return true;
+			end);
 
 			local ratGoons = shared.WorldCore.RatGoons; -- Set by SectorE WorldScript.
 			

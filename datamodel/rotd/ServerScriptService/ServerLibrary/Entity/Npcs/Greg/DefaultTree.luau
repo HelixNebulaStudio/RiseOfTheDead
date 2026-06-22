@@ -100,7 +100,12 @@ end
 
 local GREG_CAITLIN_TALK_POS = Vector3.new(-310.98, 63.046, 212.037);
 function treePackage.GoToCaitlin(npcClass: NpcClass)
-    local caitlinClass = shared.modNpcs.getByModel(workspace.Entity:FindFirstChild("Caitlin"));
+    local caitlinClass = shared.modNpcs.matchNpc(function(npcClass: NpcClass)
+        if npcClass.Player then return end;
+        if npcClass.Name ~= "Caitlin" then return end;
+        return true;
+    end);
+
     if caitlinClass then
         local dist = npcClass:DistanceFrom(caitlinClass.RootPart.Position);
 
@@ -134,7 +139,13 @@ local thingsToSayToCaitlin = {
     "We might need to reinforce the South entrance soon...";
 };
 function treePackage.TalkToCaitlin(npcClass: NpcClass)
-    local caitlinClass = shared.modNpcs.getByModel(workspace.Entity:FindFirstChild("Caitlin"));
+    
+    local caitlinClass = shared.modNpcs.matchNpc(function(npcClass: NpcClass)
+        if npcClass.Player then return end;
+        if npcClass.Name ~= "Caitlin" then return end;
+        return true;
+    end);
+    
     if caitlinClass then
         if npcClass.Properties.TalkToCaitlinCooldown and tick() < npcClass.Properties.TalkToCaitlinCooldown then
             return false;

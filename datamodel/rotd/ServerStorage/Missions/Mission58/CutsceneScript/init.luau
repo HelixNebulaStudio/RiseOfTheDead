@@ -248,7 +248,11 @@ return function(CutsceneSequence)
 
 			initEventPackge(player);
 			local choiceEventObj = modEvents:GetEvent(player, "mission58choice");
-			local caitlinNpcClass: NpcClass = modNpcs.getByModel(workspace.Entity:FindFirstChild("Caitlin"));
+			local caitlinNpcClass: NpcClass = modNpcs.matchNpc(function(npcClass: NpcClass)
+				if npcClass.Player then return end;
+				if npcClass.Name ~= "Caitlin" then return end;
+				return true;
+			end);
 
 			local revasNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Revas");
 			if revasNpcClass == nil then

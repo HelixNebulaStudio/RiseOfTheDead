@@ -19,33 +19,55 @@ if RunService:IsServer() then
 		local function OnChanged(firstRun)
 			if mission.Type == 3 then
 				local patrick = modNpcProfileLibrary:Find("Patrick");
-				patrick.Class="Survivor";
-				patrick.World="Safehome";
+				patrick.Class = "Survivor";
+				patrick.World = "Safehome";
 
 				Debugger:Log("Update patrick class")
 
-				if modBranchConfigurations.IsWorld("TheMall") then
+				if shared.WorldName == "TheMall" then
+					local patrickClass = modNpcs.matchNpc(function(npcClass: NpcClass)
+						if npcClass.Player then return end;
+						if npcClass.Name ~= "Patrick" then return end;
+						return true;
+					end);
 
-					local patrickPrefab = workspace.Entity:FindFirstChild("Patrick");
-					if patrickPrefab then
-						modReplicationManager.SetClientParent(player, patrickPrefab, game.ReplicatedStorage);
+					if patrickClass then
+						modReplicationManager.SetClientParent(player, patrickClass.Character, game.ReplicatedStorage);
 					end
 					Debugger:Warn("Hide Patrick 1");
 					
 				end
 
 			else
-				if modBranchConfigurations.IsWorld("TheMall") then
-					local patrickPrefab = workspace.Entity:FindFirstChild("Patrick");
-					if patrickPrefab then
-						modReplicationManager.SetClientParent(player, patrickPrefab, workspace.Entity);
+				if shared.WorldName == "TheMall" then
+					local patrickClass = modNpcs.matchNpc(function(npcClass: NpcClass)
+						if npcClass.Player then return end;
+						if npcClass.Name ~= "Patrick" then return end;
+						return true;
+					end);
+
+					if patrickClass then
+						modReplicationManager.SetClientParent(player, patrickClass.Character, workspace.Entity);
 					end
+
 				end
 
 				if mission.Type == 1 then -- OnActive
-					if modBranchConfigurations.IsWorld("DoubleCross") then
+					if shared.WorldName == "DoubleCross" then
 
 					else
+						if mission.Redo then
+							local caitlinClass = modNpcs.matchNpc(function(npcClass: NpcClass)
+								if npcClass.Player then return end;
+								if npcClass.Name ~= "Caitlin" then return end;
+								return true;
+							end);
+
+							if mission.ProgressionPoint >= 1 and mission.ProgressionPoint <= 3 then
+								modReplicationManager.SetClientParent(player, caitlinClass.Character, workspace.Entity);
+							end
+						end
+						
 						if mission.ProgressionPoint >= 4 and mission.ProgressionPoint <= 6 then
 							if firstRun then
 								modMission:Progress(player, MISSION_ID, function(mission)
@@ -66,17 +88,21 @@ if RunService:IsServer() then
 			end
 
 			if mission.ProgressionPoint >= 17 then
-				if modBranchConfigurations.IsWorld("Safehome") then
+				if shared.WorldName == "Safehome" then
 					local patrick = modNpcProfileLibrary:Find("Patrick");
-					patrick.Class="Survivor";
-					patrick.World="Safehome";
+					patrick.Class = "Survivor";
+					patrick.World = "Safehome";
 
 					Debugger:Log("Update patrick class")
-				elseif modBranchConfigurations.IsWorld("TheMall") then
 
-					local patrickPrefab = workspace.Entity:FindFirstChild("Patrick");
-					if patrickPrefab then
-						modReplicationManager.SetClientParent(player, patrickPrefab, game.ReplicatedStorage);
+				elseif shared.WorldName == "TheMall" then
+					local patrickClass = modNpcs.matchNpc(function(npcClass: NpcClass)
+						if npcClass.Player then return end;
+						if npcClass.Name ~= "Patrick" then return end;
+						return true;
+					end);
+					if patrickClass then
+						modReplicationManager.SetClientParent(player, patrickClass.Character, game.ReplicatedStorage);
 					end
 					Debugger:Warn("Hide Patrick 2");
 

@@ -2522,7 +2522,6 @@ MissionLibrary.New{
 	From = "Mason";
 	Description = "Mason teaches you how to make a weapon.";
 	Persistent = true;
-	World = "TheWarehouse";
 	Checkpoint = {
 		{Text="Purchase a CZ75-Auto Pistol Blueprint from the shop";};
 		{Text="Use the Workbench to build the CZ75-Auto Pistol"};
@@ -2703,32 +2702,32 @@ MissionLibrary.New{
 
 -- MARK: 78 - The Killer Hues
 MissionLibrary.New{
-	MissionId=78;
+	MissionId = 78;
 	MissionType = MissionLibrary.MissionTypes.Side;
-	Name="The Killer Hues";
-	From="Lydia";
-	Description="Lydia wants to shoot some zombies but she doesn't have a gun.";
-	Persistent=true;
-	Checkpoint={
-		{Text="Talk to Lydia and give her a weapon";};
-		{Text="Look out for zombies breaching your safehome";};
-		{Text="Kill $PlayerKills zombies while Lydia watches you kill them";};
-		{Text="Let Lydia kill $LydiaKills zombies";};
-		{Text="Kill the rest of the zombies";};
+	Name = "The Killer Hues";
+	From = "Lydia";
+	Description = "Lydia wants to shoot some zombies but she doesn't have a gun.";
+	Persistent = true;
+	Checkpoint = {
+		{Text = "Talk to Lydia and give her a weapon";};
+		{Text = "Look out for zombies breaching your safehome";};
+		{Text = "Kill $PlayerKills zombies while Lydia watches you kill them";};
+		{Text = "Let Lydia kill $LydiaKills zombies";};
+		{Text = "Kill the rest of the zombies";};
 		
-		{Text="Talk to Lydia";};
+		{Text = "Talk to Lydia";};
 	};
-	StartRequirements={
+	StartRequirements = {
 	};
-	SaveData={
-		PlayerKills=5;
-		LydiaKills=10;
+	SaveData = {
+		PlayerKills = 5;
+		LydiaKills = 10;
 	};
-	GuideText="Talk to Lydia";
-	Rewards={
-		{Type="Perks"; Amount=PerksReward.Side};
+	GuideText = "Talk to Lydia";
+	Rewards = {
+		{Type = "Perks"; Amount = PerksReward.Side};
 	};
-	Markers={};
+	Markers = {};
 	
 };
 
@@ -3104,7 +3103,7 @@ MissionLibrary.New{
 		[2]={Label="Joseph"; Target="Joseph"; Type=modMarkers.MarkerTypes.Npc;};
 		[10]={World="TheResidentials"; Label="Caitlin"; Target="Caitlin"; Type=modMarkers.MarkerTypes.Npc;};
 	};
-	CanFastTravelWhenActive=false;
+	CanFastTravelWhenActive = {2;3;8;18;};
 	--WIP = true;
 };
 

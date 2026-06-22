@@ -494,7 +494,7 @@ if RunService:IsServer() then
 		if modMission:Progress(player, 54) then return end;
 		if modMission:IsComplete(player, 2) then
 			
-			if modBranchConfigurations.IsWorld("Safehome") then
+			if shared.WorldName == "Safehome" then
 				if modMission:IsComplete(player, 54) then
 					dialog:AddChoice("guide_safehomeNpcs");
 					dialog:AddChoice("guide_safehomeSustain");

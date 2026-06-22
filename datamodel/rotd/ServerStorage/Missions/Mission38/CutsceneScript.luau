@@ -13,7 +13,7 @@ if RunService:IsServer() then
 	modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	
-	if modBranchConfigurations.IsWorld("TheResidentials") then
+	if shared.WorldName == "TheResidentials" then
 		shared.modEventService:OnInvoked("Dialogue_BindTalkedTo", function(eventPacket: EventPacket, ...)
 			local player: Player? = eventPacket.Player;
 			if player == nil then return end;

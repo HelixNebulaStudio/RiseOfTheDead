@@ -13,23 +13,6 @@ if RunService:IsServer() then
 	local modNpcs = shared.modNpcs;
 
 	--if not modBranchConfigurations.IsWorld("TheHarbor") then return MissionLogic end;
-	if modBranchConfigurations.IsWorld("BioXResearch") then
-		modNpcs.spawn2{
-			Name = "Joseph";
-			CFrame = CFrame.new(-50.208, -16.75, 23.504);
-			Properties = {
-				CutsceneActive = true;
-			};
-		};
-		modNpcs.spawn2{
-			Name = "Cooper";
-			CFrame = CFrame.new(-55.208, -16.75, 23.504);
-		};
-		modNpcs.spawn2{
-			Name = "David";
-			CFrame = CFrame.new(-60.208, -16.75, 23.504);
-		};
-	end
 
 	shared.modEventService:OnInvoked("FotlCardGame_BindNpcLose", function(eventPacket: EventPacket, ...)
 		local gameLobby, loserNpcChar = ...;

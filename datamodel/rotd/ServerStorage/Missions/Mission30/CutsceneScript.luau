@@ -27,11 +27,16 @@ return function(CutsceneSequence)
 			local mission = modMission:GetMission(player, MISSION_ID);
 			if mission == nil then return end;
 			
-			local rachelPrefab = workspace.Entity:FindFirstChild("Rachel");
-			local rachelNpcClass: NpcClass = rachelPrefab and modNpcs.getByModel(rachelPrefab);
-			
-			local vladimirPrefab = workspace.Entity:FindFirstChild("Vladimir");
-			local vladimirNpcClass: NpcClass = vladimirPrefab and modNpcs.getByModel(vladimirPrefab);
+			local rachelNpcClass: NpcClass = modNpcs.matchNpc(function(npcClass: NpcClass)
+				if npcClass.Player then return end;
+				if npcClass.Name ~= "Rachel" then return end;
+				return true;
+			end);
+			local vladimirNpcClass: NpcClass = modNpcs.matchNpc(function(npcClass: NpcClass)
+				if npcClass.Player then return end;
+				if npcClass.Name ~= "Vladimir" then return end;
+				return true;
+			end);
 			
 			local stanNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Stan");
 			if stanNpcClass == nil then
@@ -229,8 +234,12 @@ return function(CutsceneSequence)
 			local mission = modMission:GetMission(player, MISSION_ID);
 			if mission == nil then return end;
 			
-			local patrickPrefab = workspace.Entity:FindFirstChild("Patrick");
-			local patrickNpcClass: NpcClass = patrickPrefab and modNpcs.getByModel(patrickPrefab);
+			local patrickNpcClass: NpcClass = modNpcs.matchNpc(function(npcClass: NpcClass)
+				if npcClass.Player then return end;
+				if npcClass.Name ~= "Patrick" then return end;
+				return true;
+			end);
+
 			local mallPatrickSpawn = patrickNpcClass.SpawnCFrame;
 			
 			local mallStanSpawn = CFrame.new(755.640137, 59.1950226, -805.369812, -1, 0, 0, 0, 1, 0, 0, 0, -1);
@@ -249,7 +258,7 @@ return function(CutsceneSequence)
 					
 					if mission.ProgressionPoint == 4 then
 						stanNpcClass:SetCFrame(mallStanSpawn);
-						modReplicationManager.SetClientParent(player, patrickPrefab, workspace.Entity);
+						modReplicationManager.SetClientParent(player, patrickNpcClass.Character, workspace.Entity);
 						
 					elseif mission.ProgressionPoint == 5 then
 						stanNpcClass:ToggleInteractable(false);
