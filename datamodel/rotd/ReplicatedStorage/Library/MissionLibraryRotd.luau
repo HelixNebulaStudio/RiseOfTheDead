@@ -405,43 +405,43 @@ MissionLibrary.New{
 
 -- MARK: 12 - Factory Raid
 MissionLibrary.New{
-	MissionId=12;
+	MissionId = 12;
 	MissionType = MissionLibrary.MissionTypes.Core;
-	Name="Factory Raid";
-	From="Mason";
-	Description="The warehouse is starting to run low on supplies, Mason needs your help on restocking them.";
-	Persistent=true;
-	World={"TheWarehouse", "Factory"};
-	Checkpoint={
-		{Text="Talk to Mason";};
-		{Text="Follow Mason";};
-		{Text="Destroy the barricade to enter the factory door";};
-		{Text="Complete the factory raid";};
-		{Text="Talk to Mason";};
+	Name = "Factory Raid";
+	From = "Mason";
+	Description = "The warehouse is starting to run low on supplies, Mason needs your help on restocking them.";
+	Persistent = true;
+	World = {"TheWarehouse", "Factory"};
+	Checkpoint = {
+		{Text = "Talk to Mason";};
+		{Text = "Follow Mason";};
+		{Text = "Destroy the barricade to enter the factory door";};
+		{Text = "Complete the factory raid";};
+		{Text = "Talk to Mason";};
 
-		{Text="Return to the warehouse";};
+		{Text = "Return to the warehouse";};
 	};
-	GuideText="Talk to Mason to start";
-	Rewards={
+	GuideText = "Talk to Mason to start";
+	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Mission"; Id=27};
 		{Type="Mission"; Id=18};
 	};
-	LinkNextMission=4;
-	StartRequirements={
-		Level=7;
-		MissionCompleted={49};
+	LinkNextMission = 4;
+	StartRequirements = {
+		Level = 7;
+		MissionCompleted = {49};
 	};
-	Markers={
-		[1]={World="TheWarehouse"; Label="Mason"; Target="Mason"; Type=modMarkers.MarkerTypes.Npc;};
-		[2]={World="TheWarehouse"; Label="Mason"; Target="Mason"; Type=modMarkers.MarkerTypes.Npc;};
-		[3]={World="TheWarehouse"; Label="Destroy Barricade"; Target=Vector3.new(12.6, 60.15, 177.3); Type=modMarkers.MarkerTypes.Waypoint;};
-		[4]={World="TheWarehouse"; Label="Factory Raid"; Target=Vector3.new(12.6, 60.15, 177.3); Type=modMarkers.MarkerTypes.Waypoint;};
-		[5]={World="Factory"; Label="Mason"; Target="Mason"; Type=modMarkers.MarkerTypes.Npc;};
-		[6]={World="TheWarehouse"; Label="Warehouse"; Target=Vector3.new(62.4, 60.2, -28.7); Type=modMarkers.MarkerTypes.Waypoint;};
+	Markers = {
+		[1] = {World="TheWarehouse"; Label="Mason"; Target="Mason"; Type=modMarkers.MarkerTypes.Npc;};
+		[2] = {World="TheWarehouse"; Label="Mason"; Target="Mason"; Type=modMarkers.MarkerTypes.Npc;};
+		[3] = {World="TheWarehouse"; Label="Destroy Barricade"; Target=Vector3.new(12.6, 60.15, 177.3); Type=modMarkers.MarkerTypes.Waypoint;};
+		[4] = {World="TheWarehouse"; Label="Factory Raid"; Target=Vector3.new(12.6, 60.15, 177.3); Type=modMarkers.MarkerTypes.Waypoint;};
+		[5] = {World="Factory"; Label="Mason"; Target="Mason"; Type=modMarkers.MarkerTypes.Npc;};
+		[6] = {World="TheWarehouse"; Label="Warehouse"; Target=Vector3.new(62.4, 60.2, -28.7); Type=modMarkers.MarkerTypes.Waypoint;};
 	};
-	CanRedo={};
+	CanRedo = {};
 	
 };
 

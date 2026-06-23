@@ -77,7 +77,8 @@ function npcPackage.Respawn(npcClass: NpcClass)
     local clawsPrefab = script:WaitForChild("Claws"):GetChildren();
     for _, model in pairs(clawsPrefab) do
         local armPart;
-        if model.Name:sub(1,4) == "Left" then
+        local isLeft = model.Name:sub(1,4) == "Left";
+        if isLeft then
             armPart = character:FindFirstChild("LeftLowerArm");
         else
             armPart = character:FindFirstChild("RightLowerArm");
@@ -93,6 +94,7 @@ function npcPackage.Respawn(npcClass: NpcClass)
         weld.Enabled = true;
 
         local destructible: DestructibleInstance = bodyDestructiblesComp:Create(name, shieldAccessory);
+        destructible.Name = isLeft and "Left Scale Hide" or "Right Scales Hide";
         destructible.DebrisName = name;
         destructible.HealthComp:SetMaxHealth(math.max(npcClass.HealthComp.MaxHealth*0.1, 50));
         destructible.HealthComp:Reset();

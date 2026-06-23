@@ -163,6 +163,7 @@ function npcPackage.Spawned(npcClass: NpcClass)
         end)
         
         local destructible: DestructibleInstance = bodyDestructiblesComp:Create("Eye", eye);
+        destructible.Name = "Withering Eye";
         destructible.Properties.DestroyModel = false;
 
         local healthComp: HealthComp = destructible.HealthComp;

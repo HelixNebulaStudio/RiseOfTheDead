@@ -90,6 +90,7 @@ function treePackage.PlantSpore(npcClass: NpcClass)
         Debugger.Expire(sporeModel, 30);
 
         local sporeDestructible: DestructibleInstance = bodyDestructiblesComp:Create(sporeModel.Name, sporeModel);
+        sporeDestructible.Name = "Nekros Spore";
         sporeDestructible.Properties.DestroyModel = false;
         sporeDestructible.OwnerStatusCompLink = true;
         

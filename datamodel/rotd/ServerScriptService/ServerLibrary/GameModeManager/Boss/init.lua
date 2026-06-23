@@ -157,17 +157,17 @@ function GameMode:Start(room)
 			CFrame = newSpawnPoint;
 
 			AddComponents = {"CrateReward"};
+			Properties = {
+				Level = math.max(bossLevel, 1);
+
+				Arena = bossArenaModel;
+				HardMode = room.IsHard;
+				CrateId = bossLib.CrateId;
+				TargetableDistance = 4096;
+				HordeAggression = true;
+			};
 			BindPreSetup = function(npcClass: NpcClass)
-				local properties = npcClass.Properties;
 				npcClass.NetworkOwners = players;
-
-				properties.Level = math.max(bossLevel, 1);
-
-				properties.Arena = bossArenaModel;
-				properties.HardMode = room.IsHard;
-				properties.CrateId = bossLib.CrateId;
-				properties.TargetableDistance = 4096;
-				properties.HordeAggression = true;
 			end;
 			BindSetup = function(npcClass: NpcClass)
 				local bossCharacter = npcClass.Character;

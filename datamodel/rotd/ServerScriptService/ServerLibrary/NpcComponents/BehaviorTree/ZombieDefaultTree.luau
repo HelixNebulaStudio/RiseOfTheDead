@@ -240,6 +240,11 @@ function treePackage.Idle(npcClass: NpcClass)
 
     if properties.FakeSpawnPoint then
         spawnPoint = properties.FakeSpawnPoint.Position;
+
+        if properties.LastHordeAttack == nil or tick()-properties.LastHordeAttack >= 60 then 
+            properties.LastHordeAttack = tick();
+            npcClass.Move:MoveTo(spawnPoint);
+        end
     end
 
     if properties.IsMoving == false and (tick()-npcClass.LastRespawnTick) > 10 then

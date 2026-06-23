@@ -183,10 +183,10 @@ function npcPackage.Spawned(npcClass: NpcClass)
     local lvlHealth = configurations.BaseValues.MaxHealth;
 
     local limbsList = {
-        {Name="LeftArm"; Text="Left Leg"; Health=math.max(lvlHealth*0.0125, 15000); HardHealthMulti=10;};
-        {Name="RightArm"; Text="Right Leg"; Health=math.max(lvlHealth*0.0125, 15000); HardHealthMulti=10;};
-        {Name="LeftLeg"; Text="Left Hind"; Health=math.max(lvlHealth*0.005, 15000); HardHealthMulti=10;};
-        {Name="RightLeg"; Text="Right Hind"; Health=math.max(lvlHealth*0.005, 15000); HardHealthMulti=10;};
+        {Name="LeftArm"; Label="Left Claw"; Health=math.max(lvlHealth*0.0125, 15000); HardHealthMulti=10;};
+        {Name="RightArm"; Label="Right Claw"; Health=math.max(lvlHealth*0.0125, 15000); HardHealthMulti=10;};
+        {Name="LeftLeg"; Label="Left Hind"; Health=math.max(lvlHealth*0.005, 15000); HardHealthMulti=10;};
+        {Name="RightLeg"; Label="Right Hind"; Health=math.max(lvlHealth*0.005, 15000); HardHealthMulti=10;};
     };
 
     for a=1, #limbsList do
@@ -194,6 +194,7 @@ function npcPackage.Spawned(npcClass: NpcClass)
         local limbModel: Model = character:WaitForChild(limb.Name)
 
         local destructible: DestructibleInstance = bodyDestructiblesComp:Create(limb.Name, limbModel);
+        destructible.Name = limb.Label;
         destructible.Properties.DestroyModel = false;
         destructible.HealthbarAutoHide = 1;
         destructible:SetHealthbarEnabled(true);

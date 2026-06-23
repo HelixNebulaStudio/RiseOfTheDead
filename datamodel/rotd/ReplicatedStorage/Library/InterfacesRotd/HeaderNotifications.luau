@@ -89,10 +89,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                     titleImage.Image = "rbxassetid://4473237759";
                     titleText = ("The horde is attacking $Name!"):gsub("$Name", values.Name or "NIL");
                     modAudio.Preload("HordeGrowl", 5);
-                    modAudio.Play("HordeGrowl");	
+                    modAudio.Play("HordeGrowl");
 
                 elseif Type == "Breach" then
-                    titleImage.Image = "rbxassetid://4473237759";
+                    titleImage.Image = "rbxassetid://86937890959915";
                     titleText = "There's a breach in a safehome!";
                     modAudio.Preload("TerrorAlert", 5);
                     modAudio.Play("TerrorAlert");

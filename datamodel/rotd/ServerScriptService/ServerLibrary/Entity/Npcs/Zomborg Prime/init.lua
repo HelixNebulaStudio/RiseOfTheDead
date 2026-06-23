@@ -79,6 +79,7 @@ function npcPackage.Spawned(npcClass: NpcClass)
 
     local powerSource = npcClass.Character:WaitForChild("PowerSource");
     local powerSrcDestructible: DestructibleInstance = bodyDestructiblesComp:Create("Power Source", powerSource);
+    powerSrcDestructible.Name = "Power Source";
     powerSrcDestructible.HealthComp:SetMaxHealth(math.max(maxHealth*0.2, 50));
     powerSrcDestructible.HealthComp:Reset();
     
@@ -119,6 +120,7 @@ function npcPackage.Spawned(npcClass: NpcClass)
         table.insert(properties.LauncherPoints, launcherPoint);
 
         local destructible: DestructibleInstance = bodyDestructiblesComp:Create(launcher.Name, launcher);
+        destructible.Name = launcher.Name:sub(1,4) == "Left" and "Left Launcher" or "Right Launcher";
         destructible.DebrisName = launcher:GetAttribute("DebrisName");
         destructible.HealthComp:SetMaxHealth(math.max(maxHealth*0.1, 50));
         destructible.HealthComp:Reset();

@@ -193,7 +193,7 @@ GameModeLibrary.GameModes={
 				IsExtreme=true;
 				SingleArena=true;
 				HealthPerPlayer=8000;
-				ReadyLength=20;
+				ReadyLength=10;
 				
 				HardModeEnabled=true;
 				HardModeItem="zricerahorn";
@@ -215,7 +215,7 @@ GameModeLibrary.GameModes={
 				IsExtreme=true;
 				SingleArena=true;
 				HealthPerPlayer=16000;
-				ReadyLength=20;
+				ReadyLength=10;
 				
 				HardModeEnabled=true;
 				HardModeItem="vexling";
@@ -236,7 +236,7 @@ GameModeLibrary.GameModes={
 				IsExtreme=true;
 				SingleArena=true;
 				HealthPerPlayer=16000;
-				ReadyLength=20;
+				ReadyLength=10;
 			};
 			
 			["Mothena"]={
@@ -255,7 +255,7 @@ GameModeLibrary.GameModes={
 				SingleArena=true;
 				ExitTeleport=false;
 				HealthPerPlayer=16000;
-				ReadyLength=20;
+				ReadyLength=10;
 				NoArenaBoundaries=true;
 			};
 			
@@ -276,8 +276,7 @@ GameModeLibrary.GameModes={
 				SingleArena=true;
 				ExitTeleport=false;
 				HealthPerPlayer=32000;
-				ReadyLength=20;
-				NoArenaBoundaries=true;
+				ReadyLength=10;
 
 				HardModeEnabled=true;
 				HardModeItem="nekronparticulatecache";
@@ -300,7 +299,7 @@ GameModeLibrary.GameModes={
 				SingleArena=true;
 				ExitTeleport=false;
 				HealthPerPlayer=16000;
-				ReadyLength=20;
+				ReadyLength=10;
 				NoArenaBoundaries=true;
 			};
 			

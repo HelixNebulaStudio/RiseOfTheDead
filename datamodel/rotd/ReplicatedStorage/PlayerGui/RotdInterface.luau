@@ -7,6 +7,7 @@ local UserInputService = game:GetService("UserInputService");
 local ContextActionService = game:GetService("ContextActionService");
 local TweenService = game:GetService("TweenService");
 local CollectionService = game:GetService("CollectionService");
+local HttpService = game:GetService("HttpService");
 
 local camera = workspace.CurrentCamera;
 local localPlayer = game.Players.LocalPlayer;
@@ -38,6 +39,63 @@ function RotdInterface.clientGuisLoad()
 
             interface:ToggleGameBlinds(false, 4);
         end))
+
+        local function onWorldEventInfoUpdate()
+            local HUD_TASK_ID = "WorldEventTask";
+            local worldEventInfo = {
+                Name = nil;
+                Header = nil;
+                Desc = nil;
+                StartTime = nil;
+                Duration = nil;
+            };
+
+            if workspace:GetAttribute("WorldEventInfo") then
+                worldEventInfo = HttpService:JSONDecode(workspace:GetAttribute("WorldEventInfo"));
+            end
+
+            local taskHudWindow: InterfaceWindow = interface:GetWindow("TaskListHud");
+            local worldEventHudTask = taskHudWindow and taskHudWindow.Binds.getOrNewTask(HUD_TASK_ID) or nil;
+
+            local isActive = worldEventInfo.Name ~= nil;
+            if not isActive then
+                if worldEventHudTask then
+                    taskHudWindow.Binds.destroyHudTask(HUD_TASK_ID);
+                    worldEventHudTask = nil;
+                end
+
+                return;
+            end
+
+            worldEventHudTask = taskHudWindow and taskHudWindow.Binds.getOrNewTask(HUD_TASK_ID, true) or nil;
+            if worldEventHudTask == nil then return end;
+
+            worldEventHudTask.Order = 5;
+            worldEventHudTask.Properties.TitleText = `World Event`;
+
+            if worldEventInfo.Header and worldEventInfo.Header:sub(1, 13) == "rbxassetid://" then
+                worldEventHudTask.Properties.HeaderText = "";
+                worldEventHudTask.Properties.HeaderImg = worldEventInfo.Header;
+            else
+                worldEventHudTask.Properties.HeaderImg = "";
+                worldEventHudTask.Properties.HeaderText = worldEventInfo.Header or worldEventInfo.Name;
+            end
+            
+            worldEventHudTask.Properties.DescText = worldEventInfo.Desc;
+
+            if worldEventInfo.StartTime then
+                worldEventHudTask.Properties.Timers.Timer1 = {
+                    Duration = worldEventInfo.Duration or math.huge;
+                    StartTime = worldEventInfo.StartTime;
+                };
+            else
+                table.clear(worldEventHudTask.Properties.Timers);
+            end
+
+            worldEventHudTask:Update();
+        end
+        interface.Garbage:Tag(workspace:GetAttributeChangedSignal("WorldEventInfo"):Connect(onWorldEventInfoUpdate));
+        onWorldEventInfoUpdate();
     
     else
         if modBranchConfigurations.IsWorld("MainMenu") or modBranchConfigurations.IsWorld("BioXResearch") then

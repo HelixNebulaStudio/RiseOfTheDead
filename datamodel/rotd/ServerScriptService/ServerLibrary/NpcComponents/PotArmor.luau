@@ -53,6 +53,7 @@ function Component:Setup()
 	rigidConstraint.Parent = armorPickPart;
 
 	local destructible: DestructibleInstance = bodyDestructiblesComp:Create("PotArmor", armorModel);
+	destructible.Name = "Pot Armor";
 	destructible.HealthComp:SetMaxHealth((npcClass.Properties.Level or 1) * 600);
 end
 

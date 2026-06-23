@@ -252,6 +252,7 @@ function npcPackage.Spawned(npcClass: NpcClass)
             newWormModel.PrimaryPart = bodyPart;
 
             local destructible: DestructibleInstance = bodyDestructiblesComp:Create(newWormModel.Name, newWormModel);
+            destructible.Name = "Vexeworm";
             destructible.Properties.DestroyModel = false;
             local newHealth = healthPerLimb;
             

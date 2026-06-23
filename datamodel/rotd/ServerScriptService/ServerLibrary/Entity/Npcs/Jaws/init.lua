@@ -97,6 +97,7 @@ function npcPackage.Spawned(npcClass: NpcClass)
         local insideModel = jawModels[a]:WaitForChild("JawInsides");
         
         local jawDestructible: DestructibleInstance = bodyDestructiblesComp:Create(`${key} Jaw`, insideModel);
+        jawDestructible.Name = `{key == "L" and "Left" or "Right"} Jaw`;
         jawDestructible.Properties.DestroyModel = false;
 
         function jawDestructible.HealthComp:TakeDamage(damageData: DamageData)

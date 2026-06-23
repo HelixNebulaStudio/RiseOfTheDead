@@ -5,7 +5,6 @@ local RunService = game:GetService("RunService");
 local CollectionService = game:GetService("CollectionService");
 
 local modGlobalVars = shared.require(game.ReplicatedStorage.GlobalVariables);
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modHealthComponent = shared.require(game.ReplicatedStorage.Components.HealthComponent);
 local modDestructibles = shared.require(game.ReplicatedStorage.Entity.Destructibles);
 
@@ -17,7 +16,7 @@ if RunService:IsServer() then
 	modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
-	if modBranchConfigurations.IsWorld("TheWarehouse") then
+	if shared.WorldName == "TheWarehouse" then
 		shared.modEventService:OnInvoked("Interactables_BindDoorInteract", function(eventPacket: EventPacket, ...)
 			local player: Player? = eventPacket.Player;
 			if player == nil then return end;
@@ -33,7 +32,7 @@ if RunService:IsServer() then
 			end
 		end)
 
-	elseif modBranchConfigurations.IsWorld("Factory") then
+	elseif shared.WorldName == "Factory" then
 		shared.modEventService:OnInvoked("GameModeManager_BindGameModeStart", function(event: EventPacket, packet)
 			local room = packet.Room;
 			if room.Type ~= "Raid" or room.Stage ~= "Factory" then return end;
@@ -72,7 +71,7 @@ end
 return function(CutsceneSequence)
 
 	--MARK: TheWarehouse
-	if modBranchConfigurations.IsWorld("TheWarehouse") then
+	if shared.WorldName == "TheWarehouse" then
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
 			local player: Player = players[1];
@@ -106,6 +105,7 @@ return function(CutsceneSequence)
 				};
 			end
 
+			local checkLoop = nil;
 			local function OnChanged(firstRun)
 				if mission.Type == 2 then -- OnAvailable
 
@@ -357,6 +357,27 @@ return function(CutsceneSequence)
 							end;
 						end)
 
+						task.spawn(function()
+							if checkLoop then return end;
+							checkLoop = true;
+
+							while mission.Type ~= 3 do
+								task.wait(1);
+								if not game.Players:IsAncestorOf(player) then break end;
+								
+								local isInSafehome = player:GetAttribute("Location") == "Warehouse Safehouse";
+								if not isInSafehome then continue end;
+
+								modMission:Progress(player, MISSION_ID, function(mission)
+									if mission.ProgressionPoint >= 5 then
+										modMission:CompleteMission(player, MISSION_ID);
+									end
+								end)
+								
+								break;
+							end
+						end)
+
 					end
 					
 				elseif mission.Type == 3 then -- OnComplete
@@ -378,7 +399,7 @@ return function(CutsceneSequence)
 		
 		
 	--MARK: Factory
-	elseif modBranchConfigurations.IsWorld("Factory") then
+	elseif shared.WorldName == "Factory" then
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
 			local player: Player = players[1];

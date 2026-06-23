@@ -1,7 +1,8 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
+local WorldEvent = {};
+
 local WorldEventSystem = {} :: anydict;
-local HordeAttack = {}
 local AttackLocations = {};
 local LocationsList = {};
 
@@ -19,9 +20,10 @@ local HordeTypes = {
 	["Zombie"]="Zombie";
 }
 
-local random = Random.new();
 --==
-function HordeAttack.Initialize(worldEventSystem)
+WorldEvent.Index = 0;
+
+function WorldEvent.Initialize(worldEventSystem)
 	if workspace:FindFirstChild("HordeAttack") == nil then return false; end;
 	
 	WorldEventSystem = worldEventSystem;
@@ -71,16 +73,25 @@ function HordeAttack.Initialize(worldEventSystem)
 	return true;
 end
 
-function HordeAttack.Start()
-	WorldEventSystem.NextEventTick = os.time()+random:NextNumber(1600, 1800);
+function WorldEvent.Start()
+	WorldEvent.Index += 1;
+	local curIndex = WorldEvent.Index;
+
+	WorldEventSystem.NextEventTick = os.time() + math.random(1600, 1800);
 	
-	local safehouse = LocationsList[random:NextInteger(1, #LocationsList)];
+	local safehouse = #LocationsList > 0 and LocationsList[math.random(1, #LocationsList)];
 	if safehouse == nil then return end;
 	
+	local duration = 480;
+
+	WorldEventSystem:SetActiveHeader(`rbxassetid://4473237759`);
+	WorldEventSystem:SetActiveDesc(`A horde is moving through {safehouse}!\nHordes are aggresive and will have a chance to drop special loot..`);
+	WorldEventSystem:SetActiveEndTime(duration);
+
 	local locationInfo = AttackLocations[safehouse];
 	remoteHudNotification:FireAllClients("HordeAttack", {Name=safehouse});
-	shared.Notify(game.Players:GetPlayers(), "There will be a Horde Attack at the "..safehouse.."!", ("Defeated" :: any));
-	shared.Notify(game.Players:GetPlayers(), "Hordes will have a chance to drop special loot..", ("Defeated" :: any));
+	-- shared.Notify(game.Players:GetPlayers(), `There is a Horde Attack at the {safehouse}!`, ("Defeated" :: any));
+	-- shared.Notify(game.Players:GetPlayers(), `Hordes will have a chance to drop special loot..`, ("Defeated" :: any));
 
 	local zombies = 0;
 	local function UpdateNpc(npcClass: NpcClass)
@@ -92,11 +103,11 @@ function HordeAttack.Start()
 			return
 		end
 		
-		local randomRegion = locationInfo.Regions[random:NextInteger(1, #locationInfo.Regions)];
+		local randomRegion = locationInfo.Regions[math.random(1, #locationInfo.Regions)];
 		local randomPoint = Vector3.new(
-			random:NextNumber(randomRegion.Min.X, randomRegion.Max.X),
+			math.random(randomRegion.Min.X, randomRegion.Max.X),
 			randomRegion.Max.Y,
-			random:NextNumber(randomRegion.Min.Z, randomRegion.Max.Z)
+			math.random(randomRegion.Min.Z, randomRegion.Max.Z)
 		);
 
 		if modVector.DistanceSqrdXZ(npcClass.SpawnCFrame.Position, randomPoint) > math.pow(250, 2) then return end;
@@ -107,13 +118,14 @@ function HordeAttack.Start()
 		if groundHit == nil then return end;
 		
 		properties.HordeAttack = true;
+		properties.HordeAggression = true;
 		properties.FakeSpawnPoint = CFrame.new(groundPoint);
 		
 		zombies = zombies+1;
 	end
 	
 	for a=1, #modNpcs.ActiveNpcClasses do
-		if modNpcs.ActiveNpcClasses[a] and random:NextInteger(1, 3) == 1 then
+		if modNpcs.ActiveNpcClasses[a] and math.random(1, 3) == 1 then
 			UpdateNpc(modNpcs.ActiveNpcClasses[a])
 		end
 	end
@@ -123,24 +135,20 @@ function HordeAttack.Start()
 	modNpcs.OnNpcSpawn:Connect(UpdateNpc);
 	
 	local complete = false;
-	local duration = 480;
-	local startTime = os.time()+duration;
-	
-	local function announceTimeLeft()
-		if complete then return end;
-		
-		local timeLeft = startTime - os.time();
-		if timeLeft > 60 then
-			shared.Notify(game.Players:GetPlayers(), "The Horde Attack will end in "..math.ceil(timeLeft/60).." minutes!", "Defeated");
-		else
-			shared.Notify(game.Players:GetPlayers(), "The Horde Attack will end in "..math.floor(timeLeft).." seconds!", "Defeated");
+
+	task.spawn(function()
+		while not complete do
+			task.wait(2);
+
+			local npcClass: NpcClass = modNpcs.ActiveNpcClasses[math.random(1, #modNpcs.ActiveNpcClasses)];
+			if npcClass == nil or npcClass.HealthComp == nil or npcClass.HealthComp.IsDead then continue end;
+			if shared.gameConfig.BranchName == "Live" and math.random(1, 3) ~= 1 then continue end;
+
+			UpdateNpc(npcClass);
 		end
-	end
-	
+	end)
+
 	task.delay(duration, function() WorldEventSystem.EndBind:Fire(); end)
-	task.delay(duration-300, announceTimeLeft);
-	task.delay(duration-120, announceTimeLeft);
-	task.delay(duration-60, announceTimeLeft);
 	WorldEventSystem.EndBind.Event:Wait();
 	
 	if not complete then 
@@ -148,6 +156,7 @@ function HordeAttack.Start()
 		for a=1, #modNpcs.ActiveNpcClasses do
 			local npcClass: NpcClass = modNpcs.ActiveNpcClasses[a];
 			if HordeTypes[npcClass.Name] then
+				npcClass.Properties.HordeAggression = nil;
 				npcClass.Properties.FakeSpawnPoint = nil;
 				npcClass.Properties.HordeAttack = nil;
 			end
@@ -156,4 +165,4 @@ function HordeAttack.Start()
 	end;
 end
 
-return HordeAttack;
+return WorldEvent;

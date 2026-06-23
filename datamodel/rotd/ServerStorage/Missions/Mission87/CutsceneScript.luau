@@ -191,9 +191,16 @@ return function(CutsceneSequence)
 		local p16Skip = false;
 		local function OnChanged(firstRun)
 			if mission.Type == 3 then
-				spawnLocalCaitlinClass();
-
-				caitlinClass:SetCFrame(CFrame.new(1127.165, 55.389, 107.03) * CFrame.Angles(0, math.rad(90), 0));
+				if shared.WorldName == "TheResidentials" then
+					spawnLocalCaitlinClass();
+					caitlinClass:SetCFrame(CFrame.new(1127.165, 55.389, 107.03) * CFrame.Angles(0, math.rad(90), 0));
+					
+				elseif shared.WorldName == "TheHarbor" then
+					if shared.WorldCore.CaitlinClass then
+						modReplicationManager.SetClientParent(player, shared.WorldCore.CaitlinClass.Character, game.ReplicatedStorage);
+					end
+					
+				end
 				return;
 			end
 			if mission.Type ~= 1 then return end;

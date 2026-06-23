@@ -96,6 +96,7 @@ function npcPackage.Spawned(npcClass: NpcClass)
 
     local bodyDestructiblesComp = npcClass:GetComponent("BodyDestructibles");
     local destructible: DestructibleInstance = bodyDestructiblesComp:Create("Spores", sporesModel);
+    destructible.Name = "Spores";
     destructible.HealthComp:SetMaxHealth(math.max(npcClass.HealthComp.MaxHealth*0.1, 50));
     destructible.HealthComp:Reset();
 

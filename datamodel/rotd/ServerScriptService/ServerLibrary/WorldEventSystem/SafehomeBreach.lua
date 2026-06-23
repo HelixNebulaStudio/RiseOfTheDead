@@ -37,8 +37,9 @@ function WorldEvent.Initialize(worldEventsService)
 	modMission.OnPlayerMission:Connect(function(player, mission, context)
 		if context ~= "complete" then return; end
 		if mission.Id ~= 2 then return end
-		if WorldEvent.LastBreach and tick()-WorldEvent.LastBreach <= 300 then return end;
-		
+		if WorldEvent.LastBreach and tick()-WorldEvent.LastBreach <= 600 then return end;
+		if WorldEventSystem.ActiveEvent and WorldEventSystem.ActiveEvent.Name == script.Name then return end;
+
 		WorldEventSystem.NextWorldEvent = script.Name;
 		WorldEventSystem.NextEventTick = modSyncTime.GetTime()+6;
 	end)
@@ -130,10 +131,14 @@ function WorldEvent.Start()
 	WorldEventSystem.NextEventTick = modSyncTime.GetTime() + math.random(600, 900);
 	WorldEvent.LastBreach = tick();
 	
-	local duration = shared.WorldName == "TheWarehouse" and 120 or 240;
-	local startTime = modSyncTime.GetTime();
+	local duration = shared.WorldName == "TheWarehouse" and 90 or 240;
+	local startTime = workspace:GetServerTimeNow();
 	local endTime = startTime + duration;
 	
+	WorldEventSystem:SetActiveHeader(`rbxassetid://86937890959915`);
+	WorldEventSystem:SetActiveDesc(`A safehouse got breached!\nFight off the invasion and fortify the safehouse.`);
+	WorldEventSystem:SetActiveEndTime(duration);
+
 	remoteHudNotification:FireAllClients("Breach", {});
 
 	if modBranchConfigurations.IsWorld("Safehome") then
@@ -141,23 +146,6 @@ function WorldEvent.Start()
 	else
 		shared.Notify(game.Players:GetPlayers(), "A safehouse got breached! Quickly fight off the horde and refortify.", "Important");
 	end
-
-
-	local function announceTimeLeft()
-		if modSyncTime.GetTime() > endTime then return end;
-		
-		local timeLeft = endTime - modSyncTime.GetTime();
-		if timeLeft > 60 then
-			shared.Notify(game.Players:GetPlayers(), "The breach will end in "..math.ceil(timeLeft/60).." minutes!", "Important");
-		else
-			shared.Notify(game.Players:GetPlayers(), "The breach will end in "..math.floor(timeLeft).." seconds!", "Important");
-		end
-	end
-	if duration > 120 then
-		task.delay(duration-180, announceTimeLeft);
-		task.delay(duration-120, announceTimeLeft);
-	end
-	task.delay(duration-60, announceTimeLeft);
 
 	WorldEvent.Enemies = {};
 	WorldEvent.SpawnHoles = {};
@@ -234,14 +222,13 @@ function WorldEvent.Start()
 				shared.modNpcs.spawn2{
 					Name = "Zombie";
 					CFrame = spawnPointAtt.WorldCFrame * CFrame.new(0, 1.3, 0);
+					Properties = {
+						Level = math.max(lowestLevel, 1);
+						SafehomeBreach = true;
+						TargetableDistance = 320;
+						HordeAggression = true;
+					};
 					BindSetup = function(npcClass: NpcClass)
-						local properties = npcClass.Properties;
-
-						properties.Level = math.max(lowestLevel, 1);
-						properties.SafehomeBreach = true;
-						properties.TargetableDistance = 320;
-						properties.HordeAggression = true;
-						
 						table.insert(WorldEvent.Enemies, npcClass);
 
 						npcClass.HealthComp.OnIsDeadChanged:Connect(function(isDead)
@@ -265,6 +252,9 @@ function WorldEvent.Start()
 		end)
 	end
 	
+	task.delay(duration, function() WorldEventSystem.EndBind:Fire(); end)
+	WorldEventSystem.EndBind.Event:Wait();
+
 end
 
 return WorldEvent;

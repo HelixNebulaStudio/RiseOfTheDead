@@ -57,14 +57,18 @@ if RunService:IsServer() then
 
 					else
 						if mission.Redo then
-							local caitlinClass = modNpcs.matchNpc(function(npcClass: NpcClass)
-								if npcClass.Player then return end;
-								if npcClass.Name ~= "Caitlin" then return end;
-								return true;
-							end);
+							if shared.WorldName == "TheHarbor" then
+								local caitlinClass = modNpcs.matchNpc(function(npcClass: NpcClass)
+									if npcClass.Player then return end;
+									if npcClass.Name ~= "Caitlin" then return end;
+									return true;
+								end);
 
-							if mission.ProgressionPoint >= 1 and mission.ProgressionPoint <= 3 then
-								modReplicationManager.SetClientParent(player, caitlinClass.Character, workspace.Entity);
+								if mission.ProgressionPoint >= 1 and mission.ProgressionPoint <= 3 then
+									modReplicationManager.SetClientParent(player, caitlinClass.Character, workspace.Entity);
+								elseif mission.ProgressionPoint >= 4 then
+									modReplicationManager.SetClientParent(player, caitlinClass.Character, game.ReplicatedStorage);
+								end
 							end
 						end
 						

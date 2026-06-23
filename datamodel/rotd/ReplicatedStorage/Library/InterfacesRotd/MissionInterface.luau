@@ -1762,7 +1762,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			if missionHudTask == nil then return end;
 			
 			pinHudData.MissionData = missionData;
-			pinHudData.HeaderText = missionLib.Name;
+			pinHudData.HeaderText = `{missionLib.Name}{missionData.Redo and " (Redo)" or ""}`;
 
 			if newPinNotification then
 				local titleLabel = newPinNotification:WaitForChild("Title");

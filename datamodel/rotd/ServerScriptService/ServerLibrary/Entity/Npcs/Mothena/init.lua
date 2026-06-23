@@ -96,6 +96,7 @@ function npcPackage.Spawned(npcClass: NpcClass)
         local primaryPart = wingModel.PrimaryPart;
 
         local destructible: DestructibleInstance = bodyDestructiblesComp:Create(wingModel.Name, wingModel);
+        destructible.Name = wingModels[a] == "LeftWing" and "Left Wing" or "Right Wing";
         destructible.Properties.DestroyModel = false;
         local newHealth = configurations.MaxHealth * (isHard and 0.25 or 0.15);
 

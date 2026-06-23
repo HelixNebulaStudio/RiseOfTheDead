@@ -350,30 +350,35 @@ function npcPackage.Spawned(npcClass: NpcClass)
         if groupName == "TopCover" then
             newDestructInfo = {
                 Name = groupName;
+                Label = "Heli Rotor";
                 Health = isHard and 25000 or 10000;
             };
 
         elseif groupName == "FrontTip" then
             newDestructInfo = {
                 Name = groupName;
+                Label = "Front Controls";
                 Health = isHard and 50000 or 10000;
             };
 
         elseif groupName == "TailPart" then
             newDestructInfo = {
                 Name = groupName;
+                Label = "Tail Wing";
                 Health = isHard and 25000 or 25000;
             };
 
         elseif groupName == "LeftLauncher" or groupName == "RightLauncher" then
             newDestructInfo = {
                 Name = groupName;
+                Label = groupName == "LeftLauncher" and "Left Launcher" or "Right Launcher";
                 Health = isHard and 40000 or 40000;
             };
 
         elseif groupName == "ScrapPlating" then
             newDestructInfo = {
                 Name = "ScrapPlating";
+                Label = "Scrap Plating";
                 Health = isHard and 100000 or 10000;
             };
         end
@@ -382,6 +387,7 @@ function npcPackage.Spawned(npcClass: NpcClass)
             local destructibleName = newDestructInfo.Name;
             local destructibleModel = heliPartGroup;
             local destructible: DestructibleInstance = bodyDestructiblesComp:Create(destructibleName, destructibleModel);
+            destructible.Name = newDestructInfo.Label;
             destructible.Properties.DestroyModel = false;
 
             destructible.HealthComp:SetMaxHealth(newDestructInfo.Health);

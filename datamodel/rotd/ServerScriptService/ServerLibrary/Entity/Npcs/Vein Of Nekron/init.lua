@@ -267,6 +267,7 @@ function npcPackage.Spawning(npcClass: NpcClass)
 				plaqueModel.PrimaryPart = newPlaque;
 
 				local newPlaqueDestructible: DestructibleInstance = bodyDestructiblesComp:Create(plaqueName, plaqueModel);
+				newPlaqueDestructible.Name = "Nekros Plaque";
 				newPlaqueDestructible.OwnerStatusCompLink = true;
 
 				newPlaqueDestructible.HealthComp:SetMaxHealth(baseHealth * 0.1);
