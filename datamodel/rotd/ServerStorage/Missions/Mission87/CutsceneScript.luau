@@ -206,7 +206,7 @@ return function(CutsceneSequence)
 			if mission.Type ~= 1 then return end;
 
 			if josephClass == nil then
-				if mission.ProgressionPoint >= 2 and shared.WorldName == "TheResidentials" then
+				if mission.ProgressionPoint >= 2 and (shared.WorldName == "TheResidentials" or shared.WorldName == "TheHarbor") then
 					spawnLocalJosephClass();
 				end
 			end
@@ -786,6 +786,8 @@ return function(CutsceneSequence)
 			elseif shared.WorldName == "TheHarbor" then
 				--MARK: TheHarbor
 				if mission.ProgressionPoint == 2 then
+					spawnLocalJosephClass();
+
 					josephClass:ToggleInteractable(false);
 					josephClass:SetCFrame(CFrame.new(-271.475, 40.961, 230.21) * CFrame.Angles(0, math.rad(90), 0));
 					task.wait(0.5);

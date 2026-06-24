@@ -1998,7 +1998,7 @@ MissionLibrary.New{
 	Persistent = true;
 	World = {"TheHarbor"; "DoubleCross"; "Safehome"};
 	Checkpoint = {
-		{Text="Talk to Caitlin";};
+		{Text="Talk to Caitlin in The Harbor";};
 		{Text="Waiting for Revas's Response";};
 		{Text="Talk to Caitlin";};
 		{Text="Head to Revas's office";};
@@ -2019,7 +2019,7 @@ MissionLibrary.New{
 		{Text="Find the escape boat";};
 		{Text="Talk to Patrick";};	--World Safehome
 		{Text="Give or heal Patrick with a medkit";};
-		{Text="Talk to Patrick";};
+		{Text="Talk to Patrick";}; --19
 	};
 	StartRequirements = {
 		MissionCompleted = {56};
@@ -2037,7 +2037,8 @@ MissionLibrary.New{
 	Markers = {
 		[1]={World="TheHarbor"; Label="Caitlin"; Target="Caitlin"; Type=modMarkers.MarkerTypes.Npc;};
 		[4]={World="TheHarbor"; Label="Revas's Office"; Target=Vector3.new(-290.606, 107.853, 243.741); Type=modMarkers.MarkerTypes.Waypoint;};
-		[19]={World="DoubleCross"; Label="Escape Dinghy"; Target=Vector3.new(-43.618, 12.253, -62.908); Type=modMarkers.MarkerTypes.Waypoint;};
+		[16]={World="DoubleCross"; Label="Escape Dinghy"; Target=Vector3.new(-43.618, 12.253, -62.908); Type=modMarkers.MarkerTypes.Waypoint;};
+		[17]={World="Safehome"; Label="Patrick"; Target="Patrick"; Type=modMarkers.MarkerTypes.Npc;};
 	};
 	CanRedo = {};
 	StorylineSplit = {

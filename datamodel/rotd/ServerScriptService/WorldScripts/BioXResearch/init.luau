@@ -2,6 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
+local modProjectile = shared.require(game.ReplicatedStorage.Library.Projectile);
 local modTeamsManager = shared.require(game.ReplicatedStorage.Library.TeamsManager);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 
@@ -100,6 +101,22 @@ function WorldCore.onRequire()
 
     if RunService:IsServer() then
         shared.gameConfig.Config:SetAttribute("Test", "HelloWorld");
+
+        task.spawn(function()
+            local launchAtt: Attachment = workspace:WaitForChild("Environment"):WaitForChild("CenterPillar"):WaitForChild("ProjectilOrignAtt");
+
+            while task.wait(10) do
+                local pId = launchAtt:GetAttribute("ProjectileId");
+                local originCf = launchAtt.WorldCFrame;
+                local projectileInstance: ProjectileInstance = modProjectile.fire(#pId > 0 and pId or "fireworks", {
+                    OriginCFrame = originCf;
+                });
+
+                modProjectile.serverSimulate(projectileInstance, {
+                    Velocity = launchAtt.WorldCFrame.LookVector * projectileInstance.ArcTracerConfig.Velocity;
+                });
+            end
+        end)
     end
 end
 

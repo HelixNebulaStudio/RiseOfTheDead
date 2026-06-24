@@ -66,10 +66,14 @@ if RunService:IsServer() then
 
 								if mission.ProgressionPoint >= 1 and mission.ProgressionPoint <= 3 then
 									modReplicationManager.SetClientParent(player, caitlinClass.Character, workspace.Entity);
-								elseif mission.ProgressionPoint >= 4 then
+								elseif mission.ProgressionPoint > 4 then
 									modReplicationManager.SetClientParent(player, caitlinClass.Character, game.ReplicatedStorage);
 								end
 							end
+
+						else
+
+
 						end
 						
 						if mission.ProgressionPoint >= 4 and mission.ProgressionPoint <= 6 then

@@ -260,6 +260,7 @@ function LoadingScreen.newLoadingScreen(tpScreenGui, worldName)
 		loadingScreen = tpScreenGui;
 		loadingScreen.Parent = playerGui;
 		newFrame = tpScreenGui:WaitForChild("LoadingFrame");
+		loadingScreen.DisplayOrder = 6;
 
 	end
 

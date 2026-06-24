@@ -691,6 +691,10 @@ local MAP_OVERVIEWS = {
 		{ImageId="rbxassetid://9184250474"; Y=-math.huge; PperStud=2; Scale=Vector2.new(810, 810); Center=Vector2.new(-85.5, -54.5);};
 	};
 	
+	Swamplands = {
+		{ImageId="rbxassetid://121922228823336"; Y=-math.huge; PperStud=1.204819; Scale=Vector2.new(1000, 1000); Center=Vector2.new(24.665, -53.685);};
+	};
+
 	CommunityWaySide = {
 		{ImageId="rbxassetid://11229540571"; Y=20.8; PperStud=2; Scale=Vector2.new(1087, 1087); Center=Vector2.new(-58.6, 123.9);};
 		{ImageId="rbxassetid://11229527628"; Y=-math.huge; PperStud=2; Scale=Vector2.new(1087, 1087); Center=Vector2.new(-58.6, 123.9);};

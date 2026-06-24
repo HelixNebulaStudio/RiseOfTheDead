@@ -342,11 +342,21 @@ return function(CutsceneSequence)
 
 					elseif mission.ProgressionPoint == 5 then
 						
+						local revasDoor = modReplicationManager.getReplicated(player, "RevasDoorway")[1];
+
+						local doorInteractConfig = revasDoor:FindFirstChild("Interactable");
+						doorInteractConfig:SetAttribute("Locked", false);
+
 						revasNpcClass:ToggleInteractable(true);
 						revasNpcClass:SetCFrame(CFrame.new(-282.269379, 105.362907, 283.569366, 0.990268052, 0, 0.139173105, 0, 1, 0, -0.139173105, 0, 0.990268052))
 						revasNpcClass.Move:Face("Player");
 
 					elseif mission.ProgressionPoint == 6 then
+						
+						local revasDoor = modReplicationManager.getReplicated(player, "RevasDoorway")[1];
+
+						local doorInteractConfig = revasDoor:FindFirstChild("Interactable");
+						doorInteractConfig:SetAttribute("Locked", false);
 						
 						revasNpcClass:ToggleInteractable(false);
 						revasNpcClass:SetCFrame(CFrame.new(-282.269379, 105.362907, 283.569366, 0.990268052, 0, 0.139173105, 0, 1, 0, -0.139173105, 0, 0.990268052))
