@@ -102,8 +102,8 @@ function ToolHandler.new(player, storageItem, toolLib, toolModels)
 		self.Character = player.Character;
 	end
 	
-	if storageItem and storageItem.MockItem then
-		self.MockItem = true;
+	if storageItem and storageItem.IsFake then
+		self.IsFake = true;
 	end
 	
 	setmetatable(self, ToolHandler);

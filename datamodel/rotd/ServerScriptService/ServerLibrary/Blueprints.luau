@@ -102,7 +102,7 @@ function Blueprints.new(player, syncFunc)
 			buildTime = os.time()+5;
 		end;
 		
-		return {ItemId=itemId; BT=buildTime; Blueprint=usingBlueprint}
+		return {ItemId=itemId; T=buildTime; Blueprint=usingBlueprint}
 	end
 	
 	function blueprintsMeta:CanBuild()

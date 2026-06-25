@@ -71,7 +71,7 @@ if RunService:IsServer() then
 					mission.ProgressionPoint = 5;
 					
 					local buildDuration = 10;
-					processPacket.BT=modSyncTime.GetTime()+buildDuration;
+					processPacket.T = os.time() + buildDuration;
 					userWorkbench:Sync();
 					
 					task.delay(buildDuration-1, function()

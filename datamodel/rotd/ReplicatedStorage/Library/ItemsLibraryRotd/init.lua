@@ -427,6 +427,8 @@ function modItemsLibrary.onRequire()
         Tradable = modItemsLibrary.Tradable.Tradable;
     }
 
+    new(toolBase, {Id="generic"; Name="Generic"; Icon=shared.Const.PlaceholderIcon; Tags={"Unobtainable"}; Description="A generic tool for custom purposes.";});
+    
     new(toolBase, {Id="fireworks"; Name="Fireworks"; Icon="rbxassetid://6235855080"; Stackable=5; Description="Fireworks lighting up the skies for the new year!";});
     new(toolBase, {Id="matchbox"; Name="Matchbox"; Icon="rbxassetid://6269033605"; Stackable=10; Description="Can be used to ignite up flammable liquids or fuses.";});
     new(toolBase, {Id="jerrycan"; Name="Jerrycan"; Icon="rbxassetid://5886813198"; BaseValues={Fuel=100}; Description="Steel-pressed container that holds highly flammable fuel. Ignited fuel will deal 1% of max health as damage (Min: 10).";});

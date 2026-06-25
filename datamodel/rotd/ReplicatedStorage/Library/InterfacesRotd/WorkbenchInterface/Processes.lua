@@ -162,7 +162,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 				if process.Type == "Building" or process.Type == "BuildComplete" then
 					titleTag.Text = `Build {bpLib.Name}`;
 					
-					local timeLeft = process.Data.BT-curTime;
+					local timeLeft = process.Data.T-curTime;
 					local buildPercent = math.clamp(1-(timeLeft/bpLib.Duration), 0, 1);
 					
 					local initTween = progressBar:GetAttribute("initTween");

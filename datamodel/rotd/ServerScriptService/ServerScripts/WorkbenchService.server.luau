@@ -85,12 +85,8 @@ function remoteWorkbenchService.OnServerInvoke(player, action: string, ...)
 			return rPacket;
 		end
 
-		local timer;
-		if activeProcess.Type ~= playerSave.Workbench.ProcessTypes.Building then
-			timer = activeProcess.T;
-		else
-			timer = activeProcess.BT;
-		end
+		local timer = activeProcess.T;
+		
 		if timer == nil or timer-workspace:GetServerTimeNow() <= 0 then
 			rPacket.FailMsg = "Invalid process";
 			return rPacket;
@@ -112,14 +108,9 @@ function remoteWorkbenchService.OnServerInvoke(player, action: string, ...)
 
 		if showAdResult == Enum.ShowAdResult.ShowCompleted then
 			local timeLeft = timer-workspace:GetServerTimeNow();
-			Debugger:StudioLog(`adskip timeLeft = {timeLeft}`);
+			
+			activeProcess.T = os.time() + (timeLeft - shared.Const.Hour);
 
-			if activeProcess.Type == playerSave.Workbench.ProcessTypes.Building then
-			else
-				activeProcess.BT = os.time()+ (timeLeft - shared.Const.Hour);
-			end
-			activeProcess.T = os.time()+ (timeLeft - shared.Const.Hour);
-		
 			userWorkbench:Sync();
 		end
 		
@@ -317,8 +308,7 @@ function remoteBlueprintHandler.OnServerInvoke(player, action, packet)
 		local processPacket = {
 			Type = userWorkbench.ProcessTypes.Building;
 			ItemId = itemId;
-			BT = workspace:GetServerTimeNow() + buildDuration;
-			T = workspace:GetServerTimeNow() + buildDuration;
+			T = os.time() + buildDuration;
 			Blueprint = bpStorageItem ~= nil;
 
 			PlayProcessSound = true;
@@ -384,7 +374,7 @@ function remoteBlueprintHandler.OnServerInvoke(player, action, packet)
 		local buildIndex = packet.Index;
 		
 		local activeBp = userWorkbench:GetProcess(buildIndex);
-		if activeBp == nil or activeBp.BT-workspace:GetServerTimeNow() > 0 then
+		if activeBp == nil or (activeBp.T-os.time()) > 0 then
 			rPacket.FailCode = modWorkbenchLibrary.BlueprintReplies.TooFrequentRequest;
 			return rPacket;
 		end
@@ -418,7 +408,7 @@ function remoteBlueprintHandler.OnServerInvoke(player, action, packet)
 
 		local activeBp = userWorkbench:GetProcess(buildIndex);
 		
-		if activeBp == nil or activeBp.BT-workspace:GetServerTimeNow() <= 0 then
+		if activeBp == nil or activeBp.T-os.time() <= 0 then
 			rPacket.FailMsg = "Invalid process";
 			return rPacket;
 		end
@@ -426,7 +416,7 @@ function remoteBlueprintHandler.OnServerInvoke(player, action, packet)
 		local itemId = activeBp.ItemId;
 		local bpLib = modBlueprintLibrary.Get(itemId);
 
-		local skipCost = modWorkbenchLibrary.GetSkipCost(activeBp.BT-workspace:GetServerTimeNow());
+		local skipCost = modWorkbenchLibrary.GetSkipCost(activeBp.T - os.time());
 		if playerSave:GetStat("Perks") < skipCost then
 			rPacket.GoldShop = true;
 			return rPacket;
@@ -445,7 +435,7 @@ function remoteBlueprintHandler.OnServerInvoke(player, action, packet)
 
 		shared.Notify(player, bpLib.Name.." has finished building.", "Reward");
 
-		activeBp.BT = workspace:GetServerTimeNow()-1;
+		activeBp.T = os.time()-1;
 		userWorkbench:Sync();
 		
 		rPacket.Success = true;

@@ -2735,24 +2735,24 @@ MissionLibrary.New{
 
 -- MARK: 79 - Javelineer Prodigy
 MissionLibrary.New{
-	MissionId=79; --JAVELINEER_PRODIGY_MISSION_ID
+	MissionId = 79;
 	MissionType = MissionLibrary.MissionTypes.Board;
-	Name="Javelineer Prodigy"; 
-	Description="Kill enemies with throwing weapons.";
-	Timer=BOARD_TIME_LIMIT; 
-	Persistent=true;
-	Checkpoint={
-		{Text="Get $Kills Kills with a throwing weapon excluding explosives and flammables";};
+	Name = "Javelineer Prodigy"; 
+	Description = "Kill enemies with throwing weapons.";
+	Timer = BOARD_TIME_LIMIT; 
+	Persistent = true;
+	Checkpoint = {
+		{Text = "Get $Kills Kills with a throwing weapon excluding explosives and flammables";};
 	};
-	SaveData={
-		Kills=20;
+	SaveData = {
+		Kills = 20;
 	};
-	GuideText="";
-	Tier="Normal";
-	Rewards={
+	GuideText = "";
+	Tier = "Normal";
+	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Normal};
 	};
-	AddRequirements={
+	AddRequirements = {
 		{Type="Level"; Value=30};
 	};
 };

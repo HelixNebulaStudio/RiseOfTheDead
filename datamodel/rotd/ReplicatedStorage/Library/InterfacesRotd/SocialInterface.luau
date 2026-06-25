@@ -369,7 +369,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 local statCache = {};
                 
                 if RunService:IsStudio() then
-                    table.insert(statCache, {Index=99; String=`<b>Gameplay Points</b>: <font size="12">{interface.beautifyNumber(playerData.PlayPoints)}</font>`});
+                    local playPoints = interface.beautifyNumber(playerData.PlayPoints);
+                    table.insert(statCache, {Index=99; String=`<b>Gameplay Points</b>: <font size="12">{playPoints}</font>`});
                 end
 
                 if playerData.Punishment and playerData.Punishment > 0 then
@@ -1157,6 +1158,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         end
         
         debounce = false;
+        
+        if not window.Visible then return end;
         task.spawn(function() binds.SelectPlayer(playerSelection, false); end);
     end)
 

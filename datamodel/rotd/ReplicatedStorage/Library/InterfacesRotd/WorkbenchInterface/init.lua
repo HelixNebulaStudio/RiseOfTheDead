@@ -651,7 +651,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		for a=1, #processesData do
 			local process = processesData[a];
 			if process.Type == 1 then -- Building;
-				if modSyncTime.GetTime() >= process.BT then
+				if workspace:GetServerTimeNow() >= process.T then
 					table.insert(processes, {Type="BuildComplete"; Index=a; Data=process;});
 				else
 					table.insert(processes, {Type="Building"; Index=a; Data=process;});

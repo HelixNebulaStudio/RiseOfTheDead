@@ -15,7 +15,7 @@ return function(event: EventPacket, ...)
         local level, skillStats = profile.SkillTree:CalStats(skillData.Library, skillData.Points);
         if level > 0 then
             buildDuration = buildDuration * (100-skillStats.Percent.Value)/100;
-            processPacket.BT = modSyncTime.GetTime()+buildDuration;
+            processPacket.T = workspace:GetServerTimeNow() + buildDuration;
         end
     end
 end
