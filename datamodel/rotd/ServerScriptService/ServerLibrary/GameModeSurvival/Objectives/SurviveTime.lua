@@ -32,10 +32,11 @@ function Objective:Begin()
 end
 
 function Objective:Tick()
+	local controller = self.Controller;
 	local timeRemain = math.max(self.EndTime-tick(), 0);
-	local maxSpawnRate = math.min(math.max(timeRemain*0.05, 1/(math.max(self.Controller.Wave/5, 1)), 0.1), 1);
+	local maxSpawnRate = math.min(math.max(timeRemain*0.05, 1/(math.max(controller.Wave/5, 1)), 0.1), 1);
 	
-	local canSpawn = timeRemain > 1 and tick()-self.LastSpawn > maxSpawnRate and #self.Controller.EnemyNpcClasses <= 80;
+	local canSpawn = timeRemain > 1 and tick()-self.LastSpawn > maxSpawnRate and #controller.EnemyNpcClasses <= 80;
 	if self.PauseTick and tick() < self.PauseTick then
 		canSpawn = false;
 	end
@@ -43,11 +44,11 @@ function Objective:Tick()
 	if canSpawn then
 		self.LastSpawn = tick();
 		
-		local enemyName = self.Controller:PickEnemy();
+		local enemyName = controller:PickEnemy();
 		self.LastSpawnName = enemyName;
 		
-		self.Controller:SpawnEnemy(enemyName, {
-			Level = math.min(math.ceil((self.RoundDuration - timeRemain)/6) + self.Controller.Wave-1, self.Controller.PeekPlayerLevel);
+		controller:SpawnEnemy(enemyName, {
+			Level = math.min(math.ceil((self.RoundDuration - timeRemain)/6) + controller.Wave-1, controller.PeekPlayerLevel);
 		});
 		self.SpawnCount = self.SpawnCount+1;
 		self.PauseTick = nil;
@@ -57,7 +58,7 @@ function Objective:Tick()
 		
 	end
 
-	if tick() > self.EndTime and #self.Controller.EnemyNpcClasses <= 0 then
+	if tick() > self.EndTime and #controller.EnemyNpcClasses <= 0 then
 		return true;
 	end
 	

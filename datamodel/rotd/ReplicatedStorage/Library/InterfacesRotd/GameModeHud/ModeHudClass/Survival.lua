@@ -130,6 +130,17 @@ return function(interface, window, frame)
 
 			objectiveLabel.Visible = #objectiveLabel.Text > 0;
 			hazardLabel.Visible = #hazardLabel.Text > 0;
+
+			if data.WaveStartTime and data.WaveDuration then
+                hudTask.Properties.Timers.Timer1 = {
+                    Duration = data.WaveDuration or math.huge;
+                    StartTime = data.WaveStartTime;
+                };
+
+			else
+                table.clear(hudTask.Properties.Timers);
+			end
+			
 		end
 
 

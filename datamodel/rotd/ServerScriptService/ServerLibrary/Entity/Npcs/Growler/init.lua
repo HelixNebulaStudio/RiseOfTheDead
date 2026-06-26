@@ -38,6 +38,7 @@ local npcPackage = {
         "ZombieBasicMeleeAttack";
         "BodyDestructibles";
         "DynamicLevel";
+        "ImmunitySkin";
     };
     AddBehaviorTrees = {
         "ZombieDefaultTree";

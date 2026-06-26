@@ -34,6 +34,7 @@ local npcPackage = {
         "RandomClothing";
         "DynamicLevel";
         "TickCombustion";
+        "ImmunitySkin";
     };
     AddBehaviorTrees = {};
 

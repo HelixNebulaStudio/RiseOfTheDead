@@ -402,6 +402,7 @@ function Survival:SpawnEnemy(npcName, paramPacket)
 			Level = level;
 			HordeAggression = true;
 			TargetableDistance = 4096;
+			Immunity = paramPacket.Immunity;
 		};
 		BindSetup = function(npcClass: NpcClass)
 			task.spawn(function()
@@ -1033,6 +1034,7 @@ function Survival:StartWave(wave)
 	end
 	
 	--MARK: Wave Tick
+	local hudUpdateTick = tick()-5;
 	local waveStartTick = tick();
 	repeat
 		task.wait();
@@ -1046,7 +1048,6 @@ function Survival:StartWave(wave)
 		
 		task.spawn(function()
 			for id, modifierInfo in pairs(self.Modifier) do
-				
 				if Modifiers[id] == nil then
 					local module = script.Modifiers:FindFirstChild(id);
 					Modifiers[id] = shared.require(module);
@@ -1060,6 +1061,11 @@ function Survival:StartWave(wave)
 			end
 		end)
 		
+		if tick() > hudUpdateTick then
+			hudUpdateTick = tick() + 5;
+			self:Hud{};
+		end
+
 		if tick()-waveStartTick >= 120 and #modNpcs.ActiveNpcClasses <= 0 then break; end;
 		if self.SkipWave then Debugger:Warn("Skip Wave"); break; end;
 	until self.Status ~= EnumStatus.InProgress;
@@ -1089,6 +1095,10 @@ function Survival:StartWave(wave)
 			self.OnWaveEnd(game.Players:GetPlayers(), wave);
 		end
 	end)
+
+	self.WaveStartTime = nil;
+	self.WaveDuration = nil;
+
 	--MARK: Wave Tick End
 	Debugger:Log("Wave fin");
 	
@@ -1606,6 +1616,10 @@ function Survival:Hud(data)
 		Stage = self.ModeStage;
 		Header = self.HeaderText;
 		Status = self.StatusText;
+
+		WaveStartTime = self.WaveStartTime or false;
+		WaveDuration = self.WaveDuration or false;
+
 		IsHard = self.IsHard;
 		Wave = self.Wave;
 		GameState = self.GameState;

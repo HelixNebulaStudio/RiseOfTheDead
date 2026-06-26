@@ -36,6 +36,16 @@ function interfacePackage.onRequire()
 							Action = "Open";
 							Type = "Survival";
 							Stage = "Swamplands";
+							WaveStartTime = workspace:GetServerTimeNow() - 45;
+							WaveDuration = 60;
+
+							Header = "Header string";
+							Status = "Status string";
+
+							WaveObjective = false;
+							WaveHazard = false;
+							WaveSelectPacket = false;
+
 							WavePass = {
 								TimeLeft = math.random(0, 30);
 								Players = {

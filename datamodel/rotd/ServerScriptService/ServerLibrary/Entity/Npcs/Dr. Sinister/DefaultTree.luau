@@ -131,14 +131,14 @@ function treePackage.ProtectZombies(npcClass: NpcClass)
                     end
                     --
                     
-                    for _, obj in pairs(zCharacter:GetChildren()) do
-                        if obj:IsA("BasePart") then
-                            if obj:GetAttribute("DefaultColor") == nil then
-                                obj:SetAttribute("DefaultColor", obj.Color);
-                            end
-                            obj.Color = Color3.fromRGB(135, 67, 67);
-                        end
-                    end
+                    -- for _, obj in pairs(zCharacter:GetChildren()) do
+                    --     if obj:IsA("BasePart") then
+                    --         if obj:GetAttribute("DefaultColor") == nil then
+                    --             obj:SetAttribute("DefaultColor", obj.Color);
+                    --         end
+                    --         obj.Color = Color3.fromRGB(135, 67, 67);
+                    --     end
+                    -- end
                     
                     zNpcClass.Properties.SinisterImmunity = tick();
                     zNpcClass.Properties.Immunity = zNpcClass.Name ~= "Dr. Sinister" and 1 or 0.5;
@@ -146,11 +146,11 @@ function treePackage.ProtectZombies(npcClass: NpcClass)
                     task.delay(2, function()
                         if zNpcClass.Properties.SinisterImmunity == nil then return end;
                         if tick()-zNpcClass.Properties.SinisterImmunity >= 1.5 then
-                            for _, obj in pairs(zCharacter:GetChildren()) do
-                                if obj:IsA("BasePart") then
-                                    obj.Color = obj:GetAttribute("DefaultColor") or Color3.fromRGB(211, 190, 150);
-                                end
-                            end
+                            -- for _, obj in pairs(zCharacter:GetChildren()) do
+                            --     if obj:IsA("BasePart") then
+                            --         obj.Color = obj:GetAttribute("DefaultColor") or Color3.fromRGB(211, 190, 150);
+                            --     end
+                            -- end
 
                             zNpcClass.Properties.SinisterImmunity = nil;
                             zNpcClass.Properties.Immunity = nil;

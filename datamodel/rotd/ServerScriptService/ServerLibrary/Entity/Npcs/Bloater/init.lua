@@ -39,6 +39,7 @@ local npcPackage = {
         "BodyDestructibles";
         "DizzyCloud";
         "DynamicLevel";
+        "ImmunitySkin";
     };
     AddBehaviorTrees = {
         "ZombieDefaultTree";
