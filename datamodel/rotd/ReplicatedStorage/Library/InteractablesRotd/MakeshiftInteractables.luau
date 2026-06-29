@@ -40,8 +40,31 @@ function interactablePackage.init(super) -- Server/Client
             if RunService:IsServer() then 
                 obj:GetAttributeChangedSignal("Built"):Connect(function()
                     local isBuilt = obj:GetAttribute("Built");
+                    
                     obj.Transparency = isBuilt and 0 or 1;
                     obj.CanCollide = isBuilt;
+
+                    for _, c in ipairs(obj:GetChildren()) do
+                        if not c:IsA("BasePart") then continue end;
+
+                        local defCanCollide = c:GetAttribute("DefaultCanCollide");
+                        if defCanCollide == nil then
+                            c:SetAttribute("DefaultCanCollide", c.CanCollide);
+                            defCanCollide = c.CanCollide;
+                        end
+                        if defCanCollide == true then
+                            c.CanCollide = isBuilt;
+                        end
+
+                        if c.Name == "Hitbox" then continue end;
+
+                        local defTransparency = c:GetAttribute("DefaultTransparency");
+                        if defTransparency == nil then
+                            c:SetAttribute("DefaultTransparency", c.Transparency);
+                            defTransparency = c.Transparency;
+                        end
+                        c.Transparency = isBuilt and defTransparency or 1;
+                    end
                 end)
                 obj:SetAttribute("Built", false);
             end;
@@ -104,6 +127,12 @@ function interactablePackage.init(super) -- Server/Client
 
         if isComplete then
             config:SetAttribute("Complete", true);
+            shared.modEventService:ServerInvoke(
+                "Interactables_BindMakeshiftBuilt", 
+                {ReplicateTo=game.Players:GetPlayers()},
+                interactable,
+                info
+            );
         end
 
         return;
@@ -220,7 +249,7 @@ function interactablePackage.init(super) -- Server/Client
     end
 
     function MakeshiftMaterial.BindPrompt(interactable: InteractableInstance)
-        interactable.Label = `Pick up makeshift {interactable.Values.MaterialName}`;
+        interactable.Label = `Pick up {interactable.Values.MaterialName} makeshift material`;
 
     end
 

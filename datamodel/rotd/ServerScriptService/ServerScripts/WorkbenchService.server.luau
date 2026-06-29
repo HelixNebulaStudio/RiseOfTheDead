@@ -1239,7 +1239,9 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 	elseif action == 2 then -- MARK: Claim deconstruction
 		local index = arg;
 		local processData = userWorkbench:GetProcess(index);
-		if processData.T-workspace:GetServerTimeNow() > 0 then return modWorkbenchLibrary.DeconstructModReplies.TooFrequentRequest end;
+		if processData.T-workspace:GetServerTimeNow() > 0 then 
+			return modWorkbenchLibrary.DeconstructModReplies.TooFrequentRequest 
+		end;
 		
 		local itemId = processData.ItemId;
 		local itemLib = modItemsLibrary:Find(itemId);
@@ -1296,7 +1298,9 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 			local values = processData.Values;
 			local customName = processData.ItemName;
 			
-			if not inventory:SpaceCheck{{ItemId=itemId; Data={Quantity=1};}} then return modWorkbenchLibrary.BlueprintReplies.InventoryFull; end
+			if not inventory:SpaceCheck{{ItemId=itemId; Data={Quantity=1};}} then 
+				return modWorkbenchLibrary.BlueprintReplies.InventoryFull;
+			end
 
 			values.L = nil;
 			values.E = nil;

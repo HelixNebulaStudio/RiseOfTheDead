@@ -1009,7 +1009,10 @@ function Survival:StartWave(wave)
 		ObjectiveDesc = newObjective.Description;
 		WaveHazard = hazardTitle;
 		HazardDesc = hazardTitle ~= "None" and newHazard.Description or "";
-	}
+	};
+
+	self.CurObjective = pickObjectivePackage;
+	self.CurHazard = pickHazardPackage;
 	
 	self.ObjectiveType = pickObjectivePackage.Type;
 	self.HazardType = pickHazardPackage and pickHazardPackage.Type or nil;
@@ -1598,10 +1601,18 @@ function Survival:Hud(data)
 	if data.WaveObjective ~= nil then
 		self.WaveObjective = data.WaveObjective;
 		self.ObjectiveDesc = data.ObjectiveDesc or "";
+	else
+		if data.ObjectiveDesc ~= nil then
+			self.ObjectiveDesc = data.ObjectiveDesc or "";
+		end
 	end
 	if data.WaveHazard ~= nil then
 		self.WaveHazard = data.WaveHazard;
 		self.HazardDesc = data.HazardDesc or "";
+	else
+		if data.HazardDesc ~= nil then
+			self.HazardDesc = data.HazardDesc or "";
+		end
 	end
 	if data.HeaderText ~= nil then
 		self.HeaderText = data.HeaderText;

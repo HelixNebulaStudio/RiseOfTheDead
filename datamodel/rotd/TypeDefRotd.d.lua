@@ -9,6 +9,7 @@ export type GAME_EVENT_KEY_ROTD =
     | "GameModeManager_BindGameModeStart"
     | "GameModeManager_BindGameModeComplete"
     | "Interactables_BindCollectibleInteract"
+    | "Interactables_BindMakeshiftBuilt"
     | "Skills_BindResourceGatherers"
     | "Shop_BindActionEvent"
     | "Survivor_BindInventoryChanged"

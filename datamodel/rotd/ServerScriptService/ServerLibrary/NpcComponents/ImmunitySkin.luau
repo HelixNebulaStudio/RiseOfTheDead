@@ -13,10 +13,11 @@ end
 
 -- Called after NpcClass.Setup, Spawned and Respawn;
 function Component:Setup(npcClass: NpcClass)
-    npcClass.Properties.OnChanged:Connect(function(k, v)
-        if k ~= "Immunity" then return end;
-
+    local function update()
         local char = npcClass.Character;
+
+        local immunity = npcClass.Properties.Immunity;
+
         for _, obj in pairs(char:GetChildren()) do
             if not obj:IsA("BasePart") then continue end;
 
@@ -26,15 +27,23 @@ function Component:Setup(npcClass: NpcClass)
                 defColor = obj.Color;
             end
 
-			if v == nil then
+			if  immunity and immunity > 0 then
+                obj.Color = Color3.fromRGB(127, 87, 87):Lerp(Color3.fromRGB(148, 61, 61), immunity);
+            else
 				obj.Color = defColor;
-				return;
 			end
-
-            obj.Color = defColor:Lerp(Color3.fromRGB(135, 67, 67), v);
         end
+    end
 
+    npcClass.Properties.OnChanged:Connect(function(k, v)
+        if k ~= "Immunity" then return end;
+        update();
     end)
+
+    task.defer(function()
+        task.wait();
+        update();
+    end);
 end
 
 return Component;

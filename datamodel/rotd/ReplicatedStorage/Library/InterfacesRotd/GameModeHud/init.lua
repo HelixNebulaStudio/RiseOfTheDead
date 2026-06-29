@@ -40,7 +40,7 @@ function interfacePackage.onRequire()
 							WaveDuration = 60;
 
 							Header = "Header string";
-							Status = "Status string";
+							Status = "With enemies' ever growing immunity, barricade up to survive the duration";
 
 							WaveObjective = false;
 							WaveHazard = false;

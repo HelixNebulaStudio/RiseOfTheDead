@@ -18,6 +18,38 @@ Objective.Description = "With enemies' ever growing immunity, barricade up to su
 
 --==
 function Objective.onRequire()
+	shared.modEventService:OnInvoked("Interactables_BindMakeshiftBuilt", function(event: EventPacket, ...)
+		local interactable: InteractableInstance, info: InteractInfo = ...;
+		
+		local config = interactable.Config;
+		if config:GetAttribute("BuildType") ~= "Barricade" then return end;
+
+
+		task.spawn(function()
+			local model = config.Parent;
+			if model == nil or model:FindFirstChild("Destructible") then return end;
+
+			local wave = config:GetAttribute("Wave") or 1;
+
+			local destructibleConfig = modDestructibles.createDestructible("Scarecrow");
+			destructibleConfig:SetAttribute("_AttractRange", 999);
+			destructibleConfig:SetAttribute("_ExpiringDamageTick", false);
+			destructibleConfig.Parent = model;
+			
+			local destructible: DestructibleInstance = modDestructibles.getOrNew(destructibleConfig);
+			destructible.BroadcastHealth = true;
+			destructible.HealthComp:SetCanBeHurtBy("!Player&!Human"); -- not HumanoidType == Player & not Survivors
+			destructible.HealthComp:SetMaxHealth(wave * 500);
+			destructible.HealthComp:Reset();
+
+			destructible:SetupHealthbar{
+				Size = UDim2.new(4, 0, 1, 0);
+				Distance = 128;
+				OffsetWorldSpace = Vector3.new(0, 3, 0);
+				ShowLabel = true;
+			};
+		end)
+	end)
 end
 
 function Objective.new()
@@ -46,12 +78,7 @@ function Objective:Begin()
 
 	self.Barricades = {};
 
-	self.RoundDuration = math.clamp(self.Controller.Wave * 4.5, 85, 300);
-	self.EndTime = tick() + self.RoundDuration;
-	self.LastSpawn = tick();
-
-	controller.WaveStartTime = workspace:GetServerTimeNow();
-	controller.WaveDuration = self.RoundDuration;
+	self.State = 1;
 
 	for _, buildable in pairs(self.BuildableSpawns) do
 		local newBuildable = buildable:Clone();
@@ -81,71 +108,74 @@ function Objective:Begin()
 		
 		controller.StageGarbage:Tag(newMat);
 	end
+
+	local curObjectiveInfo = controller.CurObjective;
+	local locationName = curObjectiveInfo.Locations[math.random(1, #curObjectiveInfo.Locations)];
+
+	local barricationDuration = math.clamp(150 - (self.Controller.Wave * 5), 60, 150);
+
+	controller.WaveStartTime = workspace:GetServerTimeNow();
+	controller.WaveDuration = math.floor(barricationDuration);
+	controller:Hud{
+		ObjectiveDesc = `You have {barricationDuration} seconds to barricade the {locationName}.`;
+	};
 end
 
 function Objective:Tick()
 	local controller = self.Controller;
 
-	local timeRemain = math.max(self.EndTime-tick(), 0);
-	local timeLapsed = self.RoundDuration-timeRemain;
-	local maxSpawnRate = math.min(math.max(timeRemain*0.05, 1/(math.max(controller.Wave/5, 1)), 0.1), 1);
-	
-	local canSpawn = timeRemain > 1 and tick()-self.LastSpawn > maxSpawnRate and #controller.EnemyNpcClasses <= 80;
-	if self.PauseTick and tick() < self.PauseTick then
-		canSpawn = false;
-	end
-	
-	if canSpawn and timeLapsed >= 10 then
-		self.LastSpawn = tick();
-		
-		local enemyName = controller:PickEnemy();
-		self.LastSpawnName = enemyName;
-		
-        local enemyLevel = controller:GetWaveLevel();
-		local immunity = math.clamp(timeLapsed/(self.RoundDuration-30), 0, 1.1);
-		controller:SpawnEnemy(enemyName, {
-			Level = enemyLevel;
-			Immunity = immunity;
-		});
+	local endWaveBool = false;
 
-		self.PauseTick = tick()+4;
-		if self.SurviveTime then
+	if self.State == 1 then
+		if workspace:GetServerTimeNow() > controller.WaveStartTime + controller.WaveDuration then
+			self.State = 2;
+				
+			self.RoundDuration = math.clamp(self.Controller.Wave * 5, 150, 300);
+			self.EndTime = tick() + self.RoundDuration;
+			self.LastSpawn = tick();
+
+			modAudio.Play("DeathClock", workspace);
+			
+			controller.WaveStartTime = workspace:GetServerTimeNow();
+			controller.WaveDuration = self.RoundDuration;
+			controller:Hud{
+				ObjectiveDesc = `Survive the timer.`;
+			}
+		end
+
+	elseif self.State == 2 then
+
+		local timeRemain = math.max(self.EndTime-tick(), 0);
+		local timeLapsed = self.RoundDuration-timeRemain;
+		local maxSpawnRate = math.min(math.max(timeRemain*0.05, 1/(math.max(controller.Wave/5, 1)), 0.1), 1);
+		
+		local canSpawn = timeRemain > 1 and tick()-self.LastSpawn > maxSpawnRate and #controller.EnemyNpcClasses <= 50;
+		if self.PauseTick and tick() < self.PauseTick then
+			canSpawn = false;
+		end
+		
+		if canSpawn then
+			self.LastSpawn = tick();
+			
+			local enemyName = controller:PickEnemy();
+			self.LastSpawnName = enemyName;
+			
+			local enemyLevel = controller:GetWaveLevel();
+			local immunity = math.clamp(timeLapsed/(self.RoundDuration-60), 0, 1.1);
+			controller:SpawnEnemy(enemyName, {
+				Level = enemyLevel;
+				Immunity = immunity;
+			});
+
 			self.PauseTick = tick()+1;
 		end
+
+		if timeRemain <= 0 then
+			endWaveBool = true;
+		end
 	end
 
-	if self.SurviveTime then
-		if tick() > self.EndTime and #controller.EnemyNpcClasses <= 0 then
-			return true;
-		end
-
-	elseif tick() > self.EndTime - 30 then
-		self.SurviveTime = tick() + 30;
-
-		modAudio.Play("DoomAlarm", workspace);
-		for a=1, #controller.EnemyNpcClasses do
-			local npcClass: NpcClass = controller.EnemyNpcClasses[a];
-			npcClass.Properties.Immunity = nil;
-		end
-		
-		for a=1, #self.Barricades do
-			local barricade = self.Barricades[a];
-			for _, obj in pairs(barricade:GetChildren()) do
-				if obj:IsA("Configuration") then
-					obj:Destroy();
-
-				elseif obj:IsA("BasePart") then
-					obj.Anchored = false;
-				end
-			end
-
-			modAudio.Play("WoodSlam", barricade.PrimaryPart);
-			Debugger.Expire(barricade, 10);
-		end
-
-	end
-
-	return false;
+	return endWaveBool;
 end
 
 function Objective:End()

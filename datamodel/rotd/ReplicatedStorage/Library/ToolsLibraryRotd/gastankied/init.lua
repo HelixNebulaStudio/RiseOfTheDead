@@ -64,6 +64,15 @@ function toolPackage.BuildStructure(prefab: Model, optionalPacket)
             if workspace:GetServerTimeNow() <= explodeTime then continue end;
             local lastPosition = base.Position;
             
+            local explosionRadius = toolPackage.Configurations.Distance;
+            local ex = Instance.new("Explosion");
+            ex.DestroyJointRadiusPercent = 0;
+            ex.BlastRadius = explosionRadius;
+            ex.BlastPressure = 0;
+            ex.Position = lastPosition;
+            ex.Parent = workspace;
+            Debugger.Expire(ex, 1);
+
             modAudio.Play("ClockTick", base);
             modAudio.Play(math.random(1, 2) == 1 and "Explosion" or "Explosion2", base);
             
@@ -85,7 +94,7 @@ function toolPackage.BuildStructure(prefab: Model, optionalPacket)
             end
             
             local hitLayers = modExplosionHandler:Cast(lastPosition, {
-                Radius = toolPackage.Configurations.Distance;
+                Radius = explosionRadius;
             });
             
             modExplosionHandler:Process(lastPosition, hitLayers, {
