@@ -1206,9 +1206,9 @@ function library.onRequire()
 			{Wave=10; ItemId="skullburstmod"; Quantity=1; Chance=0.3;};
 			{Wave=11; ItemId="hydroponiccapsule"; Quantity=1; Chance=0.15;};
 			{Wave=12; ItemId="boomerang"; Quantity=1; Chance=0.075;};
-			{Wave=13; ItemId="rechamber1216parts2"; Quantity=1; Chance=0.038;};
+			{Wave=13; ItemId="grandgarandparts2"; Quantity=1; Chance=0.038;};
 			{Wave=14; ItemId="ammopouch"; Quantity=1; Chance=0.019;};
-			{Wave=15; ItemId="rechamber1216bp"; Quantity=1; Chance=0.001;};
+			{Wave=15; ItemId="grandgarandbp"; Quantity=1; Chance=0.001;};
 		};
 		WaveBased=true;
 	};
@@ -1263,9 +1263,9 @@ function library.onRequire()
 			{Wave=10; ItemId="skullburstmod"; Quantity=1; Chance=0.3;};
 			{Wave=11; ItemId="hydroponiccapsule"; Quantity=1; Chance=0.15;};
 			{Wave=12; ItemId="boomerang"; Quantity=1; Chance=0.075;};
-			{Wave=13; ItemId="rechamber1216parts3"; Quantity=1; Chance=0.038;};
+			{Wave=13; ItemId="dualuziparts2"; Quantity=1; Chance=0.038;};
 			{Wave=14; ItemId="ammopouch"; Quantity=1; Chance=0.019;};
-			{Wave=15; ItemId="rechamber1216bp"; Quantity=1; Chance=0.001;};
+			{Wave=15; ItemId="grandgarandparts3"; Quantity=1; Chance=0.001;};
 		};
 		WaveBased=true;
 	};
@@ -1310,9 +1310,9 @@ function library.onRequire()
 		Rewards={
 			{Wave=4; ItemId="stickygrenade"; Quantity=1; Chance=1;};
 			{Wave=4; ItemId="advmedkit"; Quantity=1; Chance=1;};
-			{Wave=4; ItemId="toxiccontainer"; Quantity=1; Chance=1;};
+			{Wave=4; ItemId="scarecrow"; Quantity=1; Chance=1;};
 
-			{Wave=8; ItemId="apron"; Quantity=1; Chance=1;};
+			{Wave=8; ItemId="scarecrow"; Quantity=1; Chance=1;};
 			{Wave=8; ItemId="megaswitchblade"; Quantity=1; Chance=1;};
 			{Wave=8; ItemId="sandwich"; Quantity=1; Chance=1;};
 

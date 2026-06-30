@@ -29,9 +29,31 @@ function Objective.onRequire()
 				or config.Parent == nil
 				or config.Parent.Parent == nil then return end;
 				
+				local missile = config.Parent.Parent;
+
 				config:SetAttribute("_InteractDuration", nil);
 				config:SetAttribute("_Label", "Activated");
-				config.Parent.Parent:SetAttribute("Active", true);
+
+				local wave = missile:GetAttribute("Wave") or 1;
+				missile:SetAttribute("Active", true);
+
+				local destructibleConfig = modDestructibles.createDestructible("Scarecrow");
+				destructibleConfig:SetAttribute("_AttractRange", 128);
+				destructibleConfig:SetAttribute("_ExpiringDamageTick", false);
+				destructibleConfig.Parent = missile;
+				
+				local destructible: DestructibleInstance = modDestructibles.getOrNew(destructibleConfig);
+				destructible.BroadcastHealth = true;
+				destructible.HealthComp:SetCanBeHurtBy("!Player&!Human"); -- not HumanoidType == Player & not Survivors
+				destructible.HealthComp:SetMaxHealth(wave * 500);
+				destructible.HealthComp:Reset();
+
+				destructible:SetupHealthbar{
+					Size = UDim2.new(4, 0, 1, 0);
+					Distance = 128;
+					OffsetWorldSpace = Vector3.new(0, 3, 0);
+					ShowLabel = true;
+				};
 			end)
 		end
 	end)
@@ -74,6 +96,7 @@ function Objective:Begin()
 	for a=1, missileSpawnCount do
 		local newMissile = table.remove(pickList, math.random(1, #pickList));
 		newMissile = newMissile:Clone();
+		newMissile:SetAttribute("Wave", controller.Wave);
 		newMissile.Parent = workspace.Environment.Game;
 		table.insert(self.CurMissiles, newMissile);
 
@@ -108,26 +131,6 @@ function Objective:Tick()
 
 		if active >= #self.CurMissiles then
 			self.State = 2;
-
-			for _, missile in ipairs(self.CurMissiles) do
-				local destructibleConfig = modDestructibles.createDestructible("Scarecrow");
-				destructibleConfig:SetAttribute("_AttractRange", 999);
-				destructibleConfig:SetAttribute("_ExpiringDamageTick", false);
-				destructibleConfig.Parent = missile;
-				
-				local destructible: DestructibleInstance = modDestructibles.getOrNew(destructibleConfig);
-				destructible.BroadcastHealth = true;
-				destructible.HealthComp:SetCanBeHurtBy("!Player&!Human"); -- not HumanoidType == Player & not Survivors
-				destructible.HealthComp:SetMaxHealth(controller.Wave * 300);
-				destructible.HealthComp:Reset();
-
-				destructible:SetupHealthbar{
-					Size = UDim2.new(4, 0, 1, 0);
-					Distance = 128;
-					OffsetWorldSpace = Vector3.new(0, 3, 0);
-					ShowLabel = true;
-				};
-			end
 
 			self.SecTick = tick();
 			controller.WaveStartTime = workspace:GetServerTimeNow();

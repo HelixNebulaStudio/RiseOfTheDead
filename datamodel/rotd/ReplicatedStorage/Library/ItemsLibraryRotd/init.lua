@@ -655,9 +655,9 @@ function modItemsLibrary.onRequire()
     new(weaponCompBase, {Id="arelshiftcrossparts"; CraftFor="arelshiftcross"; Sources={"Obtained within <b>Abandoned Bunker</b>.";}; });
     new(weaponCompBase, {Id="deagleparts"; CraftFor="deagle"; Sources={"Obtained from <b>Board Missions</b>.";};});
 
-    new(weaponCompBase, {Id="dualuziparts1"; Prefix=`Sector F`; CraftFor="dualuzi";});
-    new(weaponCompBase, {Id="dualuziparts2"; Prefix=`Prison`; CraftFor="dualuzi";});
-    new(weaponCompBase, {Id="dualuziparts3"; Prefix=`Sector D`; CraftFor="dualuzi";});
+    new(weaponCompBase, {Id="dualuziparts1"; Prefix=`Prison`; CraftFor="dualuzi";});
+    new(weaponCompBase, {Id="dualuziparts2"; Prefix=`Sector D`; CraftFor="dualuzi";});
+    new(weaponCompBase, {Id="dualuziparts3"; Prefix=`Swamplands`; CraftFor="dualuzi";});
 
     new(weaponCompBase, {Id="rechamber1216parts1"; Prefix=`Sector F`; CraftFor="rechamber1216";});
     new(weaponCompBase, {Id="rechamber1216parts2"; Prefix=`Prison`; CraftFor="rechamber1216";});

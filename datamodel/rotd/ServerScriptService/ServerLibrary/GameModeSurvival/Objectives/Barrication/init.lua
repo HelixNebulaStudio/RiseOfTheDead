@@ -32,14 +32,14 @@ function Objective.onRequire()
 			local wave = config:GetAttribute("Wave") or 1;
 
 			local destructibleConfig = modDestructibles.createDestructible("Scarecrow");
-			destructibleConfig:SetAttribute("_AttractRange", 999);
+			destructibleConfig:SetAttribute("_AttractRange", 350);
 			destructibleConfig:SetAttribute("_ExpiringDamageTick", false);
 			destructibleConfig.Parent = model;
 			
 			local destructible: DestructibleInstance = modDestructibles.getOrNew(destructibleConfig);
 			destructible.BroadcastHealth = true;
 			destructible.HealthComp:SetCanBeHurtBy("!Player&!Human"); -- not HumanoidType == Player & not Survivors
-			destructible.HealthComp:SetMaxHealth(wave * 500);
+			destructible.HealthComp:SetMaxHealth(wave * 700);
 			destructible.HealthComp:Reset();
 
 			destructible:SetupHealthbar{
@@ -112,7 +112,7 @@ function Objective:Begin()
 	local curObjectiveInfo = controller.CurObjective;
 	local locationName = curObjectiveInfo.Locations[math.random(1, #curObjectiveInfo.Locations)];
 
-	local barricationDuration = math.clamp(150 - (self.Controller.Wave * 5), 60, 150);
+	local barricationDuration = math.clamp(200 - (self.Controller.Wave * 5), 100, 200);
 
 	controller.WaveStartTime = workspace:GetServerTimeNow();
 	controller.WaveDuration = math.floor(barricationDuration);
@@ -130,7 +130,7 @@ function Objective:Tick()
 		if workspace:GetServerTimeNow() > controller.WaveStartTime + controller.WaveDuration then
 			self.State = 2;
 				
-			self.RoundDuration = math.clamp(self.Controller.Wave * 5, 150, 300);
+			self.RoundDuration = math.clamp(self.Controller.Wave * 8, 150, 300);
 			self.EndTime = tick() + self.RoundDuration;
 			self.LastSpawn = tick();
 

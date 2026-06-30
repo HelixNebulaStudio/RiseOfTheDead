@@ -68,7 +68,7 @@ function Objective:Begin()
 		table.insert(Objective.Prefabs, newPrefab);
 			
 		local destructibleConfig = modDestructibles.createDestructible("Scarecrow");
-		destructibleConfig:SetAttribute("_AttractRange", 999);
+		destructibleConfig:SetAttribute("_AttractRange", 200);
 		destructibleConfig:SetAttribute("_ExpiringDamageTick", false);
 		destructibleConfig.Parent = newPrefab;
 
