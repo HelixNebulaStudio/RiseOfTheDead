@@ -119,6 +119,7 @@ function Component:__call(damage, range, isLethal)
         Component.Pool:Return(newExplosionPart);
     end)
 
+    local tickChainCount = 0;
     local splashReflectedValue = nil;
     task.spawn(function()
         local hitLayers = modExplosionHandler:Cast(explosionPoint, {
@@ -163,20 +164,47 @@ function Component:__call(damage, range, isLethal)
                     if splashReflectedValue then
                         damage = damage * splashReflectedValue;
                     end
-                    task.spawn(function()
-                        if explodeHealthComp.IsDead then return end;
-                        local tickCombustionComp = explodeNpcClass:GetComponent("TickCombustion");
-                        if tickCombustionComp == nil then return end;
 
-                        task.wait(math.random(50, 250)/1000);
-                        if explodeHealthComp.IsDead then return end;
+                    local explosionStun = newExplosionProcessPacket.ExplosionStun;
 
-                        tickCombustionComp(math.max(damage/2, 10), range+4, isLethal);
-                    end)
+                    local dir = (explodeNpcClass:GetCFrame().Position - explosionPoint).Unit;
+                    local explodeTargetRootpart = explodeNpcClass.RootPart;
 
-                    if newExplosionProcessPacket.ExplosionStun then
+                    explodeTargetRootpart:ApplyImpulse(dir * explodeTargetRootpart:GetMass() * 200);
+
+                    local tickCombustionComp = explodeNpcClass:GetComponent("TickCombustion");
+                    if tickCombustionComp then
+                        tickChainCount += 1;
+
+                        local detonateDelay = tickChainCount*0.2;
+                        
+                        task.spawn(function()
+                            local explodeChar = explodeNpcClass.Character;
+                            if explodeHealthComp.IsDead or explodeChar == nil then return end;
+
+                            local detonateTime = workspace:GetServerTimeNow() + detonateDelay;
+                            
+                            local tickingSound = modAudio.Play("ZombieAttack3", explodeTargetRootpart);
+                            tickingSound.PlaybackSpeed = 8;
+                            tickingSound.Looped = true;
+                            explodeNpcClass.Garbage:Tag(tickingSound);
+                            
+                            for a=-0.001, detonateDelay, 0.2 do
+                                task.wait(0.2);
+                                explodeChar:SetAttribute("DetonationTime", detonateTime);
+                            end
+                            if explodeHealthComp.IsDead then return end;
+
+                            tickCombustionComp(math.max(damage/2, 10), range+4, isLethal);
+                        end)
+
+                        explosionStun = detonateDelay+0.5;
+                    end;
+
+
+                    if explosionStun then
                         explodeNpcClass.StatusComp:Apply("ExplosionRagdoll", {
-                            Expires = workspace:GetServerTimeNow() + newExplosionProcessPacket.ExplosionStun;
+                            Expires = workspace:GetServerTimeNow() + explosionStun;
                             Values = {
                                 Ragdoll = true;
                             }

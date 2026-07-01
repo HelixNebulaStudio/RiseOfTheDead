@@ -18,6 +18,8 @@ local modLeaderboardService = shared.require(game.ReplicatedStorage.Library.Lead
 local modMissionLibrary = shared.require(game.ReplicatedStorage.Library.MissionLibrary);
 local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumber);
 local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
+local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibraryRotd);
+local modFactionsLibrary = shared.require(game.ReplicatedStorage.Library.FactionsLibrary);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 local modSafehomesLibrary = shared.require(game.ReplicatedStorage.Library.SafehomesLibrary);
@@ -142,6 +144,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	
 	local missionContentScrollList = centerMissionsFrame:WaitForChild("ExpandPanel"):WaitForChild("Content");
 	local missionNavListScrollList = centerMissionsFrame:WaitForChild("ExpandPanel"):WaitForChild("NavList");
+	local hqNavListScrollList = centerHeadquartersFrame:WaitForChild("ExpandPanel"):WaitForChild("NavList");
 	
 	local noFactionFrame = centerFrame:WaitForChild("JoinFactionFrame");
 	local noFactionInput = noFactionFrame:WaitForChild("TextInput");
@@ -169,6 +172,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local updateMissionPage;
 	local centerFrameState;
 	local viewAvailableMissionFunc;
+	local updateHqPage;
 	
 	local syncActivated = false;
 	local lastSync = tick()-300;
@@ -248,17 +252,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		end
 	end
 
-	local function shrinkMissionFrame()
-		centerMissionsFrame.ExpandPanel.Visible = false;
-		centerMissionsFrame.Size = UDim2.new(1, 0, 0.333, 0);
-
-		centerMissionsFrame.PublicMissions.Size = UDim2.new(1, 0, 1, -30);
-		centerHeadquartersFrame.Visible = true;
-		centerResourceFrame.Visible = true;
-		centerFrameState = nil;
-
-		updateMissionPage();
-	end
+	local shrinkMissionFrame, shrinkHqFrame;
 	
 	local function sync(returnFactionObj, onComplete)
 		task.spawn(function()
@@ -336,10 +330,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			missionMenuPage = "";
 			clearMissionPage();
 			shrinkMissionFrame();
+			shrinkHqFrame();
 
 			local mission58Complete = false;
 			local missionData = modData:GetMission(58);
-			if missionData and missionData.Type == 3 then
+			if missionData and missionData.Type == 3 or missionData.Redo == true then
 				mission58Complete = true;
 			end
 			
@@ -440,12 +435,20 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			elseif rewardInfo.Type == "Money" then
 				local agentPayout = activeMissionData and activeMissionData.MoneyPayout;
 				local remainingPay = agentPayout and (rewardInfo.Value - agentPayout) or rewardInfo.Value;
-				rewardsStr = rewardsStr..`    + ${remainingPay} For Faction (If Success), + ${agentPayout} For Agent\n`;
+
+				if agentPayout then
+					rewardsStr = rewardsStr..`    + ${remainingPay} For Faction (If Success), + ${agentPayout} For Agent\n`;
+				else
+					rewardsStr = rewardsStr..`    + ${remainingPay} For Faction (If Success)`;
+				end
 
 				costStr = costStr..`    -${agentPayout or rewardInfo.Value} Per Agent\n`;
 
 			elseif rewardInfo.Type == "Gold" and factionData.TestGoldReward == true then
 				rewardsStr = rewardsStr.."    + " .. (rewardInfo.Value) ..modRichFormatter.GoldText(" Gold").. "\n";
+
+			elseif rewardInfo.Type == "SetFlag" and rewardInfo.Desc then
+				rewardsStr = rewardsStr.."    + "..rewardInfo.Desc;
 
 			end
 		end
@@ -659,9 +662,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					if missionSuccess then
 						local rewards = missionLib.FactionRewards;
 						for a=1, #rewards do
-							local rewardType = rewards[a].Type;
-							local rewardId = rewards[a].Id;
-							local rewardValue = rewards[a].Value;
+							local rewardInfo = rewards[a];
+							local rewardType = rewardInfo.Type;
+							local rewardId = rewardInfo.Id;
+							local rewardValue = rewardInfo.Value;
 
 							if rewardType == "Resource" then
 								reportRewardStr = reportRewardStr.."\n    • "..rewardId..": ".. rewardValue .."%";
@@ -677,6 +681,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 							elseif rewardType == "Gold" and factionData.TestGoldReward == true then
 								reportRewardStr = reportRewardStr.."\n    + ".. rewardValue .. modRichFormatter.GoldText(" Gold");
+
+							elseif rewardType == "SetFlag" and rewardInfo.Desc then
+								reportRewardStr = reportRewardStr..`\n    • {rewardInfo.Desc}`;
 
 							end
 						end
@@ -1085,6 +1092,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		end
 	end
 	
+	function binds.GetFlag(key)
+		local factionData = modData.FactionData;
+		if factionData == nil then return nil; end;
+
+		return factionData.Flags[key];
+	end
+
 	function binds.HasPermission(key)
 		local factionData = modData.FactionData;
 		if factionData == nil then return false; end;
@@ -1530,7 +1544,19 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		end)
 	end)
 	
-	
+	--MARK: Missions menu;
+	shrinkMissionFrame = function()
+		centerMissionsFrame.ExpandPanel.Visible = false;
+		centerMissionsFrame.Size = UDim2.new(1, 0, 0.333, 0);
+
+		centerMissionsFrame.PublicMissions.Size = UDim2.new(1, 0, 1, -30);
+		centerHeadquartersFrame.Visible = true;
+		centerResourceFrame.Visible = true;
+		centerFrameState = nil;
+
+		updateMissionPage();
+	end
+
 	local function expandMissionFrame()
 		centerHeadquartersFrame.Visible = false;
 		centerResourceFrame.Visible = false;
@@ -1595,6 +1621,353 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		end
 	end))
 
+	interface.Garbage:Tag(missionNavListScrollList.availableButton.MouseButton1Click:Connect(function()
+		interface:PlayButtonClick();
+		missionMenuPage = "";
+		updateMissionPage();
+		Debugger:StudioLog("Available mission");
+	end))
+
+	interface.Garbage:Tag(missionNavListScrollList.backButton.MouseButton1Click:Connect(function()
+		interface:PlayButtonClick();
+
+		centerMissionsFrame.ExpandPanel.Visible = false;
+		centerMissionsFrame:TweenSize(UDim2.new(1, 0, 0.333, 0), Enum.EasingDirection.InOut, Enum.EasingStyle.Quad, 0.2, true, shrinkMissionFrame);
+	end))
+	
+	--MARK: HqMenu;
+	local templateClaimable = script:WaitForChild("TemplateClaimable");
+
+	local disExpandContent = centerHeadquartersFrame:WaitForChild("ExpandPanel"):WaitForChild("Content");
+	local disShrinkPanel = centerHeadquartersFrame:WaitForChild("ShrinkPanel");
+	local distributionsFrame = disExpandContent:WaitForChild("Distributions");
+	local disButtonsNav = distributionsFrame:WaitForChild("Buttons");
+	local distDescLabel = distributionsFrame:WaitForChild("DescLabel");
+	local distEmptyLabel = distributionsFrame:WaitForChild("EmptyLabel");
+	local disEditButton = disButtonsNav:WaitForChild("editButton");
+
+	local disEditMode = false;
+	local cacheDisClaimed = {};
+	updateHqPage = function()
+		if binds.HasPermission("HandleDistributions") then
+			disButtonsNav.Visible = true;
+		else
+			disEditMode = false;
+			disButtonsNav.Visible = false;
+		end
+
+		local claimableFrames = {};
+		for _, obj in ipairs(distributionsFrame:GetChildren()) do
+			if obj:GetAttribute("IsAClaimable") == nil then continue end;
+			claimableFrames[obj.Name] = obj;
+		end
+
+		local disLibrary = modFactionsLibrary.DistributionsLibrary;
+		for disId, disLib in pairs(disLibrary:GetAll()) do
+			local new = claimableFrames[disId];
+
+			local isDistActive = binds.GetFlag(`DistActive_{disId}`) == true;
+			local isDistUnlocked = binds.GetFlag(`DistUnlocked_{disId}`) == true;
+
+			if claimableFrames[disId] == nil then
+				new = templateClaimable:Clone();
+				new.Name = disId;
+				new.LayoutOrder = disLib.LibraryIndex;
+				new:SetAttribute("IsAClaimable", true);
+				new.Parent = distributionsFrame;
+
+				if disLib.Type == "Item" then
+					local itemId = disLib.ItemId or disLib.Id;
+
+					local itemLib = modItemsLibrary:Find(itemId);
+
+					local itemButtonObj = modItemInterface.newItemButton(itemId);
+					local itemImgButton = itemButtonObj.ImageButton;
+					itemImgButton.Selectable = false;
+					itemImgButton.Interactable = false;
+					itemImgButton.LayoutOrder = disLib.LibraryIndex;
+					itemImgButton.AnchorPoint = Vector2.new(0, 0);
+					itemImgButton.Position = UDim2.new(0, 20, 0, 0);
+					itemImgButton.Size = UDim2.new(0, 70, 0, 70);
+					itemImgButton.Parent = new;
+					new:GetPropertyChangedSignal("Visible"):Connect(function() 
+						itemImgButton.Visible = new.Visible;
+					end)
+					itemButtonObj:Update();
+
+					local nameLabel = Instance.new("TextLabel");
+					nameLabel.AnchorPoint = Vector2.new(0, 0.5);
+					nameLabel.AutomaticSize = Enum.AutomaticSize.X;
+					nameLabel.BackgroundTransparency = 1;
+					nameLabel.Name = "NameLabel";
+					nameLabel.Parent = itemImgButton;
+					nameLabel.Position = UDim2.new(1, 10, 0.5, 0);
+					nameLabel.Size = UDim2.new(0, 0, 0, 20);
+					nameLabel.Font = Enum.Font.ArimoBold;
+					nameLabel.RichText = true;
+					nameLabel.Text = itemLib.Name;
+					nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
+					nameLabel.TextSize = 16;
+					nameLabel.TextStrokeTransparency = 0.9;
+					nameLabel.TextXAlignment = Enum.TextXAlignment.Left;
+					
+					local function updateShrinkPanel()
+						local isShrinkVisible = disShrinkPanel.Visible == true;
+						if isShrinkVisible then
+							nameLabel.Visible = false;
+							itemImgButton.Size = UDim2.new(0, 50, 0, 50);
+							itemImgButton.Parent = disShrinkPanel:WaitForChild("DistAvailable");
+						else
+							nameLabel.Visible = true;
+							itemImgButton.Size = UDim2.new(0, 70, 0, 70);
+							itemImgButton.Parent = new;
+						end
+					end
+					disShrinkPanel:GetPropertyChangedSignal("Visible"):Connect(updateShrinkPanel);
+					updateShrinkPanel();
+				end
+
+				claimableFrames[disId] = new;
+
+				local claimButton = new:WaitForChild("claimButton");
+				local fundButton = new:WaitForChild("fundButton");
+				local timeLabel = new:WaitForChild("TimeLabel");
+
+				local function tickClaimLabel(tickData: TickData)
+					if tickData.ms1000 ~= true then return end;
+
+					if not distributionsFrame:IsAncestorOf(timeLabel) then
+						interface.Scheduler.OnStepped:Disconnect(tickClaimLabel);
+						return;
+					end
+
+					local endOfDayTick = modSyncTime.TimeOfEndOfDay();
+					local timeLeft = endOfDayTick - workspace:GetServerTimeNow();
+					timeLabel.Text = modSyncTime.ToString(timeLeft);
+				end
+
+				tickClaimLabel({ms1000=true;} :: any);
+				interface.Scheduler.OnStepped:Connect(tickClaimLabel);
+
+				local debounceTick = tick();
+				claimButton.MouseButton1Click:Connect(function()
+					if claimButton.BackgroundTransparency == 1 then return end;
+					if tick() < debounceTick then return end;
+					debounceTick = tick()+1;
+
+					claimButton.Text = `Claiming...`;
+					interface:PlayButtonClick();
+
+					local rPacket = remoteFactionService:InvokeServer("claimdistribution", disId);
+					if rPacket and rPacket.Success then
+						if rPacket.FactionObj then
+							sync(rPacket.FactionObj, function(factionObj)
+								updateHqPage();
+							end);
+						end
+						modClientGuis.toggleWindow("Inventory", true);
+					end
+					
+					claimButton.Text = `Claim`;
+				end)
+
+				fundButton.MouseButton1Click:Connect(function()
+					if tick() < debounceTick then return end;
+					debounceTick = tick()+1;
+
+					interface:PlayButtonClick();
+
+					fundButton.Text = `Toggling...`;
+
+					local rPacket = remoteFactionService:InvokeServer("toggledistributions", disId);
+					if rPacket and rPacket.Success then
+						if rPacket.FactionObj then
+							sync(rPacket.FactionObj, function(factionObj)
+								updateHqPage();
+							end);
+						end
+					end
+
+					fundButton.Text = `Toggle Fund`;
+				end)
+			end
+
+			local claimButton = new:WaitForChild("claimButton");
+			local timeLabel = new:WaitForChild("TimeLabel");
+			local fundButton = new:WaitForChild("fundButton");
+			local costLabel = new:WaitForChild("CostLabel");
+
+			local newVisible = false;
+			if disEditMode or isDistActive then
+				newVisible = true;
+			end
+			new.Visible = newVisible;
+
+			if disEditMode then
+				claimButton.Visible = false;
+				timeLabel.Visible = false;
+				costLabel.Visible = true;
+
+				if not isDistUnlocked then
+					costLabel.Text = `{disLib.UnlockBy}`;
+					costLabel.Size = UDim2.new(0.4, 0, 0, 50);
+					fundButton.Visible = false;
+
+				else
+					fundButton.Visible = true;
+					costLabel.Text = `${disLib.FundCost} / Day`;
+					costLabel.Size = UDim2.new(0.3, 0, 0, 20);
+					fundButton.Text = `Toggle Fund`;
+					fundButton.BackgroundColor3 = isDistActive and Color3.fromRGB(79, 83, 148) or Color3.fromRGB(100, 100, 100);
+
+				end
+				
+
+			else
+				local endOfDayTick = modSyncTime.TimeOfEndOfDay();
+
+				claimButton.Visible = true;
+				timeLabel.Visible = true;
+				fundButton.Visible = false;
+				costLabel.Visible = false;
+
+				local isAlreadyClaimed = cacheDisClaimed[`ClaimDis_{disId}`] 
+									 and cacheDisClaimed[`ClaimDis_{disId}`] >= endOfDayTick;
+				if isAlreadyClaimed then
+					claimButton.BackgroundTransparency = 1;
+					claimButton.Text = "Already Claimed";
+
+				else
+					claimButton.BackgroundTransparency = 0;
+					claimButton.Text = "Claim";
+										
+				end
+
+			end
+		end
+
+		if disEditMode then
+			distDescLabel.Visible = true;
+			distEmptyLabel.Visible = false;
+			
+		else
+			distDescLabel.Visible = false;
+
+			local claimableVisible = 0;
+			for _, c in pairs(claimableFrames) do
+				if c.Visible then
+					claimableVisible += 1;
+				end
+			end
+
+			distEmptyLabel.Visible = claimableVisible <= 0;
+		end
+	end
+	disEditButton.MouseButton1Click:Connect(function()
+		interface:PlayButtonClick();
+
+		disEditMode = not disEditMode;
+		updateHqPage();
+	end)
+
+	local function updateDisClaimCache(data)
+		local updated = {};
+		for k, v in pairs(data) do
+			updated[k] = true;
+			cacheDisClaimed[k] = v;
+		end
+		for k, v in pairs(cacheDisClaimed) do
+			if updated[k] then continue end;
+			cacheDisClaimed[k] = nil;
+		end
+	end
+
+    local function expandHqFrame()
+		task.spawn(function()
+			local distClaims = modData:GetFlag("FactionDisClaims", true) or {};
+			updateDisClaimCache(distClaims);
+			
+			updateHqPage();
+		end)
+		
+		centerMissionsFrame.Visible = false;
+		centerResourceFrame.Visible = false;
+
+		centerHeadquartersFrame:TweenSize(UDim2.new(1, 0, 1, 0), Enum.EasingDirection.InOut, Enum.EasingStyle.Quad, 0.2, true);
+		centerHeadquartersFrame.ExpandPanel.Visible = true;
+		centerHeadquartersFrame.ShrinkPanel.Visible = false;
+		centerHeadquartersFrame.Desc.Visible = false;
+
+		travelToHqButton.Size = UDim2.new(0.15, 0, 0, 25);
+		travelToHqButton.Parent = hqNavListScrollList;
+	end
+
+	shrinkHqFrame = function()
+		centerHeadquartersFrame.ExpandPanel.Visible = false;
+		centerHeadquartersFrame.ShrinkPanel.Visible = true;
+		centerHeadquartersFrame.Desc.Visible = true;
+		centerHeadquartersFrame.Size = UDim2.new(1, 0, 0.333, 0);
+
+		centerMissionsFrame.Visible = true;
+		centerResourceFrame.Visible = true;
+		centerFrameState = nil;
+
+		travelToHqButton.Size = UDim2.new(0.2, 0, 0, 30);
+		travelToHqButton.Parent = centerHeadquartersFrame;
+		
+		disEditMode = false;
+		updateHqPage();
+	end
+
+	interface.Garbage:Tag(hqNavListScrollList.backButton.MouseButton1Click:Connect(function()
+		interface:PlayButtonClick();
+
+		centerHeadquartersFrame.ExpandPanel.Visible = false;
+		centerHeadquartersFrame:TweenSize(UDim2.new(1, 0, 0.333, 0), Enum.EasingDirection.InOut, Enum.EasingStyle.Quad, 0.2, true, shrinkHqFrame);
+	end))
+
+	interface.Garbage:Tag(centerHeadquartersFrame.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 
+		or input.UserInputType == Enum.UserInputType.Touch then
+			if centerFrameState == centerHeadquartersFrame.Name then return end;
+			centerFrameState = centerHeadquartersFrame.Name;
+
+			interface:PlayButtonClick();
+
+			expandHqFrame()
+			updateHqPage();
+		end
+	end))
+
+	interface.Garbage:Tag(travelToHqButton.MouseButton1Click:Connect(function()
+		interface:PlayButtonClick();
+		
+        modClientGuis.promptDialogBox({
+            Title = `Travel to Headquarters?`;
+            Desc = `You're about to leave this world`;
+            Buttons={
+                {
+                    Text="Travel";
+                    Style="Confirm";
+                    OnPrimaryClick=function(dialogWindow)
+                        local statusLabel = dialogWindow.Binds.StatusLabel;
+                        statusLabel.Text = "Traveling<...>";
+
+                        local _travelReturn = remoteFactionService:InvokeServer("travelhq");
+                        interface:ToggleGameBlinds(false, 3);
+                        task.wait(5);
+                    end;
+                };
+                {
+                    Text="Cancel";
+                    Style="Cancel";
+                };
+            }
+        });
+	end));
+	
+
+	--MARK: Gamepad input conn
 	interface.Garbage:Tag(UserInputService.InputBegan:Connect(function(inputObject: InputObject)
 		if not interface.isPreferringGamepad() then return end;
 
@@ -1645,51 +2018,17 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 			expandMissionFrame();
 			updateMissionPage();
+
+		elseif selectionObj == centerHeadquartersFrame then
+			if centerFrameState == centerHeadquartersFrame.Name then return end;
+			centerFrameState = centerHeadquartersFrame.Name;
+
+			interface:PlayButtonClick();
+
+			expandHqFrame();
+			updateHqPage();
 		end
 	end))
-
-	interface.Garbage:Tag(missionNavListScrollList.availableButton.MouseButton1Click:Connect(function()
-		interface:PlayButtonClick();
-		missionMenuPage = "";
-		updateMissionPage();
-		Debugger:StudioLog("Available mission");
-	end))
-
-	interface.Garbage:Tag(missionNavListScrollList.backButton.MouseButton1Click:Connect(function()
-		interface:PlayButtonClick();
-
-		centerMissionsFrame.ExpandPanel.Visible = false;
-		centerMissionsFrame:TweenSize(UDim2.new(1, 0, 0.333, 0), Enum.EasingDirection.InOut, Enum.EasingStyle.Quad, 0.2, true, shrinkMissionFrame);
-	end))
-	
-    
-	interface.Garbage:Tag(travelToHqButton.MouseButton1Click:Connect(function()
-		interface:PlayButtonClick();
-		
-        modClientGuis.promptDialogBox({
-            Title = `Travel to Headquarters?`;
-            Desc = `You're about to leave this world`;
-            Buttons={
-                {
-                    Text="Travel";
-                    Style="Confirm";
-                    OnPrimaryClick=function(dialogWindow)
-                        local statusLabel = dialogWindow.Binds.StatusLabel;
-                        statusLabel.Text = "Traveling<...>";
-
-                        local _travelReturn = remoteFactionService:InvokeServer("travelhq");
-                        interface:ToggleGameBlinds(false, 3);
-                        task.wait(5);
-                    end;
-                };
-                {
-                    Text="Cancel";
-                    Style="Cancel";
-                };
-            }
-        });
-	end));
-	
 
 	--== Settings
 	local activeSettingsPage = "InfoSettingsFrame";
@@ -2394,7 +2733,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 				nameLabel.Text = memberData.Name;
 				data.Name = memberData.Name;
-				iconLabel.Image = "rbxthumb://type=AvatarHeadShot&id="..userId.."&w=420&h=420";
+				iconLabel.Image = `rbxthumb://type=AvatarHeadShot&id={userId}&w=420&h=420`;
 
 
 				local statusIcon = iconLabel:WaitForChild("StatusIconLabel");
@@ -2417,6 +2756,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				updatedMember[userId] = true;
 			end
 
+			task.spawn(updateHqPage);
 		end
 
 		for userId, memberData in pairs(binds.MembersData) do
@@ -2548,6 +2888,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		end
 	end)
     
+	interface.Garbage:Tag(modData.OnFlagUpdate:Connect(function(flagId, data)
+		if flagId ~= "FactionDisClaims" then return end;
+
+		updateDisClaimCache(data);
+		updateHqPage();
+	end))
+
 end
 
 return interfacePackage;

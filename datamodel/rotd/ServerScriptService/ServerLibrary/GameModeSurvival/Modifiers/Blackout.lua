@@ -13,6 +13,7 @@ end
 function Modifier:Begin(controller)
 	self.LastSpawnTick = tick();
 	self.PathSpawned = 0;
+	
 	workspace:SetAttribute("ModifiersBlackout", true);
 	shared.Notify(game.Players:GetPlayers(), "[Blackout] Threat sense is disabled.", "Important");
 end

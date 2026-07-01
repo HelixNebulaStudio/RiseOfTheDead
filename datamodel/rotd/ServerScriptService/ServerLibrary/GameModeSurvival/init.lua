@@ -1039,6 +1039,7 @@ function Survival:StartWave(wave)
 	--MARK: Wave Tick
 	local hudUpdateTick = tick()-5;
 	local waveStartTick = tick();
+	local recentEnemyExistTick = tick()+60;
 	repeat
 		task.wait();
 		if newObjective:Tick() then break; end
@@ -1069,7 +1070,15 @@ function Survival:StartWave(wave)
 			self:Hud{};
 		end
 
-		if tick()-waveStartTick >= 120 and #modNpcs.ActiveNpcClasses <= 0 then break; end;
+		--force end if no enemies exists for a minute
+		if tick()-waveStartTick >= 60 then
+			if #modNpcs.ActiveNpcClasses > 0 then
+				recentEnemyExistTick = tick();
+			elseif tick()-recentEnemyExistTick >= 60 then
+				break;
+			end
+		end;
+
 		if self.SkipWave then Debugger:Warn("Skip Wave"); break; end;
 	until self.Status ~= EnumStatus.InProgress;
 	
@@ -1579,7 +1588,7 @@ function Survival:Schedule(paramPacket)
 	local exist = false;
 	
 	for a=1, #self.JobsList do
-		if self.JobsList[a].Id == job then
+		if self.JobsList[a].Id == job.Id then
 			job = self.JobsList[a];
 			exist = true;
 			break;

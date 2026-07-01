@@ -112,7 +112,7 @@ function Objective:Begin()
 	local curObjectiveInfo = controller.CurObjective;
 	local locationName = curObjectiveInfo.Locations[math.random(1, #curObjectiveInfo.Locations)];
 
-	local barricationDuration = math.clamp(200 - (self.Controller.Wave * 5), 100, 200);
+	local barricationDuration = math.clamp(200 - (controller.Wave * 5), 100, 200);
 
 	controller.WaveStartTime = workspace:GetServerTimeNow();
 	controller.WaveDuration = math.floor(barricationDuration);
@@ -125,6 +125,8 @@ function Objective:Tick()
 	local controller = self.Controller;
 
 	local endWaveBool = false;
+	local canSpawn = false;
+	local immunity = nil;
 
 	if self.State == 1 then
 		if workspace:GetServerTimeNow() > controller.WaveStartTime + controller.WaveDuration then
@@ -143,36 +145,39 @@ function Objective:Tick()
 			}
 		end
 
+		canSpawn = tick()-self.LastSpawn > 5 and #controller.EnemyNpcClasses <= 10;
+
 	elseif self.State == 2 then
 
 		local timeRemain = math.max(self.EndTime-tick(), 0);
 		local timeLapsed = self.RoundDuration-timeRemain;
-		local maxSpawnRate = math.min(math.max(timeRemain*0.05, 1/(math.max(controller.Wave/5, 1)), 0.1), 1);
+		local maxSpawnRate = math.clamp(timeRemain*0.05, 1/(math.max(controller.Wave/5, 1)), 1);
 		
-		local canSpawn = timeRemain > 1 and tick()-self.LastSpawn > maxSpawnRate and #controller.EnemyNpcClasses <= 50;
+		canSpawn = timeRemain > 1 and tick()-self.LastSpawn > maxSpawnRate and #controller.EnemyNpcClasses <= 50;
 		if self.PauseTick and tick() < self.PauseTick then
 			canSpawn = false;
 		end
 		
-		if canSpawn then
-			self.LastSpawn = tick();
-			
-			local enemyName = controller:PickEnemy();
-			self.LastSpawnName = enemyName;
-			
-			local enemyLevel = controller:GetWaveLevel();
-			local immunity = math.clamp(timeLapsed/(self.RoundDuration-60), 0, 1.1);
-			controller:SpawnEnemy(enemyName, {
-				Level = enemyLevel;
-				Immunity = immunity;
-			});
-
-			self.PauseTick = tick()+1;
-		end
+		immunity = math.clamp(timeLapsed/(self.RoundDuration-60), 0, 1.1);
 
 		if timeRemain <= 0 then
 			endWaveBool = true;
 		end
+	end
+
+	if canSpawn then
+		self.LastSpawn = tick();
+		
+		local enemyName = controller:PickEnemy();
+		self.LastSpawnName = enemyName;
+		
+		local enemyLevel = controller:GetWaveLevel();
+		controller:SpawnEnemy(enemyName, {
+			Level = enemyLevel;
+			Immunity = immunity;
+		});
+
+		self.PauseTick = tick()+1;
 	end
 
 	return endWaveBool;

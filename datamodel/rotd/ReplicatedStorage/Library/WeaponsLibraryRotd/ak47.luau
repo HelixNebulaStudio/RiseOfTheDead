@@ -11,7 +11,7 @@ local toolPackage = {
 	Animations={
 		Core={Id=101306375716410;};
 		PrimaryFire={Id=70943120517800; FocusWeight=0.1};
-		Reload={Id=84738551600224;};
+		Reload={Id=130261087947461;};
 		Load={Id=83642360885833;};
 		Inspect={Id=77627305926334;};
 		Sprint={Id=111816464911275};

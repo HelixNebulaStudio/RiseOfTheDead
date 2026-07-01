@@ -167,6 +167,7 @@ function Objective:Tick()
 end
 
 function Objective:End()
+	local controller = self.Controller;
 	self.Active = false;
 	
 	local prefabDestroyed = self.PrefabsSpawned - #Objective.Prefabs;
@@ -191,9 +192,9 @@ function Objective:End()
 			end
 		end
 
-		self.Controller:Schedule({
+		controller:Schedule({
 			Id = "Blackout";
-			EndWave = self.Controller.Wave + prefabDestroyed;
+			EndWave = controller.Wave + prefabDestroyed;
 
 			Modifier = {Id="Blackout"; Value=prefabDestroyed;};
 			Task = function(job)
@@ -213,7 +214,7 @@ function Objective:End()
 				shared.Notify(game.Players:GetPlayers(), "[Blackout] is no longer in effect.", "Inform");
 			end;
 			Tick = function(job)
-				local wavesLeft = job.EndWave - self.Controller.Wave;
+				local wavesLeft = job.EndWave - controller.Wave;
 				if wavesLeft <= 0 then return end;
 
 				Debugger:Log("Blackout Tick", wavesLeft);

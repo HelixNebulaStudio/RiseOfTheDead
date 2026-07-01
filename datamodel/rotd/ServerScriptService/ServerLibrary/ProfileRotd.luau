@@ -56,6 +56,13 @@ shared.coreBind(modProfile, "_new", function(profile: ProfileRotd, player: Playe
 
 		return customColorsData;
 	end)
+
+	profile.Flags:HookGet("FactionDisClaims", function(flagData)
+		flagData = flagData or {
+			Id="FactionDisClaims";
+		};
+		return flagData;
+	end)
 end)
 
 shared.coreBind(modProfile, "_key_load", function(profile: ProfileRotd, key: string, data: any, loadOverwrite: anydict?)

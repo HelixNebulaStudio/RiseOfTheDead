@@ -1170,7 +1170,7 @@ MissionLibrary.New{
 	FactionRewards = {
 		{Type="Resource"; Id="Food"; Value=30;};
 		{Type="Score"; Value=1;};
-		{Type="Money"; Value=8000;};
+		{Type="Money"; Value=12000;};
 	};
 	FactionSuccessCriteria = {
 		SuccessfulAgents=1;
@@ -2072,7 +2072,7 @@ MissionLibrary.New{
 	FactionRewards = {
 		{Type="Resource"; Id="Material"; Value=30;};
 		{Type="Score"; Value=1;};
-		{Type="Money"; Value=4000;};
+		{Type="Money"; Value=6000;};
 	};
 	FactionSuccessCriteria = {
 		SuccessfulAgents=1;
@@ -2131,7 +2131,7 @@ MissionLibrary.New{
 	FactionRewards = {
 		{Type="Resource"; Id="Comfort"; Value=60;};
 		{Type="Score"; Value=1;};
-		{Type="Money"; Value=5000;};
+		{Type="Money"; Value=7500;};
 	};
 	FactionSuccessCriteria = {
 		SuccessfulAgents=1;
@@ -2164,7 +2164,8 @@ MissionLibrary.New{
 	FactionRewards = {
 		{Type="Resource"; Id="Ammo"; Value=60;};
 		{Type="Score"; Value=1;};
-		{Type="Money"; Value=3000;};
+		{Type="Money"; Value=4500;};
+		{Type="SetFlag"; FlagKey="DistUnlocked_ammobox"; NewValue=true; Desc="Unlock Ammobox Distribution"};
 	};
 	FactionSuccessCriteria = {
 		SuccessfulAgents=1;
@@ -2567,7 +2568,7 @@ MissionLibrary.New{
 		{Type="Resource"; Id="Food"; Value=30;};
 		{Type="Resource"; Id="Material"; Value=30;};
 		{Type="Score"; Value=10;};
-		{Type="Money"; Value=8000;};
+		{Type="Money"; Value=12000;};
 	};
 	FactionSuccessCriteria = {
 		SuccessfulAgents = 4;
