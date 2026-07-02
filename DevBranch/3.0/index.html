@@ -1,0 +1,1738 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://helixnebulastudio.github.io/RiseOfTheDead/DevBranch/3.0/">
+      
+      
+        <link rel="prev" href="../../LiveBranch/2.0/">
+      
+      
+        <link rel="next" href="../2.3/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>3.0 - Rise of the Dead</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto Mono";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/interactive_graph.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#revived-30-update-wip" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Rise of the Dead" class="md-header__button md-logo" aria-label="Rise of the Dead" data-md-component="logo">
+      
+  <img src="../../assets/images/RotDIcon_Abr.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Rise of the Dead
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              3.0
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/HelixNebulaStudio/RiseOfTheDead" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../LiveBranch/3.0/" class="md-tabs__link">
+          
+  
+  
+  Live
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+  Dev
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../Development/Pages/" class="md-tabs__link">
+          
+  
+  
+  Development
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../Source/Pages/" class="md-tabs__link">
+          
+  
+  
+  Source
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../Storyboard/Pages/" class="md-tabs__link">
+          
+  
+  
+  Storyboard
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Issues
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/discussions" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Discussions
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Rise of the Dead" class="md-nav__button md-logo" aria-label="Rise of the Dead" data-md-component="logo">
+      
+  <img src="../../assets/images/RotDIcon_Abr.svg" alt="logo">
+
+    </a>
+    Rise of the Dead
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/HelixNebulaStudio/RiseOfTheDead" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../../LiveBranch/3.0/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Live
+  
+
+    
+  </span>
+  
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dev
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Dev
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3.0
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3.0
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#revived-30-update-wip" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Revived 3.0 Update (WIP)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#welcome-back-to-30-survivor-a-lot-has-changes-since-you-were-last-here" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Welcome back to 3.0 survivor! A lot has changes since you were last here.
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Welcome back to 3.0 survivor! A lot has changes since you were last here.">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#highlights" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Highlights
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#damage-overall" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Damage Overall!
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modifiers-modifiers-modifiers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modifiers! Modifiers! Modifiers!
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#new-items" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New Items
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#achievement-badges" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Achievement &amp; Badges
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gameplay-news-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gameplay News &amp; Changes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-story-continues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Story Continues
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#survival" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Survival
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#new-faction-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New Faction Features!
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#npc-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NPC Changes!
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#map-updates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Map Updates
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#misc-and-balancing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Misc and balancing
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2.3.x Dev
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2.2.x
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2.1.*
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2.0/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2.0.*
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../../Development/Pages/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development
+  
+
+    
+  </span>
+  
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../../Source/Pages/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Source
+  
+
+    
+  </span>
+  
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../../Storyboard/Pages/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Storyboard
+  
+
+    
+  </span>
+  
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/issues" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Issues
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/HelixNebulaStudio/RiseOfTheDead/discussions" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Discussions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#revived-30-update-wip" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Revived 3.0 Update (WIP)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#welcome-back-to-30-survivor-a-lot-has-changes-since-you-were-last-here" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Welcome back to 3.0 survivor! A lot has changes since you were last here.
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Welcome back to 3.0 survivor! A lot has changes since you were last here.">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#highlights" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Highlights
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#damage-overall" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Damage Overall!
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#modifiers-modifiers-modifiers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modifiers! Modifiers! Modifiers!
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#new-items" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New Items
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#achievement-badges" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Achievement &amp; Badges
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gameplay-news-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gameplay News &amp; Changes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-story-continues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Story Continues
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#survival" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Survival
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#new-faction-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New Faction Features!
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#npc-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NPC Changes!
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#map-updates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Map Updates
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#misc-and-balancing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Misc and balancing
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h2 id="revived-30-update-wip">Revived 3.0 Update (WIP)<a class="headerlink" href="#revived-30-update-wip" title="Permanent link">&para;</a></h2>
+<h1 id="welcome-back-to-30-survivor-a-lot-has-changes-since-you-were-last-here">Welcome back to 3.0 survivor! A lot has changes since you were last here.<a class="headerlink" href="#welcome-back-to-30-survivor-a-lot-has-changes-since-you-were-last-here" title="Permanent link">&para;</a></h1>
+<h3 id="highlights">Highlights<a class="headerlink" href="#highlights" title="Permanent link">&para;</a></h3>
+<ul>
+<li>New Items, <strong>Dual Uzi</strong>, <strong>Ice Picks</strong>, <strong>Pouch Vest</strong>, <strong>Knights Helmet</strong></li>
+<li>New Story Mission, <strong>Buyer's Remorse</strong></li>
+<li>New Survival <strong>Swamplands</strong></li>
+<li>Damage mods changes</li>
+<li>Faction Update!</li>
+</ul>
+<h3 id="damage-overall">Damage Overall!<a class="headerlink" href="#damage-overall" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Mod Tier Damage</strong>, every gun and melee mod now provides damage based on its tier.   <ul>
+<li>The tier damage amount is tied to the upgrade level of the mods.</li>
+<li>Damage mods are readjusted to balance the additional damage from tier damage.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h3 id="modifiers-modifiers-modifiers">Modifiers! Modifiers! Modifiers!<a class="headerlink" href="#modifiers-modifiers-modifiers" title="Permanent link">&para;</a></h3>
+<ul>
+<li>All stats and mechanics calculations are now done by a new modifiers system. Used in item mods, skills, status effects, passives.</li>
+</ul>
+<p><img alt="modifierbreakdown" src="../../assets/images/screenshots/modifierbreakdown.jpg" /></p>
+<ul>
+<li>
+<p><strong>Modifier Breakdown</strong> screen on workbench stats. Shows you how the item stats is being affected.</p>
+<ul>
+<li>Modifiers also provide special mechanics such as activation input handling or game event reaction.</li>
+</ul>
+</li>
+<li>
+<p><strong>Frostbite</strong> redesigned.</p>
+<ul>
+<li>Every damaging shot charges Frostbite, once charged, you can press [Q] to activate it.</li>
+<li>When activated, shooting enemies causes an <strong>Ice Blast</strong> freezing nearby enemies and applies <strong>Frostbitten</strong> debuff.</li>
+<li><strong>Ice Blast</strong>: Area of effect explosion that weak-stuns <strong>Targets</strong> within the <strong>Radius</strong> and apply <strong>Frostbitten</strong> to each enemy. <em>(Weak-stun only stuns basic enemies.)</em></li>
+<li><strong>Frostbitten</strong>: Does <strong>Premod Damage</strong> as frost damage once per second and when enemies dropped below 10% of max health will instantly shatter and die.</li>
+</ul>
+</li>
+<li>
+<p><strong>Electrocute</strong> changes, renamed from <strong>Electric Charge</strong>.</p>
+<ul>
+<li>Now has a 3s cooldown shown on the weapon modifier state hud.</li>
+<li>Damage now uses Premod Damage.</li>
+</ul>
+</li>
+<li>
+<p>Most clothing with passives now has a base modifier for their passives. </p>
+</li>
+</ul>
+<hr />
+<h3 id="new-items">New Items<a class="headerlink" href="#new-items" title="Permanent link">&para;</a></h3>
+<p><img alt="dualuzi" src="../../assets/images/items/dualuzi.png" /></p>
+<ul>
+<li>New Tier 5 Submachine gun, <strong>Dual Uzi</strong>. <ul>
+<li><b>[Passive] Dual Focus</b> When in focus, you instinctively aim each gun at an enemy closest to the center of your screen.</li>
+</ul>
+</li>
+</ul>
+<p><img alt="icepicks" src="../../assets/images/items/icepicks.png" /></p>
+<ul>
+<li>New Tier 4 Edged Melee, <strong>Ice Picks</strong>.<ul>
+<li>Two picks for ice picking.</li>
+<li><b>[Passive] Frozen Tip:</b> Enemies hit are affected with a 1s Frostbitten debuff. Cooldown: 2 seconds</li>
+<li><b>[Passive] Peak Reacher:</b> Focusing while in air lets you mount onto walls with an ice pick.</li>
+<li><b>[Passive] Chained Attack:</b>Has built-in auto swing.</li>
+</ul>
+</li>
+</ul>
+<p><img alt="greavesandsabatons" src="../../assets/images/items/greavesandsabatons.png" /></p>
+<ul>
+<li>Added new shoes, <strong>Greaves and Sabatons</strong>.<ul>
+<li><b>[Passive] Chivalrous Kick:</b> Sliding into enemies knocks the away.</li>
+</ul>
+</li>
+</ul>
+<p><img alt="pouchvest" src="../../assets/images/items/pouchvest.png" /></p>
+<ul>
+<li>Added new chest clothing, <strong>Pouch Vest</strong>.<ul>
+<li><b>[Passive] Bullet Recouper:</b> Hitscan shots that missed have a 50% chance to be recouped.</li>
+</ul>
+</li>
+</ul>
+<p><img alt="pointguardbulwark" src="../../assets/images/items/pointguardbulwark.png" /></p>
+<ul>
+<li>New HMG modifier, <strong>Point-Guard Bulwark</strong>. <ul>
+<li>Additional Armor Points build up while in focus at the reduction of your Focus Movespeed.</li>
+</ul>
+</li>
+</ul>
+<p><img alt="damagedividermod" src="../../assets/images/items/damagedividermod.png" /></p>
+<ul>
+<li>New Chest modifier, <strong>Damage Divider</strong>. <ul>
+<li>When armor &gt; 0, the damage you take is divided to health and armor damage with an additional damage reduction.</li>
+</ul>
+</li>
+</ul>
+<p><img alt="healthreaper" src="../../assets/images/items/healthreaper.png" /></p>
+<ul>
+<li>New Melee modifier, <strong>Melee Health Reaper</strong>.<ul>
+<li>Killing 3 enemies within a time window heals you.</li>
+</ul>
+</li>
+</ul>
+<p><img alt="knightshelmet" src="../../assets/images/items/knightshelmet.png" /></p>
+<ul>
+<li>New Head gear, <strong>Knight's Helmet</strong>.<ul>
+<li>The helmet of ser Duncan the big.</li>
+<li><b>[Passive] Helm Overwhelm:</b> When you take armor damage, you heal 10% damage of the damage taken.</li>
+</ul>
+</li>
+</ul>
+<p><img alt="militarygloves" src="../../assets/images/items/militarygloves.png" /></p>
+<ul>
+<li>New Gloves, <strong>Military Gloves</strong>.<ul>
+<li>Standard digital camouflage gloves, handy for holding guns.</li>
+<li><b>[Passive] Instinctive Bullseye:</b> When landing a shot on an enemy, the first hitscan will be redirected at the enemies' head if they have one.</li>
+</ul>
+</li>
+</ul>
+<p><img alt="mangrovecrate" src="../../assets/images/items/mangrovecrate.png" /></p>
+<ul>
+<li>New crate, <strong>Mangrove Crate</strong>. From <strong>Survival: Swamplands</strong>.</li>
+</ul>
+<p><img alt="dmangrovecrate" src="../../assets/images/items/dmangrovecrate.png" /></p>
+<ul>
+<li>New crate, <strong>Deadly Mangrove Crate</strong>. From <strong>Survival: Swamplands</strong>.</li>
+</ul>
+<p><img alt="solarconcentrator" src="../../assets/images/items/solarconcentrator.png" /></p>
+<ul>
+<li>New Tier 3 Commodity: <strong>Solar Concentrator</strong>. A dish that concentrates sun light into a point.</li>
+</ul>
+<p><img alt="fermentationvat" src="../../assets/images/items/fermentationvat.png" /></p>
+<ul>
+<li>New Tier 3 Commodity: <strong>Fermentation Vat</strong>. A vat for fermentation.</li>
+</ul>
+<p><img alt="hydroponiccapsule" src="../../assets/images/items/hydroponiccapsule.png" /></p>
+<ul>
+<li>New Tier 3 Commodity: <strong>Hydroponic Capsule</strong>. A mechanic to leverage physics to excert calculated push and pull forces.</li>
+</ul>
+<p><img alt="pulleymechanics" src="../../assets/images/items/pulleymechanics.png" /></p>
+<ul>
+<li>New Tier 3 Commodity: <strong>Pulley Mechanics</strong>. A mechanic to leverage physics to excert calculated push and pull forces.</li>
+</ul>
+<p><img alt="biocharkiln" src="images/items/biocharkiln.png" /></p>
+<ul>
+<li>New Tier 4 Commodity: <strong>Biochar Kiln</strong>. A system that turns organic waste into biochar, a charcoal alternative, by heating it in high heat.</li>
+</ul>
+<p><img alt="bicyclepoweredgenerator" src="../../assets/images/items/bicyclepoweredgenerator.png" /></p>
+<ul>
+<li>New Tier 4 Commodity: <strong>Bicycle Powered Generator</strong>. Generates electricity by peddling..</li>
+</ul>
+<p><img alt="biocharkiln" src="../../assets/images/items/biocharkiln.png" /></p>
+<ul>
+<li>New Tier 4 Commodity: <strong>Solar Water Still</strong>. A water purifier that uses the sun's energy to evaporate dirty water into clean water.</li>
+</ul>
+<p><img alt="floodlights" src="../../assets/images/items/floodlights.png" /></p>
+<ul>
+<li>New Tier 4 Commodity: <strong>Flood Lights</strong>. A powerful spot light for emergencies.</li>
+</ul>
+<p><img alt="lens" src="../../assets/images/items/lens.png" /></p>
+<ul>
+<li>A new component, <strong>Clear Lens</strong>, for general crafting. Clear lens that can be used to magnify or minify.</li>
+</ul>
+<p><img alt="crimsonofferings" src="../../assets/images/items/crimsonofferings.png" />
+<img alt="azureofferings" src="../../assets/images/items/azureofferings.png" />
+<img alt="sageofferings" src="../../assets/images/items/sageofferings.png" /></p>
+<ul>
+<li>New <strong>Offerings</strong> item, <strong>Crimson</strong>, <strong>Azure</strong> and <strong>Sage</strong> offerings are thew new way to obtain unlockables. Most item unlockables are removed from the Gold Shop and Icarus. </li>
+</ul>
+<hr />
+<h3 id="achievement-badges">Achievement &amp; Badges<a class="headerlink" href="#achievement-badges" title="Permanent link">&para;</a></h3>
+<p><img alt="huescollector" src="../../assets/images/icons/HuesPaletteSmall.png" /></p>
+<ul>
+<li>New Achievement: <strong>The Hues Collector</strong> <ul>
+<li>Unlocked all colors on the color palette.</li>
+</ul>
+</li>
+</ul>
+<p><img alt="rotd3" src="../../assets/images/icons/Rotd3Small.png" /></p>
+<ul>
+<li>New Achievement: <strong>Revived 3.0</strong><ul>
+<li>Unlocked the Revived 3.0 Event Pass.</li>
+<li>Players who played before the 3.0 phase 1 dropped unlocks for free. </li>
+</ul>
+</li>
+</ul>
+<hr />
+<h3 id="gameplay-news-changes">Gameplay News &amp; Changes<a class="headerlink" href="#gameplay-news-changes" title="Permanent link">&para;</a></h3>
+<p><img alt="emotewheel" src="../../assets/images/screenshots/emotewheel.jpg" /></p>
+<ul>
+<li>New <strong>Emote Wheel</strong>, now used for social gameplay. Emoting, sound quips, spray tags, emoji bubbles. Default Key is <strong>C</strong>.</li>
+</ul>
+<p><img alt="portablestorage" src="../../assets/images/screenshots/portablestorage.jpg" /></p>
+<ul>
+<li>Equiped storaged such as <strong>Duffle Bag now opens with your inventory</strong>.</li>
+<li>Hitscan bullets can now pierce destructibles, causing collateral damage, meaning shooting dense part of a destructible will cause it to take multiple instance of damage.</li>
+<li>New <strong>melee sounds</strong> for slice, punture and impact.</li>
+<li>Added Aim Assistance for mobile/controller players.</li>
+<li>New melee <strong>Lunge</strong> mechanic on <strong>Mega Switch Blade</strong> &amp; <strong>Broomspear</strong>. Lunge forward in any direction when attacking.</li>
+<li>New Blunt melee stat, <strong>Damage Block</strong>. Blocks a flat damage when equipping a blunt melee weapon.<ul>
+<li>Spiked Bat: 10, Sledgehammer: 5, Shovel: 5, NaughtyCane: 25</li>
+<li>Combines with <strong>Damage Block</strong> from <strong>Tire Armor</strong>.</li>
+</ul>
+</li>
+<li>Overworld Zombies are now scaled to your focus level and area difficulty.</li>
+<li>New <strong>Squad Hud</strong>, now shows on the top right of your screen.<ul>
+<li>Squad and teammates now also appear on your map.</li>
+</ul>
+</li>
+</ul>
+<p><img alt="SeeingRed" src="../../assets/images/screenshots/SeeingRed.png" /></p>
+<ul>
+<li>New Authority skill, <strong>Seeing Red</strong>. Killing enemies enhances your vision in the dark for a duration.</li>
+<li><strong>Crouching now reduces player visibility</strong> to Bandits and Rats Npcs.</li>
+<li><strong>Food healing now stacks</strong> and status now show heal rate.</li>
+<li><strong>Item drops</strong> are refreshed to use a physical model and can be moved around.</li>
+<li>New weapon stat <strong>Fire Alert Range</strong>. Weapon shots can now alert enemies.</li>
+<li>Melee attacks now also alert close by enemies.</li>
+<li>Throwables will now land where your crosshair aims at.</li>
+<li>Improved 3rd Person camera aim.</li>
+<li>Improved dialogue clarity by seperating dialogues from other missions into their own sub category.</li>
+<li>Character stats now show up when you mouse over Clothing label in your inventory.</li>
+<li>Clicking the button near Armor Label now opens character stats.</li>
+</ul>
+<hr />
+<h3 id="the-story-continues">The Story Continues<a class="headerlink" href="#the-story-continues" title="Permanent link">&para;</a></h3>
+<ul>
+<li>New core mission, <strong>Buyer's Remorse</strong>, from <strong>Joseph</strong>.<ul>
+<li>Frustrated with the missing deliveries from the Rats, Joseph has decided to take matters into his own hands.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h3 id="survival">Survival<a class="headerlink" href="#survival" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Survival <strong>Wave Pass</strong>. Overhauled survival rewards.<ul>
+<li>You are given 3 or more reward options every 5 waves.</li>
+<li>You can pick your next reward and continue or end the run to claim your rewards.</li>
+<li>Continuing the run will risk your reward pool of the last 15 waves.</li>
+<li>Every 15 waves you get to claim your rewards during the run without ending it.</li>
+<li>For Hard Mode, reward option prompts only if the wave has a designated reward.</li>
+</ul>
+</li>
+</ul>
+<p><img alt="swamplands" src="../../assets/images/screenshots/swamplands.jpg" /></p>
+<ul>
+<li>New Survival Map, <strong>Swamplands</strong>. A swampy lake cabin with omnious remnants of the gathering place for a suspicious group.<ul>
+<li>Added new debuff, <strong>RedCrowToxin</strong>. When you fall into the inner swamps.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h3 id="new-faction-features">New Faction Features!<a class="headerlink" href="#new-faction-features" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p>Factions now have funds, this fund can be earned by doing faction missions.</p>
+<ul>
+<li>Mission handlers will decide how much the payout is split between an agent and the faction.</li>
+<li>Faction funds are used to fund features such as the Distributions. </li>
+</ul>
+</li>
+<li>
+<p>Headquarter is now an additional menu with Distributions and Agents of the Month.</p>
+<ul>
+<li>Faction Distributions is free claimable items provided by the faction. Distribution handlers will decide what is distributed.</li>
+<li>Agents of the Month is a leaderboard to show top agent contributions of the month.</li>
+</ul>
+</li>
+<li>
+<p>Monthly stats, your monthly contributions to the faction is now shown on your faction agent profile. </p>
+</li>
+</ul>
+<hr />
+<h3 id="npc-changes">NPC Changes!<a class="headerlink" href="#npc-changes" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p>NPCs now have voices generated by <strong>TextToSpeech</strong> for their dialogue bubbles. <strong>Can be turned off in audio settings.</strong></p>
+</li>
+<li>
+<p>New <strong>Bandit &amp; Rat</strong> behavior tree. They now have more actions such as <strong>investigating</strong>, <strong>hunting</strong>, <strong>fleeing</strong>, <strong>healing</strong>. They will also communicate with each other after random stuff, alert each other if there're hostiles and if they see a dead body.</p>
+</li>
+<li>Npcs now have a <strong>limited angle of vision</strong>, sneaking behind them is now a feature.</li>
+<li>New <strong>Corrosive</strong> model and abilities. Now has the ability to charge.</li>
+<li>New <strong>Zpider</strong> model.</li>
+</ul>
+<p><img alt="ShadowStrangle" src="../../assets/images/screenshots/ShadowStrangle.png" /></p>
+<ul>
+<li>New <strong>Shadow</strong> model and abilities. Now has the ability, <strong>ShadowStrangle</strong>, which lifts you up. It also now spawns illusions of itself while invisible in the vicinity.</li>
+<li>New <strong>Safehouse Survivors Idle bebaviors</strong>, they now roam around and do stuff. e.g. Interact with the vending machine. </li>
+<li><strong>The Billies</strong> updated.<ul>
+<li><strong>Karl</strong> now places explosive barrels around. (what does it even do?)</li>
+<li><strong>Kylde</strong> now uses a grenade launcher.</li>
+</ul>
+</li>
+<li>Reworked <strong>Zomborg</strong> abilities and updated character model.<ul>
+<li>Now has the ability to charge an exploding beam.</li>
+</ul>
+</li>
+<li>Some Npcs such as <strong>Greg</strong> now has a routine system that they follow based on the in-game time of day.</li>
+<li><strong>Bandit Helicopter</strong> now taunts at you through a megaphone.</li>
+<li><strong>Vex Spitters</strong> from Elder Vexeron are now a separate.<ul>
+<li>They now spawn inside the Sunken Ship.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h3 id="map-updates">Map Updates<a class="headerlink" href="#map-updates" title="Permanent link">&para;</a></h3>
+<ul>
+<li>New areas in <strong>The Residential</strong> &amp; <strong>The Harbor</strong>.<ul>
+<li><strong>Water Treatment</strong> in the North side of Residentials.</li>
+<li><strong>RAT's Lounge</strong> under the Harbor Safehouse.</li>
+</ul>
+</li>
+<li><strong>Railways Raid</strong> reworked, you now have unique objectives in each checkpoint.<ul>
+<li>Train is now destructible and attracts Zombies.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h3 id="misc-and-balancing">Misc and balancing<a class="headerlink" href="#misc-and-balancing" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Mastery window now shows all weapons even at level 0.</li>
+<li>Boss health bars are now visible to lobby spectators.</li>
+<li>Inventory shift+clicking an item that was recently shift moved now moves it back to its previous slot.</li>
+<li>Rewritten all Npcs behavior tree to new behavior tree system.</li>
+<li>Improved hot key clarity.</li>
+<li>New TaskHud now replacing old mission hud.</li>
+<li>Desert Eagle now has 2 Piercing from 0.</li>
+<li>Expanded ZScript API for map interactable scripting.</li>
+<li>Terminal ZSCode now has luau script liniting.</li>
+<li>Adjusted skill grid order in skill tree window.</li>
+<li>Sunken Ship and Abandoned Bunker objectives now uses the regional missions system.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../../LiveBranch/2.0/" class="md-footer__link md-footer__link--prev" aria-label="Previous: 2.0">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                2.0
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../2.3/" class="md-footer__link md-footer__link--next" aria-label="Next: 2.3.x Dev">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                2.3.x Dev
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+      
+    
+    
+    
+    <a href="https://mastodon.online/@HelixNebulaDevs" target="_blank" rel="noopener me" title="Official Mastodon" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M433 179.1c0-97.2-63.7-125.7-63.7-125.7-62.5-28.7-228.6-28.4-290.5 0 0 0-63.7 28.5-63.7 125.7 0 115.7-6.6 259.4 105.6 289.1 40.5 10.7 75.3 13 103.3 11.4 50.8-2.8 79.3-18.1 79.3-18.1l-1.7-36.9s-36.3 11.4-77.1 10.1c-40.4-1.4-83-4.4-89.6-54-.6-4.6-.9-9.3-.9-13.9 85.6 20.9 158.7 9.1 178.7 6.7 56.1-6.7 105-41.3 111.2-72.9 9.8-49.8 9-121.5 9-121.5zm-75.1 125.2h-46.6V190.1c0-49.7-64-51.6-64 6.9v62.5H201V197c0-58.5-64-56.6-64-6.9v114.2H90.3c0-122.1-5.2-147.9 18.4-175 25.9-28.9 79.8-30.8 103.8 6.1l11.6 19.5 11.6-19.5c24.1-37.1 78.1-34.8 103.8-6.1 23.7 27.3 18.4 53 18.4 175"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://discord.gg/Sgs39DTCQX" target="_blank" rel="noopener" title="Community Discord Server" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M492.5 69.8c-.2-.3-.4-.6-.8-.7-38.1-17.5-78.4-30-119.7-37.1-.4-.1-.8 0-1.1.1s-.6.4-.8.8c-5.5 9.9-10.5 20.2-14.9 30.6-44.6-6.8-89.9-6.8-134.4 0-4.5-10.5-9.5-20.7-15.1-30.6-.2-.3-.5-.6-.8-.8s-.7-.2-1.1-.2C162.5 39 122.2 51.5 84.1 69c-.3.1-.6.4-.8.7C7.1 183.5-13.8 294.6-3.6 404.2c0 .3.1.5.2.8s.3.4.5.6c44.4 32.9 94 58 146.8 74.2.4.1.8.1 1.1 0s.7-.4.9-.7c11.3-15.4 21.4-31.8 30-48.8.1-.2.2-.5.2-.8s0-.5-.1-.8-.2-.5-.4-.6-.4-.3-.7-.4c-15.8-6.1-31.2-13.4-45.9-21.9-.3-.2-.5-.4-.7-.6s-.3-.6-.3-.9 0-.6.2-.9.3-.5.6-.7c3.1-2.3 6.2-4.7 9.1-7.1.3-.2.6-.4.9-.4s.7 0 1 .1c96.2 43.9 200.4 43.9 295.5 0 .3-.1.7-.2 1-.2s.7.2.9.4c2.9 2.4 6 4.9 9.1 7.2.2.2.4.4.6.7s.2.6.2.9-.1.6-.3.9-.4.5-.6.6c-14.7 8.6-30 15.9-45.9 21.8-.2.1-.5.2-.7.4s-.3.4-.4.7-.1.5-.1.8.1.5.2.8c8.8 17 18.8 33.3 30 48.8.2.3.6.6.9.7s.8.1 1.1 0c52.9-16.2 102.6-41.3 147.1-74.2.2-.2.4-.4.5-.6s.2-.5.2-.8c12.3-126.8-20.5-236.9-86.9-334.5zm-302 267.7c-29 0-52.8-26.6-52.8-59.2s23.4-59.2 52.8-59.2c29.7 0 53.3 26.8 52.8 59.2 0 32.7-23.4 59.2-52.8 59.2m195.4 0c-29 0-52.8-26.6-52.8-59.2s23.4-59.2 52.8-59.2c29.7 0 53.3 26.8 52.8 59.2 0 32.7-23.2 59.2-52.8 59.2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.footer", "navigation.path", "navigation.prune", "navigation.top", "content.code.copy", "content.code.select", "search.share"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../assets/javascripts/obsidian_tags.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+      
+        <script src="https://fastly.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+      
+        <script src="https://fastly.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+      
+        <script src="../../assets/javascripts/interactive_graph.js"></script>
+      
+    
+  </body>
+</html>
