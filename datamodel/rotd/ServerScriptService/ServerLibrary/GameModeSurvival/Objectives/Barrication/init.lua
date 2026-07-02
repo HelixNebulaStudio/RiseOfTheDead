@@ -79,6 +79,7 @@ function Objective:Begin()
 	self.Barricades = {};
 
 	self.State = 1;
+	self.LastSpawn = tick();
 
 	for _, buildable in pairs(self.BuildableSpawns) do
 		local newBuildable = buildable:Clone();

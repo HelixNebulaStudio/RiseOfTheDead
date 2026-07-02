@@ -19,8 +19,9 @@ function modifierPackage.onRequire()
 	function modifierPackage.Binds.CharacterClassIsFocusedChanged(modifier: ItemModifierInstance, isFocused: boolean)
 		if isFocused == false then return; end;
 		if modifier.WieldComp == nil then return end;
+		if modifier.EquipmentClass and modifier.WieldComp.Siid ~= modifier.EquipmentClass.StorageItem.ID then return end;
 
-		local characterClass: CharacterClass = modifier.WieldComp.CompOwner;
+		local characterClass: CharacterClass = modifier.WieldComp.CompOwner :: CharacterClass;
 		if characterClass == nil then return end;
 
 		local statusClass: StatusClassInstance? = characterClass.StatusComp:GetOrDefault("PointGuardBulwark");

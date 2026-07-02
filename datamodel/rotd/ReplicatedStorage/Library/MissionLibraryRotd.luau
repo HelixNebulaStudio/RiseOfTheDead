@@ -578,14 +578,14 @@ MissionLibrary.New{
 
 -- MARK: 18 - A New Community
 MissionLibrary.New{
-	MissionId=18;
+	MissionId = 18;
 	MissionType = MissionLibrary.MissionTypes.Core;
-	Name="A New Community";
-	From="Jane";
-	Description="Jane receives radio signals coming from the sewers. She wants you to find the source of the message.";
-	Persistent=true;
-	World={"TheWarehouse"; "TheUnderground"};
-	Checkpoint={
+	Name = "A New Community";
+	From = "Jane";
+	Description = "Jane receives radio signals coming from the sewers. She wants you to find the source of the message.";
+	Persistent = true;
+	World = {"TheWarehouse"; "TheUnderground"};
+	Checkpoint = {
 		{Text="Ask Robert to join you";};
 		{Text="Enter the sewers";};
 		{Text="Look for the survivors in the sewers";};
@@ -593,25 +593,25 @@ MissionLibrary.New{
 		{Text="Enter the Underbridge safehouse";};
 
 		{Text="Talk to the survivors";};
-		{Text="Give Carlson 2 medkits";};
+		{Text="Give or heal Carlson with a medkit";};
 		{Text="Talk to Robert";};
 		{Text="Talk to Carlson";};
 	};
-	LogEntry={};
-	GuideText="Talk to Jane to start";
-	LinkNextMission=24;
-	Rewards={
+	LogEntry = {};
+	GuideText = "Talk to Jane to start";
+	LinkNextMission = 24;
+	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Mission"; Id=22};
 		{Type="Mission"; Id=23};
 		{Type="Mission"; Id=24};
 	};
-	StartRequirements={
-		Level=10;
-		MissionCompleted={8, 4};
+	StartRequirements = {
+		Level = 10;
+		MissionCompleted = {8, 4};
 	};
-	Markers={
+	Markers = {
 		[1]={World="TheWarehouse"; Label="Robert"; Target="Robert"; Type=modMarkers.MarkerTypes.Npc;};
 		[2]={World="TheWarehouse"; Label="TheUnderground"; Target="TheUnderground"; Type=modMarkers.MarkerTypes.Travel;};
 		[3]={World="TheUnderground"; Label="Search"; Target=Vector3.new(-69.526, 11.136, 158.6); Type=modMarkers.MarkerTypes.Waypoint;};
@@ -622,7 +622,7 @@ MissionLibrary.New{
 		[8]={World="TheUnderground"; Label="Robert"; Target="Robert"; Type=modMarkers.MarkerTypes.Npc;};
 		[9]={World="TheUnderground"; Label="Carlson"; Target="Carlson"; Type=modMarkers.MarkerTypes.Npc;};
 	};
-	CanRedo={};
+	CanRedo = {};
 	
 };
 

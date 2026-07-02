@@ -1161,27 +1161,52 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		local statsFrame = profileScrollFrame.Stats;
 		local statsLabel: TextLabel = statsFrame.StatsLabel;
 		
-		local statsStr = "";
+		local statsStrList = {};
 		
 		local successCard = selectedUser.SuccessfulMissions or {This=0; Total=0};
 		local scoreCard = selectedUser.ScoreContribution or {This=0; Total=0};
+
+		local eomTick = modSyncTime.TimeOfEndOfMonth();
+		local monthlyStats = selectedUser.MonthlyStats or {};
 		
-		statsStr = statsStr.."<b>Successful missions</b>: "
-			..modFormatNumber.Beautify(successCard.This) .."  (Total: "..modFormatNumber.Beautify(successCard.Total)..")";
-		statsStr = statsStr.."\n<b>Score contribution</b>: "
-			..modFormatNumber.Beautify(scoreCard.This) .."  (Total: "..modFormatNumber.Beautify(scoreCard.Total)..")";
-		statsStr = statsStr.."\n";
-		statsStr = statsStr.."\n<b>Top Successful Missions:</b>";
+		if monthlyStats.EoMTick ~= eomTick then
+			monthlyStats = {};
+		end
+
+		table.insert(statsStrList, `<b>This Month</b>:`);
+		table.insert(statsStrList, `    <b>Score Contributed</b>: {interface.beautifyNumber(monthlyStats.TotalScore or 0)}`);
+		table.insert(statsStrList, `    <b>Money Earned</b>: ${interface.beautifyNumber(monthlyStats.TotalMoney or 0)}`);
 		
+		
+		table.insert(statsStrList, "\n");
+		table.insert(statsStrList, `<b>Successful missions</b>: {
+			interface.beautifyNumber(successCard.This)
+		}  (Total: {
+			interface.beautifyNumber(successCard.Total)
+		})`);
+		table.insert(statsStrList, `<b>Score contribution</b>: {
+			interface.beautifyNumber(scoreCard.This)
+		}  (Total: {
+			interface.beautifyNumber(scoreCard.Total)
+		})`);
+
+
+		table.insert(statsStrList, "\n");
+		table.insert(statsStrList, `<b>Top Successful Missions:</b>`);
 		local topMissions = selectedUser.TopMissions or {};
 		table.sort(topMissions, function(a, b) return a.Score > b.Score; end);
 		for a=1, math.min(#topMissions, 3) do
 			local missionInfo = topMissions[a];
 			local missionLib = modMissionLibrary.Get(missionInfo.Id);
-			statsStr = statsStr.."\n<b>"..a..".</b> "..missionLib.Name.."  (Total Score: ".. missionInfo.Score ..")";
+				
+			table.insert(statsStrList, `<b>{a}.</b> {missionLib.Name}  (Total Score: {missionInfo.Score})`);
+		end
+		if #topMissions <= 0 then
+			table.insert(statsStrList, `<b>1.</b> None`);
 		end
 		
-		statsLabel.Text = statsStr;
+
+		statsLabel.Text = table.concat(statsStrList, "\n");
 	end
 
 	function binds.RefreshMemberSettingsFrame()
@@ -1638,9 +1663,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	--MARK: HqMenu;
 	local templateClaimable = script:WaitForChild("TemplateClaimable");
 
-	local disExpandContent = centerHeadquartersFrame:WaitForChild("ExpandPanel"):WaitForChild("Content");
+	local hqExpandContentFrame = centerHeadquartersFrame:WaitForChild("ExpandPanel"):WaitForChild("Content");
 	local disShrinkPanel = centerHeadquartersFrame:WaitForChild("ShrinkPanel");
-	local distributionsFrame = disExpandContent:WaitForChild("Distributions");
+	local distributionsFrame = hqExpandContentFrame:WaitForChild("Distributions");
 	local disButtonsNav = distributionsFrame:WaitForChild("Buttons");
 	local distDescLabel = distributionsFrame:WaitForChild("DescLabel");
 	local distEmptyLabel = distributionsFrame:WaitForChild("EmptyLabel");
@@ -1649,6 +1674,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local disEditMode = false;
 	local cacheDisClaimed = {};
 	updateHqPage = function()
+		local factionData = modData.FactionData;
+		if factionData == nil then return end;
+
+		--MARK: Distributions
+		--=============================================================
 		if binds.HasPermission("HandleDistributions") then
 			disButtonsNav.Visible = true;
 		else
@@ -1862,6 +1892,56 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 			distEmptyLabel.Visible = claimableVisible <= 0;
 		end
+		--=============================================================
+
+
+		--MARK: Agent of the Month
+		--=============================================================
+		local aotMFrame = hqExpandContentFrame:WaitForChild("AotM");
+
+		local sortScoreLeaderboard = {};
+
+		for userId, memberData in pairs(factionData.Members) do
+			if memberData.MonthlyStats == nil then continue end;
+			if typeof(memberData.MonthlyStats.TotalScore) ~= "number" then continue end;
+			if memberData.MonthlyStats.TotalScore <= 0 then continue end;
+
+			table.insert(sortScoreLeaderboard, {
+				UserId = userId;
+				MemberData = memberData;
+				Score = memberData.MonthlyStats.TotalScore;
+			});
+		end
+
+		table.sort(sortScoreLeaderboard, function(a, b)
+			return a.Score > b.Score;
+		end)
+		for a=1, math.min(#sortScoreLeaderboard, 5) do
+			local boardInfo = sortScoreLeaderboard[a];
+			local userId = boardInfo.UserId;
+
+			local data = binds.MembersData[userId];
+			local templateUserListing = data.ListingFrame;
+			if templateUserListing == nil then continue end;
+
+			local new = aotMFrame:FindFirstChild(userId);
+			if new == nil then
+				new = templateUserListing:Clone();
+				new.Name = userId;
+				new.Parent = aotMFrame;
+
+				local selectPlayerDebounce = tick();
+				new.MouseButton1Click:Connect(function()
+					if tick() < selectPlayerDebounce then return end;
+					selectPlayerDebounce = tick()+1;
+					templateUserListing:SetAttribute("Clicked", true);
+				end)
+			end
+
+			new.LayoutOrder = a;
+		end
+
+		--MARK: End of UpdateHqPage();
 	end
 	disEditButton.MouseButton1Click:Connect(function()
 		interface:PlayButtonClick();
@@ -2715,6 +2795,18 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				if userListing == nil then
 					userListing = templateFactionUserFrame:Clone();
 					userListing.MouseButton1Click:Connect(function()
+						interface:PlayButtonClick();
+
+						setSelectedUser(userId);
+						binds.ActivePage = "ProfileFrame";
+						window:Update();
+					end)
+					userListing:GetAttributeChangedSignal("Clicked"):Connect(function()
+						local isClicked = userListing:GetAttribute("Clicked");
+						if isClicked ~= true then return end;
+
+						userListing:SetAttribute("Clicked", nil);
+						
 						interface:PlayButtonClick();
 
 						setSelectedUser(userId);

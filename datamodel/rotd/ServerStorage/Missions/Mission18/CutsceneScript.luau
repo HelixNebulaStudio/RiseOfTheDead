@@ -14,7 +14,7 @@ if RunService:IsServer() then
 	modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	
-	if modBranchConfigurations.IsWorld("TheUnderground") then
+	if shared.WorldName == "TheUnderground" then
         shared.modEventService:OnInvoked("Interactables_BindDoorInteract", function(eventPacket: EventPacket, ...)
 			local player: Player? = eventPacket.Player;
 			if player == nil then return end;
@@ -27,6 +27,22 @@ if RunService:IsServer() then
 				end)
 			end
         end)
+
+        shared.modEventService:OnInvoked("Tools_BindHealTool", function(eventPacket: EventPacket, ...)
+			local player: Player? = eventPacket.Player;
+			if player == nil then return end;
+
+            local action: string, toolHandler: ToolHandlerInstance, toCharacterClass: CharacterClass = ...;
+
+			if toCharacterClass == nil or toCharacterClass.Name ~= "Carlson" then return end;
+			if action ~= "UseComplete" then return end;
+
+			modMission:Progress(player, MISSION_ID, function(mission)
+				if mission.ProgressionPoint ~= 7 then return; end;
+				mission.ProgressionPoint = 8;
+			end)
+        end)
+
 	end
 
 else
@@ -58,7 +74,7 @@ return function(CutsceneSequence)
 			local function OnChanged(firstRun)
 				if mission.Type == 2 then -- OnAvailable
 					robertNpcClass.Move:Stop();
-					wait(0.5);
+					task.wait(0.5);
 					robertNpcClass:UseInteractable("sundaysEntrance");
 					
 					local face = robertNpcClass.Character:FindFirstChild("face", true);
