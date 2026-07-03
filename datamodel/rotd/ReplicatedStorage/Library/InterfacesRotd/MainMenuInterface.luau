@@ -404,7 +404,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                     if updateWindow.Binds.initMenu == nil then
                         updateWindow.Binds.initMenu = true;
                         updateWindow.Frame.AnchorPoint = Vector2.new(0.5, 0);
-                        updateWindow.Frame.Size = UDim2.new(1, 0, 0.5, 0);
+                        updateWindow.Frame.Size = UDim2.new(1, 0, 1, 0);
                         updateWindow:SetClosePosition(UDim2.new(0.5, 0, -0.6, 0), UDim2.new(0.5, 0, 0.3, 0));
                     end
 

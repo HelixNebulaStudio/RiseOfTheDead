@@ -207,8 +207,8 @@ local WORLDS = {
         WorldType = WORLD_TYPES.General;
         WeatherCycle = false;
         LoadLeaderboard = true;
+        --UseCachedPathfinding = true;
     };
-
 
 
     --MARK: Gamemode Raids;
@@ -506,6 +506,7 @@ local WORLDS = {
         MaxPlayers = 10;
         PrivateWorld = true;
         OverWorldIndex = 0;
+        --UseCachedPathfinding = true;
     };
     NekronsGambit = {
         DisplayName = "Nekron's Gambit";
@@ -1037,6 +1038,10 @@ function modBranchConfigurations.onRequire()
     end
 
     modConfigurations.Set("AllowAimAssist", true);
+
+    if curWorldInfo.UseCachedPathfinding then
+        workspace:SetAttribute("UseCachedPathfinding", true);
+    end
 end
 
 return modBranchConfigurations;

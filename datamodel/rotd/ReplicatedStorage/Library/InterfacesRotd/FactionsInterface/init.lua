@@ -1916,17 +1916,21 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		table.sort(sortScoreLeaderboard, function(a, b)
 			return a.Score > b.Score;
 		end)
+		local updateAotmItem = {};
 		for a=1, math.min(#sortScoreLeaderboard, 5) do
 			local boardInfo = sortScoreLeaderboard[a];
 			local userId = boardInfo.UserId;
 
 			local data = binds.MembersData[userId];
+			if data == nil then continue end;
+
 			local templateUserListing = data.ListingFrame;
 			if templateUserListing == nil then continue end;
 
 			local new = aotMFrame:FindFirstChild(userId);
 			if new == nil then
 				new = templateUserListing:Clone();
+				new:SetAttribute("AotmItem", true);
 				new.Name = userId;
 				new.Parent = aotMFrame;
 
@@ -1938,7 +1942,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				end)
 			end
 
+			updateAotmItem[new] = true;
 			new.LayoutOrder = a;
+		end
+		for _, obj in pairs(aotMFrame:GetChildren()) do
+			if obj:GetAttribute("AotmItem") ~= true then continue end;
+			if updateAotmItem[obj] then continue end;
+			obj:Destroy();
 		end
 
 		--MARK: End of UpdateHqPage();

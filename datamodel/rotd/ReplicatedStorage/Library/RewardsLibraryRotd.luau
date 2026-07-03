@@ -1312,7 +1312,7 @@ function library.onRequire()
 			{Wave=4; ItemId="advmedkit"; Quantity=1; Chance=1;};
 			{Wave=4; ItemId="scarecrow"; Quantity=1; Chance=1;};
 
-			{Wave=8; ItemId="scarecrow"; Quantity=1; Chance=1;};
+			{Wave=8; ItemId="dualuziparts1"; Quantity=1; Chance=1;};
 			{Wave=8; ItemId="megaswitchblade"; Quantity=1; Chance=1;};
 			{Wave=8; ItemId="sandwich"; Quantity=1; Chance=1;};
 
