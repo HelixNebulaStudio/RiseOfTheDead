@@ -303,6 +303,7 @@ return function(interface, window, frame)
 					newItemButton.Interactable = false;
 
 					local itemNameLabel = Instance.new("TextLabel");
+					itemNameLabel.Name = `NameLabel`;
 					itemNameLabel.BackgroundTransparency = 1;
 					itemNameLabel.Text = `{itemLib.Name}`;
 					itemNameLabel.AnchorPoint = Vector2.new(0.5, 1);
@@ -310,7 +311,7 @@ return function(interface, window, frame)
 					itemNameLabel.TextScaled = true;
 					itemNameLabel.RichText = true;
 					itemNameLabel.Font = Enum.Font.ArimoBold;
-					itemNameLabel.Size = UDim2.new(0.8, 0, 0, 35);
+					itemNameLabel.Size = UDim2.new(0, 250, 0, 35);
 					itemNameLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
 					itemNameLabel.Parent = newItemButton;
 

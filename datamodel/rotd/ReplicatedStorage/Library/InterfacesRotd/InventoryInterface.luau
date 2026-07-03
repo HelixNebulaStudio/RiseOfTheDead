@@ -206,7 +206,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local bodyEquipmentsFrame = inventoryFrame:WaitForChild("BodyEquipmentStats");
 	
 	local hotbarWindow: InterfaceWindow = interface:NewWindow("Hotbar", hotbarFrame);
-    hotbarWindow.Layers = {"CharacterHud"; "CompactHidden"; "Hotbar"};
+    hotbarWindow.Layers = {"CharacterHud"; "CompactHidden"; "HotbarsHud"};
 	hotbarWindow.IgnoreHideAll = true;
 	hotbarWindow.ReleaseMouse = false;
 	

@@ -38,11 +38,12 @@ function interactablePackage.init(super) -- Server/Client
             local obj = buildObjects[a].Object;
 
             if RunService:IsServer() then 
-                obj:GetAttributeChangedSignal("Built"):Connect(function()
-                    local isBuilt = obj:GetAttribute("Built");
+                local function updateModel()
+                    local isBuildComplete = config:GetAttribute("Complete");
+                    local isObjBuilt = obj:GetAttribute("Built");
                     
-                    obj.Transparency = isBuilt and 0 or 1;
-                    obj.CanCollide = isBuilt;
+                    obj.Transparency = isObjBuilt and 0 or 1;
+                    obj.CanCollide = isObjBuilt and isBuildComplete;
 
                     for _, c in ipairs(obj:GetChildren()) do
                         if not c:IsA("BasePart") then continue end;
@@ -53,7 +54,7 @@ function interactablePackage.init(super) -- Server/Client
                             defCanCollide = c.CanCollide;
                         end
                         if defCanCollide == true then
-                            c.CanCollide = isBuilt;
+                            c.CanCollide = isObjBuilt and isBuildComplete;
                         end
 
                         if c.Name == "Hitbox" then continue end;
@@ -63,10 +64,13 @@ function interactablePackage.init(super) -- Server/Client
                             c:SetAttribute("DefaultTransparency", c.Transparency);
                             defTransparency = c.Transparency;
                         end
-                        c.Transparency = isBuilt and defTransparency or 1;
+                        c.Transparency = isObjBuilt and defTransparency or 1;
                     end
-                end)
+                end
+
+                obj:GetAttributeChangedSignal("Built"):Connect(updateModel);
                 obj:SetAttribute("Built", false);
+                config:GetAttributeChangedSignal("Complete"):Connect(updateModel);
             end;
         end
 
@@ -224,7 +228,6 @@ function interactablePackage.init(super) -- Server/Client
     local MakeshiftMaterial = super.newPackage{
 		Name = "MakeshiftMaterial";
         Type = "ButtonRotd";
-        InteractDuration = 0.5;
     };
 
     function MakeshiftMaterial.new(interactable: InteractableInstance)

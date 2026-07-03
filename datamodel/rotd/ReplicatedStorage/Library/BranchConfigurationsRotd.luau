@@ -207,7 +207,7 @@ local WORLDS = {
         WorldType = WORLD_TYPES.General;
         WeatherCycle = false;
         LoadLeaderboard = true;
-        --UseCachedPathfinding = true;
+        UseCachedPathfinding = true;
     };
 
 
@@ -506,7 +506,7 @@ local WORLDS = {
         MaxPlayers = 10;
         PrivateWorld = true;
         OverWorldIndex = 0;
-        --UseCachedPathfinding = true;
+        UseCachedPathfinding = true;
     };
     NekronsGambit = {
         DisplayName = "Nekron's Gambit";

@@ -487,7 +487,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     local statPage = "Stats";
 
 	local weaponStatsWindow: InterfaceWindow = interface:NewWindow("WeaponStats", weaponStatsFrame);
-    weaponStatsWindow.BoolStringWhenActive = {String="!Hotbar"; Priority=2;};
+    weaponStatsWindow.BoolStringWhenActive = {String="!HotbarsHud"; Priority=2;};
 	weaponStatsWindow.CompactFullscreen = true;
     weaponStatsWindow.ReleaseMouse = true;
 	

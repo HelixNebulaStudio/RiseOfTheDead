@@ -104,6 +104,7 @@ function Objective:Begin()
 
 		local interactConfig = modInteractables.createInteractable("ButtonRotd");
 		interactConfig:SetAttribute("_Id", "RazeMissile");
+		interactConfig:SetAttribute("_IndicatorPresist", true);
 		interactConfig:SetAttribute("_Label", "Activate");
 		interactConfig:SetAttribute("_Uses", 1);
 		interactConfig:SetAttribute("_InteractDuration", 3);

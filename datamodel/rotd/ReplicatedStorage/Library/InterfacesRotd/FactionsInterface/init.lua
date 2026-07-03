@@ -78,7 +78,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	windowFrame.Parent = interface.ScreenGui;
 
 	local window: InterfaceWindow = interface:NewWindow("FactionsMenu", windowFrame);
-    window.BoolStringWhenActive = {String="!Hotbar"; Priority=2;};
+    window.BoolStringWhenActive = {String="!HotbarsHud"; Priority=2;};
 	window.CompactFullscreen = true;
 	window.CloseWithInteract = true;
 	
