@@ -98,7 +98,7 @@ function RotdInterface.clientGuisLoad()
         onWorldEventInfoUpdate();
     
     else
-        if modBranchConfigurations.IsWorld("MainMenu") or modBranchConfigurations.IsWorld("BioXResearch") then
+        if shared.WorldName == "MainMenu" or shared.WorldName == "BioXResearch" then
             interface:ToggleGameBlinds(false, 0.1);
             local mainMenuWindow: InterfaceWindow = interface:GetWindow("MainMenu");
             if mainMenuWindow then
@@ -106,6 +106,10 @@ function RotdInterface.clientGuisLoad()
             else
                 Debugger:Warn(`Missing main menu window.`);
             end
+
+        else
+            interface:ToggleGameBlinds(false, 1);
+            
         end
 
     end

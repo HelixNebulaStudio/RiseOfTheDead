@@ -169,6 +169,8 @@ function Objective:Tick()
 			for _, missile in ipairs(self.CurMissiles) do
 				task.delay(0.333, function()
 					local primaryPart = missile.PrimaryPart;
+					if primaryPart == nil then return end;
+
 					local lastPosition = primaryPart.Position;
 		
 					modAudio.Play(math.random(1, 2) == 1 and "Explosion" or "Explosion2", lastPosition);
@@ -212,6 +214,7 @@ function Objective:Tick()
 
 						BindHealthCompHit = function(healthComp: HealthComp, newDmgData)
 							local charClass: CharacterClass = healthComp.CompOwner :: CharacterClass;
+							if charClass == nil then return false; end;
 							
 							if charClass.ClassName == "NpcClass" and charClass.HumanoidType == "Zombie" then
 								charClass.Properties.Immunity = nil;
