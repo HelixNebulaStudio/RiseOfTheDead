@@ -16,6 +16,7 @@ local npcPackage = {
     };
     Properties = {
         IsHostile = true;
+		Detectable = false;
 
         TargetableDistance = 75;
 
