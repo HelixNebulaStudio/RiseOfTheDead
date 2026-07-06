@@ -7,7 +7,7 @@ local statusPackage = {
     Id = "remres";
     Icon = "rbxassetid://4651191717";
     Name = "Skill: Remarkable Resilience Cooldown";
-    Description = "Skill on cooldown, regenerated to $Percent% of max health.";
+    Description = "Skill on cooldown, regenerated $Percent% of max health.";
     Buff = true;
 };
 
@@ -19,7 +19,7 @@ if RunService:IsServer() then
             if damageData.Damage == nil or damageData.Damage <= 0 then return end;
             if damageData.DamageType == "Heal" then return end;
 
-            local characterClass: CharacterClass? = damageData.DamageTo;
+            local characterClass: CharacterClass? = damageData.DamageTo :: CharacterClass;
             if characterClass == nil or characterClass.ClassName ~= "PlayerClass" then return end;
 
             local player = (characterClass :: PlayerClass):GetInstance();
@@ -66,7 +66,7 @@ if RunService:IsServer() then
             return
         end;
 
-        local healAmount = math.min(healPool, 3);
+        local healAmount = math.min(healPool, 5);
         statusClass.Values.HealPool = healPool - healAmount;
 
         healthComp:TakeDamage(DamageData.new{

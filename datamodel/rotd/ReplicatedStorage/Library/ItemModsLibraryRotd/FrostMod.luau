@@ -143,8 +143,10 @@ if RunService:IsServer() then
 
 elseif RunService:IsClient() then
 
-	function modifierPackage.Binds.WeaponRenderStepped(modifier: ItemModifierInstance, toolStatusHud: anydict)
+	function modifierPackage.Binds.WeaponRenderStepped(modifier: ItemModifierInstance, ...)
 		if modifier.Enabled == false then return end;
+
+		local toolHandler: ToolHandlerInstance, toolStatusHud: anydict = ...;
 
 		if toolStatusHud.Frostbite == nil then
 			toolStatusHud.Frostbite = {

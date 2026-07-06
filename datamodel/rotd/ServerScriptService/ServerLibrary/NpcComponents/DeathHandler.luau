@@ -103,11 +103,11 @@ function Component:__call(damagedata: DamageData)
 
 			if gameSave:AddStat("Money", moneyReward) > 0 then
 				modAnalyticsService:Source{
-					Player=player;
-					Currency=modAnalyticsService.Currency.Money;
-					Amount=moneyReward;
-					EndBalance=gameSave:GetStat("Money");
-					ItemSKU=`Kill:{npcClass.Name}`;
+					Player = player;
+					Currency = modAnalyticsService.Currency.Money;
+					Amount = moneyReward;
+					EndBalance = gameSave:GetStat("Money");
+					ItemSKU = `Kill:{npcClass.Name}`;
 				};
 			end
 

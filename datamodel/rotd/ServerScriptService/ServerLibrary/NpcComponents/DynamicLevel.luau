@@ -29,7 +29,16 @@ function Component:Setup()
 		if ccPlayer then
 			damageBy = shared.modPlayers.get(ccPlayer);
 		end
-		if damageBy and damageBy.ClassName == "PlayerClass" then 
+
+		if damageBy and damageBy.ClassName == "NpcClass" then
+			local damageByTargetData = damageBy.Properties.EnemyTargetData;
+			local damageByTargetEntityClass: EntityClass = damageByTargetData and damageByTargetData.HealthComp and damageByTargetData.HealthComp.CompOwner;
+			if damageByTargetEntityClass and damageByTargetEntityClass.ClassName == "PlayerClass" then
+				damageBy = damageByTargetEntityClass :: PlayerClass;
+			end
+		end
+
+		if damageBy and damageBy.ClassName == "PlayerClass" then
 			self(damageBy);
 		end;
 

@@ -153,6 +153,7 @@ function Component:__call(damage, range, isLethal)
                 DamageBy = npcClass;
                 Damage = damage * dmgMulti;
                 DamageCate = "TickCombustion";
+                NonLethal = true;
             };
 
             if explodeEntityClass.ClassName == "NpcClass" then

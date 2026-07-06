@@ -106,6 +106,14 @@ function treePackage.IgniteDetonation(npcClass: NpcClass)
     local detonTime = npcChar:GetAttribute("DetonationTime");
     if detonTime == nil then
         if modRegion:InRegion(npcClass.RootPart.Position, targetRootPart.Position, 30) then
+
+            if targetEntityClass.ClassName == "PlayerClass" then
+                local dynamicLevel = npcClass:GetComponent("DynamicLevel");
+                if dynamicLevel and properties.Level == nil then
+                    dynamicLevel(targetEntityClass);
+                end
+            end
+
             local duration = 4;
             npcChar:SetAttribute("DetonationTime", workspace:GetServerTimeNow()+duration);
             

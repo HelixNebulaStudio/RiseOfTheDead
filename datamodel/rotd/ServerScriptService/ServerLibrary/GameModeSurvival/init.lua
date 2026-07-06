@@ -638,6 +638,7 @@ function Survival:NewWaveSelect()
 					local cloneRewardInfo = table.clone(compReward[1]);
 					cloneRewardInfo.Chance = 2;
 					cloneRewardInfo.DropTableId = dropTableId;
+					cloneRewardInfo.Repeatable = true;
 					table.insert(customRewardsTable, cloneRewardInfo);
 				end
 			end
@@ -678,26 +679,28 @@ function Survival:NewWaveSelect()
 			rewardOptions = 4;
 		end
 		repeat
-			local rewardInfo = modDropRateCalculator.roll(customRewardsTable);
-
-			-- skip reward if there's already one.
-			-- skip reward if exist last round.
-			if rewardInfo and self.RewardItemIdDebounce[rewardInfo.ItemId] ~= nil then continue; end
-
-			-- skip reward if list is empty and reward is not in player required level
-			if rewardInfo and #rewardPicksList <= 0 and (rewardInfo.Level or 0) > lowestPlayerLevel then
-				continue;
-			end
-			
-			if rewardInfo == nil then continue end;
-
-			self.RewardItemIdDebounce[rewardInfo.ItemId] = self.Wave;
-			table.insert(rewardPicksList, rewardInfo);
 			loopkill += 1;
 			if loopkill > 64 then
 				Debugger:Warn(`Breaking reward choose loop.`);
 				break;
 			end;
+			
+			local rewardInfo = modDropRateCalculator.roll(customRewardsTable);
+			if rewardInfo == nil then continue end;
+
+			-- skip reward if there's already one.
+			-- skip reward if exist last round.
+			if rewardInfo.Repeatable ~= true and self.RewardItemIdDebounce[rewardInfo.ItemId] ~= nil then
+				continue;
+			end
+
+			-- skip reward if list is empty and reward is not in player required level
+			if #rewardPicksList <= 0 and (rewardInfo.Level or 0) > lowestPlayerLevel then
+				continue;
+			end
+
+			self.RewardItemIdDebounce[rewardInfo.ItemId] = self.Wave;
+			table.insert(rewardPicksList, rewardInfo);
 		until #rewardPicksList >= math.min(rewardOptions, #customRewardsTable);
 
 	else
