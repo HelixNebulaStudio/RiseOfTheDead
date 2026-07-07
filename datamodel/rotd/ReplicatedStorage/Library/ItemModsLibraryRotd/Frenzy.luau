@@ -86,9 +86,9 @@ elseif RunService:IsClient() then
 
 		if toolStatusHud.FrenzyDamage == nil then
 			toolStatusHud.FrenzyDamage = {
-				ModItemId=`frenzydamagemod`;
-				Order=1;
-				Text="0%";
+				ModItemId = `frenzydamagemod`;
+				Order = 1;
+				Text = "0%";
 			};
 		end
 

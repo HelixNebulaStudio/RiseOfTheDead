@@ -1146,7 +1146,7 @@ function Survival:StartWave(wave)
 						storage:Add(rewardOption.ItemId, {Quantity=rewardOption.DropQuantity;});
 						storage:Sync(player);
 
-						Debugger:Warn(`Added {rewardOption.ItemId} x {rewardOption.DropQuantity} to ({player.Name}) {storage.Id}`);
+						Debugger:StudioWarn(`Added {rewardOption.ItemId} x {rewardOption.DropQuantity} to ({player.Name}) {storage.Id}`);
 					end)
 				end
 				self.SelectedOption = nil;

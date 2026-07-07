@@ -24,6 +24,9 @@ function modifierPackage.onRequire()
 		local healthComp: HealthComp? = characterClass.HealthComp;
 		if healthComp == nil or statusComp == nil then return end;
 
+		local woundedStatus: StatusClassInstance = statusComp:GetOrDefault("Wounded");
+		if woundedStatus then return end;
+
 		if damageData.DamageType == "IgnoreArmor" or healthComp.CurArmor <= 0 then return end;
 		if damageData.DamageType == "Heal" or damageData.Damage <= 0 then return end;
 

@@ -51,6 +51,10 @@ function treePackage.HasEnemy(npcClass: NpcClass)
                     return false;
                 end
             end
+
+            if targetCharacterClass.Character and targetCharacterClass.Character:FindFirstChild("GodModeFF") then
+                return false;
+            end
         end
 
         local isAlive = targetCharacterClass.HealthComp.IsDead ~= true;

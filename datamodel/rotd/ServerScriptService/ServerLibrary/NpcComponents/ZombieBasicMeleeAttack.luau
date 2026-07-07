@@ -36,13 +36,13 @@ function NpcComponent.new(npcClass: NpcClass)
 		if targetEntityClass.ClassName == "PlayerClass" or targetEntityClass.ClassName == "NpcClass" then
 			local enemyClass: CharacterClass = targetEntityClass :: CharacterClass;
 			
-			npcClass.Move:HeadTrack(enemyClass.Head);
+			npcClass.Move:HeadTrack(enemyClass.Head, 4);
 			npcClass.Move:Face(targetPosition, nil, 0.3);
 
 		elseif targetEntityClass.ClassName == "Destructible" then
 			local destructible: DestructibleInstance = targetEntityClass :: DestructibleInstance;
 
-			npcClass.Move:HeadTrack(targetPart);
+			npcClass.Move:HeadTrack(targetPart, 4);
 			npcClass.Move:Face(targetPart, nil, 0.3);
 
 			local dir = (targetPosition - npcClass.Head.Position).Unit;
