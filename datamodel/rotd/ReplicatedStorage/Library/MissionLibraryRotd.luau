@@ -1171,6 +1171,7 @@ MissionLibrary.New{
 		{Type="Resource"; Id="Food"; Value=30;};
 		{Type="Score"; Value=1;};
 		{Type="Money"; Value=12000;};
+		{Type="SetFlag"; FlagKey="DistUnlocked_juggernog"; NewValue=true; Desc="Unlock Juggernog Distribution"};
 	};
 	FactionSuccessCriteria = {
 		SuccessfulAgents=1;

@@ -52,9 +52,6 @@ function treePackage.HasEnemy(npcClass: NpcClass)
                 end
             end
 
-            if targetCharacterClass.Character and targetCharacterClass.Character:FindFirstChild("GodModeFF") then
-                return false;
-            end
         end
 
         local isAlive = targetCharacterClass.HealthComp.IsDead ~= true;
@@ -62,6 +59,12 @@ function treePackage.HasEnemy(npcClass: NpcClass)
 
         local isTargettable = targetCharacterClass.HealthComp:CanTakeDamageFrom(npcClass);
         if not isTargettable then return false end;
+
+        if properties.HordeAggression and targetCharacterClass.HumanoidType == "Player" then return true; end;
+
+        if targetCharacterClass.Character and targetCharacterClass.Character:FindFirstChild("GodModeFF") then
+            return false;
+        end
 
         local isInRange = (targetData.Distance <= properties.TargetableDistance);
         if not isInRange then return false end;

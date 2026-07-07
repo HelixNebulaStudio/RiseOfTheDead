@@ -4,7 +4,6 @@ local MissionLogic = {};
 local RunService = game:GetService("RunService");
 
 local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.Library.NpcProfileLibrary);
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 
 local MISSION_ID = 58;

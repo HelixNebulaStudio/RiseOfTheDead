@@ -27,6 +27,8 @@ local ModeHudClass = shared.require(script.Parent);
 
 local isPlayingEndTrack: boolean, survivalEndTrack:  Sound?;
 local HUD_TASK_ID = "SurvivalHudTask";
+
+local WAVE_REWARD_CYCLE = 5;
 --==
 return function(interface, window, frame)
 	local modData = shared.require(localPlayer:WaitForChild("DataModule"));
@@ -363,10 +365,14 @@ return function(interface, window, frame)
 				if #rewardOptionsList <= 1 then
 					wavePassScreenFrame.descLabel.Text = `Your reward for passing this wave!`;
 				else
-					wavePassScreenFrame.descLabel.Text = `Pick your next risk and reward! Stake your rewards!`;
+					if data.IsHard ~= true then
+						wavePassScreenFrame.descLabel.Text = `Pick your next reward!`;
+					else
+						wavePassScreenFrame.descLabel.Text = `Pick your reward!`;
+					end
 				end
-
-				if data.IsHard ~= true and (data.Wave % 15) == 0 then
+				
+				if data.IsHard ~= true and (data.Wave % WAVE_REWARD_CYCLE) == 0 then
 					voteContinueButton.Text = `Vote Continue & Claim Stakes`;
 				else
 					voteContinueButton.Text = `Vote Continue`;

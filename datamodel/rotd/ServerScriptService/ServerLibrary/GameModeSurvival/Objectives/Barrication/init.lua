@@ -114,7 +114,6 @@ function Objective:Begin()
 
 	for _, regionPart in pairs(self.ImmuneBreaks) do
 		regionPart.Parent = workspace.Debris;
-		controller.StageGarbage:Tag(regionPart);
 	end
 
 	for a=1, 4 do
@@ -227,6 +226,10 @@ end
 
 function Objective:End()
 	local controller = self.Controller;
+
+	for _, regionPart in pairs(self.ImmuneBreaks) do
+		regionPart.Parent = script;
+	end
 
 	table.clear(self.Barricades);
 end

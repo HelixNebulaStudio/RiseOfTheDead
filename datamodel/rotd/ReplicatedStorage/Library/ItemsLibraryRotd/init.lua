@@ -474,7 +474,8 @@ function modItemsLibrary.onRequire()
     new(foodBase, {Id="perkscupcake"; Name="Perks Cupcake"; Icon="rbxassetid://12806349482"; Tags={"Unobtainable";}; Description="Gives you 1000 perks.";});
     new(foodBase, {Id="sandwich"; Name="Sandwich"; Icon="rbxassetid://14880936365"; Description="Gives you 7.5 health per second for 10 seconds.";});
     new(foodBase, {Id="ziphoningserum"; Name="Ziphoning Serum"; Icon="rbxassetid://17816751372"; NonPremiumTax = 10; Description="Cleanse cleansable debuffs and gives you the Ziphoning buff for <b>3 minutes</b>.\nThe Ziphoning buff gives you <b>+1 hp/s</b> <i>(Increasable by Nekrosis Amplifier)</i> consumed from the ziphon health pool, the ziphon health pool only fills up when you do damage to enemies.";});
-
+    new(foodBase, {Id="juggernog"; Name="Juggernog"; Icon="rbxassetid://118774277308416"; Description="Gives you an additional 100 max health for 10 minutes.";});
+        
 
     --MARK: MISSION
     --==========================================================[[ MISSION ]]==========================================================--

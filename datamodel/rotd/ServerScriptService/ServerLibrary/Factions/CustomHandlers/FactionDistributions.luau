@@ -4,6 +4,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local modFactionsLibrary = shared.require(game.ReplicatedStorage.Library.FactionsLibrary);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibraryRotd);
 local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
+local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 local Handler = {};
 
@@ -97,6 +98,7 @@ function Handler.onRequire(factions)
 
                 factionGroup.Flags[fundedFlag] = endOfDayTick;
                 factionGroup:AddMoney(-disLib.FundCost, `dist{disId}`);
+                requestPacket.Values.FundCost = disLib.FundCost;
             end
         end
 
@@ -223,10 +225,22 @@ function Handler.onRequire(factions)
         end
 
         task.spawn(function()
-            factionsDatabase:UpdateRequest(factionTag, "claimdis", {
+            local rPacket = factionsDatabase:UpdateRequest(factionTag, "claimdis", {
                 UserId = player.UserId;
                 DisId = disId;
             });
+            if rPacket.Success then
+                local factionGroup = rPacket.Data;
+                if rPacket.Values.FundCost then
+                    modAnalyticsService:Sink{
+                        Player = player;
+                        Currency = modAnalyticsService.Currency.FactionMoney;
+                        Amount = rPacket.Values.FundCost;
+                        EndBalance = factionGroup.Money;
+                        ItemSKU = `Claim:Faction_{disId}`;
+                    };
+                end
+            end
         end)
 
         claimDisFlag[claimFlagKey] = endOfDayTick;

@@ -541,6 +541,7 @@ local WORLDS = {
         
         WeatherCycle = false;
         LoadLeaderboard = true;
+        UseCachedPathfinding = true;
     };
     CommunityFissionBay = {
         DisplayName = "Community: Fission Bay";
@@ -554,6 +555,7 @@ local WORLDS = {
         
         WeatherCycle = false;
         LoadLeaderboard = true;
+        UseCachedPathfinding = true;
     };
     CommunityRooftops = {
         DisplayName = "Community: Rooftops";
@@ -567,6 +569,7 @@ local WORLDS = {
 
         WeatherCycle = false;
         LoadLeaderboard = true;
+        UseCachedPathfinding = true;
     };
 }
 

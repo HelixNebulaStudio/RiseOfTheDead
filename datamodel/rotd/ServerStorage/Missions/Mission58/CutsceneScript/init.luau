@@ -9,7 +9,6 @@ local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("Global
 
 local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.Library.NpcProfileLibrary);
 
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);

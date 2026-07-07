@@ -323,6 +323,22 @@ function modStatusEffects.CritBoost(player, duration, amount)
 end
 
 
+function modStatusEffects.Juggernog(player, duration, amount)
+	duration = duration or 300;
+	amount = amount or 100;
+
+	local playerClass: PlayerClass = shared.modPlayers.get(player);
+	local statusComp: StatusComp = playerClass.StatusComp;
+
+    statusComp:Apply("Juggernog", {
+        Expires = workspace:GetServerTimeNow() + duration;
+        Duration = duration; 
+        Values = {
+            MaxHealthOverCharge = amount;
+        }
+    });
+end
+
 function modStatusEffects.Ziphoning(player: Player, duration: number)
 	duration = duration or 60;
 

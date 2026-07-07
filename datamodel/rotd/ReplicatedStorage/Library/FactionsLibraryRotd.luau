@@ -16,37 +16,14 @@ DISTRIBUTION_LIBRARY:Add{
     FundCost = 6000;
 };
 
+DISTRIBUTION_LIBRARY:Add{
+	Id = "juggernog";
 
-if shared.gameConfig.BranchName == "Dev" then
-    -- for testing only 
-    
-    DISTRIBUTION_LIBRARY:Add{
-        Id = "annihilationsoda";
+    Type = "Item";
+    ItemId = "juggernog";
 
-        Type = "Item";
-        ItemId = "annihilationsoda";
-
-        FundCost = 10000;
-    };
-
-    DISTRIBUTION_LIBRARY:Add{
-        Id = "gumball";
-
-        Type = "Item";
-        ItemId = "gumball";
-
-        FundCost = 15000;
-    };
-
-    DISTRIBUTION_LIBRARY:Add{
-        Id = "perkscupcake";
-
-        Type = "Item";
-        ItemId = "perkscupcake";
-
-        FundCost = 20000;
-    };
-
-end
+    UnlockBy = `Unlock by completing <b>Mission: Food Airdrop</b>`;
+    FundCost = 15000;
+};
 
 return modFactionsLibrary;

@@ -32,6 +32,7 @@ local cratePallet = game.ServerStorage.Prefabs.Objects.Crates.CratePallet;
 local Modifiers = {};
 
 local STORAGE_ID = "survivalrewards";
+local WAVE_REWARD_CYCLE = 5;
 --==
 Survival.OnWaveChanged = shared.EventSignal.new("OnWaveChanged");
 Survival.OnSurvivalNpcSpawn = shared.EventSignal.new("OnSurvivalNpcSpawn");
@@ -885,13 +886,13 @@ function Survival:BreakTime()
 		shared.Notify(game.Players:GetPlayers(), "A supply station has been discovered!", "Reward");
 	end;
 
-	if self.Wave%15 == 0 then
+	if self.Wave%WAVE_REWARD_CYCLE == 0 then
 		breakLength += 15;
 		statusStr = `{statusStr} [Loot Available]`;
 
 		--MARK: Claim Stakes
 		self:SpawnCrate();
-		shared.Notify(game.Players:GetPlayers(), "A Stake Crate has been discovered!", "Reward");
+		shared.Notify(game.Players:GetPlayers(), "A Reward Crate has been discovered!", "Reward");
 	end
 
 	for a=breakLength, 0, -1 do

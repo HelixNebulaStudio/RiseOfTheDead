@@ -106,6 +106,15 @@ function Hazard:Tick()
 end
 
 function Hazard:End()
+	local controller = self.Controller;
+
+    local zpiderlings = shared.modNpcs.listNpcClasses(function(npcClass: NpcClass)
+        return npcClass.Name == "Zpiderling";
+    end)
+    for a=1, #zpiderlings do
+        zpiderlings[a]:Destroy();
+    end
+
 end
 
 return Hazard;
