@@ -93,12 +93,12 @@ function GameModeManager.onRequire()
 			local interactConfig = ...;
 
 			local interactable: InteractableInstance = modInteractables.getOrNew(interactConfig);
-			local interactPart = interactable.Part;
-			if interactPart == nil then
-				rPacket.FailMsg = `Missing interactable part.`;
+			local interactPointAtt = interactable.PointAtt;
+			if interactPointAtt == nil then
+				rPacket.FailMsg = `Missing interactable point.`;
 				return rPacket;
 			end;
-			if player:DistanceFromCharacter(interactPart.Position) > 32 then
+			if player:DistanceFromCharacter(interactPointAtt.WorldPosition) > 32 then
 				rPacket.FailMsg = `Too far from interactable.`;
 				return rPacket;
 			end;
@@ -350,11 +350,11 @@ function GameModeManager.onRequire()
 			return GameModeManager:ExitGamemodeWorld(player);
 		end
 		
+		-- deprecated?
 		local interactObject = action;
 		
 		if interactObject == nil or interactModule == nil then Debugger:StudioWarn("Missing valid interactable."); return end;
-		if player:DistanceFromCharacter(interactObject.Position) > 20 then Debugger:StudioWarn("Player too far from interactable."); return end;
-		
+
 		local interactData = shared.saferequire(player, interactModule);
 		if interactData == nil then Debugger:StudioWarn("Missing interactable data."); return end;
 		
