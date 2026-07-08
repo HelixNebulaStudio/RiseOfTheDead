@@ -74,6 +74,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local branchColor = modBranchConfigurations.BranchColor
 	local colorPickerObj = interface.ColorPicker;
 	
+    local itemToolTip = modItemInterface.newItemTooltip();
+    itemToolTip.Frame.Name = `FactionItemToolTip`;
+
 	local windowFrame = script:WaitForChild("FactionsMenu"):Clone();
 	windowFrame.Parent = interface.ScreenGui;
 
@@ -1714,7 +1717,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					local itemButtonObj = modItemInterface.newItemButton(itemId);
 					local itemImgButton = itemButtonObj.ImageButton;
 					itemImgButton.Selectable = false;
-					itemImgButton.Interactable = false;
 					itemImgButton.LayoutOrder = disLib.LibraryIndex;
 					itemImgButton.AnchorPoint = Vector2.new(0, 0);
 					itemImgButton.Position = UDim2.new(0, 20, 0, 0);
@@ -1723,6 +1725,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					new:GetPropertyChangedSignal("Visible"):Connect(function() 
 						itemImgButton.Visible = new.Visible;
 					end)
+
+					itemToolTip:BindHoverOver(itemImgButton, function()
+                        itemToolTip.Frame.Parent = interface.ScreenGui;
+                        itemToolTip:Update(itemId);
+                        itemToolTip:SetPosition(itemImgButton);
+                    end);
+
 					itemButtonObj:Update();
 
 					local nameLabel = Instance.new("TextLabel");

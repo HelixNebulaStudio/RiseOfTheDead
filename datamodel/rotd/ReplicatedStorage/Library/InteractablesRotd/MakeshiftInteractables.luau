@@ -91,7 +91,7 @@ function interactablePackage.init(super) -- Server/Client
         local playerClass: PlayerClass = shared.modPlayers.get(player);
         local wieldComp = playerClass.WieldComp;
 
-        if wieldComp.ItemId ~= "generic"
+        if wieldComp.ItemId ~= "carryitem"
         or wieldComp.EquipmentClass == nil
         or wieldComp.EquipmentClass.Properties == nil
         or wieldComp.EquipmentClass.Properties.GenericType ~= "MakeshiftMaterial" then
@@ -167,7 +167,7 @@ function interactablePackage.init(super) -- Server/Client
             return;
         end
 
-        if wieldComp.ItemId ~= "generic"
+        if wieldComp.ItemId ~= "carryitem"
         or wieldComp.EquipmentClass == nil
         or wieldComp.EquipmentClass.Properties == nil
         or wieldComp.EquipmentClass.Properties.GenericType ~= "MakeshiftMaterial" then
@@ -271,7 +271,7 @@ function interactablePackage.init(super) -- Server/Client
 
         local playerClass: PlayerClass = shared.modPlayers.get(player);
 		playerClass.WieldComp:Equip{
-			ItemId = "generic";
+			ItemId = "carryitem";
 			ProxyEquip = true;
             ProxySiid = `w:{matName}`;
             ProxyEquipCallback = function(toolHandler: ToolHandlerInstance)

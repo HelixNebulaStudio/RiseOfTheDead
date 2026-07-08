@@ -21,7 +21,7 @@ function modifierPackage.Instancing(modifier: ItemModifierInstance, isFirstTime:
 	modifier.Properties.MaxProtection = 100;
 	modifier.Properties.LastDamageTick = workspace:GetServerTimeNow();
 
-	modifier.OnEnabledChanged:Connect(function(prevVal: boolean)
+	modifier.OnEnabledChanged:Connect(function()
 		if modifier.WieldComp == nil then return end;
 
 		local playerClass: PlayerClass? = modifier.WieldComp.CompOwner :: PlayerClass;

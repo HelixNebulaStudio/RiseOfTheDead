@@ -41,7 +41,7 @@ end
 function modifierPackage.Instancing(modifier: ItemModifierInstance, isFirstTime: boolean)
 	if RunService:IsClient() then return end;
 
-	modifier.OnEnabledChanged:Connect(function(prevVal: boolean)
+	modifier.OnEnabledChanged:Connect(function()
 		if modifier.WieldComp == nil then return end;
 
 		if not modifier.Enabled then return end;

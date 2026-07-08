@@ -107,7 +107,7 @@ end
 function modifierPackage.Instancing(modifier: ItemModifierInstance, isFirstTime: boolean)
 	if RunService:IsClient() then return end;
 
-	modifier.OnEnabledChanged:Connect(function(prevVal: boolean)
+	modifier.OnEnabledChanged:Connect(function()
 		if modifier.Enabled then
 			modifier:EnableTickUpdate(true);
 		else

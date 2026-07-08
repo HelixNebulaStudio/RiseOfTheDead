@@ -87,13 +87,13 @@ local toolPackage = {
 function toolPackage.newClass()
 	local equipmentClass: EquipmentClass = modEquipmentClass.new(toolPackage);
 
-	equipmentClass:AddBaseModifier("CriticalShot", {
+	equipmentClass:AddBaseModifier("CriticalHit", {
 		SumValues={
 			CritChance = 0.2;
 			CritMulti = 1;
 		};
 		ArrayValues = {
-			PassiveModifiers = "CriticalShot";
+			PassiveModifiers = "Critical Hit";
 		};
 	});
 

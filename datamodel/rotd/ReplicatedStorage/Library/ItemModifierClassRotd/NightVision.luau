@@ -21,7 +21,7 @@ function modifierPackage.Instancing(modifier: ItemModifierInstance, isFirstTime:
 		return 
 	end;
 
-	modifier.OnEnabledChanged:Connect(function(prevVal: boolean)
+	modifier.OnEnabledChanged:Connect(function()
 		if modifier.WieldComp == nil then return end;
 
 		local playerClass: PlayerClass? = modifier.WieldComp.CompOwner :: PlayerClass;

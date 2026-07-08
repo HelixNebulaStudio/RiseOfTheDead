@@ -24,8 +24,8 @@ function statusPackage.BindApply(statusClass: StatusClassInstance)
 
     local statusModifier: ItemModifierInstance = playerClass.Configurations:GetModifier(statusPackage.Id);
     if statusModifier == nil then
-        local criticalShotModule = game.ReplicatedStorage.Library.ItemModifierClass.CriticalShot;
-        statusModifier = playerClass.WieldComp:InstanceItemModifierClass(statusPackage.Id, criticalShotModule);
+        local criticalHitModule = game.ReplicatedStorage.Library.ItemModifierClass.CriticalHit;
+        statusModifier = playerClass.WieldComp:InstanceItemModifierClass(statusPackage.Id, criticalHitModule);
         statusModifier.Priority = 2;
         statusModifier.Name = `Crit Boost`;
 
@@ -33,6 +33,7 @@ function statusPackage.BindApply(statusClass: StatusClassInstance)
         statusModifier.ArrayValues.PassiveModifiers = "Crit Boost";
 
         statusModifier.Tags.GunModifier = true;
+        statusModifier.Tags.MeleeModifier = true;
         statusModifier.Tags.StatusMod = true;
     end
 

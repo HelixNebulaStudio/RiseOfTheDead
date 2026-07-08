@@ -79,7 +79,7 @@ function modItemsLibrary.onRequire()
     };
 
     local PASSIVE_WEAK_POINT_SENSE = `<b>[Passive] Weak Point Sense:</b> Shooting enemies reveals weak points, shooting them deals an additional 25% <b>PreModDamage</b>.`;
-    local PASSIVE_CRITICAL_SHOT = `<b>[Passive] Critical Shot:</b> Has a chance to do a crit which increases damage by a multiplier.`;
+    local PASSIVE_CRITICAL_HIT = `<b>[Passive] Critical Hit:</b> Has a chance to do a crit which increases damage by a multiplier.`;
     local PASSIVE_DAMAGE_REV = `<b>[Passive] Damage Rev:</b> Does more damage the less ammo you have in your magazine.`
     local PASSIVE_DUAL_FOCUS = `<b>[Passive] Dual Focus:</b> When in focus, you instinctively aim each gun at an enemy closest to the center of your screen.`;
 
@@ -94,19 +94,19 @@ function modItemsLibrary.onRequire()
     new(gunBase, {Id="xm1014"; Name="XM1014"; Icon="rbxassetid://6523762932"; Tags={"Shotgun"; "Primary Weapon";}; Description="Quick fire-rate long barrel shotgun.";});
     new(gunBase, {Id="sawedoff"; Name="Sawed-Off"; Icon="rbxassetid://17007247358"; Tags={"Shotgun"; "Primary Weapon";}; Description="Close range head remover with high multishot.";});
     new(gunBase, {Id="mariner590"; Name="Mariner 590"; Icon="rbxassetid://17007243924"; Tags={"Shotgun"; "Primary Weapon";}; Description="Quick and high damage tactical shotgun.";});
-    new(gunBase, {Id="rusty48"; Name="Rusty 48"; Icon="rbxassetid://10390716871"; Tags={"Shotgun"; "Primary Weapon";}; TradingTax = 4900; Description=`Crudely made but powerful shotgun.\n\n{PASSIVE_CRITICAL_SHOT}`;});
+    new(gunBase, {Id="rusty48"; Name="Rusty 48"; Icon="rbxassetid://10390716871"; Tags={"Shotgun"; "Primary Weapon";}; TradingTax = 4900; Description=`Crudely made but powerful shotgun.\n\n{PASSIVE_CRITICAL_HIT}`;});
     new(gunBase, {Id="rechamber1216"; Name="Rechamber 1216"; Icon="rbxassetid://92627722665597"; Tags={"Shotgun"; "Primary Weapon";}; TradingTax = 9900; Description="Military grade mag based shotgun.\n\n<b>[Passive] Knockout Trigger:</b> Knocks out enemies on headshots for 2 seconds.";});
 
     new(gunBase, {Id="mp5"; Name="MP5"; Icon="rbxassetid://9960159062"; Tags={"Submachine Gun"; "Primary Weapon";}; Description="Quick fire-rate sub-machine gun.";});
     new(gunBase, {Id="mp7"; Name="MP7"; Icon="rbxassetid://9960161355"; Tags={"Submachine Gun"; "Primary Weapon";}; Description="Good accuracy and damage sub-machine gun.";});
     new(gunBase, {Id="czevo3"; Name="CZ-Scorpion EVO 3"; Icon="rbxassetid://4814129724"; Tags={"Submachine Gun"; "Primary Weapon";}; Description=`Extremely tactical sub-machine gun with a high base damage.\n\n{PASSIVE_DAMAGE_REV}`;});
-    new(gunBase, {Id="vectorx"; Name="Vector X"; Icon="rbxassetid://8527896764"; Tags={"Submachine Gun"; "Primary Weapon";}; TradingTax = 4900; Description=`Elite sub-machine gun with built-in suppressor.\n\n{PASSIVE_CRITICAL_SHOT}`;});
+    new(gunBase, {Id="vectorx"; Name="Vector X"; Icon="rbxassetid://8527896764"; Tags={"Submachine Gun"; "Primary Weapon";}; TradingTax = 4900; Description=`Elite sub-machine gun with built-in suppressor.\n\n{PASSIVE_CRITICAL_HIT}`;});
     new(gunBase, {Id="dualuzi"; Name="Dual Uzi"; Icon="rbxassetid://70941686222281"; Tags={"Submachine Gun"; "Primary Weapon";}; TradingTax = 9900; Description=`Light and versatile dual-wielded smgs.\n\n{PASSIVE_DUAL_FOCUS}`;});
 
     new(gunBase, {Id="m4a4"; Name="M4A4"; Icon="rbxassetid://5166150878"; Tags={"Rifle"; "Primary Weapon";}; Description="Military grade M4 rifle capable of high damage and long range shooting.";});
     new(gunBase, {Id="ak47"; Name="AK-47"; Icon="rbxassetid://5166397129"; Tags={"Rifle"; "Primary Weapon";}; Description="High damage, high magazine capacity, and great fire-rate. Quite a noise maker.";});
     new(gunBase, {Id="fnfal"; Name="FN FAL"; Icon="rbxassetid://17007249959"; Tags={"Rifle"; "Primary Weapon";}; Description="The FN FAL is a high damage rifle with a very high fire rate.";});
-    new(gunBase, {Id="sr308"; Name="SR-308"; Icon="rbxassetid://16570523670"; Tags={"Rifle"; "Primary Weapon";}; Description=`Ergonomic Russian battle rifle.\n\n{PASSIVE_CRITICAL_SHOT}`;});
+    new(gunBase, {Id="sr308"; Name="SR-308"; Icon="rbxassetid://16570523670"; Tags={"Rifle"; "Primary Weapon";}; Description=`Ergonomic Russian battle rifle.\n\n{PASSIVE_CRITICAL_HIT}`;});
 
     new(gunBase, {Id="awp"; Name="AWP"; Icon="rbxassetid://5166454078"; Tags={"Sniper"; "Primary Weapon";}; Description="High Damage, high recoil and long ranged rifle.";});
     new(gunBase, {Id="rec21"; Name="Rec-21"; Icon="rbxassetid://6532745901"; Tags={"Sniper"; "Primary Weapon";}; Description="High power, light weight tactical sniper rifle.";});
@@ -429,6 +429,8 @@ function modItemsLibrary.onRequire()
 
     new(toolBase, {Id="generic"; Name="Generic"; Icon=shared.Const.PlaceholderIcon; Tags={"Unobtainable"}; Description="A generic tool for custom purposes.";});
     
+    new(toolBase, {Id="carryitem"; Name="CarryItem"; Icon=shared.Const.PlaceholderIcon; Tags={"Unobtainable"}; Description="A generic tool for carryable items.";});
+
     new(toolBase, {Id="fireworks"; Name="Fireworks"; Icon="rbxassetid://6235855080"; Stackable=5; Description="Fireworks lighting up the skies for the new year!";});
     new(toolBase, {Id="matchbox"; Name="Matchbox"; Icon="rbxassetid://6269033605"; Stackable=10; Description="Can be used to ignite up flammable liquids or fuses.";});
     new(toolBase, {Id="jerrycan"; Name="Jerrycan"; Icon="rbxassetid://5886813198"; BaseValues={Fuel=100}; Description="Steel-pressed container that holds highly flammable fuel. Ignited fuel will deal 1% of max health as damage (Min: 10).";});
