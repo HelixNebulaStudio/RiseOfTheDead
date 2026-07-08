@@ -19,7 +19,7 @@ function modItemsLibrary.onRequire()
     };
 
     -- Common
-    new(resourceBase, {Id="money"; Name="Money"; Icon="rbxassetid://86537766971763"; Stackable=10000; Description="$$$";});
+    new(resourceBase, {Id="money"; Name="Money"; Icon="rbxassetid://86537766971763"; Stackable=10000; Description="$$$"; Sources={"Obtained by selling commodities, killing bosses, doing missions and more.";};});
     
     new(resourceBase, {Id="metal"; Name="Metal Scraps"; Icon="rbxassetid://1551792125"; Description="Metallic scraps used in crafting metal objects.";});
     new(resourceBase, {Id="glass"; Name="Glass Shards"; Icon="rbxassetid://1551792117"; Description="Glass shards and pieces used in crafting glass objects.";});

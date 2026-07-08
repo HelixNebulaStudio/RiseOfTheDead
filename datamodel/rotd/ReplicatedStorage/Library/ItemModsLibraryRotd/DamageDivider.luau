@@ -39,6 +39,7 @@ function modifierPackage.onRequire()
         healthComp:TakeDamage(DamageData.new{
             Damage = newDamage;
             DamageType = "IgnoreArmor";
+			NonLethal = true;
         });
 	end
 end

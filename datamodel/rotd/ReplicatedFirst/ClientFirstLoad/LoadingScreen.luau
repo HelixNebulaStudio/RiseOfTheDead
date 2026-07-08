@@ -14,6 +14,8 @@ local LOADING_HINTS = {
 	`Lore: No one has been able to enter or exit Wrighton Dale.. Except the Rats..`;
 	`Tip: Press Delete key on an inventory item to quick open delete prompt.`;
 	`Tip: You can see where to get any item by check it in the shop's codex.`;
+	`Tip: You can use the /item command to see where to get any item, try /item juggernog`;
+	`Tip: Your clothing loadout order matters! Visually and functionally.`;
 }
 
 local WD_HEADER = "Wrighton Dale";

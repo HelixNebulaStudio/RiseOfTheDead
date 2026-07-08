@@ -25,7 +25,7 @@ if RunService:IsServer() then
             return;
         end
 
-		if damageTo.ClassName == "NpcClass" and (damageTo :: NpcClass).Properties.MeleeImmunity >= 1 then
+		if damageTo.ClassName == "NpcClass" and ((damageTo :: NpcClass).Properties.MeleeImmunity or 0) >= 1 then
 			return;
 		end
 

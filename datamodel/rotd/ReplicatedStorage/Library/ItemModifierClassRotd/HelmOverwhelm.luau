@@ -33,12 +33,14 @@ function modifierPackage.onRequire()
 		local damage = damageData.Damage;
 
 		local heal = math.ceil(damage * 0.1);
-		healthComp:TakeDamage(DamageData.new{
-			Damage = -heal;
-			DamageBy = characterClass;
-			StorageItem = modifier.EquipmentClass and modifier.EquipmentClass.StorageItem;
-			DamageType = "Heal";
-		})
+		task.defer(function()
+			healthComp:TakeDamage(DamageData.new{
+				Damage = -heal;
+				DamageBy = characterClass;
+				StorageItem = modifier.EquipmentClass and modifier.EquipmentClass.StorageItem;
+				DamageType = "Heal";
+			});
+		end)
 	end
 end
 
