@@ -259,15 +259,31 @@ function PageInterface:Load(interface: Interface, window: InterfaceWindow)
 										if rewardData.GameMode then
 											descText = descText.. "  • Dropped in <b>"..rewardData.GameMode..": "..rewardData.StageName.."</b>".."\n";
 											
-										elseif rewardData.CrateId then
-											local crateLib = modCrateLibrary.Get(rewardData.CrateId)
-											descText = descText.. "  • Dropped from <b>"..crateLib.Name.."</b>".."\n";
+										end
 
-										elseif rewardData.RewardId then
-											local rewardLib = modRewardsLibrary:Find(rewardData.RewardId);
-											descText = descText.. "  • Dropped from <b>".. (rewardLib.Name or rewardLib.Id) .."</b>".."\n";
+										local rewardLib, rewardLibName = nil;
+										if rewardData.RewardId then
+											rewardLib = modRewardsLibrary:Find(rewardData.RewardId);
+											if rewardLib then
+												rewardLibName = rewardLib.Name or rewardData.RewardId;
+											end
+										end
+
+										if rewardData.CrateId then
+											local crateLib = modCrateLibrary.Get(rewardData.CrateId)
+											descText = descText.. `  • Dropped from <b>{crateLib.Name}</b> ({rewardLibName or "unknown"})\n`;
+
+										else
+											descText = descText.. `  • Dropped from <b>{rewardLibName}</b>\n`;
 
 										end
+
+										if rewardLib and rewardLib.Sources then
+											for b=1, #rewardLib.Sources do
+												descText = descText..`    • {rewardLib.Sources[b]}\n`;
+											end
+										end
+
 									end
 								end
 								

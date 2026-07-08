@@ -636,14 +636,15 @@ function modItemsLibrary.onRequire()
                 local itemLib = modItemsLibrary:Find(craftFor);
                 data.Icon = itemLib.Icon;
 
-                data.Name = (data.Prefix and `<font color='#ff3c3c'>{data.Prefix}</font> ` or ``)..`{itemLib.Name} Parts`;
+                local prefix = data.Prefix and data.Prefix:gsub("%d", "");
+                data.Name = (prefix and `<font color='#ff3c3c'>{prefix}</font> ` or ``)..`{itemLib.Name} Parts`;
                 data.Description = `Parts used to create the {itemLib.Name} and mods.`;
             end
 
             local idIndex = data.Id:sub(#data.Id, #data.Id);
             if tonumber(idIndex) and data.Prefix then
-                local pf = data.Prefix:gsub("%U", "");
-                data.OverlayIcons={
+                local pf = data.Prefix:gsub("[^A-Z0-9]", "");
+                data.OverlayIcons = {
                     {Text=`<font color='#ff9b9b'>#{pf}</font>`};
                 };
             end
@@ -658,9 +659,9 @@ function modItemsLibrary.onRequire()
     new(weaponCompBase, {Id="arelshiftcrossparts"; CraftFor="arelshiftcross"; Sources={"Obtained within <b>Abandoned Bunker</b>.";}; });
     new(weaponCompBase, {Id="deagleparts"; CraftFor="deagle"; Sources={"Obtained from <b>Board Missions</b>.";};});
 
-    new(weaponCompBase, {Id="dualuziparts1"; Prefix=`Prison`; CraftFor="dualuzi";});
+    new(weaponCompBase, {Id="dualuziparts1"; Prefix=`Swamplands1`; CraftFor="dualuzi";});
     new(weaponCompBase, {Id="dualuziparts2"; Prefix=`Sector D`; CraftFor="dualuzi";});
-    new(weaponCompBase, {Id="dualuziparts3"; Prefix=`Swamplands`; CraftFor="dualuzi";});
+    new(weaponCompBase, {Id="dualuziparts3"; Prefix=`Swamplands2`; CraftFor="dualuzi";});
 
     new(weaponCompBase, {Id="rechamber1216parts1"; Prefix=`Sector F`; CraftFor="rechamber1216";});
     new(weaponCompBase, {Id="rechamber1216parts2"; Prefix=`Prison`; CraftFor="rechamber1216";});

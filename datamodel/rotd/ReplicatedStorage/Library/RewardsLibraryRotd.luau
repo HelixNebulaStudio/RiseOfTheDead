@@ -1136,9 +1136,10 @@ function library.onRequire()
 	
 	-- MARK: corruptedsectorfcrate
 	library:Add{
-		Id="corruptedsectorfcrate";
-		Level=240;
-		Rewards={
+		Id = "corruptedsectorfcrate";
+		Name = "Corrupted Sector F Survival";
+		Level = 240;
+		Rewards = {
 			{Wave=4; ItemId="stickygrenade"; Quantity=1; Chance=1;};
 			{Wave=4; ItemId="advmedkit"; Quantity=1; Chance=1;};
 			{Wave=4; ItemId="abgreenkey"; Quantity=1; Chance=1;};
@@ -1192,9 +1193,10 @@ function library.onRequire()
 
 	-- MARK: corruptedprisoncrate
 	library:Add{
-		Id="corruptedprisoncrate";
-		Level=300;
-		Rewards={
+		Id = "corruptedprisoncrate";
+		Name = "Corrupted Prison Survival";
+		Level = 300;
+		Rewards = {
 			{Wave=4; ItemId="stickygrenade"; Quantity=1; Chance=1;};
 			{Wave=4; ItemId="advmedkit"; Quantity=1; Chance=1;};
 			{Wave=4; ItemId="abgreenkey"; Quantity=1; Chance=1;};
@@ -1249,9 +1251,10 @@ function library.onRequire()
 
 	-- MARK: corruptedsectordcrate
 	library:Add{
-		Id="corruptedsectordcrate";
-		Level=300;
-		Rewards={
+		Id = "corruptedsectordcrate";
+		Name = "Corrupted Sector D Survival";
+		Level = 300;
+		Rewards = {
 			{Wave=4; ItemId="stickygrenade"; Quantity=1; Chance=1;};
 			{Wave=4; ItemId="advmedkit"; Quantity=1; Chance=1;};
 			{Wave=4; ItemId="abgreenkey"; Quantity=1; Chance=1;};
@@ -1305,9 +1308,10 @@ function library.onRequire()
 
 	-- MARK: corruptedmangrovecrate
 	library:Add{
-		Id="corruptedmangrovecrate";
-		Level=340;
-		Rewards={
+		Id = "corruptedmangrovecrate";
+		Name = "Corrupted Swamplands Survival";
+		Level = 340;
+		Rewards = {
 			{Wave=4; ItemId="stickygrenade"; Quantity=1; Chance=1;};
 			{Wave=4; ItemId="advmedkit"; Quantity=1; Chance=1;};
 			{Wave=4; ItemId="scarecrow"; Quantity=1; Chance=1;};
@@ -1603,6 +1607,9 @@ function library.onRequire()
 	library:Add{
 		Id = "components";
 		Name = "Components Drop Table";
+		Sources = {
+			"Corrupted Survival End Waves";
+		};
 		Rewards = componentsDropTable;
 	};
 end
