@@ -94,9 +94,9 @@ library:Add{
 	Name="Remarkable Resilience";
 	Link="effmet";
 	
-	Description="After dropping below 15% health, player will regenerate to $Percent% of max health at 3hp per second. (2 minute cooldown)";
+	Description="After dropping below 15% health, player will regenerate $Percent% of max health at 5hp per second. (2 minute cooldown)";
 	Stats={
-		Percent={Base=20; Max=40};
+		Percent={Base=10; Max=30};
 	};
 	
 	Level=20;

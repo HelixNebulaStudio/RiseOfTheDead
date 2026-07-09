@@ -66,7 +66,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     goldButton.NextSelectionDown = rScrollFrame;
 
     local goldShopWindow: InterfaceWindow = interface:NewWindow("GoldMenu", goldMenuFrame);
-    goldShopWindow.BoolStringWhenActive = {String="!Hotbar"; Priority=2;};
+    goldShopWindow.BoolStringWhenActive = {String="!HotbarsHud"; Priority=2;};
 	goldShopWindow.CompactFullscreen = true;
     goldShopWindow.DisableInteractables = true;
     goldShopWindow.CloseWithInteract = true;

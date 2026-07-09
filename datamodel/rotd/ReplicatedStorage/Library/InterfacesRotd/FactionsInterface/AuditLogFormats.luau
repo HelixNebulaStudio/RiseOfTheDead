@@ -1,4 +1,6 @@
 local modMissionsLibrary = shared.require(game.ReplicatedStorage.Library.MissionLibrary);
+local modFactionsLibrary = shared.require(game.ReplicatedStorage.Library.FactionsLibrary);
+local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibraryRotd);
 
 local function extractNumber(text, prefix)
     -- %d+ matches one or more digits directly after the prefix
@@ -225,10 +227,43 @@ return {
 			if missionLib then
 				reason = reason:gsub(`mission{missionId}`,`Mission: {missionLib.Name}`);
 			end
+
+		elseif reason:sub(1, 4) == "dist" then
+			local disId = reason:gsub("dist", "");
+
+			local disLibrary = modFactionsLibrary.DistributionsLibrary;
+			local disLib = disLibrary:Find(disId);
+			if disLib ~= nil then
+				local name = disLib.Name;
+				local itemLib = modItemsLibrary:Find(disLib.ItemId or disLib.Id);
+				if itemLib then
+					name = itemLib.Name;
+				end
+				reason = `Funding {name} distribution.`;
+			end;
 		end
 
 		rStr = (math.sign(amt) == 1 and "+" or "").. amt .." $: "..reason;
 
-		return rStr;
+		return `{rStr}.`;
 	end};
+
+	toggledisflag = {
+		GetText = function(factionData, values)
+			local members = factionData.Members;
+
+			local nameOrUserId = values[1];
+			local disId = values[2];
+			local active = values[3];
+
+			local memberData1 = members[nameOrUserId];
+			nameOrUserId = memberData1 and memberData1.Name or nameOrUserId;
+
+			if active == 1 then
+				return `{nameOrUserId} enabled distribution for ({disId}).`;
+			end
+
+			return `{nameOrUserId} disabled distribution for ({disId}).`;
+		end;
+	}
 }

@@ -29,9 +29,31 @@ function Objective.onRequire()
 				or config.Parent == nil
 				or config.Parent.Parent == nil then return end;
 				
+				local missile = config.Parent.Parent;
+
 				config:SetAttribute("_InteractDuration", nil);
 				config:SetAttribute("_Label", "Activated");
-				config.Parent.Parent:SetAttribute("Active", true);
+
+				local wave = missile:GetAttribute("Wave") or 1;
+				missile:SetAttribute("Active", true);
+
+				local destructibleConfig = modDestructibles.createDestructible("Scarecrow");
+				destructibleConfig:SetAttribute("_AttractRange", 128);
+				destructibleConfig:SetAttribute("_ExpiringDamageTick", false);
+				destructibleConfig.Parent = missile;
+				
+				local destructible: DestructibleInstance = modDestructibles.getOrNew(destructibleConfig);
+				destructible.BroadcastHealth = true;
+				destructible.HealthComp:SetCanBeHurtBy("!Player&!Human"); -- not HumanoidType == Player & not Survivors
+				destructible.HealthComp:SetMaxHealth(wave * 500);
+				destructible.HealthComp:Reset();
+
+				destructible:SetupHealthbar{
+					Size = UDim2.new(4, 0, 1, 0);
+					Distance = 128;
+					OffsetWorldSpace = Vector3.new(0, 3, 0);
+					ShowLabel = true;
+				};
 			end)
 		end
 	end)
@@ -74,6 +96,7 @@ function Objective:Begin()
 	for a=1, missileSpawnCount do
 		local newMissile = table.remove(pickList, math.random(1, #pickList));
 		newMissile = newMissile:Clone();
+		newMissile:SetAttribute("Wave", controller.Wave);
 		newMissile.Parent = workspace.Environment.Game;
 		table.insert(self.CurMissiles, newMissile);
 
@@ -81,6 +104,7 @@ function Objective:Begin()
 
 		local interactConfig = modInteractables.createInteractable("ButtonRotd");
 		interactConfig:SetAttribute("_Id", "RazeMissile");
+		interactConfig:SetAttribute("_IndicatorPresist", true);
 		interactConfig:SetAttribute("_Label", "Activate");
 		interactConfig:SetAttribute("_Uses", 1);
 		interactConfig:SetAttribute("_InteractDuration", 3);
@@ -108,26 +132,6 @@ function Objective:Tick()
 
 		if active >= #self.CurMissiles then
 			self.State = 2;
-
-			for _, missile in ipairs(self.CurMissiles) do
-				local destructibleConfig = modDestructibles.createDestructible("Scarecrow");
-				destructibleConfig:SetAttribute("_AttractRange", 999);
-				destructibleConfig:SetAttribute("_ExpiringDamageTick", false);
-				destructibleConfig.Parent = missile;
-				
-				local destructible: DestructibleInstance = modDestructibles.getOrNew(destructibleConfig);
-				destructible.BroadcastHealth = true;
-				destructible.HealthComp:SetCanBeHurtBy("!Player&!Human"); -- not HumanoidType == Player & not Survivors
-				destructible.HealthComp:SetMaxHealth(controller.Wave * 300);
-				destructible.HealthComp:Reset();
-
-				destructible:SetupHealthbar{
-					Size = UDim2.new(4, 0, 1, 0);
-					Distance = 128;
-					OffsetWorldSpace = Vector3.new(0, 3, 0);
-					ShowLabel = true;
-				};
-			end
 
 			self.SecTick = tick();
 			controller.WaveStartTime = workspace:GetServerTimeNow();
@@ -165,6 +169,8 @@ function Objective:Tick()
 			for _, missile in ipairs(self.CurMissiles) do
 				task.delay(0.333, function()
 					local primaryPart = missile.PrimaryPart;
+					if primaryPart == nil then return end;
+
 					local lastPosition = primaryPart.Position;
 		
 					modAudio.Play(math.random(1, 2) == 1 and "Explosion" or "Explosion2", lastPosition);
@@ -208,6 +214,7 @@ function Objective:Tick()
 
 						BindHealthCompHit = function(healthComp: HealthComp, newDmgData)
 							local charClass: CharacterClass = healthComp.CompOwner :: CharacterClass;
+							if charClass == nil then return false; end;
 							
 							if charClass.ClassName == "NpcClass" and charClass.HumanoidType == "Zombie" then
 								charClass.Properties.Immunity = nil;

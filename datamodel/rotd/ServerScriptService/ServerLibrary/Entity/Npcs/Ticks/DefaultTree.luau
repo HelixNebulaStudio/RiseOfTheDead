@@ -51,6 +51,7 @@ function treePackage.HasEnemy(npcClass: NpcClass)
                     return false;
                 end
             end
+
         end
 
         local isAlive = targetCharacterClass.HealthComp.IsDead ~= true;
@@ -58,6 +59,12 @@ function treePackage.HasEnemy(npcClass: NpcClass)
 
         local isTargettable = targetCharacterClass.HealthComp:CanTakeDamageFrom(npcClass);
         if not isTargettable then return false end;
+
+        if properties.HordeAggression and targetCharacterClass.HumanoidType == "Player" then return true; end;
+
+        if targetCharacterClass.Character and targetCharacterClass.Character:FindFirstChild("GodModeFF") then
+            return false;
+        end
 
         local isInRange = (targetData.Distance <= properties.TargetableDistance);
         if not isInRange then return false end;
@@ -98,14 +105,24 @@ function treePackage.IgniteDetonation(npcClass: NpcClass)
     local properties = npcClass.Properties;
     local targetData = npcClass.Properties.EnemyTargetData;
 
+    local npcChar = npcClass.Character;
+
     local targetEntityClass: EntityClass = targetData.HealthComp.CompOwner;
     local targetRootPart = targetEntityClass.RootPart;
     
-    local detonTime = npcClass.Character:GetAttribute("DetonationTime");
+    local detonTime = npcChar:GetAttribute("DetonationTime");
     if detonTime == nil then
         if modRegion:InRegion(npcClass.RootPart.Position, targetRootPart.Position, 30) then
+
+            if targetEntityClass.ClassName == "PlayerClass" then
+                local dynamicLevel = npcClass:GetComponent("DynamicLevel");
+                if dynamicLevel and properties.Level == nil then
+                    dynamicLevel(targetEntityClass);
+                end
+            end
+
             local duration = 4;
-            npcClass.Character:SetAttribute("DetonationTime", workspace:GetServerTimeNow()+duration);
+            npcChar:SetAttribute("DetonationTime", workspace:GetServerTimeNow()+duration);
             
             local tickingSound = modAudio.Play("ZombieAttack3", targetRootPart);
             tickingSound.Looped = true;
@@ -115,11 +132,11 @@ function treePackage.IgniteDetonation(npcClass: NpcClass)
             npcClass.Garbage:Tag(tickingSound);
             
             task.spawn(function()
-                detonTime = npcClass.Character:GetAttribute("DetonationTime");
+                detonTime = npcChar:GetAttribute("DetonationTime");
 
                 while workspace:GetServerTimeNow() <= detonTime do
-                    if npcClass.Character:GetAttribute("DetonationTime") == nil then return end;
-                    local timeLeft = npcClass.Character:GetAttribute("DetonationTime")-workspace:GetServerTimeNow();
+                    if npcChar:GetAttribute("DetonationTime") == nil then return end;
+                    local timeLeft = npcChar:GetAttribute("DetonationTime")-workspace:GetServerTimeNow();
                     
                     timeLeft = duration-math.clamp(timeLeft, 0, duration);
                     
@@ -150,6 +167,7 @@ end
 function treePackage.Detonate(npcClass: NpcClass)
     local configurations = npcClass.Configurations;
     local properties = npcClass.Properties;
+
     if properties.IsDetonating then return end;
     properties.IsDetonating = true;
 

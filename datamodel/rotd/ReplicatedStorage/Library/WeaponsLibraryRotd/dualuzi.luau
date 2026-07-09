@@ -90,9 +90,6 @@ function toolPackage.newClass()
 	local equipmentClass = modEquipmentClass.new(toolPackage);
 
 	equipmentClass:AddBaseModifier("DualFocus", {
-		SetValues = {
-			DualFocus = true;
-		};
 		ArrayValues = {
 			PassiveModifiers = "Dual Focus";
 		};

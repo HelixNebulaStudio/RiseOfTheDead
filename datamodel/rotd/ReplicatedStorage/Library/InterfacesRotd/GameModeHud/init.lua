@@ -36,6 +36,9 @@ function interfacePackage.onRequire()
 							Action = "Open";
 							Type = "Survival";
 							Stage = "Swamplands";
+
+							Wave = math.random(5, 200);
+
 							WaveStartTime = workspace:GetServerTimeNow() - 45;
 							WaveDuration = 60;
 
@@ -44,9 +47,9 @@ function interfacePackage.onRequire()
 
 							WaveObjective = false;
 							WaveHazard = false;
-							WaveSelectPacket = false;
-
-							WavePass = {
+							
+							--WaveSelectPacket = false;
+							WaveSelectPacket = {
 								TimeLeft = math.random(0, 30);
 								Players = {
 									["16170943"] = {
@@ -65,10 +68,10 @@ function interfacePackage.onRequire()
 										RewardPick = math.random(1, 3);
 									};
 								};
-								Rewards = {
-									{ItemId="p250"; Quantity=math.random(1, 32);};
-									{ItemId="tacticalbow"; Quantity=1;};
-									{ItemId="minigun"; Quantity=1;};
+								Options = {
+									{ItemId="p250"; Quantity=math.random(1, 32); WinChance=0.01};
+									{ItemId="tacticalbow"; Quantity=1; WinChance=0.1};
+									{ItemId="minigun"; Quantity=1; WinChance=1};
 								};
 							};
 						}

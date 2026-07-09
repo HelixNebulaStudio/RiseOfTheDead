@@ -32,6 +32,7 @@ local cratePallet = game.ServerStorage.Prefabs.Objects.Crates.CratePallet;
 local Modifiers = {};
 
 local STORAGE_ID = "survivalrewards";
+local WAVE_REWARD_CYCLE = 5;
 --==
 Survival.OnWaveChanged = shared.EventSignal.new("OnWaveChanged");
 Survival.OnSurvivalNpcSpawn = shared.EventSignal.new("OnSurvivalNpcSpawn");
@@ -638,6 +639,7 @@ function Survival:NewWaveSelect()
 					local cloneRewardInfo = table.clone(compReward[1]);
 					cloneRewardInfo.Chance = 2;
 					cloneRewardInfo.DropTableId = dropTableId;
+					cloneRewardInfo.Repeatable = true;
 					table.insert(customRewardsTable, cloneRewardInfo);
 				end
 			end
@@ -678,26 +680,28 @@ function Survival:NewWaveSelect()
 			rewardOptions = 4;
 		end
 		repeat
-			local rewardInfo = modDropRateCalculator.roll(customRewardsTable);
-
-			-- skip reward if there's already one.
-			-- skip reward if exist last round.
-			if rewardInfo and self.RewardItemIdDebounce[rewardInfo.ItemId] ~= nil then continue; end
-
-			-- skip reward if list is empty and reward is not in player required level
-			if rewardInfo and #rewardPicksList <= 0 and (rewardInfo.Level or 0) > lowestPlayerLevel then
-				continue;
-			end
-			
-			if rewardInfo == nil then continue end;
-
-			self.RewardItemIdDebounce[rewardInfo.ItemId] = self.Wave;
-			table.insert(rewardPicksList, rewardInfo);
 			loopkill += 1;
 			if loopkill > 64 then
 				Debugger:Warn(`Breaking reward choose loop.`);
 				break;
 			end;
+			
+			local rewardInfo = modDropRateCalculator.roll(customRewardsTable);
+			if rewardInfo == nil then continue end;
+
+			-- skip reward if there's already one.
+			-- skip reward if exist last round.
+			if rewardInfo.Repeatable ~= true and self.RewardItemIdDebounce[rewardInfo.ItemId] ~= nil then
+				continue;
+			end
+
+			-- skip reward if list is empty and reward is not in player required level
+			if #rewardPicksList <= 0 and (rewardInfo.Level or 0) > lowestPlayerLevel then
+				continue;
+			end
+
+			self.RewardItemIdDebounce[rewardInfo.ItemId] = self.Wave;
+			table.insert(rewardPicksList, rewardInfo);
 		until #rewardPicksList >= math.min(rewardOptions, #customRewardsTable);
 
 	else
@@ -882,13 +886,13 @@ function Survival:BreakTime()
 		shared.Notify(game.Players:GetPlayers(), "A supply station has been discovered!", "Reward");
 	end;
 
-	if self.Wave%15 == 0 then
+	if self.Wave%WAVE_REWARD_CYCLE == 0 then
 		breakLength += 15;
 		statusStr = `{statusStr} [Loot Available]`;
 
 		--MARK: Claim Stakes
 		self:SpawnCrate();
-		shared.Notify(game.Players:GetPlayers(), "A Stake Crate has been discovered!", "Reward");
+		shared.Notify(game.Players:GetPlayers(), "A Reward Crate has been discovered!", "Reward");
 	end
 
 	for a=breakLength, 0, -1 do
@@ -1039,6 +1043,7 @@ function Survival:StartWave(wave)
 	--MARK: Wave Tick
 	local hudUpdateTick = tick()-5;
 	local waveStartTick = tick();
+	local recentEnemyExistTick = tick()+60;
 	repeat
 		task.wait();
 		if newObjective:Tick() then break; end
@@ -1069,7 +1074,15 @@ function Survival:StartWave(wave)
 			self:Hud{};
 		end
 
-		if tick()-waveStartTick >= 120 and #modNpcs.ActiveNpcClasses <= 0 then break; end;
+		--force end if no enemies exists for a minute
+		if tick()-waveStartTick >= 60 then
+			if #modNpcs.ActiveNpcClasses > 0 then
+				recentEnemyExistTick = tick();
+			elseif tick()-recentEnemyExistTick >= 60 then
+				break;
+			end
+		end;
+
 		if self.SkipWave then Debugger:Warn("Skip Wave"); break; end;
 	until self.Status ~= EnumStatus.InProgress;
 	
@@ -1134,7 +1147,7 @@ function Survival:StartWave(wave)
 						storage:Add(rewardOption.ItemId, {Quantity=rewardOption.DropQuantity;});
 						storage:Sync(player);
 
-						Debugger:Warn(`Added {rewardOption.ItemId} x {rewardOption.DropQuantity} to ({player.Name}) {storage.Id}`);
+						Debugger:StudioWarn(`Added {rewardOption.ItemId} x {rewardOption.DropQuantity} to ({player.Name}) {storage.Id}`);
 					end)
 				end
 				self.SelectedOption = nil;
@@ -1579,7 +1592,7 @@ function Survival:Schedule(paramPacket)
 	local exist = false;
 	
 	for a=1, #self.JobsList do
-		if self.JobsList[a].Id == job then
+		if self.JobsList[a].Id == job.Id then
 			job = self.JobsList[a];
 			exist = true;
 			break;

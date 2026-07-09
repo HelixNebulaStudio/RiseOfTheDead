@@ -25,7 +25,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local window: InterfaceWindow = interface:NewWindow("StatusBar", frame);
 	window.IgnoreHideAll = true;
 	window.ReleaseMouse = false;
-    window.Layers = {"CharacterHud"; "CompactHidden"};
+    window.Layers = {"CharacterHud"; "CompactHidden"; "HotbarsHud"};
     interface:BindConfigKey("DisableStatusHud", {window});
 	
 	if modConfigurations.CompactInterface then

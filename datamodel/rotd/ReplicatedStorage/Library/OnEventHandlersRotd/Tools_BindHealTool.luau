@@ -4,7 +4,8 @@ local RunService = game:GetService("RunService");
 
 local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 --==
-return function(event: EventPacket, action: string, toolHandler: ToolHandlerInstance, toCharacterClass: CharacterClass)
+return function(event: EventPacket, ...)
+    local action: string, toolHandler: ToolHandlerInstance, toCharacterClass: CharacterClass = ...;
     local equipmentClass: EquipmentClass = toolHandler.EquipmentClass;
     local configurations = equipmentClass.Configurations;
     local properties = equipmentClass.Properties;

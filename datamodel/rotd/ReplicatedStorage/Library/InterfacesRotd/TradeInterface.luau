@@ -877,7 +877,6 @@ local function holdButton(button, label, onClick)
 				otherStorageInterface:Update();
 				if tradeStorage then
 					for id, storageItem in pairs(tradeStorage.Container) do
-						Debugger:Log("StorageItem in trade: ",storageItem);
 						hasItems = true;
 					end
 				end

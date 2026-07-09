@@ -17,5 +17,5 @@ A side mission that unlocks the ability to use the walkie talkie to call in uniq
 		- [ ] Trauma team is essentially your TF2 medic
 			- [ ] They follow the player around and draws aggro towards them. They give the player hp/s as long as they are near and alive.
 	- [ ] Military: Calls in an Air Strike (Future concept)
-- [ ] 
+- [x] 
       

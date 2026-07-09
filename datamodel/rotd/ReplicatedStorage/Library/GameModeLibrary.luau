@@ -384,8 +384,6 @@ GameModeLibrary.GameModes={
 
 				HardModeEnabled = true;
 				MapItemId = "swamplandsmap";
-				
-				WIP=true;
 			};
 
 			--MARK: Community Survivals

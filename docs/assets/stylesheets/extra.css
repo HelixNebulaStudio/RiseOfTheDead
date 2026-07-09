@@ -56,11 +56,15 @@
     border-radius: 10px;
 }
 
+.md-typeset .md-tag {
+    background: #3f1010;
+}
+
 .md-typeset code:not(.md-code__content) {
     border-radius: 4px;
-    background-color: #3d2f2f;
-    color: #a05959;
-    font-weight: 600;
+    background-color: #2c1818;
+    color: #ff7878;
+    font-weight: 300;
 }
 
 .highlighttable th.filename span.filename {
@@ -82,4 +86,12 @@
 
 [data-md-color-scheme="slate"] {
     --md-hue: 0; 
+}
+
+[dir=ltr] .md-typeset .task-list-indicator:before {
+  background-color: #301e1e;
+}
+
+.md-typeset [type=checkbox]:checked+.task-list-indicator:before {
+  background-color: #803b3b;
 }

@@ -1136,9 +1136,10 @@ function library.onRequire()
 	
 	-- MARK: corruptedsectorfcrate
 	library:Add{
-		Id="corruptedsectorfcrate";
-		Level=240;
-		Rewards={
+		Id = "corruptedsectorfcrate";
+		Name = "Corrupted Sector F Survival";
+		Level = 240;
+		Rewards = {
 			{Wave=4; ItemId="stickygrenade"; Quantity=1; Chance=1;};
 			{Wave=4; ItemId="advmedkit"; Quantity=1; Chance=1;};
 			{Wave=4; ItemId="abgreenkey"; Quantity=1; Chance=1;};
@@ -1192,9 +1193,10 @@ function library.onRequire()
 
 	-- MARK: corruptedprisoncrate
 	library:Add{
-		Id="corruptedprisoncrate";
-		Level=300;
-		Rewards={
+		Id = "corruptedprisoncrate";
+		Name = "Corrupted Prison Survival";
+		Level = 300;
+		Rewards = {
 			{Wave=4; ItemId="stickygrenade"; Quantity=1; Chance=1;};
 			{Wave=4; ItemId="advmedkit"; Quantity=1; Chance=1;};
 			{Wave=4; ItemId="abgreenkey"; Quantity=1; Chance=1;};
@@ -1206,9 +1208,9 @@ function library.onRequire()
 			{Wave=10; ItemId="skullburstmod"; Quantity=1; Chance=0.3;};
 			{Wave=11; ItemId="hydroponiccapsule"; Quantity=1; Chance=0.15;};
 			{Wave=12; ItemId="boomerang"; Quantity=1; Chance=0.075;};
-			{Wave=13; ItemId="rechamber1216parts2"; Quantity=1; Chance=0.038;};
+			{Wave=13; ItemId="grandgarandparts2"; Quantity=1; Chance=0.038;};
 			{Wave=14; ItemId="ammopouch"; Quantity=1; Chance=0.019;};
-			{Wave=15; ItemId="rechamber1216bp"; Quantity=1; Chance=0.001;};
+			{Wave=15; ItemId="grandgarandbp"; Quantity=1; Chance=0.001;};
 		};
 		WaveBased=true;
 	};
@@ -1249,9 +1251,10 @@ function library.onRequire()
 
 	-- MARK: corruptedsectordcrate
 	library:Add{
-		Id="corruptedsectordcrate";
-		Level=300;
-		Rewards={
+		Id = "corruptedsectordcrate";
+		Name = "Corrupted Sector D Survival";
+		Level = 300;
+		Rewards = {
 			{Wave=4; ItemId="stickygrenade"; Quantity=1; Chance=1;};
 			{Wave=4; ItemId="advmedkit"; Quantity=1; Chance=1;};
 			{Wave=4; ItemId="abgreenkey"; Quantity=1; Chance=1;};
@@ -1263,9 +1266,9 @@ function library.onRequire()
 			{Wave=10; ItemId="skullburstmod"; Quantity=1; Chance=0.3;};
 			{Wave=11; ItemId="hydroponiccapsule"; Quantity=1; Chance=0.15;};
 			{Wave=12; ItemId="boomerang"; Quantity=1; Chance=0.075;};
-			{Wave=13; ItemId="rechamber1216parts3"; Quantity=1; Chance=0.038;};
+			{Wave=13; ItemId="dualuziparts2"; Quantity=1; Chance=0.038;};
 			{Wave=14; ItemId="ammopouch"; Quantity=1; Chance=0.019;};
-			{Wave=15; ItemId="rechamber1216bp"; Quantity=1; Chance=0.001;};
+			{Wave=15; ItemId="grandgarandparts3"; Quantity=1; Chance=0.001;};
 		};
 		WaveBased=true;
 	};
@@ -1305,14 +1308,15 @@ function library.onRequire()
 
 	-- MARK: corruptedmangrovecrate
 	library:Add{
-		Id="corruptedmangrovecrate";
-		Level=340;
-		Rewards={
+		Id = "corruptedmangrovecrate";
+		Name = "Corrupted Swamplands Survival";
+		Level = 340;
+		Rewards = {
 			{Wave=4; ItemId="stickygrenade"; Quantity=1; Chance=1;};
 			{Wave=4; ItemId="advmedkit"; Quantity=1; Chance=1;};
-			{Wave=4; ItemId="toxiccontainer"; Quantity=1; Chance=1;};
+			{Wave=4; ItemId="scarecrow"; Quantity=1; Chance=1;};
 
-			{Wave=8; ItemId="apron"; Quantity=1; Chance=1;};
+			{Wave=8; ItemId="dualuziparts1"; Quantity=1; Chance=1;};
 			{Wave=8; ItemId="megaswitchblade"; Quantity=1; Chance=1;};
 			{Wave=8; ItemId="sandwich"; Quantity=1; Chance=1;};
 
@@ -1603,6 +1607,9 @@ function library.onRequire()
 	library:Add{
 		Id = "components";
 		Name = "Components Drop Table";
+		Sources = {
+			"Corrupted Survival End Waves";
+		};
 		Rewards = componentsDropTable;
 	};
 end

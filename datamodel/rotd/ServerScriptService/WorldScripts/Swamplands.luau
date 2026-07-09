@@ -45,7 +45,7 @@ function WorldCore.InitGameController()
         {Type="SuppliesRequest"; Chance=1/9; Fmod=9;};
         {Type="GrowlingArmy"; Chance=1/5; Fmod=6;};
         {Type="RazeMissiles"; Chance=1/4; Fmod=7;};
-        {Type="Barrication"; Chance=1/5; Fmod=8; Locations={"Cabin"}; };
+        {Type="Barrication"; Chance=1/5; Fmod=10; Locations={"Cabin"}; };
     };
 
     newGameController.HazardsList = {

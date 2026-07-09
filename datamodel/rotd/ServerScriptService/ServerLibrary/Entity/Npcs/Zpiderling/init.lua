@@ -15,6 +15,8 @@ local npcPackage = {
     Properties = {
         IsHostile = true;
         Detectable = false;
+        
+        HordeAggression = true;
 
         TargetableDistance = 75;
 

@@ -68,6 +68,10 @@ local statTemplates = {
 		{Key="FireAlertRange"; Text="<b>Impact Alert Range:</b>    $statu"; Type="1dp";};
 
         {Key="DamageBlock"; Text="<b>[Melee Dampening] Additional Damage Block:</b>    $stat"; Type="2dp"; OnlyExpand=true;};
+        
+		{Key="CritChance"; Text="<b>Crit Chance:</b>    $stat"; Type="percent2dp"};
+
+		{Key="EverEvolving"; Text="<b>Ever Evolving:</b>    x$stat"; Type="4dp"};
 	};
 	--MARK: Weapon stats;
 	Gun={
@@ -316,6 +320,9 @@ local mouseOverDescription = {
     ThrowRange={
 		Desc="The range of accurate melee throws.";
     };
+    EverEvolving={
+        Desc="Adds <b>Damage</b> by multiplying game version number with <b>Premod Damage</b>.";
+    };
 
 	--MARK: Clothings desc;
 	HotEquipSlots={
@@ -487,7 +494,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     local statPage = "Stats";
 
 	local weaponStatsWindow: InterfaceWindow = interface:NewWindow("WeaponStats", weaponStatsFrame);
-    weaponStatsWindow.BoolStringWhenActive = {String="!Hotbar"; Priority=2;};
+    weaponStatsWindow.BoolStringWhenActive = {String="!HotbarsHud"; Priority=2;};
 	weaponStatsWindow.CompactFullscreen = true;
     weaponStatsWindow.ReleaseMouse = true;
 	

@@ -20,9 +20,11 @@ function Objective:Load()
 end
 
 function Objective:Begin()
+	local controller = self.Controller;
+
 	self.StartTime = tick()+5;
 	self.LastSpawnTick = tick();
-    self.EliminateCount = math.clamp(self.Controller.Wave *5, 20, 100);
+    self.EliminateCount = math.ceil(math.clamp(controller.Wave *(controller.IsHard and 7 or 5), 20, 200));
 
 	self.SpawnCount = 0;
 	self.SpawnPattern = math.random(1, 3);

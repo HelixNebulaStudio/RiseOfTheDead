@@ -50,10 +50,11 @@ function interactablePackage.init(super) -- Server/Client
 
             local interactable: InteractableInstance = super.getOrNew(interactConfig, player);
             local id = interactable.Id or "nil";
-            local interactPart = interactable.Part;
+            local interactPointAtt = interactable.PointAtt;
             
-            local distanceFromTrigger = player:DistanceFromCharacter(interactPart.Position) or -1;
-            if interactPart == nil or distanceFromTrigger > 20 then
+            
+            local distanceFromTrigger = interactPointAtt and player:DistanceFromCharacter(interactPointAtt.WorldPosition) or -1;
+            if interactPointAtt == nil or distanceFromTrigger > 20 then
                 Debugger:Warn(player.Name,"Too far from trigger. ("..distanceFromTrigger..")");
                 rPacket.FailMsg = `Too far from object.`
                 return rPacket; 

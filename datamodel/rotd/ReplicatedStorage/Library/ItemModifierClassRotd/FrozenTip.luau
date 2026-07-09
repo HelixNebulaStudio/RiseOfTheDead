@@ -25,7 +25,7 @@ if RunService:IsServer() then
             return;
         end
 
-		if damageTo.ClassName == "NpcClass" and (damageTo :: NpcClass).Properties.MeleeImmunity >= 1 then
+		if damageTo.ClassName == "NpcClass" and ((damageTo :: NpcClass).Properties.MeleeImmunity or 0) >= 1 then
 			return;
 		end
 
@@ -73,8 +73,10 @@ if RunService:IsServer() then
 
 elseif RunService:IsClient() then
 	
-	function modifierPackage.Binds.WeaponRenderStepped(modifier: ItemModifierInstance, toolStatusHud: anydict)
+	function modifierPackage.Binds.WeaponRenderStepped(modifier: ItemModifierInstance, ...)
 		if modifier.Enabled == false then return end;
+
+		local toolHandler: ToolHandlerInstance, toolStatusHud: anydict = ...;
 
 		local equipmentClass: EquipmentClass? = modifier.EquipmentClass;
 		assert(equipmentClass, `Missing equipment class: {modifier}`);

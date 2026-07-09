@@ -7,7 +7,7 @@ local attirePackage = {
 	GroupName="ChestGroup";
 	
 	Configurations={
-		TickRepellent = 4;
+		TickRepellent = 2;
 		ArmorPoints = 30;
 		Warmth = 8;
 	};

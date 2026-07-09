@@ -27,6 +27,8 @@ local ModeHudClass = shared.require(script.Parent);
 
 local isPlayingEndTrack: boolean, survivalEndTrack:  Sound?;
 local HUD_TASK_ID = "SurvivalHudTask";
+
+local WAVE_REWARD_CYCLE = 5;
 --==
 return function(interface, window, frame)
 	local modData = shared.require(localPlayer:WaitForChild("DataModule"));
@@ -224,7 +226,7 @@ return function(interface, window, frame)
 			timerLabel.Text = `Lock In\n{waveSelect.TimeLeft}`;
 			if waveSelect.TimeLeft <= 5 and waveSelect.TimeLeft % 2 == 0 then
 				timerLabel.TextColor3 = Color3.fromRGB(255, 60, 60);
-				modAudio.Play("ClockTick", wavePassScreenFrame);
+				modAudio.Play("ClockTick", wavePassScreenFrame:WaitForChild("Background"));
 			else
 				timerLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
 			end
@@ -271,7 +273,7 @@ return function(interface, window, frame)
 					levelLabel.TextColor3 = playerLevel >= rewardRequireLevel and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(180, 94, 94);
 
 					local chanceLabel = newOption:WaitForChild("chanceLabel");
-					chanceLabel.Text = `{math.max(math.floor(rewardInfo.WinChance*100),1)}%`;
+					chanceLabel.Text = `{math.max(math.floor((rewardInfo.WinChance or 0)*100),1)}%`;
 
 					local challengeLabel = newOption:WaitForChild("challengeLabel");
 					if rewardInfo.Objectives and rewardInfo.Hazards then
@@ -301,6 +303,19 @@ return function(interface, window, frame)
 					local newItemButton: ImageButton = itemButtonObject.ImageButton;
 					newItemButton.Active = false;
 					newItemButton.Interactable = false;
+
+					local itemNameLabel = Instance.new("TextLabel");
+					itemNameLabel.Name = `NameLabel`;
+					itemNameLabel.BackgroundTransparency = 1;
+					itemNameLabel.Text = `{itemLib.Name}`;
+					itemNameLabel.AnchorPoint = Vector2.new(0.5, 1);
+					itemNameLabel.Position = UDim2.new(0.5, 0, 1, 35);
+					itemNameLabel.TextScaled = true;
+					itemNameLabel.RichText = true;
+					itemNameLabel.Font = Enum.Font.ArimoBold;
+					itemNameLabel.Size = UDim2.new(0, 250, 0, 35);
+					itemNameLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
+					itemNameLabel.Parent = newItemButton;
 
                     itemToolTip:BindHoverOver(newOption, function()
                         itemToolTip.Frame.Parent = interface.ScreenGui;
@@ -350,10 +365,14 @@ return function(interface, window, frame)
 				if #rewardOptionsList <= 1 then
 					wavePassScreenFrame.descLabel.Text = `Your reward for passing this wave!`;
 				else
-					wavePassScreenFrame.descLabel.Text = `Pick your next risk and reward! Stake your rewards!`;
+					if data.IsHard ~= true then
+						wavePassScreenFrame.descLabel.Text = `Pick your next reward!`;
+					else
+						wavePassScreenFrame.descLabel.Text = `Pick your reward!`;
+					end
 				end
-
-				if data.IsHard ~= true and (data.Wave % 15) == 0 then
+				
+				if data.IsHard ~= true and (data.Wave % WAVE_REWARD_CYCLE) == 0 then
 					voteContinueButton.Text = `Vote Continue & Claim Stakes`;
 				else
 					voteContinueButton.Text = `Vote Continue`;

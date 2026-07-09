@@ -24,18 +24,23 @@ function modifierPackage.onRequire()
 		local healthComp: HealthComp? = characterClass.HealthComp;
 		if healthComp == nil or statusComp == nil then return end;
 
+		local woundedStatus: StatusClassInstance = statusComp:GetOrDefault("Wounded");
+		if woundedStatus then return end;
+
 		if damageData.DamageType == "IgnoreArmor" or healthComp.CurArmor <= 0 then return end;
 		if damageData.DamageType == "Heal" or damageData.Damage <= 0 then return end;
 
 		local damage = damageData.Damage;
 
 		local heal = math.ceil(damage * 0.1);
-		healthComp:TakeDamage(DamageData.new{
-			Damage = -heal;
-			DamageBy = characterClass;
-			StorageItem = modifier.EquipmentClass and modifier.EquipmentClass.StorageItem;
-			DamageType = "Heal";
-		})
+		task.defer(function()
+			healthComp:TakeDamage(DamageData.new{
+				Damage = -heal;
+				DamageBy = characterClass;
+				StorageItem = modifier.EquipmentClass and modifier.EquipmentClass.StorageItem;
+				DamageType = "Heal";
+			});
+		end)
 	end
 end
 

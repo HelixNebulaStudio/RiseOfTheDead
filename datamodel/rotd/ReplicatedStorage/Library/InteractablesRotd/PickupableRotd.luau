@@ -3,6 +3,8 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local RunService = game:GetService("RunService");
 local localPlayer = game.Players.LocalPlayer;
 
+local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
+
 local interactablePackage = {};
 --==
 function interactablePackage.init(super) -- Server/Client
@@ -16,6 +18,8 @@ function interactablePackage.init(super) -- Server/Client
         -- Defaulting to can interact = true;
         if RunService:IsServer() then return end;
 
+        local config = interactable.Config;
+
         local clientData = info.ClientData;
         if clientData == nil then return; end;
 
@@ -28,6 +32,14 @@ function interactablePackage.init(super) -- Server/Client
             interactable.Label = `Mastery Level {levelRequired} Required`;
             return;
         end
+
+        local itemId = interactable.Values.ItemId;
+        local itemLib = modItemsLibrary:Find(itemId);
+
+        if config:GetAttribute("_EquipItemId") == "pickaxe" then
+            interactable.Label = `Mine {itemLib.Name}`;
+        end
+
     end
 
     super.registerPackage(PickupableRotd);

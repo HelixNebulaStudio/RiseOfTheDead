@@ -65,7 +65,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     --==
 
     local window: InterfaceWindow = interface:NewWindow("MasteryMenu", masteryFrame);
-    window.BoolStringWhenActive = {String="!Hotbar"; Priority=2;};
+    window.BoolStringWhenActive = {String="!HotbarsHud"; Priority=2;};
 	window.CompactFullscreen = true;
     window.CloseWithInteract = true;
 	

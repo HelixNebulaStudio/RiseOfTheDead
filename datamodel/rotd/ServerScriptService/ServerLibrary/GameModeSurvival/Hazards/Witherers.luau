@@ -54,6 +54,14 @@ function Hazard:Tick()
 end
 
 function Hazard:End()
+
+	local witherers = shared.modNpcs.listNpcClasses(function(npcClass: NpcClass)
+        return npcClass.Name == "Witherer";
+    end)
+    for a=1, #witherers do
+        witherers[a]:Destroy();
+    end
+
 end
 
 return Hazard;

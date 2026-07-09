@@ -36,7 +36,6 @@ function toolHandler.Equip(handler: ToolHandlerInstance)
 	local properties = equipmentClass.Properties;
 
 	handler:LoadWieldConfig();
-	Debugger:Warn(`Equip ({handler.WieldComp.ItemId})`);
 end
 
 

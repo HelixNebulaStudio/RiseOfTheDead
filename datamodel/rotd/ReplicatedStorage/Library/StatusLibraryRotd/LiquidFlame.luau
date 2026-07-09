@@ -33,7 +33,8 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
     if healthComp == nil then return end;
 
     local damage = statusClass.Values.Damage or 1;
-    damage = damage + (damage*math.clamp(statusClass.Values.Stacks or 0, 0, 100));
+    local stacks = statusClass.Values.Stacks or 1;
+    damage *= math.clamp(stacks, 0, 100);
     
     local dmgData = DamageData.new{
         DamageBy = statusClass.ApplyBy;

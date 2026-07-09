@@ -73,8 +73,10 @@ if RunService:IsServer() then
 
 elseif RunService:IsClient() then
 
-	function modifierPackage.Binds.WeaponRenderStepped(modifier: ItemModifierInstance, toolStatusHud: anydict)
+	function modifierPackage.Binds.WeaponRenderStepped(modifier: ItemModifierInstance, ...)
 		if modifier.Enabled == false then return end;
+
+		local toolHandler: ToolHandlerInstance, toolStatusHud: anydict = ...;
 
 		local equipmentClass: EquipmentClass? = modifier.EquipmentClass;
 		if equipmentClass == nil then return end;
@@ -84,9 +86,9 @@ elseif RunService:IsClient() then
 
 		if toolStatusHud.FrenzyDamage == nil then
 			toolStatusHud.FrenzyDamage = {
-				ModItemId=`frenzydamagemod`;
-				Order=1;
-				Text="0%";
+				ModItemId = `frenzydamagemod`;
+				Order = 1;
+				Text = "0%";
 			};
 		end
 
@@ -105,7 +107,7 @@ end
 function modifierPackage.Instancing(modifier: ItemModifierInstance, isFirstTime: boolean)
 	if RunService:IsClient() then return end;
 
-	modifier.OnEnabledChanged:Connect(function(prevVal: boolean)
+	modifier.OnEnabledChanged:Connect(function()
 		if modifier.Enabled then
 			modifier:EnableTickUpdate(true);
 		else

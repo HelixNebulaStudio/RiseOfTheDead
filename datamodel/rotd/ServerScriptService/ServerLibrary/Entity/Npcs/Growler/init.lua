@@ -46,7 +46,7 @@ local npcPackage = {
 
     DynamicLevelScaling = {
         WalkSpeed = function(lvl) return math.clamp(15 + math.floor(lvl/10), 1, 30); end;
-        MaxHealth = function(lvl) return 49+(math.max(100*lvl, 200)); end;
+        MaxHealth = function(lvl) return 49+(math.max(50*lvl, 200)); end;
         AttackDamage = function(lvl) return math.min(10+(lvl/3), 100); end;
     };
 };
@@ -73,6 +73,10 @@ end
 
 function npcPackage.Respawn(npcClass: NpcClass)
     local character = npcClass.Character;
+
+    local dynamicLevel = npcClass:GetComponent("DynamicLevel");
+    dynamicLevel();
+
     local bodyDestructiblesComp = npcClass:GetComponent("BodyDestructibles");
 
     local clawsPrefab = script:WaitForChild("Claws"):GetChildren();
@@ -97,7 +101,7 @@ function npcPackage.Respawn(npcClass: NpcClass)
         local destructible: DestructibleInstance = bodyDestructiblesComp:Create(name, shieldAccessory);
         destructible.Name = isLeft and "Left Scale Hide" or "Right Scales Hide";
         destructible.DebrisName = name;
-        destructible.HealthComp:SetMaxHealth(math.max(npcClass.HealthComp.MaxHealth*0.1, 50));
+        destructible.HealthComp:SetMaxHealth(math.max(npcClass.HealthComp.MaxHealth*2, 50));
         destructible.HealthComp:Reset();
 
         destructible:SetupHealthbar{

@@ -47,7 +47,9 @@ local npcPackage = {
 --==
 
 function npcPackage.Spawning(npcClass: NpcClass)
-    local ticksModel = npcClass.Character:WaitForChild("ExplosiveTickBlobs");
+    local char = npcClass.Character;
+
+    local ticksModel = char:WaitForChild("ExplosiveTickBlobs");
     local tickBlobs = ticksModel:GetChildren();
     
     modTables.Shuffle(tickBlobs);
@@ -68,6 +70,21 @@ function npcPackage.Spawning(npcClass: NpcClass)
             obj.Parent = ticksModel;
         end
     end
+
+    local blobs = {};
+    for _, obj in ipairs(char.UpperTorso:GetChildren()) do
+        if obj:IsA("BasePart") and obj.Name == "Blobs" then
+            table.insert(blobs, obj);
+        end
+    end
+    char:GetAttributeChangedSignal("DetonationTime"):Connect(function()
+        for _, blob in ipairs(blobs) do
+            blob.Material = char:GetAttribute("DetonationTime") and Enum.Material.Neon or Enum.Material.Foil;
+        end
+    end)
+    npcClass.Garbage:Tag(function()
+        char:SetAttribute("DetonationTime", nil);
+    end)
 
     npcClass:GetComponent("RandomClothing")();
     npcClass:GetComponent("TickCombustion").CombustOnDeath = false;

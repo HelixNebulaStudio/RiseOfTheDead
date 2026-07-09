@@ -1,6 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
+local CollectionService = game:GetService("CollectionService");
 
 local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
 --==
@@ -78,6 +79,48 @@ end
 function toolPackage.BindMeleePointHit(handler: ToolHandlerInstance, packet)
 	if not game:GetService("RunService"):IsStudio() then return end;
 	Debugger:Warn("MeleePointHit", packet);
+end
+
+function toolPackage.ClientEquip(handler: ToolHandlerInstance)
+	local wieldComp: WieldComp = handler.WieldComp;
+
+	local function updateMinables()
+		local interactConfigs = CollectionService:GetTagged("Interactable");
+
+		local minableInteractConfigList = {};
+		for a=1, #interactConfigs do
+			local config = interactConfigs[a];
+
+			if config:GetAttribute("_Name") ~= "PickupableRotd" then continue end;
+			if config:GetAttribute("_EquipItemId") ~= "pickaxe" then continue end;
+
+			table.insert(minableInteractConfigList, config);
+
+			local model = config.Parent;
+
+			local isPickaxeEquiped = wieldComp.ItemId == "pickaxe";
+			local highlight: Highlight = model:FindFirstChild("PickaxeHighlight");
+
+			if isPickaxeEquiped and highlight == nil then
+				highlight = Instance.new("Highlight");
+				highlight.Name = "PickaxeHighlight";
+				highlight.FillTransparency = 1;
+				highlight.OutlineTransparency = 0.5;
+				highlight.DepthMode = Enum.HighlightDepthMode.Occluded;
+				highlight.Parent = model;
+
+			elseif isPickaxeEquiped == false and highlight then
+				highlight:Destroy();
+
+			end
+
+		end
+	end
+	
+	handler.Garbage:Tag(CollectionService:GetInstanceAddedSignal("Interactable"):Connect(updateMinables));
+	updateMinables();
+
+	handler.Garbage:Tag(updateMinables);
 end
 
 return toolPackage;

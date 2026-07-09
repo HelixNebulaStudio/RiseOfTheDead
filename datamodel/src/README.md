@@ -2,6 +2,7 @@ Revive Engine source code is located here and is closed source.
 
 
 Recent changes to code in Engine codebase:
+- Updated Freecam to use new systems.
 - Added TextSizes ref for interface auto scale.
 - Fixed locked out Npcs (e.g. Frank & Jesse) from certain doors.
 - Fixed Instrument Interface. [#1135] [#1136]

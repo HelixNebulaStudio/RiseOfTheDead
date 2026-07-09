@@ -161,8 +161,8 @@ if RunService:IsServer() then
 				local profile = shared.modProfile:Get(player);
 				local playerSave = profile:GetActiveSave();
 				local inventory = playerSave.Inventory;
-				local total, itemList = inventory:ListQuantity("medkit", 2);
-				if total >= 2 then
+				local total, itemList = inventory:ListQuantity("medkit", 1);
+				if total >= 1 then
 					dialog:AddChoice("aNewCommunity_here", function()
 						if itemList then
 							for a=1, #itemList do

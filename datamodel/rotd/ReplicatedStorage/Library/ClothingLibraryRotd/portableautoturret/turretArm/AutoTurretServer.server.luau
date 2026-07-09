@@ -654,6 +654,17 @@ function Update()
 
 		for _, obj in pairs(weaponModel:GetDescendants()) do
 			obj:SetAttribute("FPIgnore", nil);
+
+			if obj:IsA("Motor6D") then
+				local replacementWeld = Instance.new("Weld");
+				replacementWeld.Name = obj.Name;
+				replacementWeld.Parent = obj.Parent;
+				replacementWeld.Part0 = obj.Part0;
+				replacementWeld.Part1 = obj.Part1;
+				replacementWeld.C0 = obj.C0;
+				replacementWeld.C1 = obj.C1;
+				obj:Destroy();
+			end
 		end
 
 		local rigidConstraint = Instance.new("RigidConstraint");

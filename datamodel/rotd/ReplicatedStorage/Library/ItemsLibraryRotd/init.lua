@@ -19,7 +19,7 @@ function modItemsLibrary.onRequire()
     };
 
     -- Common
-    new(resourceBase, {Id="money"; Name="Money"; Icon="rbxassetid://86537766971763"; Stackable=10000; Description="$$$";});
+    new(resourceBase, {Id="money"; Name="Money"; Icon="rbxassetid://86537766971763"; Stackable=10000; Description="$$$"; Sources={"Obtained by selling commodities, killing bosses, doing missions and more.";};});
     
     new(resourceBase, {Id="metal"; Name="Metal Scraps"; Icon="rbxassetid://1551792125"; Description="Metallic scraps used in crafting metal objects.";});
     new(resourceBase, {Id="glass"; Name="Glass Shards"; Icon="rbxassetid://1551792117"; Description="Glass shards and pieces used in crafting glass objects.";});
@@ -79,7 +79,7 @@ function modItemsLibrary.onRequire()
     };
 
     local PASSIVE_WEAK_POINT_SENSE = `<b>[Passive] Weak Point Sense:</b> Shooting enemies reveals weak points, shooting them deals an additional 25% <b>PreModDamage</b>.`;
-    local PASSIVE_CRITICAL_SHOT = `<b>[Passive] Critical Shot:</b> Has a chance to do a crit which increases damage by a multiplier.`;
+    local PASSIVE_CRITICAL_HIT = `<b>[Passive] Critical Hit:</b> Has a chance to do a crit which increases damage by a multiplier.`;
     local PASSIVE_DAMAGE_REV = `<b>[Passive] Damage Rev:</b> Does more damage the less ammo you have in your magazine.`
     local PASSIVE_DUAL_FOCUS = `<b>[Passive] Dual Focus:</b> When in focus, you instinctively aim each gun at an enemy closest to the center of your screen.`;
 
@@ -94,19 +94,19 @@ function modItemsLibrary.onRequire()
     new(gunBase, {Id="xm1014"; Name="XM1014"; Icon="rbxassetid://6523762932"; Tags={"Shotgun"; "Primary Weapon";}; Description="Quick fire-rate long barrel shotgun.";});
     new(gunBase, {Id="sawedoff"; Name="Sawed-Off"; Icon="rbxassetid://17007247358"; Tags={"Shotgun"; "Primary Weapon";}; Description="Close range head remover with high multishot.";});
     new(gunBase, {Id="mariner590"; Name="Mariner 590"; Icon="rbxassetid://17007243924"; Tags={"Shotgun"; "Primary Weapon";}; Description="Quick and high damage tactical shotgun.";});
-    new(gunBase, {Id="rusty48"; Name="Rusty 48"; Icon="rbxassetid://10390716871"; Tags={"Shotgun"; "Primary Weapon";}; TradingTax = 4900; Description=`Crudely made but powerful shotgun.\n\n{PASSIVE_CRITICAL_SHOT}`;});
+    new(gunBase, {Id="rusty48"; Name="Rusty 48"; Icon="rbxassetid://10390716871"; Tags={"Shotgun"; "Primary Weapon";}; TradingTax = 4900; Description=`Crudely made but powerful shotgun.\n\n{PASSIVE_CRITICAL_HIT}`;});
     new(gunBase, {Id="rechamber1216"; Name="Rechamber 1216"; Icon="rbxassetid://92627722665597"; Tags={"Shotgun"; "Primary Weapon";}; TradingTax = 9900; Description="Military grade mag based shotgun.\n\n<b>[Passive] Knockout Trigger:</b> Knocks out enemies on headshots for 2 seconds.";});
 
     new(gunBase, {Id="mp5"; Name="MP5"; Icon="rbxassetid://9960159062"; Tags={"Submachine Gun"; "Primary Weapon";}; Description="Quick fire-rate sub-machine gun.";});
     new(gunBase, {Id="mp7"; Name="MP7"; Icon="rbxassetid://9960161355"; Tags={"Submachine Gun"; "Primary Weapon";}; Description="Good accuracy and damage sub-machine gun.";});
     new(gunBase, {Id="czevo3"; Name="CZ-Scorpion EVO 3"; Icon="rbxassetid://4814129724"; Tags={"Submachine Gun"; "Primary Weapon";}; Description=`Extremely tactical sub-machine gun with a high base damage.\n\n{PASSIVE_DAMAGE_REV}`;});
-    new(gunBase, {Id="vectorx"; Name="Vector X"; Icon="rbxassetid://8527896764"; Tags={"Submachine Gun"; "Primary Weapon";}; TradingTax = 4900; Description=`Elite sub-machine gun with built-in suppressor.\n\n{PASSIVE_CRITICAL_SHOT}`;});
+    new(gunBase, {Id="vectorx"; Name="Vector X"; Icon="rbxassetid://8527896764"; Tags={"Submachine Gun"; "Primary Weapon";}; TradingTax = 4900; Description=`Elite sub-machine gun with built-in suppressor.\n\n{PASSIVE_CRITICAL_HIT}`;});
     new(gunBase, {Id="dualuzi"; Name="Dual Uzi"; Icon="rbxassetid://70941686222281"; Tags={"Submachine Gun"; "Primary Weapon";}; TradingTax = 9900; Description=`Light and versatile dual-wielded smgs.\n\n{PASSIVE_DUAL_FOCUS}`;});
 
     new(gunBase, {Id="m4a4"; Name="M4A4"; Icon="rbxassetid://5166150878"; Tags={"Rifle"; "Primary Weapon";}; Description="Military grade M4 rifle capable of high damage and long range shooting.";});
     new(gunBase, {Id="ak47"; Name="AK-47"; Icon="rbxassetid://5166397129"; Tags={"Rifle"; "Primary Weapon";}; Description="High damage, high magazine capacity, and great fire-rate. Quite a noise maker.";});
     new(gunBase, {Id="fnfal"; Name="FN FAL"; Icon="rbxassetid://17007249959"; Tags={"Rifle"; "Primary Weapon";}; Description="The FN FAL is a high damage rifle with a very high fire rate.";});
-    new(gunBase, {Id="sr308"; Name="SR-308"; Icon="rbxassetid://16570523670"; Tags={"Rifle"; "Primary Weapon";}; Description=`Ergonomic Russian battle rifle.\n\n{PASSIVE_CRITICAL_SHOT}`;});
+    new(gunBase, {Id="sr308"; Name="SR-308"; Icon="rbxassetid://16570523670"; Tags={"Rifle"; "Primary Weapon";}; Description=`Ergonomic Russian battle rifle.\n\n{PASSIVE_CRITICAL_HIT}`;});
 
     new(gunBase, {Id="awp"; Name="AWP"; Icon="rbxassetid://5166454078"; Tags={"Sniper"; "Primary Weapon";}; Description="High Damage, high recoil and long ranged rifle.";});
     new(gunBase, {Id="rec21"; Name="Rec-21"; Icon="rbxassetid://6532745901"; Tags={"Sniper"; "Primary Weapon";}; Description="High power, light weight tactical sniper rifle.";});
@@ -214,7 +214,7 @@ function modItemsLibrary.onRequire()
     new(clothingBase, {Id="bunnymanhead"; Name="Bunny Man's Head"; Icon="rbxassetid://4845183167"; Tags={"Head"; "Easter"}; Description="Bunny Man's Headwear.\n\n<b>[Passive] Dead Bunny:</b>  Normal environmental Zombies will ignore you during the Easter event.\nEvent-Active: "..tostring(modConfigurations.SpecialEvent.Easter); Sources={"Obtained from <b>The Bunny Man in Mission: Bunny Man's Eggs</b>";};});
     new(clothingBase, {Id="jackolantern"; Name="Jack o' Lantern"; Icon="rbxassetid://14951707178"; Tags={"Head"; "Slaughterfest";}; Description="Where Jack watches through the jacks o lanterns.";});
     new(clothingBase, {Id="ninjashroud"; Name="Ninja Shroud"; Icon="rbxassetid://88409858365523"; Tags={"Head";}; Description="Comfortable cloth shroud.\n\n<b>[Passive] Ninja Fleet:</b> Sprint button is now a dash button. You automatically sprint when you haven't taken damage to your health for an amount of time. Your base move speed is reduced but sprint speed is increased.";});
-    new(clothingBase, {Id="knightshelmet"; Name="Knight's Helmet"; Icon="rbxassetid://134453328061975"; Tags={"Head";}; Description="The helmet of ser Duncan the big.\n\n<b>[Passive] Helm Overwhelm:</b> When you take armor damage, you heal 10% damage of the damage taken.";});
+    new(clothingBase, {Id="knightshelmet"; Name="Knight's Helmet"; Icon="rbxassetid://134453328061975"; Tags={"Head";}; Description="The helmet of ser Duncan the big.\n\n<b>[Passive] Helm Overwhelm:</b> When you take armor damage and not wounded, you heal 10% damage of the damage taken.";});
 
     -- Chest
     new(clothingBase, {Id="greytshirt"; Name="T-Shirt"; Icon="rbxassetid://5756503297"; Tags={"Chest"}; Description="Comfy T-Shirt. Gives you <b>1 Armor Point</b> for protection.";});
@@ -429,6 +429,8 @@ function modItemsLibrary.onRequire()
 
     new(toolBase, {Id="generic"; Name="Generic"; Icon=shared.Const.PlaceholderIcon; Tags={"Unobtainable"}; Description="A generic tool for custom purposes.";});
     
+    new(toolBase, {Id="carryitem"; Name="CarryItem"; Icon=shared.Const.PlaceholderIcon; Tags={"Unobtainable"}; Description="A generic tool for carryable items.";});
+
     new(toolBase, {Id="fireworks"; Name="Fireworks"; Icon="rbxassetid://6235855080"; Stackable=5; Description="Fireworks lighting up the skies for the new year!";});
     new(toolBase, {Id="matchbox"; Name="Matchbox"; Icon="rbxassetid://6269033605"; Stackable=10; Description="Can be used to ignite up flammable liquids or fuses.";});
     new(toolBase, {Id="jerrycan"; Name="Jerrycan"; Icon="rbxassetid://5886813198"; BaseValues={Fuel=100}; Description="Steel-pressed container that holds highly flammable fuel. Ignited fuel will deal 1% of max health as damage (Min: 10).";});
@@ -474,7 +476,8 @@ function modItemsLibrary.onRequire()
     new(foodBase, {Id="perkscupcake"; Name="Perks Cupcake"; Icon="rbxassetid://12806349482"; Tags={"Unobtainable";}; Description="Gives you 1000 perks.";});
     new(foodBase, {Id="sandwich"; Name="Sandwich"; Icon="rbxassetid://14880936365"; Description="Gives you 7.5 health per second for 10 seconds.";});
     new(foodBase, {Id="ziphoningserum"; Name="Ziphoning Serum"; Icon="rbxassetid://17816751372"; NonPremiumTax = 10; Description="Cleanse cleansable debuffs and gives you the Ziphoning buff for <b>3 minutes</b>.\nThe Ziphoning buff gives you <b>+1 hp/s</b> <i>(Increasable by Nekrosis Amplifier)</i> consumed from the ziphon health pool, the ziphon health pool only fills up when you do damage to enemies.";});
-
+    new(foodBase, {Id="juggernog"; Name="Juggernog"; Icon="rbxassetid://118774277308416"; Description="Gives you an additional 100 max health for 10 minutes.";});
+        
 
     --MARK: MISSION
     --==========================================================[[ MISSION ]]==========================================================--
@@ -633,14 +636,15 @@ function modItemsLibrary.onRequire()
                 local itemLib = modItemsLibrary:Find(craftFor);
                 data.Icon = itemLib.Icon;
 
-                data.Name = (data.Prefix and `<font color='#ff3c3c'>{data.Prefix}</font> ` or ``)..`{itemLib.Name} Parts`;
+                local prefix = data.Prefix and data.Prefix:gsub("%d", "");
+                data.Name = (prefix and `<font color='#ff3c3c'>{prefix}</font> ` or ``)..`{itemLib.Name} Parts`;
                 data.Description = `Parts used to create the {itemLib.Name} and mods.`;
             end
 
             local idIndex = data.Id:sub(#data.Id, #data.Id);
             if tonumber(idIndex) and data.Prefix then
-                local pf = data.Prefix:gsub("%U", "");
-                data.OverlayIcons={
+                local pf = data.Prefix:gsub("[^A-Z0-9]", "");
+                data.OverlayIcons = {
                     {Text=`<font color='#ff9b9b'>#{pf}</font>`};
                 };
             end
@@ -655,9 +659,9 @@ function modItemsLibrary.onRequire()
     new(weaponCompBase, {Id="arelshiftcrossparts"; CraftFor="arelshiftcross"; Sources={"Obtained within <b>Abandoned Bunker</b>.";}; });
     new(weaponCompBase, {Id="deagleparts"; CraftFor="deagle"; Sources={"Obtained from <b>Board Missions</b>.";};});
 
-    new(weaponCompBase, {Id="dualuziparts1"; Prefix=`Sector F`; CraftFor="dualuzi";});
-    new(weaponCompBase, {Id="dualuziparts2"; Prefix=`Prison`; CraftFor="dualuzi";});
-    new(weaponCompBase, {Id="dualuziparts3"; Prefix=`Sector D`; CraftFor="dualuzi";});
+    new(weaponCompBase, {Id="dualuziparts1"; Prefix=`Swamplands1`; CraftFor="dualuzi";});
+    new(weaponCompBase, {Id="dualuziparts2"; Prefix=`Sector D`; CraftFor="dualuzi";});
+    new(weaponCompBase, {Id="dualuziparts3"; Prefix=`Swamplands2`; CraftFor="dualuzi";});
 
     new(weaponCompBase, {Id="rechamber1216parts1"; Prefix=`Sector F`; CraftFor="rechamber1216";});
     new(weaponCompBase, {Id="rechamber1216parts2"; Prefix=`Prison`; CraftFor="rechamber1216";});

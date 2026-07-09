@@ -1,5 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
+
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 local modVector = shared.require(game.ReplicatedStorage.Library.Util.Vector);
 local modTables = shared.require(game.ReplicatedStorage.Library.Util.Tables);
 
@@ -774,6 +776,12 @@ function treePackage.Flee(npcClass: NpcClass)
         if fleePhrase then
             npcClass.Chat(nil, fleePhrase.Say);
         end
+    end
+
+    if properties.KnockoutInteractConfig == nil then
+        local knockoutInteractConfig = modInteractables.createInteractable("Knockout");
+        knockoutInteractConfig.Parent = npcClass.Character;
+        properties.KnockoutInteractConfig = knockoutInteractConfig;
     end
 
     return true;

@@ -254,7 +254,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local initMissionPass;
     --MARK: Window
 	local window: InterfaceWindow = interface:NewWindow("Missions", windowFrame);
-	window.BoolStringWhenActive = {String="!Hotbar"; Priority=2;};
+	window.BoolStringWhenActive = {String="!HotbarsHud"; Priority=2;};
 	window.CompactFullscreen = true;
     window.CloseWithInteract = true;
 	if modConfigurations.CompactInterface then

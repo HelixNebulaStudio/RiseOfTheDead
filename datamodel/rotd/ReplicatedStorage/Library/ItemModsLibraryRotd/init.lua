@@ -931,18 +931,18 @@ function library.onRequire()
 	}
 
 	library:Add{
-		Id="rocketmanmod";
-		Name="Rocketman";
-		Desc="While player is in the air, reload time is reduced to zero. Adds <b>Rpm</b> to <b>Fire Rate</b>.";
-		Icon="http://www.roblox.com/asset/?id=12505260876";
-		BaseTier=2;
-		Tier=2;
-		Stackable=false;
-		Type={"Rocket"};
-		EffectTrigger=library.EffectTrigger.Passive;
-		Module=script.Rocketman;
-		Category="Rare Mods";
-		Upgrades={
+		Id = "rocketmanmod";
+		Name = "Rocketman";
+		Desc = "While player is in the air, reload time is reduced to zero. Adds <b>Rpm</b> to <b>Fire Rate</b>.";
+		Icon = "http://www.roblox.com/asset/?id=12505260876";
+		BaseTier = 2;
+		Tier = 2;
+		Stackable = false;
+		Type = {"Rocket"};
+		EffectTrigger = library.EffectTrigger.Passive;
+		Module = script.Rocketman;
+		Category = "Rare Mods";
+		Upgrades = {
 			{DataTag="FR"; Name="Rpm"; Syntax="Upgrade Fire Rate"; ValueType="Normal"; MaxLevel=10; BaseCost=6; MaxCost=60; BaseValue=10; MaxValue=120; TweakBonus=10; Scaling=library.ScalingStyle.NaturalCurve; Rate=1.5;};
 		};
 	}
@@ -1073,20 +1073,20 @@ function library.onRequire()
 	}
 
 	library:Add{
-		Id="frenzydamagemod";
-		Name="Frenzy Damage";
-		Desc="Additional <b>Damage</b> is built up when you take damage.\n<b>Stack Rate:</b> 1% per Damage\n<b>Decay Delay:</b> 20s";
-		Icon="rbxassetid://105743703562476";
-		BaseTier=2;
-		Tier=2;
-		Upgrades={
+		Id = "frenzydamagemod";
+		Name = "Frenzy Damage";
+		Desc = "Additional <b>Damage</b> is built up when you take damage.\n<b>Stack Rate:</b> 1% per Damage\n<b>Decay Delay:</b> 20s";
+		Icon = "rbxassetid://105743703562476";
+		BaseTier = 2;
+		Tier = 2;
+		Upgrades = {
 			{DataTag="FD"; Name="Frenzy Damage"; Syntax="Upgrade Frenzy Damage"; MaxLevel=10; BaseCost=5; MaxCost=100; BaseValue=0.01; MaxValue=0.35; TweakBonus=0.01; Scaling=library.ScalingStyle.NaturalCurve; Rate=1.5;};
 		};
-		Stackable=false;
-		Type={"Pistol"; "Submachine Gun"; "Shotgun"; "Rifle"; "Sniper"; "Heavy machine gun";};
-		EffectTrigger=library.EffectTrigger.OnBulletHit;
-		Module=script.Frenzy;
-		Category="Rare Mods";
+		Stackable = false;
+		Type = {"Pistol"; "Submachine Gun"; "Shotgun"; "Rifle"; "Sniper"; "Heavy machine gun";};
+		EffectTrigger = library.EffectTrigger.OnBulletHit;
+		Module = script.Frenzy;
+		Category = "Rare Mods";
 	}
 
 	-- MARK: Elementals Mods 500-599;

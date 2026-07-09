@@ -13,6 +13,8 @@ if RunService:IsServer() then
 		local npcClass: NpcClass, damageData: DamageData = ...;
 
 		task.spawn(function()
+			if damageData == nil then return end;
+			
 			local storageItem: StorageItem? = damageData.StorageItem;
 			if storageItem == nil then return end;
 
