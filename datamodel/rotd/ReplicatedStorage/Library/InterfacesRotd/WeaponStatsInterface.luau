@@ -35,6 +35,7 @@ local statTemplates = {
 		{Key="Oxygen"; Text="<b>Max Oxygen:</b>    $stat"; Type="int"};
     };
 	Melee={
+		{Key="PreModDamage"; Text="<b>PreModDamage:</b>    $stat"; Type="3dp"};
 		{Key="Damage"; Text="<b>Damage:</b>    $stat"; Type="3dp"};
 		{Key="PrimaryAttackSpeed"; Text="<b>Attack Speed:</b>    $stat"; Type="3dp"};
 		{Key="StaminaCost"; Text="<b>Stamina Cost:</b>    $stat"; Type="2dp"};

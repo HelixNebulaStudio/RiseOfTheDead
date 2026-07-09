@@ -20,7 +20,7 @@ local toolPackage = {
 		Unequip={Id=127466609333739};
 		Idle={Id=74318408349078;};
 	
-		SpecialReload={Id=134203123804957;};
+		SpecialReload={Id=130899762811150;};
 		SpecialLoad={Id=93932634098637;};
 	};
 

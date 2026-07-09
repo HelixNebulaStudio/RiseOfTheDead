@@ -22,10 +22,10 @@ function modifierPackage.Instancing(modifier: ItemModifierInstance, isFirstTime:
         local configurations = modifier.EquipmentClass.Configurations;
 
         local baseDamage = configurations.PreModDamage;
-        local additionalDmg = baseDamage * verionToNum;
+        local additionalDmg = baseDamage * (verionToNum/2);
         
         modifier.SetValues.EverEvolving = verionToNum;
-        modifier.SumValues.Damage = additionalDmg;
+        modifier.SumValues.PreModDamage = additionalDmg;
     end
 
 	modifier.OnEnabledChanged:Connect(update);
