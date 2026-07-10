@@ -637,7 +637,9 @@ function modItemsLibrary.onRequire()
                 data.Icon = itemLib.Icon;
 
                 local prefix = data.Prefix and data.Prefix:gsub("%d", "");
-                data.Name = (prefix and `<font color='#ff3c3c'>{prefix}</font> ` or ``)..`{itemLib.Name} Parts`;
+                local subPrefix = data.Prefix and data.Prefix:gsub("%D", "");
+                data.Name = (prefix and `<font color='#ff3c3c'>{prefix}</font> ` or ``)
+                         ..`{itemLib.Name} Parts{subPrefix and #subPrefix > 0 and ` #{subPrefix}` or ``}`;
                 data.Description = `Parts used to create the {itemLib.Name} and mods.`;
             end
 

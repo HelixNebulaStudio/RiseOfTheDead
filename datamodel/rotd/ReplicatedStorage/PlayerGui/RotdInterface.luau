@@ -20,6 +20,9 @@ local modCameraGraphics = shared.require(game.ReplicatedStorage.PlayerScripts.Ca
 
 local RotdInterface = shared.require(game.ReplicatedStorage.Library.UI.InterfaceClass).new(script.Parent);
 --==
+function RotdInterface.onRequire()
+end
+
 function RotdInterface.clientGuisLoad()
     local playerClass: PlayerClass = shared.modPlayers.get(localPlayer);
     local interface: InterfaceInstance = RotdInterface;
@@ -115,8 +118,5 @@ function RotdInterface.clientGuisLoad()
     end
 end
 
-function RotdInterface.onRequire()
-
-end
 
 return RotdInterface;

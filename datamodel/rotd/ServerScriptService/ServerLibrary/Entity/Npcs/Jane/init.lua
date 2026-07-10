@@ -35,7 +35,7 @@ local npcPackage = {
             Data = {
                 RestTimeInterval = NumberRange.new(90, 160);
                 RestingSeatName = "JaneSeat";
-                RestDuration = NumberRange.new(20, 29);
+                RestDuration = NumberRange.new(240, 300);
                 RestSay = {
                     "Nooo~! We've lost the signal again..";
                     "I hope they are alright.";

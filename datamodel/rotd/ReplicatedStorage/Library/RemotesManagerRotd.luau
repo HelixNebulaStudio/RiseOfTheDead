@@ -6,6 +6,8 @@ local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesM
 
 function modRemotesManager.onRequire()
 	if RunService:IsServer() then
+		--== DataControl;
+		modRemotesManager:NewEventRemote("MasterySync");
 
 		--== Interfaces;
 		modRemotesManager:NewUnreliableEventRemote("LiveFeedRemote").Secure = true;
@@ -21,6 +23,7 @@ function modRemotesManager.onRequire()
 		--== Equipments;
 		modRemotesManager:NewFunctionRemote("EngineersPlanner", 0.1);
 		modRemotesManager:NewFunctionRemote("AutoTurret", 0.1).Secure = true;
+		modRemotesManager:NewFunctionRemote("GpsRemote", 1);
 		
 		--== GameModes;
 		modRemotesManager:NewFunctionRemote("GameModeLobbies", 1).Secure = true;
@@ -30,6 +33,8 @@ function modRemotesManager.onRequire()
 		modRemotesManager:NewEventRemote("GameModeHud");
 		modRemotesManager:NewEventRemote("GameModeAssign");
 
+		--== Social
+		modRemotesManager:NewEventRemote("TravelRequest");
 	end
 end
 

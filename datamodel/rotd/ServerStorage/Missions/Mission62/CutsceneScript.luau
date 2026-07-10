@@ -3,12 +3,11 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
-local modEntity = shared.require(game.ReplicatedStorage.Library.Entity);
+local modEntity = shared.require(game.ReplicatedStorage.Entity);
 local modRegion = shared.require(game.ReplicatedStorage.Library.Region);
 
 local MISSION_ID = 62;

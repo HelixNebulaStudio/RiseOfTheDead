@@ -5,6 +5,7 @@ local RunService = game:GetService("RunService");
 local modProjectile = shared.require(game.ReplicatedStorage.Library.Projectile);
 local modTeamsManager = shared.require(game.ReplicatedStorage.Library.TeamsManager);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
+local modEntity = shared.require(game.ReplicatedStorage.Entity);
 
 if RunService:IsServer() then
     modRegionMission = shared.require(game.ServerScriptService.ServerLibrary.RegionMission);
@@ -101,6 +102,9 @@ function WorldCore.onRequire()
 
     if RunService:IsServer() then
         shared.gameConfig.Config:SetAttribute("Test", "HelloWorld");
+
+		local mechDoor1: ObjectEntity = modEntity.getOrNew(workspace.Environment.Doors:WaitForChild("MechDoubleDoors1"));
+		mechDoor1:GetInteractable():SetPermissions("CanInteract", true);
 
         task.spawn(function()
             local launchAtt: Attachment = workspace:WaitForChild("Environment"):WaitForChild("CenterPillar"):WaitForChild("ProjectilOrignAtt");

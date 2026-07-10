@@ -39,7 +39,7 @@ local npcPackage = {
             Data = {
                 RestTimeInterval = NumberRange.new(70, 120);
                 RestPoint = CFrame.lookAt(Vector3.new(28.717, 57.651, 18.246), Vector3.new(15.417, 57.651, 18.246));
-                RestDuration = NumberRange.new(59, 69);
+                RestDuration = NumberRange.new(150, 300);
                 RestSay = {
                     "If anyone needs help, I will be pleased to help out.";
                     "Anyone in need of help?";

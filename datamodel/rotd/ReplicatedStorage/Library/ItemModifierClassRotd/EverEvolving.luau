@@ -19,13 +19,10 @@ function modifierPackage.Instancing(modifier: ItemModifierInstance, isFirstTime:
 
         if modifier.EquipmentClass == nil then return end;
 
-        local configurations = modifier.EquipmentClass.Configurations;
-
-        local baseDamage = configurations.PreModDamage;
-        local additionalDmg = baseDamage * (verionToNum/2);
+        local multi = 1 + (verionToNum/2);
         
         modifier.SetValues.EverEvolving = verionToNum;
-        modifier.SumValues.PreModDamage = additionalDmg;
+        modifier.ProductValues.PreModDamage = multi;
     end
 
 	modifier.OnEnabledChanged:Connect(update);

@@ -14,6 +14,7 @@ local modBattlePassSave = shared.require(game.ServerScriptService.ServerLibrary.
 local modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
 local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
+local remoteMasterySync;
 --==
 shared.coreBind(modProfile, "_new", function(profile: ProfileRotd, player: Player)
     profile.ItemUnlockables = modItemUnlockables.new(player);
@@ -131,7 +132,9 @@ end)
 
 
 function modProfile.onRequire()
+	remoteMasterySync = modRemotesManager:Get("MasterySync");
 	local remoteProfileService = modRemotesManager:Get("ProfileService");
+	local remoteTravelRequest = modRemotesManager:Get("TravelRequest");
 
 	local enterCampaignDebounce = {};
 	function remoteProfileService.OnServerInvoke(player, action, ...)
@@ -244,6 +247,40 @@ function modProfile.onRequire()
 		return;
 	end
 
+	shared.modProfile.OnPlayerPacketRecieved:Connect(function(profile, ...)
+		local packet = ...;
+		
+		local player = profile.Player;
+		Debugger:Log(player," Received packet", packet);
+		
+		if packet and packet.Data then
+			if packet.Data.Request == "TravelRequest" then
+				if profile.Settings.DisabledTravelRequests == 1 then return end;
+				if profile.TravelRequests == nil then profile.TravelRequests = {} end;
+				local name = packet.Data.Value and packet.Data.Value.UserName;
+
+				profile.TravelRequests[name] = packet.Data.Value;
+				remoteTravelRequest:FireClient(player, packet.Data.Value);
+				shared.Notify(player, name.." is requesting to travel to you. Check "..name.." in the social menu.", "Inform");
+
+			elseif packet.Data.Request == "TravelResponse" then
+				local name = packet.Data.Sender;
+				local _accepted = packet.Data.Value and packet.Data.Value.Accepted;
+				shared.Notify(player, name.." accepted your travel request.", "Inform");
+				task.wait(1);
+				modServerManager:TravelToPlayer(player, name);
+
+			end
+		end
+	end)
+
+end
+
+function modProfile:SyncMastery()
+	if self.ActiveSave and self.ActiveGameSave then
+		local activeSave = self.ActiveGameSave;
+		remoteMasterySync:FireAllClients(self.Player.Name, activeSave:GetStat("Level"));
+	end
 end
 
 return modProfile;

@@ -37,7 +37,7 @@ local npcPackage = {
             Data = {
                 RestTimeInterval = NumberRange.new(90, 160);
                 RestingSeatName = "StephanieSeat";
-                RestDuration = NumberRange.new(19, 29);
+                RestDuration = NumberRange.new(240, 360);
                 RestSay = {
                     "Ropes.. check. Ammunition.. check. Guns.. oh..";
                     "Hmmm.. should I check the shelves again..? nah.";

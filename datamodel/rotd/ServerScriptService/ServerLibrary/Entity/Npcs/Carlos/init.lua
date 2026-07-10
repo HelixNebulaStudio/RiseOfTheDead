@@ -38,7 +38,7 @@ local npcPackage = {
                 RestFunctionName = "PlayFluteFunc";
                 RestTimeInterval = NumberRange.new(120, 300);
                 RestingSeatName = "CarlosSeat";
-                RestDuration = NumberRange.new(90, 120);
+                RestDuration = NumberRange.new(150, 300);
                 RestSay = {
                     "The sorrow days will need some tunes..";
                     "♪ You only live once, living miserably around oceans ♪";
