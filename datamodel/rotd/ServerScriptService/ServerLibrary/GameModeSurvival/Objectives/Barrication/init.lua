@@ -33,7 +33,7 @@ function Objective.onRequire()
 			local wave = config:GetAttribute("Wave") or 1;
 
 			local destructibleConfig = modDestructibles.createDestructible("Scarecrow");
-			destructibleConfig:SetAttribute("_AttractRange", 350);
+			destructibleConfig:SetAttribute("_AttractRange", 32);
 			destructibleConfig:SetAttribute("_ExpiringDamageTick", false);
 			destructibleConfig.Parent = model;
 			

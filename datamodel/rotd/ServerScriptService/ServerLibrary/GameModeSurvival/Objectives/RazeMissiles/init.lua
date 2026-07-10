@@ -86,11 +86,11 @@ function Objective:Begin()
 		table.insert(pickList, missile);
 	end
 		
-	local missileSpawnCount = 3;
+	local missileSpawnCount = 2;
 	if controller.Wave >= 50 then
-		missileSpawnCount = 5;
-	elseif controller.Wave >= 20 then
 		missileSpawnCount = 4;
+	elseif controller.Wave >= 20 then
+		missileSpawnCount = 3;
 	end
 
 	for a=1, missileSpawnCount do
@@ -107,7 +107,7 @@ function Objective:Begin()
 		interactConfig:SetAttribute("_IndicatorPresist", true);
 		interactConfig:SetAttribute("_Label", "Activate");
 		interactConfig:SetAttribute("_Uses", 1);
-		interactConfig:SetAttribute("_InteractDuration", 3);
+		interactConfig:SetAttribute("_InteractDuration", 2);
 		interactConfig.Parent = newMissile:WaitForChild("keyPad");
 
 	end

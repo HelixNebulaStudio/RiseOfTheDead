@@ -15,7 +15,7 @@ local treePackage = {
 
 function treePackage.onRequire()
 	local arcTracer = modArcTracing.new();
-	--arcTracer.DebugArc = true;
+    
 	arcTracer.IncludeInstances = {workspace.Terrain; workspace.Environment; workspace.Clips};
 	arcTracer.RayRadius = 1.5;
 	arcTracer.Acceleration = Vector3.new(0, -workspace.Gravity, 0);
