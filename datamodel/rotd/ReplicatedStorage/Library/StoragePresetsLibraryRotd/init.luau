@@ -42,22 +42,6 @@ modStoragePresetsLibrary:Add{
 };
 
 modStoragePresetsLibrary:Add{
-	Id = "Safehouse";
-    Name = "Safehouse Storage";
-    Configuration = {
-        Persistent=true;
-        Size=24;
-        MaxSize=50;
-        Expandable=true;
-        MaxPages=4;
-        PremiumPage=4;
-    };
-    Permissions = {
-        CanInteract = true;
-    };
-};
-
-modStoragePresetsLibrary:Add{
 	Id = "trade";
     Configuration = {
         Size=8;

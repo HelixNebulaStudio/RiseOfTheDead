@@ -7,6 +7,7 @@ local camera = workspace.CurrentCamera;
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modClothingLibrary = shared.require(game.ReplicatedStorage.Library.ClothingLibrary);
+local modStoragePresetsLibrary = shared.require(game.ReplicatedStorage.Library.StoragePresetsLibrary);
 local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 local modTables = shared.require(game.ReplicatedStorage.Library.Util.Tables);
@@ -50,7 +51,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local pageButton = script:WaitForChild("pageButton");
 	local buttonsFrame = storageFrame:WaitForChild("ButtonsFrame");
 	local gridLayout = storageList:WaitForChild("UIGridLayout");
-    
+    local lockedFrame = storageFrame:WaitForChild("LockedFrame");
 	
     local window: InterfaceWindow = interface:NewWindow("ExternalStorage", storageFrame);
     window.DisableInteractables = true;
@@ -141,6 +142,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	
 	local function updateFrame()
 		if not modConfigurations.CompactInterface then
+            storageList.Size = UDim2.new(1, -10, 1, buttonsFrame.Visible and -75 or -40);
 			storageFrame.Size = UDim2.new(0, refreshBoundarySize(), 0, math.clamp(storageList.UIGridLayout.AbsoluteContentSize.Y + 41, 0, 360) + (buttonsFrame.Visible and 35 or 0));
 		else
 			storageList.CanvasSize = UDim2.new(0, 0, 0, storageList.UIGridLayout.AbsoluteContentSize.Y);
@@ -535,6 +537,15 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         
         updateFrame();
         activeStorageInterface:Update(nil, nil, true);
+
+        lockedFrame.Visible = false;
+
+        local storagePresetLib = modStoragePresetsLibrary:Find(storagePresetId);
+        if storagePresetLib then
+            if storagePresetLib.BindStorageWindowUpdate then
+                storagePresetLib.BindStorageWindowUpdate(window, activeStorageId);
+            end
+        end
 	end)
 
 	storageList.UIGridLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function() --not crash

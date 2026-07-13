@@ -700,6 +700,7 @@ MissionLibrary.New{
 	Tier="Easy";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Easy};
+		{Type="EventFlag"; Id="SafePage4"};
 	};
 	AddRequirements={
 		{Type="Level"; Value=30};
@@ -3171,6 +3172,62 @@ MissionLibrary.New{
 		{Text = "Find and salvage the Nekron Particulate tubes"};
 		{Text = "Leave before the Elder Vexeron comes back"};
 	};
+};
+
+-- MARK: 91 - Trimming the Corruption
+MissionLibrary.New{
+	MissionId = 91;
+	MissionType = MissionLibrary.MissionTypes.Board;
+	Name = "Trimming the Corruption";
+	Description = "Over growth of the corruption is spreading everywhere, kill them.";
+	Timer = BOARD_TIME_LIMIT;
+	Persistent = true;
+	Checkpoint = {
+		{Text="Find and kill $Kills overgrown veins";};
+	};
+	SaveData = {Kills=20;};
+	GuideText = "";
+	Tier = "Easy";
+	Rewards = {
+		{Type="Perks"; Amount=PerksReward.Easy};
+		{Type="EventFlag"; Id="SafePage5"};
+	};
+	AddRequirements = {
+		{Type="Level"; Value=150};
+	};
+	
+};
+
+-- MARK: 92 - Eerie Reflection
+MissionLibrary.New{
+	MissionId = 92;
+	MissionType = MissionLibrary.MissionTypes.Board;
+	Name = "Eerie Reflection";
+	Description = "Safehouse survivors said they saw you outside while you were still in the safehouse, investigate what that could be.";
+	Timer = BOARD_TIME_LIMIT;
+	Persistent = true;
+	Checkpoint = {
+		{Text="Investigate $Area";};
+		{Text="Kill Pathoroth";};
+	};
+	SaveData = {
+		Area = function()
+			local list = {
+				"outside W.D. Warehouse: Office";
+			};
+			return list[math.random(1, #list)];
+		end;
+	};
+	GuideText = "";
+	Tier = "Normal";
+	Rewards = {
+		{Type="Perks"; Amount=PerksReward.Normal};
+		{Type="EventFlag"; Id="SafePage6"};
+	};
+	AddRequirements = {
+		{Type="Level"; Value=200};
+	};
+	
 };
 
 return MissionLibrary;

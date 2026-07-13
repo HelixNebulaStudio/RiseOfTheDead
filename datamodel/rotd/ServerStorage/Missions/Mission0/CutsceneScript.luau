@@ -1,16 +1,13 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
---== Client Variables;
-local localPlayer = game.Players.LocalPlayer;
+--==
 local RunService = game:GetService("RunService");
+
+local localPlayer = game.Players.LocalPlayer;
 
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 
---== Variables;
-local MISSION_ID = 0;
-
 if RunService:IsServer() then
-	modNpcs = shared.modNpcs;
 	modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	
@@ -19,7 +16,9 @@ else
 	
 end
 
---== Script;
+local MISSION_ID = 0;
+--==
+
 return function(CutsceneSequence)
 	--if not modBranchConfigurations.IsWorld("TheWarehouse") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
 	
