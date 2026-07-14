@@ -54,7 +54,6 @@ function Component:__call(callerCharacterClass: CharacterClass)
 
 	local healthComp: HealthComp = npcClass.HealthComp;
 	if healthComp.IsDead then return end;
-	if healthComp.CurHealth < healthComp.MaxHealth then return end;
 
 	local npcPackage = npcClass.NpcPackage;
 	local dynamicLevelScaling = npcPackage.DynamicLevelScaling;
@@ -136,10 +135,16 @@ function Component:__call(callerCharacterClass: CharacterClass)
 	end
 	configurations.BaseValues.CripplingHit = lvlCripplingHit;
 
+	
+	if healthComp.CurHealth < healthComp.MaxHealth then
+		local healthPercent = healthComp.CurHealth/healthComp.MaxHealth;
+		healthComp:SetMaxHealth(configurations.MaxHealth);
+		healthComp:SetHealth(configurations.MaxHealth * healthPercent);
 
-	if healthComp.LastDamagedBy == nil then
+	elseif healthComp.LastDamagedBy == nil then
 		healthComp:SetMaxHealth(configurations.MaxHealth);
 		healthComp:Reset();
+
 	end
 
 	if configurations.Immunity then

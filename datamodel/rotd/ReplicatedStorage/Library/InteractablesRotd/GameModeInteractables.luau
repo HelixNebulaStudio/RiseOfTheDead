@@ -97,6 +97,15 @@ function interactablePackage.init(super) -- Server/Client
 		local clientData = info.ClientData;
 		if clientData == nil then return end;
 
+		local config = interactable.Config;
+
+		local playerClass: PlayerClass = shared.modPlayers.get(localPlayer);
+        if playerClass.Properties.InBossBattle then
+            interactable.CanInteract = false;
+            interactable.Label = `Locked until you defeat {config:GetAttribute("Stage")}`;
+            return;
+        end
+
 		interactable.CanInteract = true;
 
 		local mode = interactable.Values.Mode;
@@ -241,7 +250,7 @@ function interactablePackage.init(super) -- Server/Client
 		local playerClass: PlayerClass = shared.modPlayers.get(localPlayer);
         if playerClass.Properties.InBossBattle then
             interactable.CanInteract = false;
-            interactable.Label = `Door's locked until you defeat {config:GetAttribute("Stage")}`;
+            interactable.Label = `Locked until you defeat {config:GetAttribute("Stage")}`;
             return;
         end
 

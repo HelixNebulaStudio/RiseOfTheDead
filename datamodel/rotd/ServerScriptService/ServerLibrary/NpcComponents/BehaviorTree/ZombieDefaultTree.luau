@@ -188,15 +188,6 @@ function treePackage.Attack(npcClass: NpcClass)
     local targetEntityClass: EntityClass = targetHealthComp.CompOwner;
 
     local targetPosition = targetEntityClass:GetCFrame().Position;
-    if targetEntityClass.ClassName == "PlayerClass" then
-        local relativeCframe = npcClass.RootPart.CFrame:ToObjectSpace(CFrame.new(targetPosition));
-        
-        local dirAngle = math.deg(math.atan2(relativeCframe.X, -relativeCframe.Z));
-        if math.abs(dirAngle) > 50 then
-            properties.AttackCooldown = tick() + math.random(10, 20)/100;
-            return false;
-        end;
-    end
     
     properties.AttackCooldown = tick() + (configurations.AttackSpeed * math.random(90, 110)/100);
     
@@ -207,6 +198,7 @@ function treePackage.Attack(npcClass: NpcClass)
 
     elseif attackComp then
         attackComp(targetData.TargetPart);
+
     end
     
     return true;

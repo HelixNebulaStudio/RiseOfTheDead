@@ -43,7 +43,7 @@ return function(CutsceneSequence)
 		for a=1, 16 do
 			local aimPoint = CFrame.new(targetPoint) 
 				* CFrame.Angles(0, math.rad(math.random(1, 360)), 0)
-				* CFrame.Angles(math.rad(math.random(30, 50)), 0, 0) 
+				* CFrame.Angles(math.rad(math.random(-80, 80)), 0, 0) 
 				* CFrame.new(0, 0, 1024);
 			
 			local aimDir = (aimPoint.p-targetPoint).Unit;
@@ -159,6 +159,7 @@ return function(CutsceneSequence)
 				local plaqueModel = Instance.new("Model");
 				plaqueModel.Name = plaqueName;
 				plaqueModel.Parent = workspace.Environment;
+				plaqueModel:SetAttribute("surfacesize", size);
 
 				local newPlaque = PLAQUE_PREFAB:Clone();
 				newPlaque.Name = "PrimaryPart";

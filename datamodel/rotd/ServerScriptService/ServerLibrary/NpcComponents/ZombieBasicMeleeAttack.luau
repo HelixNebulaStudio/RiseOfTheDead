@@ -1,9 +1,12 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
+local RunService = game:GetService("RunService");
+
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 local modSfxService = shared.require(game.ReplicatedStorage.Library.SfxService);
 local modMath = shared.require(game.ReplicatedStorage.Library.Util.Math);
+local modVector = shared.require(game.ReplicatedStorage.Library.Util.Vector);
 
 local NpcComponent = {};
 NpcComponent.ClassName = "NpcComponent";
@@ -72,10 +75,52 @@ function NpcComponent.new(npcClass: NpcClass)
 
 		local configurations: ConfigVariable = npcClass.Configurations;
 
-		npcClass.PlayAnimation("Attack", 0.05, nil, 2);
+		npcClass.Move:SetMoveSpeed("set", "attack", 0, npcClass.Move.MoveSpeedPriority.Action, 0.5);
+		npcClass.PlayAnimation("Attack", 0.05, nil, 1);
+		
+		local character = npcClass.Character;
+		local charCf = character:GetPivot();
+		local extentsSize = npcClass.DefaultExtentsSize;
+
+		local meleeBoxSize = Vector3.new(extentsSize.X, extentsSize.Y, configurations.AttackRange + extentsSize.Z);
+		local meleeBoxCf = charCf * CFrame.new(0, 0, -(meleeBoxSize.Z/2));
+
+
+		task.wait(0.5);
+
+		local targetCf = targetEntityClass:GetCFrame();
+		local isInMeleeHitbox = modVector.IsInBoundingBox(meleeBoxCf, meleeBoxSize, targetCf.Position);
+		if RunService:IsStudio() then
+			local box = Instance.new("Part");
+			box.Anchored = true;
+			box.CanCollide = false;
+			box.CanQuery = false;
+			box.CanTouch = false;
+			box.Color = Color3.fromRGB(255, 0, 0);
+			box.Material = Enum.Material.ForceField;
+			box.Size = meleeBoxSize;
+			box.CFrame = meleeBoxCf;
+			box.Parent = workspace.Debris;
+
+			Debugger.Expire(box, 0.1);
+		end
+		if not isInMeleeHitbox then return end;
+
+
+		if targetEntityClass.ClassName == "PlayerClass" or targetEntityClass.ClassName == "NpcClass" then
+			local isZombieMeleeDebounced = targetEntityClass.Properties 
+				and targetEntityClass.Properties.ZombieMeleeDebounce
+				and tick() < targetEntityClass.Properties.ZombieMeleeDebounce;
+				
+			if isZombieMeleeDebounced then return end; -- Hit Cooldown
+
+			if targetEntityClass.Properties then
+				targetEntityClass.Properties.ZombieMeleeDebounce = tick()+0.1;
+			end
+		end
 
 		local distance = enemyTargetData.Distance or 999;
-		local dmgRange = math.pow((1-math.clamp(distance/configurations.AttackRange, 0, 1)), 1/2);
+		local dmgRange = 1; --math.pow((1-math.clamp(distance/configurations.AttackRange, 0, 1)), 1/2);
 		
 		local attackDamage = configurations.AttackDamage;
 
@@ -111,6 +156,7 @@ function NpcComponent.new(npcClass: NpcClass)
 				};
 			});
 		end
+
     end
 end
 
