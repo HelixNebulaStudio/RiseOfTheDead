@@ -22,5 +22,6 @@ To keep up to date with the active development. You can click the commits button
 - To keep discussions relavant. Old or inactive discussion posts will be automatically closed after a week to a month depending on the post's content.
 
 ## Pull Requests (bug fixes, typo corrections..)
+- Watch this [Rise of the Dead Development: Submitting Changes](https://www.youtube.com/watch?v=fff_pBEj_ac) guide.
 - You can submit small changes for a bug fix or correcting a typo or etc via a pull request. These request will be reviewed and copied to the main private branch so make sure every issue is independent and submit different pull request per issue.
 - You can use github's web vscode here: https://github.dev/HelixNebulaStudio/RiseOfTheDead
