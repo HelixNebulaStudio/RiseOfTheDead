@@ -6,6 +6,7 @@ on:
 jobs:
   discord_webhook:
     runs-on: ubuntu-latest
+    if: ${{ !github.event.repository.fork }}
     steps:
       - name: Discord Commits
         uses: Sniddl/discord-commits@v1.6
