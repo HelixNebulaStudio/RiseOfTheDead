@@ -69,7 +69,10 @@ local function isLockCheck(player, page)
         local gameSave: GameSaveRotd = profile:GetActiveSave() :: GameSaveRotd;
 
         fulfillStates.LevelRequirement = gameSave:GetStat("Level") >= lvlRequired;
-        fulfillStates.PremiumRequirement = profile.Premium == true;
+
+        if requiresPremium then
+            fulfillStates.PremiumRequirement = profile.Premium == true;
+        end
 
         if unlockFlags then
             local eventFlag = unlockFlags.EventFlag;
