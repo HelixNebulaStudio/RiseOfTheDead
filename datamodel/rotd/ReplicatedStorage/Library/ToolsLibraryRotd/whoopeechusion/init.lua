@@ -18,20 +18,22 @@ local toolPackage = {
 	Properties={};
 };
 
-function toolPackage:ActionEvent(packet)
+function toolPackage.ActionEvent(handler: ToolHandlerInstance, packet)
 	if packet.ActionIndex ~= 1 then return end;
-	if self.LastFire ~= nil and tick()-self.LastFire < 1 then return end;
-	self.LastFire  = tick();
 
-	for a=1, #self.Prefabs do
-		local prefab = self.Prefabs[a];
-		
-		local fartSound = prefab.PrimaryPart:FindFirstChild("fartsound");
-		fartSound:SetAttribute("SoundOwner", self.Player and self.Player.Name or nil);
-		game:GetService("CollectionService"):AddTag(fartSound, "PlayerNoiseSounds");
-		fartSound.PlaybackSpeed = math.random(90, 110)/100;
-		fartSound:Play();
-	end
+	local properties = handler.EquipmentClass and handler.EquipmentClass.Properties;
+	if properties.LastFire ~= nil and tick()-properties.LastFire < 1 then return end;
+	properties.LastFire = tick();
+
+	local prefab = handler.MainToolModel;
+	if not workspace:IsAncestorOf(prefab) then return end;
+	
+	local fartSound = prefab.PrimaryPart:FindFirstChild("fartsound");
+	fartSound:SetAttribute("SoundOwner", handler.CharacterClass.Name);
+	game:GetService("CollectionService"):AddTag(fartSound, "PlayerNoiseSounds");
+	
+	fartSound.PlaybackSpeed = math.random(90, 110)/100;
+	fartSound:Play();
 end
 
 function toolPackage.newClass()

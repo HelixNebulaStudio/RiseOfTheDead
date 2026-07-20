@@ -569,8 +569,8 @@ GameModeLibrary.GameModes={
 				Description="Let's just make sure everything goes well..";
 
 				MaxPlayers=4;
-				RewardsId="sunkenchest";
-				RewardsIds={"sunkenchest";};
+				--RewardsId="sunkenchest";
+				--RewardsIds={"sunkenchest";};
 
 				Soundtrack="Soundtrack:Kingdom2Dirge";
 				EnableStopwatch=true;

@@ -152,7 +152,7 @@ MissionLibrary.New{
 	Persistent = true;
 	World = "TheWarehouse";
 	Objectives = {
-		["ArmSearch"]={Index=1; Description="Kill some zombies to look for a zombie arm"; Type="RequireItem"; ItemId="zombiearm"};
+		["ArmSearch"]={Index=1; Description="Kill some zombies for a zombie arm"; Type="RequireItem"; ItemId="zombiearm"};
 	};
 	ObjectivesCompleteText = "Return the zombie arm to Dr. Deniski";
 	GuideText = "Talk to Dr. Deniski to start";
@@ -217,34 +217,34 @@ MissionLibrary.New{
 
 -- MARK: 6 - First Rescue
 MissionLibrary.New{
-	MissionId=6;
+	MissionId = 6;
 	MissionType = MissionLibrary.MissionTypes.Core;
-	Name="First Rescue";
-	From="Robert";
-	Description="You found Robert trapped inside Bloxmart and you want to get him out.";
-	Persistent=true;
-	World="TheWarehouse";
-	Checkpoint={
+	Name = "First Rescue";
+	From = "Robert";
+	Description = "You found Robert trapped inside Bloxmart and you want to get him out.";
+	Persistent = true;
+	World = "TheWarehouse";
+	Checkpoint = {
 		{Text="Destroy the wooden barricade";};
 		{Text="Bring Robert back to the safehouse";};
 	};
-	SaveData={HP=5;};
-	GuideText="Someone is screaming for help in Bloxmart, go check it out";
-	Rewards={
+	SaveData = {HP=5;};
+	GuideText = "Someone is screaming for help in Bloxmart, go check it out";
+	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Mission"; Id=3};
 		{Type="Mission"; Id=7};
 	};
 	LinkNextMission = 7;
-	StartRequirements={
+	StartRequirements = {
 		Level=2;
 	};
-	Markers={
+	Markers = {
 		[1]={World="TheWarehouse"; Label="Destroy"; Target=Vector3.new(269.352, 62.881, 34.188); Type=modMarkers.MarkerTypes.Waypoint;};
 		[2]={World="TheWarehouse"; Label="Warehouse Safehouse"; Target=Vector3.new(62.4, 63.2, -28.7); Type=modMarkers.MarkerTypes.Waypoint;};
 	};
-	CanRedo={};
+	CanRedo = {};
 	
 };
 
@@ -1209,23 +1209,23 @@ MissionLibrary.New{
 
 -- MARK: 36 - Calming Tunes
 MissionLibrary.New{
-	MissionId=36;
+	MissionId = 36;
 	MissionType = MissionLibrary.MissionTypes.Side;
-	Name="Calming Tunes";
-	From="Erik";
-	Description="Help Erik from losing his sanity.";
-	Persistent=true;
-	World="TheUnderground";
-	Objectives={
-		["Musicbox"]={Index=1; Description="Give Erik a music box"; Type="RequireItem"; ItemId="musicbox"; Amount=1;};
+	Name = "Calming Tunes";
+	From = "Erik";
+	Description = "Help Erik from losing his sanity.";
+	Persistent = true;
+	World = "TheUnderground";
+	Objectives = {
+		["Musicbox"]={Index=1; Description="Build a music box by killing Zpider for the blueprint"; Type="RequireItem"; ItemId="musicbox"; Amount=1;};
 	};
-	ObjectivesCompleteText="Return to Erik with the music box";
-	SaveData={};
-	GuideText="Talk to Erik to start";
-	Rewards={
+	ObjectivesCompleteText = "Return to Erik in the Underbridge Safehouse with the music box";
+	SaveData = {};
+	GuideText = "Talk to Erik to start";
+	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Side};
 	};
-	StartRequirements={
+	StartRequirements = {
 		Level=35;
 	};
 	
@@ -3214,6 +3214,17 @@ MissionLibrary.New{
 		Area = function()
 			local list = {
 				"outside W.D. Warehouse: Office";
+				"outside W.D. Warehouse: Sundays";
+				"inside W.D. Warehouse: Bloxmart";
+				"outside Underbridge Safehouse";
+				"outside Train Station Safehouse";
+				"above Train Station Safehouse";
+				"outside W.D. Mall Safehouse";
+				"near W.D. Mall Epic Cakery";
+				"outside W.D. Mall";
+				"outside Radio Station";
+				"inside Fin's Automobile";
+				"outside Hazelnut Cafe";
 			};
 			return list[math.random(1, #list)];
 		end;

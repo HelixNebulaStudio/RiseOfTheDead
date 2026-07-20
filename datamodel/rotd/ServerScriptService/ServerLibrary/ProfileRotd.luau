@@ -16,7 +16,7 @@ local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrar
 
 local remoteMasterySync;
 --==
-shared.coreBind(modProfile, "_new", function(profile: ProfileRotd, player: Player)
+shared.coreBind(modProfile, "_new", function(profile: ProfileRotd, profileMeta: anydict, player: Player)
     profile.ItemUnlockables = modItemUnlockables.new(player);
     profile.Trader = modTraderProfile.new(player);
 

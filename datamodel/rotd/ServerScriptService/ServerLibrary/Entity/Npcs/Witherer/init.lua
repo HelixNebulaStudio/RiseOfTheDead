@@ -183,6 +183,7 @@ function npcPackage.Spawned(npcClass: NpcClass)
             local damageBy: PlayerClass? = damageData.DamageBy;
             if damageBy == nil or damageBy.ClassName ~= "PlayerClass" then return end;
             if damageBy:DistanceFrom(eyeBase.Position) > 64 then return end;
+            if destructible.Enabled == false then return end;
 
             destructible:SetEnabled(false);
             destructible:SetHealthbarEnabled(false);
@@ -190,6 +191,7 @@ function npcPackage.Spawned(npcClass: NpcClass)
             eyeVisible = false;
             eyeAtt.CFrame = CFrame.identity;
             task.delay(math.random(70, 160)/100, function()
+                if destructible.HealthComp.IsDead then return end;
                 eyeAtt.CFrame = defaultEyeCf;
                 eyeVisible = true;
 
@@ -200,6 +202,13 @@ function npcPackage.Spawned(npcClass: NpcClass)
             local newDmgData = damageData:Clone();
             newDmgData.HideBubble = true;
             npcClass.HealthComp:TakeDamage(newDmgData);
+        end)
+        healthComp.OnIsDeadChanged:Connect(function(isDead, prevIsDead, damageData)
+            if not isDead then return end;
+
+            local newDmgData = damageData:Clone();
+            newDmgData.HideBubble = true;
+            npcClass.HealthComp:SetIsDead(true, newDmgData);
         end)
     end
 

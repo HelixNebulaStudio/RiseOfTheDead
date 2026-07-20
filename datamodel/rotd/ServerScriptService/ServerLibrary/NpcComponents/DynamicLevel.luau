@@ -138,8 +138,12 @@ function Component:__call(callerCharacterClass: CharacterClass)
 	
 	if healthComp.CurHealth < healthComp.MaxHealth then
 		local healthPercent = healthComp.CurHealth/healthComp.MaxHealth;
-		healthComp:SetMaxHealth(configurations.MaxHealth);
-		healthComp:SetHealth(configurations.MaxHealth * healthPercent);
+
+		if self.SetCooldown == nil or tick() > self.SetCooldown then
+			self.SetCooldown = tick() + 150;
+			healthComp:SetMaxHealth(configurations.MaxHealth);
+			healthComp:SetHealth(configurations.MaxHealth * healthPercent);
+		end
 
 	elseif healthComp.LastDamagedBy == nil then
 		healthComp:SetMaxHealth(configurations.MaxHealth);

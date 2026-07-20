@@ -18,31 +18,32 @@ local toolPackage = {
 	Properties={};
 };
 
-function toolPackage:ActionEvent(packet)
+function toolPackage.ActionEvent(handler: ToolHandlerInstance, packet)
 	if packet.ActionIndex ~= 1 then return end;
-	if self.LastFire ~= nil and tick()-self.LastFire < 1 then return end;
-	self.LastFire  = tick();
+	
+	local properties = handler.EquipmentClass and handler.EquipmentClass.Properties;
+	if properties.LastFire ~= nil and tick()-properties.LastFire < 1 then return end;
+	properties.LastFire = tick();
 
-	for a=1, #self.Prefabs do
-		local prefab = self.Prefabs[a];
-		
-		local chickenScreams = {};
-		for _, obj in pairs(prefab.PrimaryPart:GetChildren()) do
-			if obj:IsA("Sound") then
-				local chance = obj:GetAttribute("Chance") or 1;
-				for a=1, chance do
-					table.insert(chickenScreams, obj);
-				end
-			end
+	local prefab = handler.MainToolModel;
+	if not workspace:IsAncestorOf(prefab) then return end;
+	
+	local chickenScreams = {};
+	for _, obj in pairs(prefab.PrimaryPart:GetChildren()) do
+		if not obj:IsA("Sound") then continue end;
+		local chance = obj:GetAttribute("Chance") or 1;
+		for a=1, chance do
+			table.insert(chickenScreams, obj);
 		end
-		
-		local chickenSnd = chickenScreams[math.random(1, #chickenScreams)];
-		chickenSnd:SetAttribute("SoundOwner", self.Player and self.Player.Name or nil);
-		game:GetService("CollectionService"):AddTag(chickenSnd, "PlayerNoiseSounds");
-		
-		chickenSnd.PlaybackSpeed = math.random(90, 110)/100;
-		chickenSnd:Play();
 	end
+	
+	local chickenSnd = chickenScreams[math.random(1, #chickenScreams)];
+	chickenSnd:SetAttribute("SoundOwner", handler.CharacterClass.Name);
+	game:GetService("CollectionService"):AddTag(chickenSnd, "PlayerNoiseSounds");
+	
+	chickenSnd.PlaybackSpeed = math.random(90, 110)/100;
+	chickenSnd:Play();
+		
 end
 
 function toolPackage.newClass()

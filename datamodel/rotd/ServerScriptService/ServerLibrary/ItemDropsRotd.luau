@@ -50,16 +50,15 @@ function modItemDrops.InfoRotd(itemId, sourceStrs, sourceList, stepName, ...)
         for sn, _ in pairs(modGameModeLibrary.GameModes[gm].Stages) do
             local stageLib = modGameModeLibrary.GameModes[gm].Stages[sn];
 
-            local rewardIds = stageLib.RewardsIds or {};
-            if stageLib.RewardsId and table.find(rewardIds, stageLib.RewardsId) then
+            local rewardIds = stageLib.RewardsIds and table.clone(stageLib.RewardsIds) or {};
+            if stageLib.RewardsId and table.find(rewardIds, stageLib.RewardsId) == nil then
                 table.insert(rewardIds, stageLib.RewardsId);
             end
 
             for a=1, #rewardIds do
-                if rewardIds[a] == itemId then
-                    table.insert(sourceList.RewardSrcs, {GameMode=gm; StageName=sn;})
-                    break;
-                end
+                if rewardIds[a] ~= itemId then continue end;
+                table.insert(sourceList.RewardSrcs, {GameMode=gm; StageName=sn;})
+                break;
             end
         end
     end

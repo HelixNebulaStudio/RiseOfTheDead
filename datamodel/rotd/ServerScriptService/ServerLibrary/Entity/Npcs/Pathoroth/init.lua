@@ -8,7 +8,7 @@ local npcPackage = {
     
 	Configurations = {
         AttackDamage = 50;
-        AttackRange = 14;
+        AttackRange = 8;
         AttackSpeed = 4;
 
         MaxHealth = 100;

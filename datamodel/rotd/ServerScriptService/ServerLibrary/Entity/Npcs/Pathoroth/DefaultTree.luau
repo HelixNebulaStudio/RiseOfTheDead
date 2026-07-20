@@ -288,6 +288,13 @@ function treePackage.TransformLarge(npcClass: NpcClass)
             
             head.Transparency = 1;
             head.Size = Vector3.zero;
+            for _, obj in ipairs(head:GetChildren()) do
+                if obj:IsA("Decal") then
+                    obj.Transparency = 1;
+                elseif obj:IsA("Texture") then
+                    obj.Transparency = 1;
+                end
+            end
 
             if properties.FaceDecal then
                 properties.FaceDecal:Destroy();
@@ -306,6 +313,7 @@ function treePackage.TransformLarge(npcClass: NpcClass)
         NumberSequenceKeypoint.new(1, 1)
     };
     
+    npcClass.DefaultExtentsSize = Vector3.new(6, 12, 2);
     npcClass.Move:SetMoveSpeed("set", "default", 10, 0);
 end
 

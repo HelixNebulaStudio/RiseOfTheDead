@@ -27,6 +27,50 @@ local PATHOROTH_SPAWNS = {
 		WorldName = "TheWarehouse";
 		Position = Vector3.new(599.512, 57.701, 280.441);
 	};
+	["outside W.D. Warehouse: Sundays"] = {
+		WorldName = "TheWarehouse";
+		Position = Vector3.new(483.35, 57.848, -65.021);
+	};
+	["inside W.D. Warehouse: Bloxmart"] = {
+		WorldName = "TheWarehouse";
+		Position = Vector3.new(282.338, 57.848, 7.252);
+	};
+	["outside Underbridge Safehouse"] = {
+		WorldName = "TheUnderground";
+		Position = Vector3.new(-10.881, 8.794, 159.935);
+	};
+	["outside Train Station Safehouse"] = {
+		WorldName = "TheUnderground";
+		Position = Vector3.new(289.505, -17.252, -104.435);
+	};
+	["above Train Station Safehouse"] = {
+		WorldName = "TheUnderground";
+		Position = Vector3.new(237.934, 26.248, -141.13);
+	};
+	["outside W.D. Mall Safehouse"] = {
+		WorldName = "TheMall";
+		Position = Vector3.new(812.653, 98.689, -767.595);
+	};
+	["near W.D. Mall Epic Cakery"] = {
+		WorldName = "TheMall";
+		Position = Vector3.new(416.143, 96.804, -886.671);
+	};
+	["outside W.D. Mall"] = {
+		WorldName = "TheMall";
+		Position = Vector3.new(721.055, 101.808, -944.576);
+	};
+	["outside Radio Station"] = {
+		WorldName = "TheResidentials";
+		Position = Vector3.new(1093.538, 63.832, -424.147);
+	};
+	["inside Fin's Automobile"] = {
+		WorldName = "TheResidentials";
+		Position = Vector3.new(1208.256, 56.848, 358.526);
+	};
+	["outside Hazelnut Cafe"] = {
+		WorldName = "TheResidentials";
+		Position = Vector3.new(965.905, 57.763, 67.69);
+	};
 };
 --==
 

@@ -778,7 +778,7 @@ function library.onRequire()
 			{Index=1; ItemId="wires"; Quantity=1; Chance=1;};
 			{Index=1; ItemId="motor"; Quantity=1; Chance=componentChance;};
 			
-			{Index=2; ItemId="sniperdamagebp";  Chance=modBpChance;};
+			{Index=2; ItemId="musicboxbp"; Quantity=1; Chance=modBpChance;};
 			{Index=2; ItemId="sniperfireratebp";  Chance=modBpChance;};
 			{Index=2; ItemId="sniperammocapbp";  Chance=modBpChance;};
 			
@@ -1007,7 +1007,7 @@ function library.onRequire()
 			{Index=2; ItemId="radiator"; Recyclable=true; Quantity=1; Chance=1/3;};
 			{Index=2; ItemId="frostbp"; Recyclable=true; Quantity=1; Chance=0.5;};
 			{Index=2; ItemId="riflehyperdamagemod"; Recyclable=true; Quantity=1; Chance=0.5;};
-			{Index=2; ItemId="musicboxbp"; Recyclable=true; Quantity=1; Chance=0.5;};
+			{Index=2; ItemId="sniperdamagebp"; Recyclable=true; Quantity=1; Chance=0.5;};
 		};
 	};
 

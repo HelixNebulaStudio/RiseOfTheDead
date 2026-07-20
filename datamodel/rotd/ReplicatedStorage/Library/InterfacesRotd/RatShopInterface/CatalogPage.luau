@@ -5,9 +5,9 @@ PageInterface.__index = PageInterface;
 
 local localplayer = game.Players.LocalPlayer;
 
+local RunService = game:GetService("RunService");
 local TextService = game:GetService("TextService");
 
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library:WaitForChild("RemotesManager"));
 local modRewardsLibrary = shared.require(game.ReplicatedStorage.Library.RewardsLibrary);
@@ -15,6 +15,7 @@ local modCrateLibrary = shared.require(game.ReplicatedStorage.Library.CrateLibra
 
 local modItemInterface = shared.require(game.ReplicatedStorage.Library.UI.ItemInterface);
 local modRichFormatter = shared.require(game.ReplicatedStorage.Library.UI.RichFormatter);
+local modUIUtil = shared.require(game.ReplicatedStorage.Library.UI.UIUtil);
 
 local remoteShopService = modRemotesManager:Get("ShopService");
 
@@ -93,6 +94,7 @@ local catInfoLib = {
 }
 
 local itemDetailCache = {};
+local itemInfoRequestCooldown = {};
 --==
 
 function PageInterface:Load(interface: Interface, window: InterfaceWindow)
@@ -180,23 +182,17 @@ function PageInterface:Load(interface: Interface, window: InterfaceWindow)
 			
 			itemButtonObj:Update();
 			
-			local unlocked, showLockedInfo;
+			local showLockedInfo = true;
 			
-			if itemUnlocked then
-				unlocked = true;
-				showLockedInfo = true;
-				
-			else
-				unlocked = false;
-				showLockedInfo = false;
+			if not itemUnlocked then
 				newItemButton.ImageColor3 = Color3.fromRGB(0, 0, 0);
-				
 			end
 			
 			local function updateTooltip()
+				if not modUIUtil.IsMouseOver(newItemButton) then return end;
 				itemToolTip.Frame.Parent = window.Binds.PageFrame.Parent;
 
-				if unlocked and showLockedInfo == false then
+				if showLockedInfo == false then
 					itemToolTip.CustomUpdate = nil;
 
 				else
@@ -218,22 +214,22 @@ function PageInterface:Load(interface: Interface, window: InterfaceWindow)
 						typeIcon.Image = itemLib.TypeIcon or modItemsLibrary.TypeIcons[itemLib.Type] or "";
 						quantityLabel.Text = "";
 
-						if itemDetailCache[itemId] == nil then
+						if itemDetailCache[itemId] == nil or RunService:IsStudio() then
 							task.spawn(function()
+								if itemInfoRequestCooldown[itemId] and tick() < itemInfoRequestCooldown[itemId] then return end;
+								itemInfoRequestCooldown[itemId] = tick()+5;
+								
 								local r = remoteShopService:InvokeServer("iteminfo", itemId);
 								if r and typeof(r) == "table" then
 									itemDetailCache[itemId] = r;
 									updateTooltip();
 								end
 							end)
-							return;
 						end
+
 						local itemDetails = itemDetailCache[itemId];
 
 						local descText = ""
-						if not unlocked then
-							descText = descText.."<b>You have not yet unlocked this item.</b>\n\n";
-						end
 
 						descText = descText..`{modItemInterface.Headers.H3O}ItemId:{modItemInterface.Headers.H3C} {itemId}\n`;
 						descText = descText..modItemInterface.Headers.H3O.."Description:"..modItemInterface.Headers.H3C.."\n"..(itemLib.Description or "Missing description").."\n";
@@ -273,7 +269,7 @@ function PageInterface:Load(interface: Interface, window: InterfaceWindow)
 											local crateLib = modCrateLibrary.Get(rewardData.CrateId)
 											descText = descText.. `  • Dropped from <b>{crateLib.Name}</b> ({rewardLibName or "unknown"})\n`;
 
-										else
+										elseif rewardLibName then
 											descText = descText.. `  • Dropped from <b>{rewardLibName}</b>\n`;
 
 										end

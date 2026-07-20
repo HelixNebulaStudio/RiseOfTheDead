@@ -5,13 +5,33 @@ local RunService = game:GetService("RunService");
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 local modSfxService = shared.require(game.ReplicatedStorage.Library.SfxService);
+local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modMath = shared.require(game.ReplicatedStorage.Library.Util.Math);
 local modVector = shared.require(game.ReplicatedStorage.Library.Util.Vector);
 
 local NpcComponent = {};
 NpcComponent.ClassName = "NpcComponent";
 NpcComponent.__index = NpcComponent;
+NpcComponent.HitIndex = 0;
+NpcComponent.HitCache = {};
 --==
+
+function NpcComponent.onRequire()
+	remoteNpcComponent = modRemotesManager:Get("NpcComponent");
+
+	remoteNpcComponent.OnServerEvent:Connect(function(player, compName, hitIndex, isHit)
+		if compName ~= script.Name then return end;
+
+		for a=#NpcComponent.HitCache, 1, -1 do
+			local hitCache = NpcComponent.HitCache[a];
+
+			if hitCache.HitIndex ~= hitIndex then continue end;
+			if hitCache.Player ~= player then continue end;
+
+			hitCache.IsHit = isHit;
+		end
+	end)
+end
 
 function NpcComponent.new(npcClass: NpcClass)
     return function(targetPart)
@@ -34,8 +54,9 @@ function NpcComponent.new(npcClass: NpcClass)
 
 		local targetEntityClass: EntityClass = enemyHealthComp.CompOwner;
 		targetPart = targetPart or targetEntityClass.RootPart;
+
 		local targetPosition = targetPart.Position;
-		
+
 		if targetEntityClass.ClassName == "PlayerClass" or targetEntityClass.ClassName == "NpcClass" then
 			local enemyClass: CharacterClass = targetEntityClass :: CharacterClass;
 			
@@ -75,21 +96,71 @@ function NpcComponent.new(npcClass: NpcClass)
 
 		local configurations: ConfigVariable = npcClass.Configurations;
 
-		npcClass.Move:SetMoveSpeed("set", "attack", 0, npcClass.Move.MoveSpeedPriority.Action, 0.5);
 		npcClass.PlayAnimation("Attack", 0.05, nil, 1);
+
+		if targetEntityClass.ClassName == "PlayerClass" or targetEntityClass.ClassName == "NpcClass" then
+			local isZombieMeleeDebounced = targetEntityClass.Properties 
+				and targetEntityClass.Properties.ZombieMeleeDebounce
+				and tick() < targetEntityClass.Properties.ZombieMeleeDebounce;
+				
+			if isZombieMeleeDebounced then return end; -- Hit Cooldown
+
+			if targetEntityClass.Properties then
+				targetEntityClass.Properties.ZombieMeleeDebounce = tick()+0.1;
+			end
+		end
+
+		npcClass.Move:SetMoveSpeed("set", "attack", 0, npcClass.Move.MoveSpeedPriority.Action, 0.5);
 		
 		local character = npcClass.Character;
+		local rootPart = npcClass.RootPart;
+		local humanoid = npcClass.Humanoid;
+
 		local charCf = character:GetPivot();
 		local extentsSize = npcClass.DefaultExtentsSize;
 
 		local meleeBoxSize = Vector3.new(extentsSize.X, extentsSize.Y, configurations.AttackRange + extentsSize.Z);
-		local meleeBoxCf = charCf * CFrame.new(0, 0, -(meleeBoxSize.Z/2));
+		local meleeBoxCf = charCf * CFrame.new(0, -humanoid.HipHeight-rootPart.Size.Y/2 + (extentsSize.Y/2), -(meleeBoxSize.Z/2));
 
+		local curTick = tick();
+		local hitCache;
+		if targetEntityClass.ClassName == "PlayerClass" then
+			local player = (targetEntityClass :: PlayerClass):GetInstance();
+
+			NpcComponent.HitIndex += 1;
+			hitCache = {
+				Player = player; 
+				HitIndex = NpcComponent.HitIndex;
+				Tick = tick()+1;
+			};
+
+			table.insert(NpcComponent.HitCache, hitCache);
+			remoteNpcComponent:FireClient(
+				player,
+				"ZombieBasicMeleeAttack", 
+				"attack", 
+				hitCache.HitIndex,
+				meleeBoxCf,
+				meleeBoxSize,
+				targetPart
+			);
+
+			for a=#NpcComponent.HitCache, 1, -1 do
+				if curTick < NpcComponent.HitCache[a].Tick then continue end;
+				table.remove(NpcComponent.HitCache, a);
+			end
+		end
+
+		local targetVel = targetPart.AssemblyLinearVelocity;
 
 		task.wait(0.5);
+		if npcClass.HealthComp.IsDead then return end;
 
-		local targetCf = targetEntityClass:GetCFrame();
-		local isInMeleeHitbox = modVector.IsInBoundingBox(meleeBoxCf, meleeBoxSize, targetCf.Position);
+		local isInMeleeHitboxServer = modVector.IsInBoundingBox(meleeBoxCf, meleeBoxSize, targetPosition);
+		local isInMeleeHitboxClient = hitCache and hitCache.IsHit == true;
+
+		targetPosition += targetVel;
+
 		if RunService:IsStudio() then
 			local box = Instance.new("Part");
 			box.Anchored = true;
@@ -104,23 +175,10 @@ function NpcComponent.new(npcClass: NpcClass)
 
 			Debugger.Expire(box, 0.1);
 		end
-		if not isInMeleeHitbox then return end;
-
-
-		if targetEntityClass.ClassName == "PlayerClass" or targetEntityClass.ClassName == "NpcClass" then
-			local isZombieMeleeDebounced = targetEntityClass.Properties 
-				and targetEntityClass.Properties.ZombieMeleeDebounce
-				and tick() < targetEntityClass.Properties.ZombieMeleeDebounce;
-				
-			if isZombieMeleeDebounced then return end; -- Hit Cooldown
-
-			if targetEntityClass.Properties then
-				targetEntityClass.Properties.ZombieMeleeDebounce = tick()+0.1;
-			end
-		end
+		if not isInMeleeHitboxClient or not isInMeleeHitboxServer then return end;
 
 		local distance = enemyTargetData.Distance or 999;
-		local dmgRange = 1; --math.pow((1-math.clamp(distance/configurations.AttackRange, 0, 1)), 1/2);
+		local dmgMulti = 1;
 		
 		local attackDamage = configurations.AttackDamage;
 
@@ -128,11 +186,11 @@ function NpcComponent.new(npcClass: NpcClass)
 			attackDamage = math.min(attackDamage + (enemyHealthComp.MaxHealth * 0.1), npcClass.HealthComp.MaxHealth);
 			
 		elseif targetEntityClass.ClassName == "Destructible" then
-			dmgRange = 1+math.abs(modMath.GaussianRandom());
+			dmgMulti = 1+math.abs(modMath.GaussianRandom());
 		
 		end
 
-		attackDamage = attackDamage * dmgRange;
+		attackDamage = attackDamage * dmgMulti;
 
 		local dmgData: DamageData = DamageData.new{
 			Damage = attackDamage;
@@ -144,6 +202,13 @@ function NpcComponent.new(npcClass: NpcClass)
 		enemyHealthComp:TakeDamage(dmgData);
 
 		if targetEntityClass.ClassName == "Destructible" then return end;
+
+		modSfxService.spawnImpactEffect{
+			BasePart = targetPart;
+			Point = targetPosition;
+			Normal = -npcClass:GetCFrame().LookVector;
+			ImpactType = "Impact";
+		};
 		
 		if configurations.CripplingHit and configurations.CripplingHit >= math.random(0, 100)/100 then
 			local targetCharacterClass: CharacterClass = targetEntityClass :: CharacterClass;
