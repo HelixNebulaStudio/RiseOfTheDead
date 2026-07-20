@@ -3,5 +3,9 @@
 sourcemap.json
 .obsidian/*
 
+# Python bytecode / cache
+__pycache__/
+*.pyc
+
 # Revive Engine source
 src/

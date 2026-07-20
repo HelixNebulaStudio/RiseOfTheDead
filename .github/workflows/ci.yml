@@ -29,4 +29,7 @@ jobs:
       - run: pip install mkdocs-obsidian-interactive-graph-plugin
       - run: pip install mkdocs-nav-weight
       - run: pip install mkdocs-include-dir-to-nav
-      - run: mkdocs gh-deploy --force
+      - name: Build and deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: mkdocs gh-deploy --force

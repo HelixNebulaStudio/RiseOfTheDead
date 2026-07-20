@@ -1,0 +1,1 @@
+Community discussions, ideation and fan theories all at [Github repository](https://github.com/HelixNebulaStudio/RiseOfTheDead/discussions)

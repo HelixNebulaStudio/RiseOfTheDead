@@ -8,8 +8,8 @@ nav:
   - Development: Development
   - Source: Source
   - Storyboard: Storyboard
-  - Issues: "https://github.com/HelixNebulaStudio/RiseOfTheDead/issues"
-  - Discussions: "https://github.com/HelixNebulaStudio/RiseOfTheDead/discussions"
+  - Issues: Issues.md
+  - Discussions: Discussions.md
 
 theme:
     name: 'material'
@@ -85,6 +85,9 @@ plugins:
   - roamlinks
   - obsidian-interactive-graph
 
+hooks:
+  - docs/assets/custom_plugins/leaderboard_hook.py
+
 extra:
   generator: false
   social:
@@ -98,10 +101,11 @@ extra:
 extra_javascript:
   - assets/javascripts/obsidian_tags.js
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
-  - https://unpkg.com/mermaid/dist/mermaid.min.js 
+  - https://unpkg.com/mermaid/dist/mermaid.min.js
   - https://fastly.jsdelivr.net/npm/jquery/dist/jquery.min.js
   - https://fastly.jsdelivr.net/npm/echarts/dist/echarts.min.js
   - assets/javascripts/interactive_graph.js
+  - assets/javascripts/github_issues.js
 
 extra_css:
   - assets/stylesheets/extra.css
