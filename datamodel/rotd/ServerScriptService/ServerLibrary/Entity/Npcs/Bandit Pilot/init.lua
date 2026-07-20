@@ -390,7 +390,9 @@ function npcPackage.Spawned(npcClass: NpcClass)
             destructible.Name = newDestructInfo.Label;
             destructible.Properties.DestroyModel = false;
 
-            destructible.HealthComp:SetMaxHealth(newDestructInfo.Health);
+            local infoHealthValue = newDestructInfo.Health;
+
+            destructible.HealthComp:SetMaxHealth(infoHealthValue);
             destructible.HealthComp:Reset();
 
             destructible:SetupHealthbar{
@@ -484,11 +486,6 @@ function npcPackage.Spawned(npcClass: NpcClass)
                     if curHealth > oldHealth then return end;
                     local properties = destructible.Properties;
 
-                    healthComp:TakeDamage(DamageData.new{
-                        Damage = 20;
-                        DamageBy = damageData.DamageBy;
-                    });
-
                     if properties.LastExplosionTick and tick()-properties.LastExplosionTick < 1.5 then return end;
                     properties.LastExplosionTick = tick();
 
@@ -502,7 +499,7 @@ function npcPackage.Spawned(npcClass: NpcClass)
 
                     if destructibleName == "TopCover" then
                         healthComp:TakeDamage(DamageData.new{
-                            Damage = 400;
+                            Damage = math.ceil(infoHealthValue*2);
                             TargetPart = destructibleModel.PrimaryPart;
                         });
                         
@@ -510,13 +507,13 @@ function npcPackage.Spawned(npcClass: NpcClass)
 
                     elseif destructibleName == "TailPart" then
                         healthComp:TakeDamage(DamageData.new{
-                            Damage = 300;
+                            Damage = math.ceil(infoHealthValue*2);
                             TargetPart = destructibleModel.PrimaryPart;
                         });
 
                     elseif destructibleName == "FrontTip" then
                         healthComp:TakeDamage(DamageData.new{
-                            Damage = 300;
+                            Damage = math.ceil(infoHealthValue*2);
                             TargetPart = destructibleModel.PrimaryPart;
                         });
 
@@ -706,7 +703,7 @@ function npcPackage.Spawned(npcClass: NpcClass)
     function properties.DespawnGunmen()
         for _, gunmenNpcClass: NpcClass in pairs(gunmenNpcClasses) do
             if gunmenNpcClass.HealthComp.IsDead then continue end;
-            gunmenNpcClass.NetworkOwners = nil;
+            gunmenNpcClass.NetworkOwners = (nil :: any);
             gunmenNpcClass:Destroy();
         end
         table.clear(gunmenNpcClasses);
@@ -724,7 +721,7 @@ function npcPackage.Spawned(npcClass: NpcClass)
     function properties.DespawnHeavyBandits()
         for _, heavyBanditNpcClass: NpcClass in pairs(heavyBanditsNpcClasses) do
             if heavyBanditNpcClass.HealthComp.IsDead then continue end;
-            heavyBanditNpcClass.NetworkOwners = nil;
+            heavyBanditNpcClass.NetworkOwners = (nil :: any);
             heavyBanditNpcClass:Destroy();
         end
         table.clear(heavyBanditsNpcClasses);

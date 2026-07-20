@@ -37,15 +37,21 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
 
     local stackedDamage = damage + damage * (stacks or 0);
 
-    local npcClass: NpcClass = statusClass.StatusOwner :: NpcClass;
-    local healthComp: HealthComp? = npcClass.HealthComp;
+    local entityClass: EntityClass = statusClass.StatusOwner :: EntityClass;
+    local healthComp: HealthComp? = entityClass.HealthComp;
     if healthComp == nil or healthComp.IsDead then return end;
     
     local finalDamage = stackedDamage;
 
     local curHpRatio = 1 /100; -- 1%
-    local chargeUp = math.clamp( ((stacks or 0)+1) /10, 0, 1);
-    finalDamage = finalDamage + math.max(math.ceil(healthComp.CurHealth * curHpRatio * chargeUp), 1);
+    local ratioRamp = math.clamp( ((stacks or 0)+1) /10, 0, 1);
+
+    local ratioDmg = healthComp.CurHealth * curHpRatio;
+    if entityClass.ClassName == "Destructible" then
+        ratioDmg = 1;
+    end
+
+    finalDamage = finalDamage + math.max(math.ceil(ratioDmg * ratioRamp), 1);
 
     if stackedDamage <= 0 then return; end
     
