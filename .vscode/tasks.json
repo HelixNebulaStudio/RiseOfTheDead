@@ -26,24 +26,6 @@
                 "cwd": "${workspaceFolder}"
             },
             "problemMatcher": []
-        },
-        {
-            "label": "Sync",
-            "type": "shell",
-            "command": "git fetch origin",
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "Reset Project",
-            "type": "shell",
-            "command": "git fetch origin && git reset --hard origin/$(git rev-parse --abbrev-ref HEAD) && git clean -fd",
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": []
         }
     ]
 }
