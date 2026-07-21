@@ -33,13 +33,14 @@ function Objective:Begin()
 end
 
 function Objective:Tick()
-    local activeEnemyCount = #self.Controller.EnemyNpcClasses;
+    local liveEnemies = self.Controller.EnemyNpcClasses;
+    local activeEnemyCount = #liveEnemies;
     
 	local canSpawn = true;
     if tick()-self.LastSpawnTick <= math.min(math.max(self.Controller.IsHard and 0.1 or 0.5, activeEnemyCount/40), 1) then
         canSpawn = false;
     end
-    if #self.Controller.EnemyNpcClasses > 80 then
+    if activeEnemyCount > 80 then
         canSpawn = false;
     end
 	if self.PauseTick and tick() < self.PauseTick then
@@ -63,37 +64,24 @@ function Objective:Tick()
 			Level = enemyLevel;
 		});
 	end
-	
-	if self.SpawnPattern == 1 then
-		
-	-- elseif self.SpawnPattern == 2 then
-	-- 	if math.fmod(self.SpawnCount, 10) == 0 and self.PauseTick == nil then
-	-- 		self.PauseTick = tick()+2;
-	-- 	end
-
-	-- elseif self.SpawnPattern == 3 then
-	-- 	if math.fmod(self.SpawnCount, 20) == 0 and self.PauseTick == nil then
-	-- 		self.PauseTick = tick()+4;
-	-- 	end
-		
-	end
 
 	if self.SpawnCount >= self.EliminateCount then
-		local enemiesLeft = #self.Controller.EnemyNpcClasses;
+		local enemiesLeft = activeEnemyCount;
 		if enemiesLeft <= 0 then
 			return true;
 		else
 			if self.InformTick == nil or tick()-self.InformTick > 10 then
 				self.InformTick = tick();
 				shared.Notify(game.Players:GetPlayers(), `{enemiesLeft} enemies remaining..`, "Inform");
+			end
+			if tick()-self.LastSpawnTick > 150 then					
+				if self.DespawnTick == nil or tick() > self.DespawnTick then
+					self.DespawnTick = tick()+3;
 
-				if tick()-self.LastSpawnTick > 150 then
-					local counts = {};
-					for _, npcClass in pairs(self.Controller.EnemyNpcClasses) do
-						counts[npcClass.Name] = (counts[npcClass.Name] or 0) +1;
-					end
-					for name, count in pairs(counts) do
-						shared.Notify(game.Players:GetPlayers(), `{count} {name} remaining..`, "Inform");
+					local pickEnemy = #liveEnemies > 1 and liveEnemies[math.random(1, #liveEnemies)] or liveEnemies[1];
+					if pickEnemy then
+						Debugger:Warn("Despawned potential stuck");
+						pickEnemy:Destroy();
 					end
 				end
 			end

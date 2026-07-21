@@ -34,6 +34,8 @@ function NpcComponent.onRequire()
 end
 
 function NpcComponent.new(npcClass: NpcClass)
+	npcClass.Properties.AttacksMissed = 0;
+
     return function(targetPart)
 		if npcClass.HealthComp.IsDead then return end;
         if npcClass:IsRagdolling() then return end;
@@ -60,8 +62,8 @@ function NpcComponent.new(npcClass: NpcClass)
 		if targetEntityClass.ClassName == "PlayerClass" or targetEntityClass.ClassName == "NpcClass" then
 			local enemyClass: CharacterClass = targetEntityClass :: CharacterClass;
 			
-			npcClass.Move:HeadTrack(enemyClass.Head, 4);
-			npcClass.Move:Face(targetPosition, nil, 0.3);
+			-- npcClass.Move:HeadTrack(enemyClass.Head, 4);
+			-- npcClass.Move:Face(targetPosition, nil, 0.3);
 
 		elseif targetEntityClass.ClassName == "Destructible" then
 			local destructible: DestructibleInstance = targetEntityClass :: DestructibleInstance;
@@ -98,7 +100,10 @@ function NpcComponent.new(npcClass: NpcClass)
 
 		npcClass.PlayAnimation("Attack", 0.05, nil, 1);
 
-		if targetEntityClass.ClassName == "PlayerClass" or targetEntityClass.ClassName == "NpcClass" then
+		local tarIsPlayerClass = targetEntityClass.ClassName == "PlayerClass";
+		local tarIsCharClass = tarIsPlayerClass or targetEntityClass.ClassName == "NpcClass";
+		
+		if tarIsCharClass then
 			local isZombieMeleeDebounced = targetEntityClass.Properties 
 				and targetEntityClass.Properties.ZombieMeleeDebounce
 				and tick() < targetEntityClass.Properties.ZombieMeleeDebounce;
@@ -124,7 +129,7 @@ function NpcComponent.new(npcClass: NpcClass)
 
 		local curTick = tick();
 		local hitCache;
-		if targetEntityClass.ClassName == "PlayerClass" then
+		if tarIsPlayerClass then
 			local player = (targetEntityClass :: PlayerClass):GetInstance();
 
 			NpcComponent.HitIndex += 1;
@@ -175,7 +180,10 @@ function NpcComponent.new(npcClass: NpcClass)
 
 			Debugger.Expire(box, 0.1);
 		end
-		if not isInMeleeHitboxClient or not isInMeleeHitboxServer then return end;
+		if tarIsPlayerClass and (not isInMeleeHitboxClient or not isInMeleeHitboxServer) then
+			npcClass.Properties.AttacksMissed += 1;
+			return 
+		end;
 
 		local distance = enemyTargetData.Distance or 999;
 		local dmgMulti = 1;

@@ -189,6 +189,8 @@ function treePackage.Attack(npcClass: NpcClass)
 
     local targetPosition = targetEntityClass:GetCFrame().Position;
     
+    Debugger:Warn("AttacksMissed", properties.AttacksMissed);
+
     properties.AttackCooldown = tick() + (configurations.AttackSpeed * math.random(90, 110)/100);
     
     local attackComp = npcClass:GetComponent("ZombieBasicMeleeAttack");
