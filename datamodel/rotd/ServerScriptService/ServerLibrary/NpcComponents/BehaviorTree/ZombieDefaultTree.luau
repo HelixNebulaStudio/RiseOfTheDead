@@ -1,6 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
+local modProjectile = shared.require(game.ReplicatedStorage.Library.Projectile);
 local modRaycastUtil = shared.require(game.ReplicatedStorage.Library.Util.RaycastUtil);
 
 --[[
@@ -10,7 +11,8 @@ local treePackage = {
     LogicString = {
         Default = "PreLogic | HasEnemy & (AlertTree | AggroTree) | IdleTree";
         AlertTree = "!IsHardMode & !WasDamaged & LookAtEnemy";
-        AggroTree = "InMeleeRange & CanAttack & [Attack] | [FollowEnemy]";
+        ThrowTree = "InHordeBundle & [ThrowJunk]";
+        AggroTree = "InMeleeRange & CanAttack & [Attack] | ThrowTree | [FollowEnemy]";
         IdleTree = "[Idle]";
     };
 }
@@ -120,7 +122,12 @@ function treePackage.HasEnemy(npcClass: NpcClass)
         
     end
 
-    return properties.EnemyTargetData ~= nil;
+    local hasEnemy = properties.EnemyTargetData ~= nil;
+    if not hasEnemy then
+        npcClass.Properties.AttacksMissed = 0;
+    end
+
+    return hasEnemy;
 end
 
 function treePackage.IsHardMode(npcClass: NpcClass)
@@ -189,21 +196,114 @@ function treePackage.Attack(npcClass: NpcClass)
 
     local targetPosition = targetEntityClass:GetCFrame().Position;
     
-    Debugger:Warn("AttacksMissed", properties.AttacksMissed);
+    --Debugger:Warn("AttacksMissed", properties.AttacksMissed);
 
-    properties.AttackCooldown = tick() + (configurations.AttackSpeed * math.random(90, 110)/100);
+    local attackSpeed = (configurations.AttackSpeed * math.random(100, 120)/100);
+    if npcClass.Properties.AttacksMissed >= 5 then
+        attackSpeed = attackSpeed/2;
+    end
+    properties.AttackCooldown = tick() + attackSpeed;
     
     local attackComp = npcClass:GetComponent("ZombieBasicMeleeAttack");
     if npcClass.WieldComp.EquipmentClass and npcClass.WieldComp.EquipmentClass.Class == "Melee" then
         npcClass.Move:LookAt(targetPosition);
         npcClass.WieldComp:InvokeToolAction("PrimarySwingRequest");
 
+    elseif npcClass.Properties.AttacksMissed >= 15 and targetEntityClass.ClassName == "PlayerClass" then
+
+        -- Debugger:StudioWarn(`Frenzy attack`);
+
+        local playerClass: PlayerClass = targetEntityClass :: PlayerClass;
+        local predictPos = playerClass:GetPredictedCFrame(1);
+
+        npcClass.Move:MoveTo(predictPos.Position);
+        for a=0, 3 do
+            task.wait(0.3);
+            if npcClass.HealthComp.IsDead then break; end;
+            attackComp(targetData.TargetPart, 0.3, false);
+        end
+        if npcClass.HealthComp.IsDead then return; end;
+        task.wait(3*0.3);
+        if npcClass.HealthComp.IsDead then return; end;
+        properties.AttackCooldown = tick() + 1;
+
+        npcClass.Properties.AttacksMissed = 0;
+
     elseif attackComp then
-        attackComp(targetData.TargetPart);
+        attackComp(targetData.TargetPart, math.min(attackSpeed, 0.5));
 
     end
     
     return true;
+end
+
+function treePackage.InHordeBundle(npcClass: NpcClass)
+    local properties = npcClass.Properties;
+
+    local targetData: NpcTargetData = properties.EnemyTargetData;
+
+    if math.random(1, 3) ~= 1 then return false; end;
+
+    if properties.LastInHordeBundleTick == nil or (tick()-properties.LastInHordeBundleTick) > 10 then
+        return false;
+    end;
+
+    if properties.HordeBundleSize == nil or properties.HordeBundleSize <= 10 then
+        return false;
+    end
+
+    local rightHand = npcClass.Character:FindFirstChild("RightHand");
+    if rightHand == nil then return false end;
+
+    if targetData.Distance > 64 then return false; end;
+
+    return true;
+end
+
+function treePackage.ThrowJunk(npcClass: NpcClass)
+    local configurations = npcClass.Configurations;
+    local properties = npcClass.Properties;
+
+    properties.LastInHordeBundleTick = nil;
+
+    local targetData: NpcTargetData = properties.EnemyTargetData;
+    local targetEntityClass: EntityClass = targetData.HealthComp and targetData.HealthComp.CompOwner;
+    local targetPart = targetData.TargetPart or targetData.Model.PrimaryPart;
+
+    local rightHand = npcClass.Character:FindFirstChild("RightHand");
+    if rightHand == nil then return end;
+
+    npcClass.Move:Stop();
+    npcClass.Move:Face(targetPart, nil, 5);
+
+    npcClass.PlayAnimation("Throw");
+    task.wait(1);
+    if npcClass.HealthComp.IsDead then return end;
+
+    local originCf = rightHand.CFrame;
+
+    local enemyPosition = targetPart.Position;
+    local flyTime = math.random(600, 1200)/1000;
+    if targetEntityClass.ClassName == "PlayerClass" then
+        enemyPosition = (targetEntityClass::PlayerClass):GetPredictedCFrame(flyTime).Position;
+    end
+
+    local projectileInstance: ProjectileInstance = modProjectile.fire("junk", {
+        OriginCFrame = originCf;
+    });
+    projectileInstance.Part.Parent = npcClass.Character;
+
+    local velocity = projectileInstance.ArcTracer:GetVelocityByTime(
+        originCf.Position, 
+        enemyPosition, 
+        flyTime
+    );
+    modProjectile.serverSimulate(projectileInstance, {
+        Velocity = velocity;
+        ExcludeInstances = {workspace.Entity; workspace.Entities;};
+    });
+
+    task.wait(5);
 end
 
 function treePackage.FollowEnemy(npcClass: NpcClass)
@@ -211,17 +311,19 @@ function treePackage.FollowEnemy(npcClass: NpcClass)
     local properties = npcClass.Properties;
     local targetData: NpcTargetData = properties.EnemyTargetData;
 
+    local targetEntityClass: EntityClass = targetData.HealthComp and targetData.HealthComp.CompOwner;
     local targetPart = targetData.TargetPart or targetData.Model.PrimaryPart;
 
     npcClass.Move:Follow(targetPart, 2.5, 1);
 
-    if targetData.Distance > 67 
+    if targetData.Distance > 100 
     and (properties.NextFollowSprintTick == nil or tick()>properties.NextFollowSprintTick) then
         properties.NextFollowSprintTick = tick() + math.random(7, 10);
 
         local baseWs = configurations.BaseValues.WalkSpeed or 15;
         npcClass.Move:SetMoveSpeed("set", "followsprint", baseWs+6, npcClass.Move.MoveSpeedPriority.Movement, math.random(4, 7));
     end
+
 
     return true;
 end

@@ -135,21 +135,27 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			status.Quan.Text = statusClass.Text;
 
 		elseif lib.QuantityLabel then
-			local stat = statusClass.Values[lib.QuantityLabel];
-			local str = stat;
-			local v = tonumber(stat);
-			
-			if v then
-				local statStr = tostring(stat);
-				if #statStr >= 7 then
-					str = (math.round(v/100000)/10).."M";
-				elseif #statStr >= 4 then
-					str = (math.round(v/100)/10).."K";
-				else
-					str = math.round(v);
+			local newQuanStr = lib.QuantityLabel;
+
+			for k, v in pairs(statusClass.Values) do
+				if typeof(v) ~= "string" and typeof(v) ~= "number" then continue end;
+
+				local num = tonumber(v);
+				if num then
+					local statStr = tostring(v);
+					if #statStr >= 7 then
+						str = (math.round(num/100000)/10).."M";
+					elseif #statStr >= 4 then
+						str = (math.round(num/100)/10).."K";
+					else
+						str = math.round(num);
+					end
 				end
+
+				newQuanStr = newQuanStr:gsub("$"..k, v);
 			end
-			status.Quan.Text = str or "";
+			status.Quan.Text = newQuanStr;
+
 		end
 		
 		local descStr = lib.Description;

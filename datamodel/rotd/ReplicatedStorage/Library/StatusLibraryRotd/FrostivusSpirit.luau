@@ -8,7 +8,7 @@ local statusPackage = {
     Icon = "rbxassetid://4534155688";
     Name = "Frostivus Spirit";
     Description = "Buff adds +$Amount bonus damage. For every kill you get, increases bonus damage by 20. You lose 20 damage every 3 seconds. (Max Stacks: 10'000 damage)";
-    QuantityLabel = "Amount";
+    QuantityLabel = "$Amount";
     Buff = true;
     PresistUntilExpire = {"Amount"};
 };

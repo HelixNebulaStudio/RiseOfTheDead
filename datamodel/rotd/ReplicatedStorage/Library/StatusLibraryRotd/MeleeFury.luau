@@ -5,7 +5,7 @@ local statusPackage = {
     Icon="rbxassetid://6557976555";
     Name="Melee Fury";
     Description="Buff increases attack speed by $Amount stacks. (Max Stacks: 0.5 seconds)";
-    QuantityLabel="Amount";
+    QuantityLabel="$Amount";
     Buff=true;
     Cleansable=true;
 };

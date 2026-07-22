@@ -36,7 +36,7 @@ end
 function NpcComponent.new(npcClass: NpcClass)
 	npcClass.Properties.AttacksMissed = 0;
 
-    return function(targetPart)
+    return function(targetPart, attackSpeed, stopToAttack)
 		if npcClass.HealthComp.IsDead then return end;
         if npcClass:IsRagdolling() then return end;
 
@@ -54,16 +54,28 @@ function NpcComponent.new(npcClass: NpcClass)
 			return;
 		end
 
+		local configurations: ConfigVariable = npcClass.Configurations;
+
 		local targetEntityClass: EntityClass = enemyHealthComp.CompOwner;
 		targetPart = targetPart or targetEntityClass.RootPart;
 
 		local targetPosition = targetPart.Position;
 
+		if stopToAttack ~= false then
+			npcClass.Move:SetMoveSpeed("set", "attack", 0, npcClass.Move.MoveSpeedPriority.Action, attackSpeed);
+		end
+
 		if targetEntityClass.ClassName == "PlayerClass" or targetEntityClass.ClassName == "NpcClass" then
 			local enemyClass: CharacterClass = targetEntityClass :: CharacterClass;
 			
-			-- npcClass.Move:HeadTrack(enemyClass.Head, 4);
-			-- npcClass.Move:Face(targetPosition, nil, 0.3);
+			if stopToAttack ~= true then
+				local relativeCframe = npcClass.RootPart.CFrame:ToObjectSpace(CFrame.new(targetPosition));
+				local dirAngle = math.atan2(relativeCframe.X, -relativeCframe.Z);
+
+				if math.abs(dirAngle) > math.rad(75) then
+					npcClass.Move:Face(targetPart, nil, 0.3);
+				end
+			end
 
 		elseif targetEntityClass.ClassName == "Destructible" then
 			local destructible: DestructibleInstance = targetEntityClass :: DestructibleInstance;
@@ -96,10 +108,6 @@ function NpcComponent.new(npcClass: NpcClass)
 			modAudio.Play("ZombieAttack"..math.random(1, 3), npcClass.RootPart).PlaybackSpeed = (math.random(100, 120)/100);
 		end
 
-		local configurations: ConfigVariable = npcClass.Configurations;
-
-		npcClass.PlayAnimation("Attack", 0.05, nil, 1);
-
 		local tarIsPlayerClass = targetEntityClass.ClassName == "PlayerClass";
 		local tarIsCharClass = tarIsPlayerClass or targetEntityClass.ClassName == "NpcClass";
 		
@@ -115,8 +123,6 @@ function NpcComponent.new(npcClass: NpcClass)
 			end
 		end
 
-		npcClass.Move:SetMoveSpeed("set", "attack", 0, npcClass.Move.MoveSpeedPriority.Action, 0.5);
-		
 		local character = npcClass.Character;
 		local rootPart = npcClass.RootPart;
 		local humanoid = npcClass.Humanoid;
@@ -124,7 +130,14 @@ function NpcComponent.new(npcClass: NpcClass)
 		local charCf = character:GetPivot();
 		local extentsSize = npcClass.DefaultExtentsSize;
 
-		local meleeBoxSize = Vector3.new(extentsSize.X, extentsSize.Y, configurations.AttackRange + extentsSize.Z);
+		task.wait(0.2);
+		if npcClass.HealthComp.IsDead then return end;
+		npcClass.PlayAnimation("Attack", 0.05, nil, 1);
+
+		local attackRange = configurations.AttackRange;
+		attackRange += math.min(npcClass.Properties.AttacksMissed/10, 2);
+
+		local meleeBoxSize = Vector3.new(extentsSize.X + (attackRange/10), extentsSize.Y, attackRange + extentsSize.Z);
 		local meleeBoxCf = charCf * CFrame.new(0, -humanoid.HipHeight-rootPart.Size.Y/2 + (extentsSize.Y/2), -(meleeBoxSize.Z/2));
 
 		local curTick = tick();
@@ -156,15 +169,12 @@ function NpcComponent.new(npcClass: NpcClass)
 			end
 		end
 
-		local targetVel = targetPart.AssemblyLinearVelocity;
-
-		task.wait(0.5);
+		task.wait(attackSpeed-0.2);
 		if npcClass.HealthComp.IsDead then return end;
 
+		targetPosition = targetPart.Position;
 		local isInMeleeHitboxServer = modVector.IsInBoundingBox(meleeBoxCf, meleeBoxSize, targetPosition);
 		local isInMeleeHitboxClient = hitCache and hitCache.IsHit == true;
-
-		targetPosition += targetVel;
 
 		if RunService:IsStudio() then
 			local box = Instance.new("Part");
@@ -184,6 +194,7 @@ function NpcComponent.new(npcClass: NpcClass)
 			npcClass.Properties.AttacksMissed += 1;
 			return 
 		end;
+		npcClass.Properties.AttacksMissed = 0;
 
 		local distance = enemyTargetData.Distance or 999;
 		local dmgMulti = 1;
