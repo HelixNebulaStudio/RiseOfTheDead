@@ -1,0 +1,1963 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://helixnebulastudio.github.io/RiseOfTheDead/Development/Concepts/Custom%20Pathfinding%20Engine/">
+      
+      
+        <link rel="prev" href="../Damage%20Statis/">
+      
+      
+        <link rel="next" href="../Cargo%20Ship%20Coop/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Custom Pathfinding Engine - Rise of the Dead</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto Mono";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/interactive_graph.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#assumptions" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="Rise of the Dead" class="md-header__button md-logo" aria-label="Rise of the Dead" data-md-component="logo">
+      
+  <img src="../../../assets/images/RotDIcon_Abr.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Rise of the Dead
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Custom Pathfinding Engine
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/HelixNebulaStudio/RiseOfTheDead" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../LiveBranch/3.0/" class="md-tabs__link">
+          
+  
+  
+  Live
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../DevBranch/3.0/" class="md-tabs__link">
+          
+  
+  
+  Dev
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../Pages/" class="md-tabs__link">
+          
+  
+  
+  Development
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../Source/Pages/" class="md-tabs__link">
+          
+  
+  
+  Source
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../Storyboard/Pages/" class="md-tabs__link">
+          
+  
+  
+  Storyboard
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../Issues/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Issues
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../Discussions/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Discussions
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Rise of the Dead" class="md-nav__button md-logo" aria-label="Rise of the Dead" data-md-component="logo">
+      
+  <img src="../../../assets/images/RotDIcon_Abr.svg" alt="logo">
+
+    </a>
+    Rise of the Dead
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/HelixNebulaStudio/RiseOfTheDead" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../../../LiveBranch/3.0/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Live
+  
+
+    
+  </span>
+  
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../../../DevBranch/3.0/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dev
+  
+
+    
+  </span>
+  
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Pages/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pages
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../../Completed/Witherer/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Completed
+  
+
+    
+  </span>
+  
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concepts
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Concepts
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../The%20Shadow%20Market/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The Shadow Market
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Safehome%20Spaces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Safehome Spaces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Safehome%20Management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Safehome Management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Rescue%20Bullet/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rescue Bullet
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Melee%20Knockback%20Bomb/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Melee Knockback Bomb
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Elemental%20Modifiers%20on%20Projectiles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Elemental Modifiers on Projectiles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Damage%20Statis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Damage Statis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Custom Pathfinding Engine
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Custom Pathfinding Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#assumptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Assumptions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#-baked-static-navmesh-is-persisted-as-a-modulescript-asset-inside-gameserverstoragemapnavmeshes-one-module-per-named-layer-the-mere-presence-of-this-folder-is-the-feature-flag-that-enables-the-new-system-if-it-is-absent-the-engine-transparently-uses-robloxs-pathfindingservice" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        - Baked static navmesh is persisted as a ModuleScript asset inside game.ServerStorage.MapNavMeshes (one module per named layer). The mere presence of this folder is the feature flag that enables the new system; if it is absent, the engine transparently uses Roblox's PathfindingService.
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modules
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Modules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#nav-mesh" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Nav Mesh
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nav-mesh-renderer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Nav Mesh Renderer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plugin
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#path-finder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Path Finder
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-structures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Structures
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Data Structures">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#navmeshlayer-modulescript-sharedtable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NavMeshLayer (ModuleScript / SharedTable)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#path-returned-by-pathfindercomputeasync" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Path (returned by PathFinder:ComputeAsync)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api-drop-in-replacement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API (drop-in replacement)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optimization
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#todo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Todo
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Cargo%20Ship%20Coop/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cargo Ship Coop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../Limbo/Requesting%20Backup/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Limbo
+  
+
+    
+  </span>
+  
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../../../Source/Pages/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Source
+  
+
+    
+  </span>
+  
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../../../Storyboard/Pages/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Storyboard
+  
+
+    
+  </span>
+  
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Issues/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Issues
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../Discussions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Discussions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#assumptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Assumptions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#-baked-static-navmesh-is-persisted-as-a-modulescript-asset-inside-gameserverstoragemapnavmeshes-one-module-per-named-layer-the-mere-presence-of-this-folder-is-the-feature-flag-that-enables-the-new-system-if-it-is-absent-the-engine-transparently-uses-robloxs-pathfindingservice" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        - Baked static navmesh is persisted as a ModuleScript asset inside game.ServerStorage.MapNavMeshes (one module per named layer). The mere presence of this folder is the feature flag that enables the new system; if it is absent, the engine transparently uses Roblox's PathfindingService.
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modules
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Modules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#nav-mesh" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Nav Mesh
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nav-mesh-renderer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Nav Mesh Renderer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plugin
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#path-finder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Path Finder
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-structures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Structures
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Data Structures">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#navmeshlayer-modulescript-sharedtable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NavMeshLayer (ModuleScript / SharedTable)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#path-returned-by-pathfindercomputeasync" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Path (returned by PathFinder:ComputeAsync)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api-drop-in-replacement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API (drop-in replacement)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optimization
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#todo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Todo
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+
+  <nav class="md-path" aria-label="Navigation" >
+    <ol class="md-path__list">
+      
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../../Pages/" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    Development
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../The%20Shadow%20Market/" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    Concepts
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <a href="../../Pages/#tag:concept" class="md-tag">concept</a>
+      
+    
+      
+      
+      
+      
+        <a href="../../Pages/#tag:system" class="md-tag">system</a>
+      
+    
+  </nav>
+
+
+  
+  
+
+
+  <h1>Custom Pathfinding Engine</h1>
+
+<p>Roblox's built-in <code>PathfindingService</code> is the bottleneck on maps with many entities. According to the microprofiler, there are also unusual interactions with <code>Terrain</code> and Mesh colliders that inflate compute time. </p>
+<p>Goals:
+- Bake a <strong>static navmesh</strong> for the static map so runtime compute is a graph search, not a physics sweep.
+- <strong>Reuse computed paths</strong> of nearby origins to nearby destinations (the existing cache already does this at a 16-stud snap; we extend it to the navmesh graph).
+- <strong>Compute in parallel / async</strong> and keep Roblox's <code>PathfindingService</code> only as a fallback.</p>
+<p>This system needs:
+- [ ] A plugin to preview, adjust and bake navmeshes.
+- [ ] An API that matches Roblox's <code>PathfindingService</code> API so it is a drop-in replacement.</p>
+<h2 id="assumptions">Assumptions<a class="headerlink" href="#assumptions" title="Permanent link">&para;</a></h2>
+<h2 id="-baked-static-navmesh-is-persisted-as-a-modulescript-asset-inside-gameserverstoragemapnavmeshes-one-module-per-named-layer-the-mere-presence-of-this-folder-is-the-feature-flag-that-enables-the-new-system-if-it-is-absent-the-engine-transparently-uses-robloxs-pathfindingservice">- Baked static navmesh is persisted as a <strong><code>ModuleScript</code> asset inside <code>game.ServerStorage.MapNavMeshes</code></strong> (one module per named layer). <strong>The mere presence of this folder is the feature flag</strong> that enables the new system; if it is absent, the engine transparently uses Roblox's <code>PathfindingService</code>.<a class="headerlink" href="#-baked-static-navmesh-is-persisted-as-a-modulescript-asset-inside-gameserverstoragemapnavmeshes-one-module-per-named-layer-the-mere-presence-of-this-folder-is-the-feature-flag-that-enables-the-new-system-if-it-is-absent-the-engine-transparently-uses-robloxs-pathfindingservice" title="Permanent link">&para;</a></h2>
+<ul>
+<li>
+<p><strong>The <code>Dynamic</code> runtime layer is a future feature.</strong> This plan scopes only the <code>Static</code> baked layer; runtime door/barricade edits are out of scope for now.</p>
+</li>
+<li>
+<p><strong>Terrain is sampled only at bake time</strong> by the studio plugin (voxelizing <code>workspace.Terrain</code>), never at runtime. This addresses the microprofiler's "unusual Terrain interactions" without per-frame terrain queries.</p>
+</li>
+<li>
+<p>Generation must take <strong>all <code>PathfindingModifier</code> instances under <code>workspace</code></strong> into account (their <code>PassThrough</code>, <code>Material</code>, and <code>Label</code> map onto navmesh surface tags and <code>Costs</code>).</p>
+</li>
+<li>
+<p>Navmesh rendering uses a <strong><code>Color3</code> value table</strong> to map each surface tag to an overlay color (not hardcoded colors). The renderer is <strong>studio-only</strong> (debug/authoring), not replicated to clients.</p>
+</li>
+<li>
+<p><strong>Agent <code>AgentRadius</code> / <code>AgentHeight</code> are applied at the path-computation stage.</strong> Any clearance data the navmesh needs to gate walkability is <strong>baked in</strong> during generation (see <code>Clearance</code> field), so compute only filters, never re-derives geometry.</p>
+</li>
+<li>
+<p>The custom engine wraps (not deletes) Roblox's <code>PathfindingService</code> as the existing fallback.</p>
+</li>
+<li>
+<p>The existing <code>NpcClass.PathAgent</code> config remains the single source of agent parameters; the new engine reads from it.</p>
+</li>
+</ul>
+<h2 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>
+flowchart TD
+
+    A[Studio Plugin] --&gt;|bake| B[ServerStorage.MapNavMeshes ModuleScript]
+
+    W[workspace.PathfindingModifier] --&gt;|classify| A
+
+    T[workspace.Terrain bake-time only] --&gt;|voxelize| A
+
+    B --&gt; C[NavMesh Module Static only]
+
+    C --&gt; E[NavMesh Renderer studio only]
+
+    C --&gt; F[PathFinder Module]
+
+    G[NpcClass.PathAgent radius height] --&gt; F
+
+    F --&gt;|graph search| H[Waypoints]
+
+    F --&gt;|on failure| I[PathfindingService fallback]
+
+    H --&gt; J[Move Component]
+
+    J --&gt; K[ParallelNpc Movement]
+</code></pre>
+<h2 id="modules">Modules<a class="headerlink" href="#modules" title="Permanent link">&para;</a></h2>
+<h3 id="nav-mesh">Nav Mesh<a class="headerlink" href="#nav-mesh" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Handles navmesh generation, modifications, and outputs a data structure for path computation.</li>
+<li><strong>Scope: <code>Static</code> layer only</strong> (baked once from the base map, stored as a <code>ModuleScript</code> inside <code>game.ServerStorage.MapNavMeshes</code>, one module per named layer). The <code>Dynamic</code> runtime layer (doors, barricades, movable objects) is a <strong>future feature</strong> and explicitly out of scope here.</li>
+<li>On load, if <code>game.ServerStorage.MapNavMeshes</code> is absent, the module reports <code>Available = false</code> and all callers fall back to Roblox's <code>PathfindingService</code>. The folder's presence is the sole enable flag.</li>
+</ul>
+<h3 id="nav-mesh-renderer">Nav Mesh Renderer<a class="headerlink" href="#nav-mesh-renderer" title="Permanent link">&para;</a></h3>
+<p>Encapsulated renderer for the Nav Mesh with an editable toggle.
+- Navmesh polygons are drawn from vertices as <code>CFrames</code> pointing inward so each face is a filled polygon.
+- A thin <code>BasePart</code> (size <code>(x, 0, z)</code>) connects one vertex to another for <strong>clickability</strong> (selection / drag in the plugin).
+- A <code>Highlight</code> instance inside a <code>Model</code> made up of those parts provides the colored overlay. Surface tags map to colors via a <strong><code>Color3</code> value table</strong> (configurable, not hardcoded), e.g. <code>TagColors = { ground = Color3.fromRGB(0,200,0); wall = Color3.fromRGB(200,0,0); climb = Color3.fromRGB(255,150,0); roof = Color3.fromRGB(0,120,255); jump = Color3.fromRGB(255,220,0) }</code>.
+- The renderer is <strong>studio-only</strong> (used by the plugin and a Studio debug HUD); it is never replicated to clients. It exposes <code>Show(layer)</code>, <code>Hide(layer)</code>, <code>SetEditable(bool)</code>, and <code>SetTagColors(table)</code>.</p>
+<h3 id="plugin">Plugin<a class="headerlink" href="#plugin" title="Permanent link">&para;</a></h3>
+<p>Studio plugin for static navmesh viewing, adjusting and baking.</p>
+<ul>
+<li><strong>Generate button</strong>
+  - Requires a region <code>BasePart</code> defining the bounds to generate within.
+  - Requires a folder containing the <strong>raw map geometry</strong> to sample. Nothing in this folder is tagged; walkability is derived purely from the geometry: a part contributes walkable surface only when <code>Part.CanCollide == true</code> (collidable geometry defines the walkable world). Surfaces are classified by their <strong>surface normal / angle</strong> — <code>ground</code> for up-facing walkable, <code>wall</code> for steep, <code>roof</code> for downward-facing ceilings — and <code>climb</code> is assigned to instances whose <code>ClassName == "Truss"</code>. <strong>Material is not used for classification.</strong> Non-collidable parts are ignored for walkable-surface generation.
+  - Scans <strong>all <code>PathfindingModifier</code> instances under <code>workspace</code></strong> and folds their <code>PassThrough</code> / <code>Material</code> / <code>Label</code> into the surface classification and <code>Costs</code> (e.g. a <code>PathfindingModifier</code> with <code>Label = "Barricade"</code> raises cost to match <code>Barricade = 100</code>.
+  - Voxelizes <strong><code>workspace.Terrain</code></strong> at bake time (studio only) so terrain walkable surfaces are included in the static mesh; this is the only place terrain is read, avoiding the per-frame Terrain cost seen in the microprofiler.
+  - Regenerates a navmesh into a folder named after the layer.</li>
+<li><strong>Nav mesh preview</strong> — uses the Nav Mesh Renderer module.</li>
+<li><strong>Toggle navmesh</strong> — when a layer folder is selected, toggles that layer's visibility.</li>
+<li><strong>Vertex / edge editing</strong> — click a rendered part to select a vertex or edge; drag to move, or retag an edge (<code>ground</code>/<code>wall</code>/<code>climb</code>/<code>roof</code>/<code>jump</code>).</li>
+<li><strong>Off-mesh links</strong> — author <code>jump</code> links between two vertices, storing gap distance and direction; used for ledges, vaults, and <code>PathfindingLink</code> equivalents.</li>
+<li><strong>Bake / Export</strong> — serializes the layer into a <code>ModuleScript</code> asset saved under <code>game.ServerStorage.MapNavMeshes</code> (one module per named layer). Supports multiple named layers.</li>
+<li><strong>Import</strong> — loads an existing baked <code>ModuleScript</code> from <code>ServerStorage.MapNavMeshes</code> back into the editor for adjustment.</li>
+</ul>
+<h3 id="path-finder">Path Finder<a class="headerlink" href="#path-finder" title="Permanent link">&para;</a></h3>
+<p>Computes a path over the navmesh data structure. This is the runtime replacement for <code>PathfindingService</code>.</p>
+<ul>
+<li><strong>Graph build</strong>: navmesh polygons become nodes; shared edges become connections. Off-mesh <code>jump</code>/<code>climb</code> links become zero-geometry edges with a cost derived from gap distance and the agent's <code>AgentCanJump</code>/<code>AgentCanClimb</code>.</li>
+<li><strong>Search</strong>: A* (or Dijkstra for uniform cost) over the polygon graph, weighted by the agent <code>Costs</code> table so <code>DefinePath</code>/<code>Walkway</code>/<code>Slowpath</code>/<code>Barricade</code> behave like today's <code>PathAgent.Costs</code>.</li>
+<li><strong>Agent filtering (radius/height at compute time)</strong>: reads <code>NpcClass.PathAgent</code> (<a href="src/ReplicatedStorage/Entity/NpcClass.luau:125"><code>src/ReplicatedStorage/Entity/NpcClass.luau:125</code></a>) — <code>AgentRadius</code>, <code>AgentHeight</code>, <code>AgentCanJump</code>, <code>AgentCanClimb</code>, <code>WaypointSpacing</code>. <code>AgentRadius</code>/<code>AgentHeight</code> are applied <strong>during search</strong> using the <strong>baked <code>Clearance</code></strong> field on each polygon/vertex (computed at generation, not re-derived at runtime) to prune polygons the agent cannot fit through and to offset the smoothed path off walls.</li>
+<li><strong>Smoothing</strong>: string-pull / line-of-sight funnel algorithm to collapse collinear waypoints, matching Roblox's <code>WaypointSpacing = math.huge</code> behavior already used in <a href="src/ReplicatedStorage/Entity/NpcClass.luau:132"><code>src/ReplicatedStorage/Entity/NpcClass.luau:132</code></a>.</li>
+<li><strong>Off-mesh traversal</strong>: emits a <code>PathWaypoint</code> with <code>Action = Jump</code>/<code>Climb</code> and the stored direction so the existing <code>customWaypoint</code> handler at <a href="src/ServerScriptService/ServerLibrary/NpcComponents/Move.lua:463"><code>src/ServerScriptService/ServerLibrary/NpcComponents/Move.lua:463</code></a> can react.</li>
+<li><strong>Async / parallel</strong>: compute is invoked from the actor (<code>ParallelNpc</code>) so it never blocks the server thread; results are returned via the existing <code>ActorEvent</code> channel.</li>
+<li><strong>Missing-layer guard</strong>: if <code>game.ServerStorage.MapNavMeshes</code> does not exist (map never baked), <code>PathFinder:CreatePath</code> immediately returns a thin wrapper that delegates <code>ComputeAsync</code> to <code>PathfindingService</code> so behavior is unchanged from today.</li>
+<li><strong>Fallback</strong>: on <code>NoPath</code> after N retries, defer to <code>PathfindingService:FindPathAsync()</code> and store the result in the existing <code>SharedTable</code> path cache (no <code>Dynamic</code> layer write, since that is a future feature).</li>
+<li><strong>Caching</strong>: reuse the existing <code>SharedTable</code> cache (<code>GlobalPathCache</code>, <code>GlobalWaypointCache</code>) keyed by snapped origin/dest, extended to look up sub-paths within the navmesh graph.</li>
+</ul>
+<h2 id="data-structures">Data Structures<a class="headerlink" href="#data-structures" title="Permanent link">&para;</a></h2>
+<h3 id="navmeshlayer-modulescript-sharedtable">NavMeshLayer (ModuleScript / SharedTable)<a class="headerlink" href="#navmeshlayer-modulescript-sharedtable" title="Permanent link">&para;</a></h3>
+<div class="language-lua highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="nv">Name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Static&quot;</span><span class="p">;</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="nv">Version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="nv">CellSize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">            </span><span class="c1">-- snap precision, see Optimization below</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="nv">Vertices</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nv">Vector3</span><span class="p">,</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">};</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="nv">Polygons</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">        </span><span class="p">{</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">            </span><span class="nv">Id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">            </span><span class="nv">Vertices</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="p">};</span><span class="w">   </span><span class="c1">-- indices into Vertices</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">            </span><span class="nv">Tag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;ground&quot;</span><span class="p">;</span><span class="w">              </span><span class="c1">-- ground | wall | climb | roof</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">            </span><span class="nv">Neighbors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">9</span><span class="w"> </span><span class="p">};</span><span class="w">     </span><span class="c1">-- adjacent polygon ids</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">            </span><span class="nv">Center</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Vector3</span><span class="p">;</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">            </span><span class="nv">Clearance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">number</span><span class="p">;</span><span class="w">          </span><span class="c1">-- baked max AgentRadius that fits this polygon (studs); used at compute time</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">        </span><span class="p">};</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">    </span><span class="p">};</span>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">    </span><span class="nv">Links</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w">                </span><span class="c1">-- off-mesh connections</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">        </span><span class="p">{</span>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">            </span><span class="nv">From</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="nv">To</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">12</span><span class="p">;</span>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">            </span><span class="nv">Type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;jump&quot;</span><span class="p">;</span><span class="w">    </span><span class="c1">-- jump | climb</span>
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">            </span><span class="nv">Direction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Vector3</span><span class="p">;</span>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">            </span><span class="nv">Gap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">number</span><span class="p">;</span>
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="w">        </span><span class="p">};</span>
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="w">    </span><span class="p">};</span>
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="p">}</span>
+</span></code></pre></div>
+<h3 id="path-returned-by-pathfindercomputeasync">Path (returned by PathFinder:ComputeAsync)<a class="headerlink" href="#path-returned-by-pathfindercomputeasync" title="Permanent link">&para;</a></h3>
+<p>Mirrors Roblox's <code>Path</code> object so callers are unchanged:</p>
+<ul>
+<li><code>Status: Enum.PathStatus</code></li>
+<li><code>GetWaypoints(): { { Position: Vector3, Action: number, Label: string } }</code></li>
+<li><code>GetPathWaypoints()</code> alias for compatibility.</li>
+</ul>
+<h2 id="api-drop-in-replacement">API (drop-in replacement)<a class="headerlink" href="#api-drop-in-replacement" title="Permanent link">&para;</a></h2>
+<div class="language-lua highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kd">local</span><span class="w"> </span><span class="nv">modPathFinder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">shared</span><span class="p">.</span><span class="nf">require</span><span class="p">(</span><span class="nv">game</span><span class="p">.</span><span class="py">ReplicatedStorage</span><span class="p">.</span><span class="py">Library</span><span class="p">.</span><span class="py">PathFinder</span><span class="p">);</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="c1">-- matches PathfindingService:CreatePath(agentParams)</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="kd">local</span><span class="w"> </span><span class="nv">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">PathFinder</span><span class="p">:</span><span class="nf">CreatePath</span><span class="p">(</span><span class="nv">npcClass</span><span class="p">.</span><span class="py">PathAgent</span><span class="p">);</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="c1">-- matches Path:ComputeAsync(start, goal)</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="nv">path</span><span class="p">:</span><span class="nf">ComputeAsync</span><span class="p">(</span><span class="nv">originPos</span><span class="p">,</span><span class="w"> </span><span class="nv">destPos</span><span class="p">);</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="kr">if</span><span class="w"> </span><span class="nv">path</span><span class="p">.</span><span class="py">Status</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nv">Enum</span><span class="p">.</span><span class="py">PathStatus</span><span class="p">.</span><span class="py">Success</span><span class="w"> </span><span class="kr">then</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">    </span><span class="kr">for</span><span class="w"> </span><span class="nv">_</span><span class="p">,</span><span class="w"> </span><span class="nv">wp</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="nv">path</span><span class="p">:</span><span class="nf">GetWaypoints</span><span class="p">()</span><span class="w"> </span><span class="kr">do</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">        </span><span class="c1">-- wp.Position, wp.Action, wp.Label</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">    </span><span class="kr">end</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="kr">end</span>
+</span></code></pre></div>
+<p>Integration points (minimal edits):
+- <a href="src/ServerScriptService/ServerLibrary/NpcComponents/Move.lua:512"><code>src/ServerScriptService/ServerLibrary/NpcComponents/Move.lua:512</code></a> <code>Move:ComputePath</code> → call <code>PathFinder</code> instead of <code>PathfindingService</code>.
+- <a href="src/ServerScriptService/ServerLibrary/Entity/ParallelNpc/Movement.lua:300"><code>src/ServerScriptService/ServerLibrary/Entity/ParallelNpc/Movement.lua:300</code></a> <code>computePath</code> → call <code>PathFinder</code>, keep cache + fallback.
+- <a href="src/ServerScriptService/ServerLibrary/NpcComponents/Follow.lua:137"><code>src/ServerScriptService/ServerLibrary/NpcComponents/Follow.lua:137</code></a> and <a href="src/ServerScriptService/ServerLibrary/NpcComponents/Movement/init.lua:191"><code>src/ServerScriptService/ServerLibrary/NpcComponents/Movement/init.lua:191</code></a> <code>PathfindingService:CreatePath</code> → <code>PathFinder:CreatePath</code>.</p>
+<h2 id="optimization">Optimization<a class="headerlink" href="#optimization" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Navmesh precision is snapped to a <strong>1-stud grid</strong> for vertices (the runtime cache already snaps to 16; the baked mesh is finer and the cache keys off it).</li>
+<li>Store polygons in a flat array + adjacency list to keep A* allocation low inside the actor.</li>
+<li>Pre-bake <code>Center</code> and <code>Neighbors</code> so runtime search is O(edges), not O(surface scans).</li>
+<li>Reuse the existing <code>SharedTable</code> path cache to skip recompute for nearby origin/dest pairs.</li>
+</ul>
+<h2 id="todo">Todo<a class="headerlink" href="#todo" title="Permanent link">&para;</a></h2>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <strong>Define navmesh data schema</strong> — create <code>src/ReplicatedStorage/Library/PathFinder/NavMeshData.luau</code> with the <code>NavMeshLayer</code>/<code>Polygon</code>/<code>Link</code> types and (de)serialization to/from the <code>ModuleScript</code> asset.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <strong>Implement Nav Mesh generation</strong> — <code>NavMeshGenerator.luau</code>: voxelize a region <code>BasePart</code>, sample walkable surfaces from the raw (untagged) map-geometry folder (only <code>Part.CanCollide == true</code>), voxelize <code>workspace.Terrain</code> (bake-time only), classify by surface normal/angle (<code>ground</code>/<code>wall</code>/<code>roof</code>) and mark <code>climb</code> for <code>ClassName == "Truss"</code> (material unused), fold in every <code>PathfindingModifier</code> under <code>workspace</code> (<code>PassThrough</code>/<code>Material</code>/<code>Label</code> → tag + <code>Costs</code>), bake a per-polygon <code>Clearance</code> (max <code>AgentRadius</code> that fits), and emit vertices/polygons/neighbors snapped to 1 stud.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <strong>Implement Nav Mesh module</strong> — <code>NavMesh.luau</code>: load the <code>Static</code> layer from <code>ServerStorage.MapNavMeshes</code> (no <code>Dynamic</code> layer yet — future feature), query polygon at position. If the folder is missing, set <code>Available = false</code> and let callers use Roblox's <code>PathfindingService</code>. The folder's presence is the enable flag.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <strong>Implement Nav Mesh Renderer</strong> — <code>NavMeshRenderer.luau</code> (studio-only): build <code>Highlight</code>+thin-part <code>Model</code> per layer, <code>Show</code>/<code>Hide</code>/<code>SetEditable</code>/<code>SetTagColors</code>, color via the <code>Color3</code> value table.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <strong>Implement Path Finder</strong> — <code>init.lua</code> (rojo entry module under <code>ReplicatedStorage/Library/PathFinder</code>): <code>CreatePath(agentParams)</code>, <code>ComputeAsync</code>, A* over polygon graph with <code>Costs</code> weighting, apply <code>AgentRadius</code>/<code>AgentHeight</code> at compute time using the baked <code>Clearance</code> field (offset smoothed path off walls), funnel smoothing, off-mesh link emission, async via actor, fallback to <code>PathfindingService</code> (cached via <code>SharedTable</code>), and the missing-<code>ServerStorage.MapNavMeshes</code> guard so an unbaked map transparently uses Roblox's <code>PathfindingService</code>.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <strong>Build Studio Plugin</strong> — <code>src/Plugin/.../NavMeshBaker.plugin.lua</code>: Generate button (incl. <code>PathfindingModifier</code> scan), preview, toggle, vertex/edge editing, off-mesh link authoring, bake/export + import to <code>ServerStorage.MapNavMeshes</code>.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <strong>Wire integration points</strong> — swap <code>PathfindingService</code> calls in <code>Move.lua</code>, <code>ParallelNpc/Movement.lua</code>, <code>Follow.lua</code>, <code>Movement/init.lua</code> to <code>PathFinder</code>, preserving cache + fallback.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <strong>Add debug HUD</strong> — reuse <code>Debugger:HudPrint</code> / <code>Debugger:Ray</code> to visualize the active layer and computed waypoints in Studio.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <strong>Write tests</strong> — bake a small test region, assert <code>PathFinder:ComputeAsync</code> returns <code>Success</code> where Roblox does, and <code>NoPath</code>+fallback where Roblox fails.</li>
+</ul>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../Damage%20Statis/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Damage Statis">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Damage Statis
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../Cargo%20Ship%20Coop/" class="md-footer__link md-footer__link--next" aria-label="Next: Cargo Ship Coop">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Cargo Ship Coop
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+      
+    
+    
+    
+    <a href="https://mastodon.online/@HelixNebulaDevs" target="_blank" rel="noopener me" title="Official Mastodon" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M433 179.1c0-97.2-63.7-125.7-63.7-125.7-62.5-28.7-228.6-28.4-290.5 0 0 0-63.7 28.5-63.7 125.7 0 115.7-6.6 259.4 105.6 289.1 40.5 10.7 75.3 13 103.3 11.4 50.8-2.8 79.3-18.1 79.3-18.1l-1.7-36.9s-36.3 11.4-77.1 10.1c-40.4-1.4-83-4.4-89.6-54-.6-4.6-.9-9.3-.9-13.9 85.6 20.9 158.7 9.1 178.7 6.7 56.1-6.7 105-41.3 111.2-72.9 9.8-49.8 9-121.5 9-121.5zm-75.1 125.2h-46.6V190.1c0-49.7-64-51.6-64 6.9v62.5H201V197c0-58.5-64-56.6-64-6.9v114.2H90.3c0-122.1-5.2-147.9 18.4-175 25.9-28.9 79.8-30.8 103.8 6.1l11.6 19.5 11.6-19.5c24.1-37.1 78.1-34.8 103.8-6.1 23.7 27.3 18.4 53 18.4 175"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://discord.gg/Sgs39DTCQX" target="_blank" rel="noopener" title="Community Discord Server" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M492.5 69.8c-.2-.3-.4-.6-.8-.7-38.1-17.5-78.4-30-119.7-37.1-.4-.1-.8 0-1.1.1s-.6.4-.8.8c-5.5 9.9-10.5 20.2-14.9 30.6-44.6-6.8-89.9-6.8-134.4 0-4.5-10.5-9.5-20.7-15.1-30.6-.2-.3-.5-.6-.8-.8s-.7-.2-1.1-.2C162.5 39 122.2 51.5 84.1 69c-.3.1-.6.4-.8.7C7.1 183.5-13.8 294.6-3.6 404.2c0 .3.1.5.2.8s.3.4.5.6c44.4 32.9 94 58 146.8 74.2.4.1.8.1 1.1 0s.7-.4.9-.7c11.3-15.4 21.4-31.8 30-48.8.1-.2.2-.5.2-.8s0-.5-.1-.8-.2-.5-.4-.6-.4-.3-.7-.4c-15.8-6.1-31.2-13.4-45.9-21.9-.3-.2-.5-.4-.7-.6s-.3-.6-.3-.9 0-.6.2-.9.3-.5.6-.7c3.1-2.3 6.2-4.7 9.1-7.1.3-.2.6-.4.9-.4s.7 0 1 .1c96.2 43.9 200.4 43.9 295.5 0 .3-.1.7-.2 1-.2s.7.2.9.4c2.9 2.4 6 4.9 9.1 7.2.2.2.4.4.6.7s.2.6.2.9-.1.6-.3.9-.4.5-.6.6c-14.7 8.6-30 15.9-45.9 21.8-.2.1-.5.2-.7.4s-.3.4-.4.7-.1.5-.1.8.1.5.2.8c8.8 17 18.8 33.3 30 48.8.2.3.6.6.9.7s.8.1 1.1 0c52.9-16.2 102.6-41.3 147.1-74.2.2-.2.4-.4.5-.6s.2-.5.2-.8c12.3-126.8-20.5-236.9-86.9-334.5zm-302 267.7c-29 0-52.8-26.6-52.8-59.2s23.4-59.2 52.8-59.2c29.7 0 53.3 26.8 52.8 59.2 0 32.7-23.4 59.2-52.8 59.2m195.4 0c-29 0-52.8-26.6-52.8-59.2s23.4-59.2 52.8-59.2c29.7 0 53.3 26.8 52.8 59.2 0 32.7-23.2 59.2-52.8 59.2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.footer", "navigation.path", "navigation.prune", "navigation.top", "content.code.copy", "content.code.select", "search.share"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../../assets/javascripts/obsidian_tags.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+      
+        <script src="https://fastly.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+      
+        <script src="https://fastly.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+      
+        <script src="../../../assets/javascripts/interactive_graph.js"></script>
+      
+        <script src="../../../assets/javascripts/github_issues.js"></script>
+      
+    
+  </body>
+</html>
