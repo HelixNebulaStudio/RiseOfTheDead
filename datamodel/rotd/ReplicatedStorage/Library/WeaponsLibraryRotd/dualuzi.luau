@@ -47,7 +47,7 @@ local toolPackage = {
 		
 		-- Stats
 		Damage = 66;
-		PotentialDamage = 555;
+		PotentialDamage = 666;
 		
 		AmmoLimit = 80;
 		MaxAmmoLimit = (80*6);
