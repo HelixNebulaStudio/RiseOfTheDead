@@ -992,7 +992,7 @@ local function holdButton(button, label, onClick)
         if binds.TradeSession == nil then
             binds.TradeSession = {};
         end
-        modTables.ReplaceValues(binds.TradeSession, data);
+        modTables.replaceValues(binds.TradeSession, data);
     end
 
 	interface.Garbage:Tag(remoteTradeRequest.OnClientEvent:Connect(function(requestType, ...)

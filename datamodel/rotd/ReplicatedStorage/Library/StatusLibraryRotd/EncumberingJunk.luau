@@ -30,9 +30,8 @@ function statusPackage.BindUpdate(statusClass: StatusClassInstance)
     local modCharacter = (characterClass :: PlayerClass).CharacterVars;
 
     local slowPercent = statusClass.Values.Amount or 5;
-    local newWsMulti = math.clamp(100-math.min(slowPercent, 100), 0, 100)/100;
+    local newWsMulti = math.clamp(100-math.clamp(slowPercent, 0, 30), 0, 100)/100;
 
-    Debugger:StudioWarn(`newWsMulti`, newWsMulti);
     modCharacter.CharacterProperties.SpeedMulti:Set("junkslows", newWsMulti, 4);
 end
 

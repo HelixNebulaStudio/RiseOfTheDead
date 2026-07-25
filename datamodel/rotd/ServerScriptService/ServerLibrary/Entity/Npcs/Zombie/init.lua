@@ -43,7 +43,7 @@ local npcPackage = {
     DynamicLevelScaling = {
         WalkSpeed = function(lvl) return math.clamp(20 + math.floor(lvl/10), 1, 30); end;
         MaxHealth = function(lvl) return 49+(math.max(50*lvl, 50)); end;
-        AttackDamage = function(lvl) return math.min(10+(lvl/2), 100); end;
+        AttackDamage = function(lvl) return math.min(14+(lvl/2), 100); end;
     };
 };
 

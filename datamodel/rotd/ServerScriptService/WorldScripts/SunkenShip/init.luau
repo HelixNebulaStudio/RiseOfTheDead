@@ -58,7 +58,7 @@ function WorldCore.onRequire()
             if #modRegion:GetPlayersWithin(vexClip) > 0 then continue end;
             
             if #validPlayers <= 0 then continue end;
-            modTables.Shuffle(validPlayers);
+            modTables.shuffle(validPlayers);
 
             local numToSpawn = math.random(1, #validPlayers);
             for a=1, numToSpawn do

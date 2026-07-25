@@ -173,7 +173,7 @@ function NpcComponent.new(npcClass: NpcClass)
 		if npcClass.HealthComp.IsDead then return end;
 
 		targetPosition = targetPart.Position;
-		local isInMeleeHitboxServer = modVector.IsInBoundingBox(meleeBoxCf, meleeBoxSize, targetPosition);
+		local isInMeleeHitboxServer = modVector.isInBoundingBox(meleeBoxCf, meleeBoxSize, targetPosition);
 		local isInMeleeHitboxClient = hitCache and hitCache.IsHit == true;
 
 		if RunService:IsStudio() then

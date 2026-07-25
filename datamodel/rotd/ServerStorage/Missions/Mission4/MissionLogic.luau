@@ -23,27 +23,29 @@ function MissionLogic.onRequire()
 		local npcClass: NpcClass = ...;
 		if npcClass == nil or npcClass.HumanoidType ~= "Zombie" then return end;
 				
-		local playerTags = modDamageTag:Get(npcClass.Character, "Player");
-		for a=1, #playerTags do
-			local playerTag = playerTags[a];
-			local player: Player = playerTag.Player;
-			if player == nil or not game.Players:IsAncestorOf(player) then continue end;
+		task.spawn(function()
+			local playerTags = modDamageTag:Get(npcClass.Character, "Player");
+			for a=1, #playerTags do
+				local playerTag = playerTags[a];
+				local player: Player = playerTag.Player;
+				if player == nil or not game.Players:IsAncestorOf(player) then continue end;
 
-			modMission:Progress(player, MISSION_ID, function(mission: Mission)
-				if mission.ObjectivesCompleted.ArmSearch then return end;
-				mission.SaveData.Kills = (mission.SaveData.Kills or 0) +1;
-				if math.random(1, 6) > 1 and mission.SaveData.Kills <= 10 then return end;
+				modMission:Progress(player, MISSION_ID, function(mission: Mission)
+					if mission.ObjectivesCompleted.ArmSearch then return end;
+					mission.SaveData.Kills = (mission.SaveData.Kills or 0) +1;
+					if math.random(1, 6) > 1 and mission.SaveData.Kills <= 10 then return end;
 
-				modItemDrops.spawn{
-					ItemId = "zombiearm";
-					SpawnCFrame = npcClass.RootPart.CFrame;
-					DropIfNotOwned = true;
-					DisableTouchPickup = true;
-					Players = {player};
-				};
-			end)
+					modItemDrops.spawn{
+						ItemId = "zombiearm";
+						SpawnCFrame = npcClass.RootPart.CFrame;
+						DropIfNotOwned = true;
+						DisableTouchPickup = true;
+						Players = {player};
+					};
+				end)
 
-		end
+			end
+		end)
 	end)
 end
 

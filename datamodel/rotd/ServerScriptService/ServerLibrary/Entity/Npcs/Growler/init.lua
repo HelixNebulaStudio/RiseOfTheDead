@@ -56,7 +56,7 @@ function npcPackage.Spawning(npcClass: NpcClass)
     local driedFleshModel = npcClass.Character:WaitForChild("DriedNekronFlesh");
     local fleshParts = driedFleshModel:GetChildren();
     
-    modTables.Shuffle(fleshParts);
+    modTables.shuffle(fleshParts);
     for a=1, #fleshParts do
         if a > 3 then
             Debugger.Expire(fleshParts[a], 0);

@@ -74,7 +74,7 @@ if RunService:IsServer() then
 					};
 					dropPrefab.PrimaryPart.Anchored = true;
 				end
-				mission.Changed:Disconnect(OnChanged);
+				mission.OnChanged:Disconnect(OnChanged);
 
 			end
 		end

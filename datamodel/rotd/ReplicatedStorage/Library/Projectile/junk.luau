@@ -113,8 +113,8 @@ function projectilePackage.BindArcContact(projectile: ProjectileInstance, arcPoi
         end
 
         targetCharacterClass.StatusComp:Apply("EmcumberingJunk", {
-            Expires = workspace:GetServerTimeNow() + 30;
-            Duration = 30;
+            Expires = workspace:GetServerTimeNow() + 10;
+            Duration = 10;
             Values = {
                 Amount = newAmt;
             };

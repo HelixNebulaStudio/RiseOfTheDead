@@ -17,9 +17,12 @@ else
 end
 
 local MISSION_ID = 0;
+
+local cutscenePackage = {};
 --==
 
-return function(CutsceneSequence)
+--MARK: run
+function cutscenePackage.run(CutsceneSequence)
 	--if not modBranchConfigurations.IsWorld("TheWarehouse") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
 	
 	CutsceneSequence:Initialize(function()
@@ -57,3 +60,5 @@ return function(CutsceneSequence)
 	
 	return CutsceneSequence;
 end;
+
+return cutscenePackage;

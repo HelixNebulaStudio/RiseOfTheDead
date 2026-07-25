@@ -3241,4 +3241,40 @@ MissionLibrary.New{
 	
 };
 
+--MARK: 93 - Parameters Secured
+MissionLibrary.New{
+	MissionId = 93;
+	MissionType = MissionLibrary.MissionTypes.Board;
+	Name = "Parameters Secured";
+	Description = "Safehouse survivors needs some areas secured so that they can scavenge safely.";
+	Timer = BOARD_TIME_LIMIT;
+	Persistent = true;
+	Checkpoint = {
+		{Text="Secure the area $Area";};
+	};
+	SaveData = {
+		Area = function()
+			local list = shared.WorldName == "" and {"BioXResearch";} 
+			or {
+				"outside Sector F near Sewer Exit to W.D. Warehouse";
+				"inside the Train Station near W.D. Mall entrance";
+				"outside Radio Station near W.D. Mall";
+				"in Bunker Inc. near Residentials Safehouse";
+				"outside the Harbor Substation near the Golden Bridge";
+			};
+			return list[math.random(1, #list)];
+		end;
+	};
+	GuideText = "";
+	Tier = "Normal";
+	Rewards = {
+		{Type="Perks"; Amount=PerksReward.Normal};
+	};
+	AddRequirements = {
+		{Type="Level"; Value=200};
+	};
+	
+};
+
+
 return MissionLibrary;

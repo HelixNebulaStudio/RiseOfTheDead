@@ -123,7 +123,7 @@ return function(CutsceneSequence)
 				end
 				
 			elseif mission.Type == 3 then -- OnComplete
-				mission.Changed:Disconnect(OnChanged);
+				mission.OnChanged:Disconnect(OnChanged);
 				if strangerNpcClass and strangerNpcClass.Character then
 					strangerNpcClass.Character:Destroy();
 					strangerNpcClass = nil;

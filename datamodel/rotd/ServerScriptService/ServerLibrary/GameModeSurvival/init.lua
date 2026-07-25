@@ -218,15 +218,17 @@ function Survival:Load()
 		local npcClass: NpcClass = ...;
 		if npcClass == nil or npcClass.HumanoidType ~= "Zombie" then return end;
 	
-		local playerTags = modDamageTag:Get(npcClass.Character, "Player");
-		for a=1, #playerTags do
-			local playerTag = playerTags[a];
-			local player: Player = playerTag.Player;
-			if player == nil or not game.Players:IsAncestorOf(player) then continue end;
+		task.spawn(function()
+			local playerTags = modDamageTag:Get(npcClass.Character, "Player");
+			for a=1, #playerTags do
+				local playerTag = playerTags[a];
+				local player: Player = playerTag.Player;
+				if player == nil or not game.Players:IsAncestorOf(player) then continue end;
 
-			local playerName = player.Name;
-			self.StatsCount[playerName] = (self.StatsCount[playerName] or 0) + 1;
-		end
+				local playerName = player.Name;
+				self.StatsCount[playerName] = (self.StatsCount[playerName] or 0) + 1;
+			end
+		end)
 	end)
 	
 	-- MARK: /survival

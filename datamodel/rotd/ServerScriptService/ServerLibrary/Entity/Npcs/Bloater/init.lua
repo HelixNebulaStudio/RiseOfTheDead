@@ -59,7 +59,7 @@ function npcPackage.Spawning(npcClass: NpcClass)
     local sporesModel = npcClass.Character:WaitForChild("Spores");
     local sporesParts = sporesModel:GetChildren();
     
-    modTables.Shuffle(sporesParts);
+    modTables.shuffle(sporesParts);
     local pickCount = math.random(8, 12);
     for a=1, #sporesParts do
         if a > pickCount then

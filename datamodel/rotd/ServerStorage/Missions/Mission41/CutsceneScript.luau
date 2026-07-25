@@ -20,58 +20,60 @@ if RunService:IsServer() then
 		local npcClass: NpcClass = ...;
 		if npcClass == nil or npcClass.Name ~= "Cultist" then return end;
 		
-		local playerTags = modDamageTag:Get(npcClass.Character, "Player");
-		for a=1, #playerTags do
-			local playerTag = playerTags[a];
-			local player: Player = playerTag.Player;
-			if player == nil or not game.Players:IsAncestorOf(player) then continue end;
+		task.spawn(function()
+			local playerTags = modDamageTag:Get(npcClass.Character, "Player");
+			for a=1, #playerTags do
+				local playerTag = playerTags[a];
+				local player: Player = playerTag.Player;
+				if player == nil or not game.Players:IsAncestorOf(player) then continue end;
 
-			local mission = modMission:GetMission(player, MISSION_ID);
-			if mission.Type == 2 then
-				modMission:StartMission(player, MISSION_ID);
-				
-			elseif mission.Type == 1 and mission.ProgressionPoint <= 2 then
-				local function spawnCultistNote()
-					modItemDrops.spawn{
-						ItemId = "cultistnote1";
-						SpawnCFrame = CFrame.new(npcClass.Properties.DeathPosition);
-						Players = {player};
-						DisableTouchPickup = true;
-					};
-				end
-				
-				modMission:Progress(player, MISSION_ID, function(mission)
-					if mission.ProgressionPoint == 1 then
-						mission.SaveData.Kills = mission.SaveData.Kills -1;
-						if mission.SaveData.Kills <= 0 then
-							mission.ProgressionPoint = 2;
+				local mission = modMission:GetMission(player, MISSION_ID);
+				if mission.Type == 2 then
+					modMission:StartMission(player, MISSION_ID);
+					
+				elseif mission.Type == 1 and mission.ProgressionPoint <= 2 then
+					local function spawnCultistNote()
+						modItemDrops.spawn{
+							ItemId = "cultistnote1";
+							SpawnCFrame = CFrame.new(npcClass.Properties.DeathPosition);
+							Players = {player};
+							DisableTouchPickup = true;
+						};
+					end
+					
+					modMission:Progress(player, MISSION_ID, function(mission)
+						if mission.ProgressionPoint == 1 then
+							mission.SaveData.Kills = mission.SaveData.Kills -1;
+							if mission.SaveData.Kills <= 0 then
+								mission.ProgressionPoint = 2;
+								spawnCultistNote();	
+							end
+						elseif mission.ProgressionPoint == 2 then
 							spawnCultistNote();	
-						end
-					elseif mission.ProgressionPoint == 2 then
-						spawnCultistNote();	
-					end;
-				end)
-				
-			elseif mission.Type == 1 and (mission.ProgressionPoint == 4 or mission.ProgressionPoint == 5) then
-				local function spawnCultistHood()
-					modItemDrops.spawn{
-						ItemId = "cultisthood";
-						SpawnCFrame = CFrame.new(npcClass.Properties.DeathPosition);
-						Players = {player};
-						DisableTouchPickup = true;
-					};
+						end;
+					end)
+					
+				elseif mission.Type == 1 and (mission.ProgressionPoint == 4 or mission.ProgressionPoint == 5) then
+					local function spawnCultistHood()
+						modItemDrops.spawn{
+							ItemId = "cultisthood";
+							SpawnCFrame = CFrame.new(npcClass.Properties.DeathPosition);
+							Players = {player};
+							DisableTouchPickup = true;
+						};
+					end
+					
+					modMission:Progress(player, MISSION_ID, function(mission)
+						if mission.ProgressionPoint == 4 then
+							mission.ProgressionPoint = 5;
+						end;
+					end)
+					spawnCultistHood();	
+					
 				end
-				
-				modMission:Progress(player, MISSION_ID, function(mission)
-					if mission.ProgressionPoint == 4 then
-						mission.ProgressionPoint = 5;
-					end;
-				end)
-				spawnCultistHood();	
-				
-			end
 
-		end
+			end
+		end)
 	end)
 
 	shared.modEventService:OnInvoked("Generic_BindItemPickup", function(eventPacket: EventPacket, ...)

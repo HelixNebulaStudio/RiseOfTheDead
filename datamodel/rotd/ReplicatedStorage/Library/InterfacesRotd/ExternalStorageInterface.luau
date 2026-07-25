@@ -606,7 +606,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     --MARK: OnToggle
 	window.OnToggle:Connect(function(visible, storageId, packet)
 		if visible then
-            modTables.ReplaceValues(openSettings, packet);
+            modTables.replaceValues(openSettings, packet);
             
             openSettings.StorageId = storageId;
 

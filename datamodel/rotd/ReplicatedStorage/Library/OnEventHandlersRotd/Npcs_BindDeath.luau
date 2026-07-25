@@ -10,10 +10,12 @@ return function(event: EventPacket, ...)
     local npcClass: NpcClass = ...;
     if npcClass == nil or npcClass.Name ~= "Zombie" then return end;
 
+	if modConfigurations.WithererSpawnLogic ~= true then return end;
+
 	local deathPosition = npcClass.Properties.DeathPosition;
 	local level = npcClass.Properties.Level;	
-	
-	if modConfigurations.WithererSpawnLogic == true then
+
+	task.spawn(function()
 		local voxelPoint = chunkStats:GetOrDefault(chunkStats:GetVoxelPosition(deathPosition, 64), {});
 		local voxelData = voxelPoint.Value;
 		
@@ -40,5 +42,5 @@ return function(event: EventPacket, ...)
                 };
 			end
 		end
-	end
+	end)
 end;

@@ -62,7 +62,7 @@ local BP_COLORS = {
 	LockedPassOwner = Color3.fromRGB(110, 60, 60);
 	LockedPremium = Color3.fromRGB(80, 72, 49);
 };
-local missionMarkerColor = Color3.fromRGB(251, 255, 0);
+local MISSION_MARKER_COLOR = Color3.fromRGB(251, 255, 0);
 
 local REWARDS_PRESETS = {
     Perks={Text="+$value Perks"};
@@ -240,12 +240,20 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		missionHudTask.Properties.DescText = pinHudData.TaskText;
 
 		local missionData = pinHudData.MissionData;
+
 		if missionData.SaveData.Timers then
 			for k, v in pairs(missionData.SaveData.Timers) do
 				missionHudTask.Properties.Timers[k] = v;
 			end
 		else
 			table.clear(missionHudTask.Properties.Timers);
+		end
+		if missionData.SaveData.Bars then
+			for k, v in pairs(missionData.SaveData.Bars) do
+				missionHudTask.Properties.Bars[k] = v;
+			end
+		else
+			table.clear(missionHudTask.Properties.Bars);
 		end
 		
 		missionHudTask:Update();
@@ -444,23 +452,23 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		local missionsProfile = modTableManager.GetDataHierarchy(modData.Profile, "GameSave/Missions");
 
 		local missionsData = {};
-		local pinnedMissionData = nil;
+		local pinnedMission = nil;
 		local selectableMissions, selectIndex = {}, 1;
 
 		for a=1, #missionsProfile do
-			local missionData = missionsProfile[a];
+			local rawMission = missionsProfile[a];
+			local mId = rawMission.Id;
+			local lib = modMissionsLibrary.Get(mId);
 
-			local lib = modMissionsLibrary.Get(missionData.Id);
-
-			if missionData.Pinned then
-				pinnedMissionData = missionData;
+			if rawMission.Pinned then
+				pinnedMission = modData:GetMission(mId);
 			end
 
-			missionsData[missionData.Id] = missionData;
+			missionsData[rawMission.Id] = rawMission;
 			-- {"Type":2 "StartTime":1697328143 "ProgressionPoint":1 "Id":67 "AddTime":1697328143 "CatType":4 "SaveData":{}}
-			if missionData.Type ~= 3 and validMissionType(lib) then 
-				table.insert(selectableMissions, missionData);
-				if missionData.Pinned then
+			if rawMission.Type ~= 3 and validMissionType(lib) then 
+				table.insert(selectableMissions, rawMission);
+				if rawMission.Pinned then
 					selectIndex = #selectableMissions;
 				end
 			end
@@ -866,7 +874,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			newEntry.Parent = scrollFrame;
 			
 			local strokeUI = newEntry:WaitForChild("UIStroke");
-			if pinnedMissionData and pinnedMissionData.Id == node.Id then
+			if pinnedMission and pinnedMission.Id == node.Id then
 				strokeUI.Color = branchColor;
 				strokeUI.Enabled = true;
 				highlightAnimGradiant.Parent = strokeUI;
@@ -1054,7 +1062,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					if data.ProgressionPoint > a or data.Type == 3 then --set complete
 						pointColor = Color3.fromRGB(180, 180, 180);
 					elseif data.ProgressionPoint == a then
-						pointColor = missionMarkerColor;
+						pointColor = MISSION_MARKER_COLOR;
 					end
 					
 					local completionBox = newTaskLabel:WaitForChild("CompletionBox");
@@ -1384,10 +1392,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		local pinnedMission = nil;
 		local pinnedMissionLib;
 		for a=1, #missionsList do
-			local book = modMissionsLibrary.Get(missionsList[a].Id);
-			if missionsList[a].Pinned then
+			local rawMission = missionsList[a];
+			local mId = rawMission.Id;
+			local book = modMissionsLibrary.Get(mId);
+
+			if rawMission.Pinned then
 				pinnedMissionLib = book;
-				pinnedMission = missionsList[a];
+				pinnedMission = modData:GetMission(mId);
 				if pinnedMissionName ~= book.Name then
 					cancelAllMissionFunctions();
 				end
@@ -1623,7 +1634,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			if missionData.Pinned and missionData.Type ~= 3 then
 				newListing.LayoutOrder = 0;
 				newListing.ImageColor3 = Color3.fromRGB(100, 100, 100);
-				pinStatus.BackgroundColor3 = missionMarkerColor;
+				pinStatus.BackgroundColor3 = MISSION_MARKER_COLOR;
 				pinStatus.Visible = true;
 				newListing.Parent = PinnedMissionFrame;
 				newListing.Visible = true;
@@ -1633,7 +1644,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				if missionData.Type == 1 then
 					newListing.LayoutOrder = 1;
 					newListing.ImageColor3 = Color3.fromRGB(100, 100, 100);
-					pinStatus.BackgroundColor3 = missionMarkerColor;
+					pinStatus.BackgroundColor3 = MISSION_MARKER_COLOR;
 					titleTag.TextColor3 = Color3.fromRGB(200, 200, 200);
 					pinStatus.Visible = true;
 
@@ -1780,15 +1791,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			end
 
 			binds.UpdatePinnedHud = function()
-				missionsList = modTableManager.GetDataHierarchy(modData.Profile, "GameSave/Missions");
-								
+				-- missionsList = modTableManager.GetDataHierarchy(modData.Profile, "GameSave/Missions");
 				local missionId = missionData.Id;
-				for a=1, #missionsList do
-					if missionsList[a].Id == missionId then
-						missionData = missionsList[a];
-						break;
-					end
-				end
+				missionData = modData:GetMission(missionId);
+
 				if missionData == nil then
 					Debugger:Warn("Mission data for pinned (",missionId,") no longer exist.");
 					binds.UpdatePinnedHud = nil;
@@ -1798,6 +1804,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				
 				local timeLapsed = os.time()-missionData.StartTime;
 				pinHudData.TitleText = (timeLapsed <= 10 and "New " or "")..missionTypeTitle.." Mission";
+				pinHudData.setActive(true);
 			end
 			binds.UpdatePinnedHud();
 
@@ -2354,7 +2361,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				else
 					modMarkers.SetMarker("PinMissionMarker", missionWorld, modBranchConfigurations.GetWorldDisplayName(missionWorld), modMarkers.MarkerTypes.Travel);
 				end
-				modMarkers.SetColor("PinMissionMarker", markInfo.Color or missionMarkerColor);
+				modMarkers.SetColor("PinMissionMarker", markInfo.Color or MISSION_MARKER_COLOR);
 				modMarkers.SetGlowing("PinMissionMarker", true);
 			end
 
@@ -2365,7 +2372,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 					if npcModel then
 						modMarkers.SetMarker("PinMissionMarker", npcModel.PrimaryPart, pinnedMissionLib.From, modMarkers.MarkerTypes.Npc);
-						modMarkers.SetColor("PinMissionMarker", missionMarkerColor);
+						modMarkers.SetColor("PinMissionMarker", MISSION_MARKER_COLOR);
 						modMarkers.SetGlowing("PinMissionMarker", true);
 
 					else
@@ -2374,7 +2381,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 						if npcWorld ~= modBranchConfigurations.WorldName then
 							modMarkers.SetMarker("PinMissionMarker", npcWorld, modBranchConfigurations.GetWorldDisplayName(npcWorld), modMarkers.MarkerTypes.Travel);
-							modMarkers.SetColor("PinMissionMarker", missionMarkerColor);
+							modMarkers.SetColor("PinMissionMarker", MISSION_MARKER_COLOR);
 							modMarkers.SetGlowing("PinMissionMarker", true);
 						else
 							modMarkers.ClearMarker("PinMissionMarker");
@@ -2415,10 +2422,14 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			else
 				modMarkers.ClearMarker("PinMissionMarker");
 			end
+
+			pinnedMission.OnChanged:Fire();
+
 		else
 			modMarkers.ClearMarker("PinMissionMarker");
 			pinHudData.setActive(false);
 			cancelAllMissionFunctions();
+
 		end
 
 		for name, icon in pairs(modHeadIcons.GetIcons()) do
@@ -2447,6 +2458,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		if not windowFrame:IsDescendantOf(localPlayer.PlayerGui) then return end;
 		window:Update();
 		countAvailableMissions();
+	end)
+	interface:BindEvent("UpdateMission", function(mId)
+		if not windowFrame:IsDescendantOf(localPlayer.PlayerGui) then return end;
+	
+		if binds.UpdatePinnedHud then
+			binds.UpdatePinnedHud();
+		end
 	end)
 	
 	initMissionPass = function()

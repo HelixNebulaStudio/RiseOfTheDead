@@ -3,10 +3,13 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local RunService = game:GetService("RunService");
 
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
+local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibraryRotd);
 
 local interactablePackage = {};
 
 function interactablePackage.init(super) -- Server/Client
+
+    --MARK: MakeshiftBuildable
     local MakeshiftBuildable = super.newPackage{
 		Name = "MakeshiftBuildable";
         Type = "ButtonRotd";
@@ -295,6 +298,66 @@ function interactablePackage.init(super) -- Server/Client
     end
 
     super.registerPackage(MakeshiftMaterial);
+
+    --MARK: MakeshiftItemPile
+    local MakeshiftItemPile = super.newPackage{
+		Name = "MakeshiftItemPile";
+        Type = "ButtonRotd";
+    };
+    
+    function MakeshiftItemPile.new(interactable: InteractableInstance)
+        local config: Configuration = interactable.Config;
+
+        config:SetAttribute("_Uses", config:GetAttribute("_Uses") or 5);
+    end
+
+    function MakeshiftItemPile.BindInteract(interactable: InteractableInstance, info: InteractInfo)
+        local config: Configuration = interactable.Config;
+        local itemId = interactable.Values.ItemId or `metalbarricade`;
+
+        local player = info.Player;
+        if player == nil then return; end
+        local playerClass: PlayerClass = shared.modPlayers.get(player);
+        if playerClass.WieldComp.ItemId == itemId then return end;
+
+        MakeshiftMaterial.TypePackage.BindInteract(interactable, info); -- super call: ButtonRotd.BindInteract
+        if info.Action == "Client" then return end;
+
+		playerClass.WieldComp:Equip{
+			ItemId = itemId;
+			ProxyEquip = true;
+            ProxyEquipCallback = function(toolHandler: ToolHandlerInstance)
+                local properties = toolHandler.EquipmentClass.Properties;
+                properties.UnequipOnPlace = true;
+                properties.AutoDespawnDuration = config:GetAttribute("AutoDespawnDuration");
+            end
+		};
+        
+        local usesLeft = config:GetAttribute("_Uses");
+        if usesLeft <= 0 then
+            Debugger.Expire(config.Parent);
+        end
+
+        return;
+    end
+    
+    function MakeshiftItemPile.BindPrompt(interactable: InteractableInstance)
+        local config = interactable.Config;
+        local itemId = interactable.Values.ItemId or "metalbarricade";
+        local itemLib = modItemsLibrary:Find(itemId);
+
+        local usesLeft = config:GetAttribute("_Uses");
+        if usesLeft <= 0 then
+            interactable.Label = `Out of {itemLib.Name}`;
+            interactable.CanInteract = false;
+
+            return;
+        end
+
+        interactable.Label = `Take {itemLib.Name} makeshift item {usesLeft and `({usesLeft})` or ""}`;
+    end
+
+    super.registerPackage(MakeshiftItemPile);
 
 end
 

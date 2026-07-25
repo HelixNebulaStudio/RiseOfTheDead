@@ -37,14 +37,18 @@ function toolPackage.CustomSpawn(handler: ToolHandlerInstance, cframe)
 
 	local player = (charClass :: PlayerClass):GetInstance();
 
+	local prefab, interactable;
+
 	local rewards = modCrates.GenerateRewards(itemId, player);
 	if #rewards > 0 then
-		local prefab, interactable = modCrates.spawn(itemId, cframe, {player}, rewards);
+		prefab, interactable = modCrates.spawn(itemId, cframe, {player}, rewards);
 		Debugger.Expire(prefab, 120);
 
 		modAudio.Play("StorageWoodPickup", prefab.PrimaryPart, nil, false);
 		interactable:Sync(nil, {EmptyLabel=`Owned by: {player.Name}`});
 	end
+
+	return prefab;
 end
 
 

@@ -13,7 +13,7 @@ ClientNpcComponent.RemoteHandlers["attack"] = function(...)
     local hitIndex, hitCf, hitSize, tarPart = ...;
     if not workspace:IsAncestorOf(tarPart) then return end;
 
-    local isInMeleeHitbox = modVector.IsInBoundingBox(hitCf, hitSize, tarPart.Position);
+    local isInMeleeHitbox = modVector.isInBoundingBox(hitCf, hitSize, tarPart.Position);
     ClientNpcComponent.Remote:FireServer(script.Name, hitIndex, isInMeleeHitbox);
 end
 

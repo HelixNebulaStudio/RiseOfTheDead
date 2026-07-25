@@ -52,7 +52,7 @@ function npcPackage.Spawning(npcClass: NpcClass)
     local ticksModel = char:WaitForChild("ExplosiveTickBlobs");
     local tickBlobs = ticksModel:GetChildren();
     
-    modTables.Shuffle(tickBlobs);
+    modTables.shuffle(tickBlobs);
     for a=1, #tickBlobs do
         if a > 10 then
             game.Debris:AddItem(tickBlobs[a], 0);
