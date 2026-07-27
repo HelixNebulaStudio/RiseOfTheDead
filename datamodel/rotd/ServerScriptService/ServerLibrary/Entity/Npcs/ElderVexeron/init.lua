@@ -370,7 +370,7 @@ function npcPackage.Spawned(npcClass: NpcClass)
                     end
                 end
                 
-                Debugger:Warn(`Closest target to eat {closestDist} ({closestPlayer})`);
+                Debugger:StudioLog(`Closest target to eat {closestDist} ({closestPlayer})`);
                 if closestPlayer == nil or closestDist >= 16 then continue end;
 
                 shared.modEventService:ServerInvoke("ElderVexeron_BindEaten", {ReplicateTo={closestPlayer}}, npcClass);

@@ -6,9 +6,10 @@ local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumb
 local modWorkbenchLibrary = shared.require(game.ReplicatedStorage.Library.WorkbenchLibrary);
 
 local modTradingService = shared.require(game.ServerScriptService.ServerLibrary.TradingService);
-local modAnalytics = shared.require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 
 return function(player, dialog, data)
+	local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
+
 	local profile = shared.modProfile:Get(player);
 	local playerSave = profile:GetActiveSave();
 	local traderProfile = profile and profile.Trader;
@@ -30,7 +31,13 @@ return function(player, dialog, data)
 
 		tradingSession:BindStateUpdate(function()
 			if tradingSession.State == 3 then
-				modAnalytics.RecordResource(player.UserId, 20, "Sink", "Gold", "Usage", "cultistkey1");
+				modAnalyticsService:Sink{
+					Player=player;
+					Currency=modAnalyticsService.Currency.Gold;
+					Amount=20;
+					EndBalance=traderProfile.Gold;
+					ItemSKU=`Npc:cultistkey1`;
+				};
 			end
 		end)
 

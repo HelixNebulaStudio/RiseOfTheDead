@@ -5,6 +5,8 @@ local RunService = game:GetService("RunService");
 local modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
 local modProfile = shared.require(game.ServerScriptService.ServerLibrary.Profile);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
+local modGameModeLibrary = shared.require(game.ReplicatedStorage.Library.GameModeLibrary);
+local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 --==
 local GameMode = {};
@@ -62,9 +64,19 @@ function GameMode:WorldLoad(modeData)
 		GameMode.Active = gameController;
 		modConfigurations.Set("InfTargeting", true);
 		
+		local gameLib = modGameModeLibrary.GetGameMode(gameType);
+		local stageLib = gameLib and modGameModeLibrary.GetStage(gameType, gameStage);
+
 		gameController.OnComplete = function(players)
 			task.spawn(function()
 				for _, player in pairs(players) do
+					modAnalyticsService:LogProgressionCompleteEvent{
+						Player = player;
+						PathName = `{gameType}`;
+						Level = stageLib.Index;
+						LevelName = `{(modeData.Room.IsHard and "Hard-" or "")..gameStage}`;
+					};
+
 					local profile = modProfile:Get(player);
 					local timePlayed = math.ceil(tick()-arenaTimer);
 					profile.Analytics:LogTime("Arena:"..(modeData.Room.IsHard and "Hard-" or "")..gameStage, timePlayed);

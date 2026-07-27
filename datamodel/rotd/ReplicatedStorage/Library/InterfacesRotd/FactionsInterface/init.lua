@@ -337,7 +337,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 			local mission58Complete = false;
 			local missionData = modData:GetMission(58);
-			if missionData and missionData.Type == 3 or missionData.Redo == true then
+			if missionData and (missionData.Type == 3 or missionData.Redo == true) then
 				mission58Complete = true;
 			end
 			
@@ -1690,12 +1690,64 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		end
 
 		local claimableFrames = {};
+		
+		local disLibrary = modFactionsLibrary.DistributionsLibrary;
+
+		binds.refreshDistributions = function()
+			local factionData = modData.FactionData;
+
+			for disId, new in pairs(claimableFrames) do
+				local timeLabel = new:FindFirstChild("TimeLabel");
+				if not distributionsFrame:IsAncestorOf(new) then continue end;
+
+				local disLib = disLibrary:Find(disId);
+
+				local endOfDayTick = modSyncTime.TimeOfEndOfDay();
+
+				local fundedFlag = `DistFunded_{disId}`;
+				local fundedFlagVal = factionData.Flags[fundedFlag] or 0;
+
+				local timeLeft = fundedFlagVal - workspace:GetServerTimeNow();
+				if timeLabel then
+					if timeLeft <= 0 then
+						timeLabel.Text = `Out of stock`;
+					else
+						timeLabel.Text = modSyncTime.ToString(timeLeft);
+					end
+				end
+
+				local claimButton = new:FindFirstChild("claimButton");
+				if claimButton and claimButton:GetAttribute("Freeze") ~= true then
+					local isAlreadyClaimed = cacheDisClaimed[`ClaimDis_{disId}`] 
+										and cacheDisClaimed[`ClaimDis_{disId}`] >= endOfDayTick;
+					if isAlreadyClaimed then
+						claimButton.BackgroundTransparency = 1;
+						claimButton.Text = "Already Claimed";
+
+					else
+						local fundedFlag = `DistFunded_{disId}`;
+						local fundedFlagVal = factionData.Flags[fundedFlag];
+
+						local isOutOfStock = ((fundedFlagVal or 0) - workspace:GetServerTimeNow()) <= 0;
+						if isOutOfStock then
+							claimButton.BackgroundTransparency = 0;
+							claimButton.Text = `Restock ${interface.beautifyNumber(disLib.FundCost)}`;
+
+						else
+							claimButton.BackgroundTransparency = 0;
+							claimButton.Text = "Claim";
+
+						end				
+					end
+				end
+			end
+		end
+
 		for _, obj in ipairs(distributionsFrame:GetChildren()) do
 			if obj:GetAttribute("IsAClaimable") == nil then continue end;
 			claimableFrames[obj.Name] = obj;
 		end
 
-		local disLibrary = modFactionsLibrary.DistributionsLibrary;
 		for disId, disLib in pairs(disLibrary:GetAll()) do
 			local new = claimableFrames[disId];
 
@@ -1772,28 +1824,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				local fundButton = new:WaitForChild("fundButton");
 				local timeLabel = new:WaitForChild("TimeLabel");
 
-				local function tickClaimLabel(tickData: TickData)
-					if tickData.ms1000 ~= true then return end;
-
-					if not distributionsFrame:IsAncestorOf(timeLabel) then
-						interface.Scheduler.OnStepped:Disconnect(tickClaimLabel);
-						return;
-					end
-
-					local endOfDayTick = modSyncTime.TimeOfEndOfDay();
-					local timeLeft = endOfDayTick - workspace:GetServerTimeNow();
-					timeLabel.Text = modSyncTime.ToString(timeLeft);
-				end
-
-				tickClaimLabel({ms1000=true;} :: any);
-				interface.Scheduler.OnStepped:Connect(tickClaimLabel);
-
 				local debounceTick = tick();
 				claimButton.MouseButton1Click:Connect(function()
 					if claimButton.BackgroundTransparency == 1 then return end;
 					if tick() < debounceTick then return end;
 					debounceTick = tick()+1;
 
+					claimButton:SetAttribute("Freeze", true);
 					claimButton.Text = `Claiming...`;
 					interface:PlayButtonClick();
 
@@ -1806,8 +1843,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						end
 						modClientGuis.toggleWindow("Inventory", true);
 					end
+					claimButton:SetAttribute("Freeze", nil);
 					
-					claimButton.Text = `Claim`;
+					if binds.refreshDistributions then
+						binds.refreshDistributions();
+					end
 				end)
 
 				fundButton.MouseButton1Click:Connect(function()
@@ -1863,26 +1903,15 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				
 
 			else
-				local endOfDayTick = modSyncTime.TimeOfEndOfDay();
-
 				claimButton.Visible = true;
 				timeLabel.Visible = true;
 				fundButton.Visible = false;
 				costLabel.Visible = false;
 
-				local isAlreadyClaimed = cacheDisClaimed[`ClaimDis_{disId}`] 
-									 and cacheDisClaimed[`ClaimDis_{disId}`] >= endOfDayTick;
-				if isAlreadyClaimed then
-					claimButton.BackgroundTransparency = 1;
-					claimButton.Text = "Already Claimed";
-
-				else
-					claimButton.BackgroundTransparency = 0;
-					claimButton.Text = "Claim";
-										
-				end
-
 			end
+		end
+		if binds.refreshDistributions then
+			binds.refreshDistributions();
 		end
 
 		if disEditMode then
@@ -2684,6 +2713,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		end
 		if binds.refreshActiveMissionInfo then
 			binds.refreshActiveMissionInfo();
+		end
+		if binds.refreshDistributions then
+			binds.refreshDistributions();
 		end
     end);
 

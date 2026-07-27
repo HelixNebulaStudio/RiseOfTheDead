@@ -22,7 +22,6 @@ local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 
 local modProfile = shared.require(game.ServerScriptService.ServerLibrary.Profile);
 local modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
-local modAnalytics = shared.require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modSkillTree = shared.require(game.ServerScriptService.ServerLibrary.SkillTree);
 local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
@@ -196,8 +195,6 @@ function ConsumeBlueprintCost(player, fulfillment)
 			playerSave:AddStat(r.Name, -r.Amount);
 
 			if r.Name == "Perks" or r.Name == "Money" then
-				modAnalytics.RecordResource(player.UserId, r.Amount, "Sink", r.Name, "Gameplay", "BuildCost");
-
 				modAnalyticsService:Sink{
 					Player=player;
 					Currency=modAnalyticsService.Currency[r.Name];
@@ -423,8 +420,7 @@ function remoteBlueprintHandler.OnServerInvoke(player, action, packet)
 		end
 		
 		playerSave:AddStat("Perks", -skipCost);
-		modAnalytics.RecordResource(player.UserId, skipCost, "Sink", "Perks", "Gameplay", "SkipBuild");
-		
+
 		modAnalyticsService:Sink{
 			Player=player;
 			Currency=modAnalyticsService.Currency.Perks;
@@ -932,8 +928,7 @@ function remoteTweakItem.OnServerInvoke(player, interactPart, action, ...)
 			if playerSave:GetStat("TweakPoints") <= 0 then return modWorkbenchLibrary.PurchaseReplies.InsufficientCurrency; end;
 			playerSave:AddStat("TweakPoints", -1);
 			shared.Notify(player, "A tweak point has been consumed.", "Reward");
-			modAnalytics.RecordResource(player.UserId, 1, "Sink", "TweakPoints", "Gameplay", "Tweak Item");
-			
+
 			modAnalyticsService:Sink{
 				Player=player;
 				Currency=modAnalyticsService.Currency.TweakPoints;
@@ -946,8 +941,7 @@ function remoteTweakItem.OnServerInvoke(player, interactPart, action, ...)
 			if playerSave:GetStat("Perks") >= 20 then
 				playerSave:AddStat("Perks", -20);
 				shared.Notify(player, "20 perks has been consumed.", "Reward");
-				modAnalytics.RecordResource(player.UserId, 20, "Sink", "Perks", "Gameplay", "Tweak Item");
-				
+
 				modAnalyticsService:Sink{
 					Player=player;
 					Currency=modAnalyticsService.Currency.Perks;
@@ -1607,7 +1601,6 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 		
 		playerSave:AddStat("Perks", -skipCost);
 
-		modAnalytics.RecordResource(player.UserId, skipCost, "Sink", "Perks", "Gameplay", "SkipPolish");
 		modAnalyticsService:Sink{
 			Player=player;
 			Currency=modAnalyticsService.Currency.Perks;

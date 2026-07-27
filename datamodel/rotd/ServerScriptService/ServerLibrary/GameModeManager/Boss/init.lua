@@ -22,7 +22,7 @@ local modGarbageHandler = shared.require(game.ReplicatedStorage.Library.GarbageH
 
 local modNpcs = shared.modNpcs;
 local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
-local modAnalytics = shared.require(game.ServerScriptService.ServerLibrary.GameAnalytics);
+local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 local modProfile = shared.require(game.ServerScriptService.ServerLibrary.Profile);
 
 local BossArenaModules = script;
@@ -40,8 +40,7 @@ end
 function GameMode:AnnounceReady()
 	shared.Notify(
 		game.Players:GetPlayers(), 
-		(bossAnnouncements[math.random(1, #bossAnnouncements)]):gsub("$bossName", self.GameTable.Stage),
-		"Defeated");
+		(bossAnnouncements[math.random(1, #bossAnnouncements)]):gsub("$bossName", self.GameTable.Stage), "Defeated");
 end
 
 function GameMode:Load(room)
@@ -95,6 +94,7 @@ end
 function GameMode:Start(room)
 	local roomMeta = getmetatable(room);
 	
+	local gameStage = self.GameTable.Stage;
 	local bossLib = self.GameTable.StageLib;
 	
 	local died = false;
@@ -129,13 +129,13 @@ function GameMode:Start(room)
 		
 	for a=1, #players do
 		local playerClass: PlayerClass = modPlayers.get(players[a]);
-		playerClass.Properties.InBossBattle = self.GameTable.Stage;
+		playerClass.Properties.InBossBattle = gameStage;
 		
 		remoteGameModeUpdate:FireClient(players[a], "closemenu");
 		remoteGameModeHud:FireClient(players[a], {
 			Action="Open";
 			Type="Boss";
-			Stage=self.GameTable.Stage;
+			Stage=gameStage;
 			Room=room;
 		});
 	end
@@ -238,7 +238,7 @@ function GameMode:Start(room)
 
 					if #players > 0 then
 						for _, player in pairs(players) do
-							shared.Notify(player, npcClass.Name, "BossDefeat");
+							shared.Notify(player, npcClass.Name, ("BossDefeat" :: any));
 						end
 						shared.modEventService:ServerInvoke("Boss_BindDefeated", {ReplicateTo=players}, {
 							NpcClass = npcClass;
@@ -274,11 +274,16 @@ function GameMode:Start(room)
 							end
 							
 							for _, player in pairs(players) do
-								modAnalytics.RecordProgression(player.UserId, "Complete", "Boss:"..(room.IsHard and "Hard-" or "")..self.GameTable.Stage);
+								modAnalyticsService:LogProgressionCompleteEvent{
+									Player = player;
+									PathName = `Boss`;
+									Level = bossLib.Index;
+									LevelName = `{(room.IsHard and "Hard-" or "")..gameStage}`;
+								};
 								
 								local profile = modProfile:Get(player);
 								local timePlayed = math.ceil(tick()-arenaTimer);
-								profile.Analytics:LogTime("Arena:"..(room.IsHard and "Hard-" or "")..self.GameTable.Stage, timePlayed);
+								profile.Analytics:LogTime("Arena:"..(room.IsHard and "Hard-" or "")..gameStage, timePlayed);
 							end
 						end)
 					end

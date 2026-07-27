@@ -8,7 +8,6 @@ local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modDamageTag = shared.require(game.ReplicatedStorage.Library.DamageTag);
 
 local modExperience = shared.require(game.ServerScriptService.ServerLibrary.Experience);
-local modAnalytics = shared.require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 local Component = {};
@@ -124,7 +123,6 @@ function Component:__call(damagedata: DamageData)
 				playerBonusExp[player.Name] = true;
 
 				if gameSave:AddStat("Perks", 1) > 0 then
-					modAnalytics.RecordResource(player.UserId, 1, "Source", "Perks", "Gameplay", "FocusKills");
 					modAnalyticsService:Source{
 						Player = player;
 						Currency = modAnalyticsService.Currency.Perks;

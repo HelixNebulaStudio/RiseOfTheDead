@@ -2,7 +2,6 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 
 --== Variables;
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
-local modAnalytics = shared.require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumber);
 local modWorkbenchLibrary = shared.require(game.ReplicatedStorage.Library.WorkbenchLibrary);
 

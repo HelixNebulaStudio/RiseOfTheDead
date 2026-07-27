@@ -3254,7 +3254,7 @@ MissionLibrary.New{
 	};
 	SaveData = {
 		Area = function()
-			local list = shared.WorldName == "" and {"BioXResearch";} 
+			local list = shared.WorldName == "BioXResearch" and {"BioXResearch";} 
 			or {
 				"outside Sector F near Sewer Exit to W.D. Warehouse";
 				"inside the Train Station near W.D. Mall entrance";

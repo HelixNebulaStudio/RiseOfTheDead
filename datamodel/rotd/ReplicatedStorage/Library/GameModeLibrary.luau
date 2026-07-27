@@ -178,6 +178,7 @@ GameModeLibrary.GameModes={
 			
 			--== Extreme Bosses
 			["Zricera"]={
+				Index=101;
 				MaxPlayers=8;
 				TitleImage="rbxassetid://3640418603";
 				Description="I think I better get some help for this.";
@@ -200,6 +201,7 @@ GameModeLibrary.GameModes={
 			};
 			
 			["Vexeron"]={
+				Index=102;
 				MaxPlayers=8;
 				TitleImage="rbxassetid://4601671040";
 				Description="Fight it in it's domain, sure, why not..";
@@ -222,6 +224,7 @@ GameModeLibrary.GameModes={
 			};
 			
 			["Pathoroth"]={
+				Index=-1;
 				MaxPlayers=8;
 				TitleImage="rbxassetid://5712929087";
 				Description="Appears to be stronger with zombies around it, and it just morphed into one of us!";
@@ -240,6 +243,7 @@ GameModeLibrary.GameModes={
 			};
 			
 			["Mothena"]={
+				Index=103;
 				MaxPlayers=8;
 				TitleImage="rbxassetid://6313471097";
 				Description="Lamps";
@@ -260,6 +264,7 @@ GameModeLibrary.GameModes={
 			};
 			
 			["Bandit Helicopter"]={
+				Index=104;
 				MaxPlayers=8;
 				TitleImage="rbxassetid://5101726655";
 				Description="Should I bring a knife to fight a helicopter?";
@@ -284,6 +289,7 @@ GameModeLibrary.GameModes={
 			
 			
 			["Vein Of Nekron"]={
+				Index=105;
 				MaxPlayers=8;
 				TitleImage="rbxassetid://8750128901";
 				Description="Looks like it's trying to spread, we should probably stop it from spreading..";
@@ -313,6 +319,7 @@ GameModeLibrary.GameModes={
 		-- HardModeTitleImage="rbxassetid://12409876370";
 		Stages={
 			["Sector F"]={
+				Index=1001;
 				WorldId = "SectorF";
 				ExitSpawn = "CXsecF2";
 				TitleImage = "rbxassetid://4817414130";
@@ -331,6 +338,7 @@ GameModeLibrary.GameModes={
 				HardModeEnabled = true;
 			};
 			["Prison"]={
+				Index=1002;
 				WorldId = "Prison";
 				ExitSpawn = "hacClinic1";
 				TitleImage = "rbxassetid://5943256940";
@@ -349,6 +357,7 @@ GameModeLibrary.GameModes={
 				HardModeEnabled = true;
 			};
 			["Sector D"]={
+				Index=1003;
 				WorldId="SectorD";
 				ExitSpawn="sectorDToRes";
 				TitleImage="rbxassetid://7145049831";
@@ -367,6 +376,7 @@ GameModeLibrary.GameModes={
 				HardModeEnabled=true;
 			};
 			["Swamplands"]={
+				Index=1004;
 				WorldId = "Swamplands";
 				ExitSpawn = "swampToHarbor";
 				TitleImage = "rbxassetid://78769778825277";
@@ -388,6 +398,7 @@ GameModeLibrary.GameModes={
 
 			--MARK: Community Survivals
 			["CommunityWaySide"]={
+				Index=1101;
 				WorldId="CommunityWaySide";
 				TitleImage="rbxassetid://10976370766";
 				MaxPlayers=5;
@@ -403,6 +414,7 @@ GameModeLibrary.GameModes={
 				HardModeEnabled=true;
 			};
 			["CommunityFissionBay"]={
+				Index=1102;
 				WorldId="CommunityFissionBay";
 				TitleImage="rbxassetid://12401525448";
 				MaxPlayers=5;
@@ -418,6 +430,7 @@ GameModeLibrary.GameModes={
 				HardModeEnabled=true;
 			};
 			["CommunityRooftops"]={
+				Index=1103;
 				WorldId="CommunityRooftops";
 				TitleImage="rbxassetid://13951712046";
 				MaxPlayers=5;
@@ -440,6 +453,7 @@ GameModeLibrary.GameModes={
 		Module="Raid";
 		Stages={
 			["Factory"]={
+				Index=2001;
 				WorldId="Factory";
 				ExitSpawn="factoryExit";
 				MaxPlayers=1;
@@ -450,6 +464,7 @@ GameModeLibrary.GameModes={
 			};
 			
 			["Office"]={
+				Index=2002;
 				WorldId="Office";
 				ExitSpawn="officeExit";
 				MaxPlayers=6;
@@ -460,6 +475,7 @@ GameModeLibrary.GameModes={
 			};
 			
 			["BanditOutpost"]={
+				Index=2003;
 				WorldId = "BanditOutpost";
 				ExitSpawn = "patrick";
 				MaxPlayers = 6;
@@ -474,6 +490,7 @@ GameModeLibrary.GameModes={
 			};
 			
 			["Tombs"]={
+				Index=2004;
 				WorldId="Tombs";
 				ExitSpawn="officeExit";
 				MaxPlayers=6;
@@ -484,6 +501,7 @@ GameModeLibrary.GameModes={
 			};
 			
 			["Railways"]={
+				Index=2005;
 				WorldId="Railways";
 				ExitSpawn="trainstation";
 				MaxPlayers=6;
@@ -494,6 +512,7 @@ GameModeLibrary.GameModes={
 			};
 
 			["Abandoned Bunker"]={
+				Index=2006;
 				WorldId="AbandonedBunker";
 				ExitSpawn="communitySh";
 				MaxPlayers=6;
@@ -504,6 +523,7 @@ GameModeLibrary.GameModes={
 			};
 			
 			["Eighth Street"]={
+				Index=2007;
 				WorldId = "EighthStreet";
 				ExitSpawn = "communitySh";
 				MaxPlayers = 6;
@@ -521,6 +541,7 @@ GameModeLibrary.GameModes={
 		Module="Coop";
 		Stages={
 			["Genesis"] = {
+				Index=3001;
 				WorldId = "Genesis";
 				ExitSpawn = "communitySh";
 				TitleImage = "rbxassetid://7431603916";
@@ -537,6 +558,7 @@ GameModeLibrary.GameModes={
 			};
 			
 			["Mr. Klaw's Workshop"] = {
+				Index=3002;
 				WorldId = "KlawsWorkshop";
 				TitleImage = "rbxassetid://8402447350";
 				
@@ -547,6 +569,7 @@ GameModeLibrary.GameModes={
 			};
 
 			["SunkenShip"] = {
+				Index=3003;
 				WorldId = "SunkenShip";
 				ExitSpawn = "sewersToharbor";
 				TitleImage = "rbxassetid://11114580671";
@@ -563,6 +586,7 @@ GameModeLibrary.GameModes={
 			};
 
 			["CargoShip"]={
+				Index=3004;
 				WorldId="CargoShip";
 				ExitSpawn="sewersToharbor";
 				TitleImage="rbxassetid://18589491051";

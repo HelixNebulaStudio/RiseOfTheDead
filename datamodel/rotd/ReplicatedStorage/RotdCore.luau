@@ -7,7 +7,7 @@ local RotdCore = {};
 local modGlobalVars = shared.require(game.ReplicatedStorage.GlobalVariables);
 modGlobalVars.DevVersion="3.0.x";
 modGlobalVars.GameVersion = "3.0";
-modGlobalVars.GameBuild = "129";
+modGlobalVars.GameBuild = "130";
 modGlobalVars.ModeVerLabel = `$Fps fps\t$UpTime\tRotd $GameVersion $BranchName $IsMobile`;
 
 --==
@@ -52,8 +52,49 @@ if RunService:IsServer() then
     local modItemDrops = shared.require(game.ServerScriptService.ServerLibrary.ItemDropsRotd);
     local modShopSystem = shared.require(game.ServerScriptService.ServerLibrary.ShopSystem);
     local modGameModeManager = shared.require(game.ServerScriptService.ServerLibrary.GameModeManager);
+    local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
+    
+    modAnalyticsService:InitCurrencies{
+        Money = "Money";
+        Perks = "Perks";
+        TweakPoints = "TweakPoints";
+        Gold = "Gold";
+        PlayPoints = "PlayPoints";
+        FactionMoney = "FactionMoney";
+    };
+    modAnalyticsService:InitOnBoardingSteps{
+        ClickPlay = 1;
 
+        Mission1_WakeUp = 2;
+        Mission1_TakePistol = 3;
+        Mission1_EquipPistol = 4;
+        Mission1_Complete = 5;
+
+        Mission2_WakeUp = 6;
+        Mission2_TalkToMason = 7;
+        Mission2_ExitBedroom = 8;
+        Mission2_DrDeniskiHeal = 9;
+        Mission2_PurchaseAmmo = 10;
+        Mission2_KillTenZombies = 11;
+        Mission2_Complete = 12;
+
+        Mission5_Start = 13;
+        Mission5_CheckBlueprintCost = 14;
+        Mission5_BuildDamageMod = 15;
+        Mission5_CollectDamageMod = 16;
+        Mission5_Complete = 17;
+
+        Mission6_Start = 18;
+        Mission6_DestroyedBarricade = 19;
+        Mission6_Complete = 20;
+
+        Mission7_Start = 21;
+        Mission7_EnteredBossFight = 22;
+        Mission7_DefeatedBoss = 23;
+        Mission7_UnlockedBloxmartGate = 24;
+        Mission7_Complete = 25;
+    };
 end
 
 function RotdCore.OnPlayerAdded(player)

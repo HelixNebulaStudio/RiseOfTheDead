@@ -3,11 +3,11 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local RunService = game:GetService("RunService");
 
 local modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
-local modAnalytics = shared.require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modProfile = shared.require(game.ServerScriptService.ServerLibrary.Profile);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modGameModeLibrary = shared.require(game.ReplicatedStorage.Library.GameModeLibrary);
 local modLeaderboardService = shared.require(game.ReplicatedStorage.Library.LeaderboardService);
+local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 --==
 local GameMode = {};
@@ -68,16 +68,21 @@ function GameMode:WorldLoad(modeData)
 		
 		GameMode.Active = gameController;
 		if GameMode.Active.Initiated == nil then
-			spawn(function()
+			task.spawn(function()
 				GameMode.Active:Initialize(modeData.Room);
 				GameMode.Active.Initiated = true;
 			end)
 		end
 		GameMode.Active.OnComplete = function(players)
-			spawn(function()
+			task.spawn(function()
 				for _, player in pairs(players) do
-					modAnalytics.RecordProgression(player.UserId, "Complete", gameType..":"..(modeData.Room.IsHard and "Hard-" or "")..gameStage);
-					
+					modAnalyticsService:LogProgressionCompleteEvent{
+						Player = player;
+						PathName = `{gameType}`;
+						Level = stageLib.Index;
+						LevelName = `{(modeData.Room.IsHard and "Hard-" or "")..gameStage}`;
+					};
+
 					local profile = modProfile:Get(player);
 					local timePlayed = math.ceil(tick()-arenaTimer);
 					profile.Analytics:LogTime("Arena:"..(modeData.Room.IsHard and "Hard-" or "")..gameStage, timePlayed);

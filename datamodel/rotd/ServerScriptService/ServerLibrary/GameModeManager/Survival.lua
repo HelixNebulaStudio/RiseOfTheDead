@@ -91,7 +91,18 @@ function GameMode:WorldLoad(modeData)
 			end)
 			task.spawn(function()
 				for _, player in pairs(players) do
-					local profile = modProfile:Get(player);
+					if not game.Players:IsAncestorOf(player) then continue end;
+
+					modAnalyticsService:LogProgressionCompleteEvent{
+						Player = player;
+						PathName = `{gameType}`;
+						Level = stageLib.Index;
+						LevelName = `{(modeData.Room.IsHard and "Hard-" or "")..gameStage}`;
+					};
+
+					local profile = modProfile:Find(player.Name);
+					if profile == nil then continue end;
+
 					profile.Analytics:LogTime("Arena:"..(modeData.Room.IsHard and "Hard-" or "")..gameStage, math.ceil(tick()-arenaTimer));
 					
 					local playerSave = profile:GetActiveSave();
@@ -115,7 +126,7 @@ function GameMode:WorldLoad(modeData)
 					
 					if modeData.Room.IsHard then
 						if stageLib.LeaderboardDataKey then
-							spawn(function()
+							task.spawn(function()
 								local modeKey = gameStage..stageLib.LeaderboardDataKey;
 								profile.MonthlyStats["LM_H"..modeKey] = math.max((profile.MonthlyStats["LM_H"..modeKey] or 0), wave);
 								profile.SeasonlyStats["LS_H"..modeKey] = math.max((profile.SeasonlyStats["LS_H"..modeKey] or 0), wave);
@@ -128,7 +139,7 @@ function GameMode:WorldLoad(modeData)
 
 					else
 						if stageLib.LeaderboardDataKey then
-							spawn(function()
+							task.spawn(function()
 								local modeKey = gameStage..stageLib.LeaderboardDataKey;
 								profile.MonthlyStats["LM_"..modeKey] = math.max((profile.MonthlyStats["LM_"..modeKey] or 0), wave);
 								profile.SeasonlyStats["LS_"..modeKey] = math.max((profile.SeasonlyStats["LS_"..modeKey] or 0), wave);

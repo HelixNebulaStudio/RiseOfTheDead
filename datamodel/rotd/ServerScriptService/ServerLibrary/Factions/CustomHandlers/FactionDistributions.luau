@@ -208,6 +208,7 @@ function Handler.onRequire(factions)
         local fundedFlag = `DistFunded_{disId}`;
         local fundedFlagVal = factionGroup.Flags[fundedFlag];
         if fundedFlagVal == nil or endOfDayTick > fundedFlagVal then
+            -- Distribution not funded for next day
             if disLib.FundCost and factionGroup.Money < disLib.FundCost then
                 shared.Notify(player, `The faction can no longer afford the {disName} distribution.`, "Negative");
                 return;
@@ -240,6 +241,8 @@ function Handler.onRequire(factions)
                         ItemSKU = `Claim:Faction_{disId}`;
                     };
                 end
+                factionGroup:Sync();
+                
             end
         end)
 

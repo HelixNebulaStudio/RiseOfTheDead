@@ -10,11 +10,11 @@ local modServerManager = shared.require(game.ServerScriptService.ServerLibrary.S
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
 local modGameModeLibrary = shared.require(game.ReplicatedStorage.Library.GameModeLibrary);
-local modAnalytics = shared.require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modLeaderboardService = shared.require(game.ReplicatedStorage.Library.LeaderboardService);
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
+local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 local modMatchMaking = shared.require(game.ServerScriptService.ServerLibrary.MatchMaking);
 
@@ -642,33 +642,38 @@ function GameModeManager:Initialize(gameType, gameStage)
 				for a=1, #room.Players do
 					task.spawn(function()
 						local player = room.Players[a] and room.Players[a].Instance;
-						if player then
-							local playerClass: PlayerClass = modPlayers.get(player);
-							if playerClass and playerClass.RootPart then
-								playerClass.RootPart.Anchored = false;
-							end
+						if player == nil or not game.Players:IsAncestorOf(player) then return end;
+						
+						local playerClass: PlayerClass = modPlayers.get(player);
+						if playerClass and playerClass.RootPart then
+							playerClass.RootPart.Anchored = false;
+						end
 
-							if room.IsHard then
-								local hardItemId = gameTable.StageLib.HardModeItem;
-								
-								if player and player.Character then
-									local toolModel = hardItemId and player.Character:FindFirstChild(hardItemId);
-									local storageItemID = toolModel and toolModel:GetAttribute("StorageItemId");
-									if storageItemID then
-										local profile = shared.modProfile:Get(player);
-										local inventory = profile.ActiveInventory;
-										local storageItem = inventory and inventory.Find and inventory:Find(storageItemID);
-										if storageItem then
-											local itemLib = modItemsLibrary:Find(hardItemId);
-											inventory:Remove(storageItemID, 1);
-											shared.Notify(player, ("$Item removed from your Inventory."):gsub("$Item", itemLib.Name), "Negative");
-										end
+						if room.IsHard then
+							local hardItemId = gameTable.StageLib.HardModeItem;
+							
+							if player and player.Character then
+								local toolModel = hardItemId and player.Character:FindFirstChild(hardItemId);
+								local storageItemID = toolModel and toolModel:GetAttribute("StorageItemId");
+								if storageItemID then
+									local profile = shared.modProfile:Get(player);
+									local inventory = profile.ActiveInventory;
+									local storageItem = inventory and inventory.Find and inventory:Find(storageItemID);
+									if storageItem then
+										local itemLib = modItemsLibrary:Find(hardItemId);
+										inventory:Remove(storageItemID, 1);
+										shared.Notify(player, ("$Item removed from your Inventory."):gsub("$Item", itemLib.Name), "Negative");
 									end
 								end
 							end
-							
-							modAnalytics.RecordProgression(room.Players[a].Instance.UserId, "Start", gameType..":"..(room.IsHard and "Hard" or "")..gameStage);
 						end
+						
+						modAnalyticsService:LogProgressionStartEvent{
+							Player = player;
+							PathName = `{gameType}`;
+							Level = stageLib.Index;
+							LevelName = `{(room.IsHard and "Hard" or "")..gameStage}`;
+						};
 					end);
 				end
 				--==

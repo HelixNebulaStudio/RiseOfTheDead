@@ -11,7 +11,6 @@ local modDropRateCalculator = shared.require(game.ReplicatedStorage.Library.Drop
 local modColorPicker = shared.require(game.ReplicatedStorage.Library.UI.ColorPicker);
 
 local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
-local modAnalytics = shared.require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 local remoteNpcData;
@@ -146,7 +145,7 @@ function NpcTaskData.onRequire()
                         addItem.Data, 
                         function(queueEvent, storageItem)
                             local itemTxt = `{itemLibrary.Name} ({addItem.Data.Quantity})`;
-                            shared.Notify(player, `You recieved {itemTxt} from {npcName}.`, "PickUp");
+                            shared.Notify(player, `You recieved {itemTxt} from {npcName}.`, ("PickUp" :: any));
                             shared.modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
                         end
                     );
@@ -206,7 +205,7 @@ function NpcTaskData.onRequire()
                 local itemLib = modItemsLibrary:Find(itemId);
 
                 playerInventory:Add(itemId, itemsList[a].Data, function()
-                    shared.Notify(player, `{itemLib.Name} ({itemsList[a].Data.Quantity}) has been returned to your Inventory.`, "PickUp");
+                    shared.Notify(player, `{itemLib.Name} ({itemsList[a].Data.Quantity}) has been returned to your Inventory.`, ("PickUp" :: any));
                 end);
             end
 
@@ -252,7 +251,6 @@ function NpcTaskData.onRequire()
                 end
 
                 playerSave:AddStat("Perks", -perkCost);
-                modAnalytics.RecordResource(player.UserId, perkCost, "Sink", "Perks", "Gameplay", "SkipTask");
 
                 modAnalyticsService:Sink{
                     Player=player;
@@ -270,7 +268,6 @@ function NpcTaskData.onRequire()
                 end
 
                 traderProfile:AddGold(-goldCost);
-                modAnalytics.RecordResource(player.UserId, goldCost, "Sink", "Gold", "Gameplay", "SkipTask");
 
                 modAnalyticsService:Sink{
                     Player=player;

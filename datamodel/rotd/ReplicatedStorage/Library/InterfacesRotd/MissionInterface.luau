@@ -263,6 +263,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     --MARK: Window
 	local window: InterfaceWindow = interface:NewWindow("Missions", windowFrame);
 	window.BoolStringWhenActive = {String="!HotbarsHud"; Priority=2;};
+	window.DisableInteractables = true;
 	window.CompactFullscreen = true;
     window.CloseWithInteract = true;
 	if modConfigurations.CompactInterface then
@@ -1404,7 +1405,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				end
 			end
 
-			local typeKey = modMissionsLibrary.GetTypeKey(book.MissionType);
+			local typeKey = modMissionsLibrary.getTypeKey(book.MissionType);
 			
 			if missionTypesList[typeKey] then
 				table.insert(missionTypesList[typeKey], {

@@ -88,6 +88,17 @@ function MissionLogic.onRequire()
 				task.wait(math.random(2, 7));
 				if targetMission.Type ~= 1 or not game.Players:IsAncestorOf(targetPlayer) then return end;
 
+				local activeParametersKey = targetMission.SaveData.Area;	
+				local areaInfo = activeParametersKey and AREAS_TO_SECURE[activeParametersKey];
+
+				local zoneRegion;
+				if areaInfo then
+					zoneRegion = {
+						CFrame = areaInfo.RegionCFrame;
+						Size = areaInfo.RegionSize;
+					};
+				end
+
 				shared.modNpcs.spawn2{
 					Name = ({"Zombie"; "Ticks"; "Heavy"})[math.random(1, 3)];
 					CFrame = spawnCf * CFrame.Angles(0, math.rad(math.random(0, 360)), 0);
@@ -96,6 +107,8 @@ function MissionLogic.onRequire()
 						AreaDifficulty = areaDiff;
 						TargetableDistance = 128;
 						HordeAggression = true;
+						ZoneRegion = zoneRegion;
+						ThinkCycle = 0.5;
 					};
 					BindSetup = function(npcClass: NpcClass)
 						local targetHandlerComp = npcClass:GetComponent("TargetHandler");
@@ -243,7 +256,7 @@ function MissionLogic.Init(missionProfile: MissionsProfile, mission: Mission)
 
 						end
 
-						if t1Bar.Seconds <= (t1Bar.Duration/2) 
+						if t1Bar.Seconds <= (t1Bar.Duration-10)
 						and tick() > lastAggroTick then
 							lastAggroTick = tick()+math.random(4, 8);
 
@@ -253,6 +266,16 @@ function MissionLogic.Init(missionProfile: MissionsProfile, mission: Mission)
 								if npcClass.HealthComp == nil or npcClass.HealthComp.IsDead then continue end;
 								if not playerClass.HealthComp:CanTakeDamageFrom(npcClass) then continue end;
 								if math.random(1, 2) ~= 1 then continue end;
+
+								if npcClass.Properties.ZoneRegion == nil then
+									npcClass.Properties.ZoneRegion = {
+										CFrame = areaInfo.RegionCFrame;
+										Size = areaInfo.RegionSize;
+									};
+									task.delay(math.random(10, 60), function()
+										npcClass.Properties.ZoneRegion = nil;
+									end)
+								end
 
 								local targetHandlerComp = npcClass:GetComponent("TargetHandler");
 								targetHandlerComp:AddTarget(playerClass.Character);

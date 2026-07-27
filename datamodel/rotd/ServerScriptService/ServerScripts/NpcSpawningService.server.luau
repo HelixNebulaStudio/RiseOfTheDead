@@ -81,13 +81,8 @@ function Spawner.new(spawnConfig: Configuration)
     local spawnTypeSpacing = SPAWN_TYPE_SPACING[self.SpawnNpcName] or self.SpawnSpacing or 32;
     self.SpawnMaxBySpace = math.ceil(math.ceil(spawnSpace.X) * math.ceil(spawnSpace.Y) / math.pow(spawnTypeSpacing,2) );
 	
-    local worldSpaceSize = self.CFrame:vectorToWorldSpace(self.Size);
-    worldSpaceSize = Vector3.new(math.abs(worldSpaceSize.X), math.abs(worldSpaceSize.Y), math.abs(worldSpaceSize.Z));
-    
-    local pos = self.CFrame.Position;
-    local pointMin = pos - worldSpaceSize/2;
-    local pointMax = pos + worldSpaceSize/2;
-    self.SpawnRegion = {Min=pointMin; Max=pointMax;};
+    local _, spawnRegion = modVector.getRandomCFrameInBoundingBox(self.CFrame, self.Size);
+    self.SpawnRegion = spawnRegion;
     
     table.insert(ACTIVE_SPAWNERS, self);
     return self;
@@ -103,13 +98,12 @@ function Spawner:Destroy()
 end
 
 function Spawner:GetSpawnCFrame()
-    local targetPos = Vector3.new(
-        math.random(self.SpawnRegion.Min.X*10, self.SpawnRegion.Max.X*10)/10,
-        self.SpawnRegion.Max.Y,
-        math.random(self.SpawnRegion.Min.Z*10, self.SpawnRegion.Max.Z*10)/10
-    );
+    local targetCf, spawnRegion = modVector.getRandomCFrameInBoundingBox(self.CFrame, self.Size);
 
-    local rayDist = (self.SpawnRegion.Max.Y-self.SpawnRegion.Min.Y) + self.SpawnModelSize.Y;
+    targetCf = CFrame.new(targetCf.X, spawnRegion.Max.Y, targetCf.Z);
+    local targetPos = targetCf.Position;
+
+    local rayDist = (spawnRegion.Max.Y-spawnRegion.Min.Y) + self.SpawnModelSize.Y;
     local groundRay = Ray.new(targetPos, Vector3.new(0, -rayDist, 0));
     local groundHit, groundPoint = workspace:FindPartOnRayWithWhitelist(groundRay, {workspace.Environment; workspace.Terrain}, false);
 

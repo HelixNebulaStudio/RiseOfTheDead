@@ -3,13 +3,15 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modProjectile = shared.require(game.ReplicatedStorage.Library.Projectile);
 local modRaycastUtil = shared.require(game.ReplicatedStorage.Library.Util.RaycastUtil);
+local modVector = shared.require(game.ReplicatedStorage.Library.Util.Vector);
 
 --[[
     All zombie humanoid type npcs will default to this logic tree.
 ]]
 local treePackage = {
     LogicString = {
-        Default = "PreLogic | HasEnemy & (AlertTree | AggroTree) | IdleTree";
+        Default = "PreLogic | ZoneTree | HasEnemy & (AlertTree | AggroTree) | IdleTree";
+        ZoneTree = "!InZone & [GoToZone]";
         AlertTree = "!IsHardMode & !WasDamaged & LookAtEnemy";
         ThrowTree = "InHordeBundle & [ThrowJunk]";
         AggroTree = "InMeleeRange & CanAttack & [Attack] | ThrowTree | [FollowEnemy]";
@@ -25,6 +27,33 @@ function treePackage.PreLogic(npcClass: NpcClass)
     end
 
     return false;
+end
+
+function treePackage.InZone(npcClass: NpcClass)
+    local properties = npcClass.Properties;
+
+    if properties.ZoneRegion == nil then return true; end;
+
+    local zoneInfo = properties.ZoneRegion;
+    local isInZone = modVector.isInBoundingBox(zoneInfo.CFrame, zoneInfo.Size, npcClass:GetCFrame().Position);
+
+    if isInZone then return true end;
+
+    npcClass.OnThink:Fire();
+    return false;
+end
+
+function treePackage.GoToZone(npcClass: NpcClass)
+    local properties = npcClass.Properties;
+
+    local zoneInfo = properties.ZoneRegion;
+
+    if properties.LastMoveToZoneTick == nil or tick() > properties.LastMoveToZoneTick or npcClass.Move.IsMoving == false then
+        properties.LastMoveToZoneTick = tick()+math.random(3, 20);
+            
+        local targetCf,_ = modVector.getRandomCFrameInBoundingBox(zoneInfo.CFrame, zoneInfo.Size);
+        npcClass.Move:MoveTo(targetCf.Position);
+    end
 end
 
 function treePackage.HasEnemy(npcClass: NpcClass)

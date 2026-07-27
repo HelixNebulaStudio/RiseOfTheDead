@@ -143,9 +143,7 @@ if RunService:IsServer() then
 					bannerDestructible:SetEnabled(false);
 					
 					task.delay(300, function()
-						local bannerDestructible: DestructibleInstance = modDestructibles.getOrNew(
-							factionbannerPrefab.Destructible
-						);
+						local bannerDestructible: DestructibleInstance = modDestructibles.getOrNew(destructibleConfig);
 						if bannerDestructible then
 							bannerDestructible.HealthComp:SetMaxHealth(50000);
 							bannerDestructible.HealthComp:Reset();

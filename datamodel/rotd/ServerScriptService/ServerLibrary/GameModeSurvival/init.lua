@@ -924,6 +924,11 @@ end
 
 function Survival:GetSurvivalStorage(player)
 	local profile = shared.modProfile:Get(player);
+	if profile == nil then 
+		Debugger:Warn(`GetSurvivalStorage Missing Profile({player.Name}) IsInGame:{game.Players:IsAncestorOf(player)}`);
+		return
+	end;
+
 	local cachedStorages = profile:GetCacheStorages();
 	
 	local storage: Storage = self.Storages[player];
@@ -1146,6 +1151,8 @@ function Survival:StartWave(wave)
 						if rewardOption == nil then return end;
 
 						local storage: Storage = self:GetSurvivalStorage(player);
+						if storage == nil then return end;
+
 						storage:Add(rewardOption.ItemId, {Quantity=rewardOption.DropQuantity;});
 						storage:Sync(player);
 
@@ -1241,6 +1248,8 @@ function Survival:StartWave(wave)
 						if rewardInfo == nil then return end;
 
 						local storage: Storage = self:GetSurvivalStorage(player);
+						if storage == nil then return end;
+
 						storage:Add(rewardInfo.ItemId, {Quantity=rewardInfo.DropQuantity;});
 						storage:Sync(player);
 

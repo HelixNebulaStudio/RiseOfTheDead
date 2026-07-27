@@ -14,7 +14,6 @@ local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 
 local modBlueprints = shared.require(game.ServerScriptService.ServerLibrary.Blueprints);
-local modAnalytics = shared.require(game.ServerScriptService.ServerLibrary.GameAnalytics);
 local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 local modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 local modItemDrops = shared.require(game.ServerScriptService.ServerLibrary.ItemDrops);
@@ -303,6 +302,7 @@ function modGameSave:SetMasteries(key, amount)
 end
 
 function modGameSave:CalculateLevel()
+	local player = self.Player;
 	local previousLevel = self:GetStat("Level") or 0;
 	local totalLevels = self:SumMasteries();
 	self:SetStat("Level", math.clamp(totalLevels, 0, modGlobalVars.MaxLevels));
@@ -310,10 +310,10 @@ function modGameSave:CalculateLevel()
 	if totalLevels > previousLevel then
 		if totalLevels ~= 0 and math.fmod(totalLevels, 5) == 0 then
 			self:AddStat("Perks", 10);
-			shared.Notify(self.Player, (("+10 Perks for reaching level $level."):gsub("$level", totalLevels)), "Reward");
+			shared.Notify(player, (("+10 Perks for reaching level $level."):gsub("$level", totalLevels)), "Reward");
 
 			modAnalyticsService:Source{
-				Player=self.Player;
+				Player=player;
 				Currency=modAnalyticsService.Currency.Perks;
 				Amount=10;
 				EndBalance=self:GetStat("Perks");
@@ -326,10 +326,10 @@ function modGameSave:CalculateLevel()
 				self.Profile:GuiAction("glowquickbutton", "MasteryMenu");
 			end)
 		end
-		remoteHudNotification:FireClient(self.Player, "Levelup", {Level=totalLevels;});
+		remoteHudNotification:FireClient(player, "Levelup", {Level=totalLevels;});
 		
 		self:Sync("Masteries");
-		remoteMasterySync:FireAllClients(self.Player.Name, self.Level);
+		remoteMasterySync:FireAllClients(player.Name, self.Level);
 		
 		local unlockedNewSkill = false;
 		if not unlockedNewSkill then
@@ -363,22 +363,21 @@ function modGameSave:CalculateLevel()
 			end
 		end
 		if unlockedNewSkill then
-			shared.Notify(self.Player, "New skill unlocked, press [L] to open your masteries menu.", "Inform");
+			shared.Notify(player, "New skill unlocked, press [L] to open your masteries menu.", "Inform");
 		end
 		
-		if totalLevels < 10 then
-			modAnalytics.RecordProgression(self.Player.UserId, "Complete", "MasteryLevel:"..totalLevels);
-		elseif totalLevels < 500 and math.fmod(totalLevels, 10) == 0 then
-			modAnalytics.RecordProgression(self.Player.UserId, "Complete", "MasteryLevel:"..totalLevels);
-		elseif totalLevels < 1000 and math.fmod(totalLevels, 50) == 0 then
-			modAnalytics.RecordProgression(self.Player.UserId, "Complete", "MasteryLevel:"..totalLevels);
-		elseif math.fmod(totalLevels, 100) == 0 then
-			modAnalytics.RecordProgression(self.Player.UserId, "Complete", "MasteryLevel:"..totalLevels);
+		if math.fmod(totalLevels, 10) == 0 then
+			modAnalyticsService:LogFunnelStepEvent{
+				Player = player;
+				FunnelName = "MasteryLevel";
+				Step = math.clamp(1+math.floor(totalLevels/10), 0, 100);
+				StepName = `MasteryLevel_{math.floor(totalLevels/10)*10}`;
+			};
 		end
 	end
 	pcall(function()
-		local iconLevelTag = self.Player and self.Player.Character and self.Player.Character:FindFirstChild("LevelIcon", true);
-		if self.Player and self.Player.Character and self.Player.Character:FindFirstChild("LevelIcon", true) then
+		local iconLevelTag = player and player.Character and player.Character:FindFirstChild("LevelIcon", true);
+		if player and player.Character and player.Character:FindFirstChild("LevelIcon", true) then
 			iconLevelTag.LevelTag.Text = totalLevels;
 		end
 	end)
