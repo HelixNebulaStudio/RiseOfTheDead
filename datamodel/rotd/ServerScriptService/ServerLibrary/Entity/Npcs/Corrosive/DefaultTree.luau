@@ -39,8 +39,8 @@ function treePackage.Charge(npcClass: NpcClass)
     properties.ChargeCooldown = tick()+15;
     npcClass.Move:Stop();
 
-    task.wait(0.1);
     local enemyTargetData: NpcTargetData = npcClass.Properties.EnemyTargetData;
+    task.wait(0.1);
     local enemyNpcClass: CharacterClass = enemyTargetData.HealthComp.CompOwner :: CharacterClass;
 
     if isHard then

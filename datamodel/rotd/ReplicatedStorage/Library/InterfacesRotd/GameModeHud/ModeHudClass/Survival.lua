@@ -253,6 +253,7 @@ return function(interface, window, frame)
 				Debugger:StudioLog(`waveSelect`, waveSelect);
 				for a, rewardInfo in ipairs(rewardOptionsList) do
 					local itemId = rewardInfo.ItemId;
+					local dropQty = rewardInfo.DropQuantity or 1;
 					local itemLib = modItemsLibrary:Find(itemId);
 
 					local newOption = templateRewardOption:Clone();
@@ -263,7 +264,7 @@ return function(interface, window, frame)
 						Size = UDim2.new(0, 280, 0, 400);
 					}):Play();
 					newOption.Parent = rewardOptionsFrame;
-					if a==1 then
+					if a==1 or waveSelect.Players[tostring(localPlayer.UserId)].OptionPick == a then
 						wavePassScreenElement.SelectionStroke.Parent = newOption;
 					end
 
@@ -317,6 +318,11 @@ return function(interface, window, frame)
 					itemNameLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
 					itemNameLabel.Parent = newItemButton;
 
+					local quantityLabel = newItemButton:WaitForChild("QuantityLabel");
+					quantityLabel.Text = `x{dropQty}`;
+					quantityLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
+					quantityLabel.Visible = dropQty > 1;
+
                     itemToolTip:BindHoverOver(newOption, function()
                         itemToolTip.Frame.Parent = interface.ScreenGui;
                         itemToolTip:Update(itemId);
@@ -354,6 +360,48 @@ return function(interface, window, frame)
 						self:Update(data);
 					end)
 					
+					if rewardInfo.BonusReward then
+						local bonusRewardInfo = rewardInfo.BonusReward;
+						local bonusItemId = bonusRewardInfo.ItemId;
+						local bonusQty = bonusRewardInfo.DropQuantity;
+
+						local bonusItemLib = modItemsLibrary:Find(bonusItemId);
+
+						local bonusItemButtonObject = modItemInterface.newItemButton();
+						bonusItemButtonObject:SetZIndex(0);
+						bonusItemButtonObject:SetItemId(bonusItemId);
+
+						local bonusItemButton: ImageButton = bonusItemButtonObject.ImageButton;
+						bonusItemButton.Active = false;
+						bonusItemButton.Interactable = false;
+
+						local bonusItemLabel = Instance.new("TextLabel");
+						bonusItemLabel.Name = `PlusLabel`;
+						bonusItemLabel.AutomaticSize = Enum.AutomaticSize.X;
+						bonusItemLabel.BackgroundTransparency = 1;
+						bonusItemLabel.Text = `+`;
+						bonusItemLabel.AnchorPoint = Vector2.new(1, 0.5);
+						bonusItemLabel.Position = UDim2.new(0, 0, 0.5, 0);
+						bonusItemLabel.TextSize = 32;
+						bonusItemLabel.RichText = true;
+						bonusItemLabel.Font = Enum.Font.ArimoBold;
+						bonusItemLabel.Size = UDim2.new(0, 5, 1, 0);
+						bonusItemLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
+						bonusItemLabel.Parent = bonusItemButton;
+
+						local bonusQuantityLabel = bonusItemButton:WaitForChild("QuantityLabel");
+						bonusQuantityLabel.Text = `x{bonusQty}`;
+						bonusQuantityLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
+						bonusQuantityLabel.Visible = bonusQty > 1;
+
+						bonusItemButton.Name = bonusItemId;
+						bonusItemButton.Size = UDim2.new(0.5, 0, 0.5, 0);
+						bonusItemButton.Parent = itemSlotFrame;
+						
+						bonusItemButtonObject:Update();
+						bonusItemButton.Image = bonusItemLib.Icon;
+					end
+
 					if #rewardOptionsList <= 1 then
 						newOption.UIPadding:Destroy();
 						newOption.PlayerVote.Visible = false;

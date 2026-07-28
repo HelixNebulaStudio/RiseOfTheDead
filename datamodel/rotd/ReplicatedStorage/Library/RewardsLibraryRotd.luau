@@ -1198,7 +1198,7 @@ function library.onRequire()
 		Level = 300;
 		Rewards = {
 			{Wave=4; ItemId="stickygrenade"; Quantity=1; Chance=1;};
-			{Wave=4; ItemId="advmedkit"; Quantity=1; Chance=1;};
+			{Wave=4; ItemId="advmedkit"; Quantity={Min=1; Max=2}; Chance=1;};
 			{Wave=4; ItemId="abgreenkey"; Quantity=1; Chance=1;};
 
 			{Wave=8; ItemId="apron"; Quantity=1; Chance=1;};
@@ -1255,7 +1255,7 @@ function library.onRequire()
 		Name = "Corrupted Sector D Survival";
 		Level = 300;
 		Rewards = {
-			{Wave=4; ItemId="stickygrenade"; Quantity=1; Chance=1;};
+			{Wave=4; ItemId="stickygrenade"; Quantity={Min=1; Max=2}; Chance=1;};
 			{Wave=4; ItemId="advmedkit"; Quantity=1; Chance=1;};
 			{Wave=4; ItemId="abgreenkey"; Quantity=1; Chance=1;};
 
