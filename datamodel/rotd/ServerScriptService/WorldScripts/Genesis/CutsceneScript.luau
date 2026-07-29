@@ -72,7 +72,7 @@ end
 --== Script;
 local MISSION_ID = 56;
 return function(CutsceneSequence)
-	if not modBranchConfigurations.IsWorld("Genesis") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
+	if shared.WorldName ~= "Genesis" then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
 		
 	local cutsceneAssets = game.ReplicatedStorage:WaitForChild("CutsceneAssets");
 
@@ -103,6 +103,8 @@ return function(CutsceneSequence)
 		gameController:SetHeader("");
 		gameController:SetStatus("Exit the safe room");
 
+		local jetTriggered = false;
+
 		local locationsChecklist = {};
 		gameController.OnPlayersLocationChanged:Connect(function(data: {Players: {[Player]: string}; PlayersCount: number})
 			for player, location in pairs(data.Players) do
@@ -120,6 +122,7 @@ return function(CutsceneSequence)
 			elseif locationsChecklist["Abandoned Safehouse"] == true and stageIndex < 6 then
 				gameController:SetStatus("Respond to the radio distress call");
 				stageIndex = 6;
+				jetTriggered = true;
 
 			elseif locationsChecklist["Garage"] == true and stageIndex < 3 then
 				gameController:SetStatus("Get the garage gates open");
@@ -218,8 +221,6 @@ return function(CutsceneSequence)
 			end
 		end)
 
-		
-		local jetTriggered = false;
 		if Cache.JetTriggerConn then Cache.JetTriggerConn:Disconnect() end;
 		Cache.JetTriggerConn = gameObjects.JetTrigger.Touched:Connect(function(hitPart)
 			if jetTriggered then return end;
@@ -236,8 +237,13 @@ return function(CutsceneSequence)
 			end
 		end)
 		
+		local dbJetTriggerTick = tick()+20;
 		repeat
-			task.wait()
+			task.wait();
+			if tick() > dbJetTriggerTick then
+				dbJetTriggerTick = tick()+10;
+				Debugger:Warn("Waiting for jet trigger touch.");
+			end
 		until jetTriggered or checkGameIndex();
 		if checkGameIndex() then return; end;
 		
@@ -275,6 +281,7 @@ return function(CutsceneSequence)
 			task.wait();
 		until milRadioInteractConfig:GetAttribute("IsActive") == true or checkGameIndex();
 		if checkGameIndex() then return; end;
+		
 		Debugger:Warn("MilitaryRadio active");
 		gameController:SetStatus("[Radio]: Missiles are inbound, stay inside as adviced. *Static*");
 

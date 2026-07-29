@@ -264,7 +264,9 @@ return function(interface, window, frame)
 						Size = UDim2.new(0, 280, 0, 400);
 					}):Play();
 					newOption.Parent = rewardOptionsFrame;
-					if a==1 or waveSelect.Players[tostring(localPlayer.UserId)].OptionPick == a then
+
+					local localPlayerWaveSelect = waveSelect.Players[tostring(localPlayer.UserId)];
+					if a==1 or (localPlayerWaveSelect and localPlayerWaveSelect.OptionPick == a) then
 						wavePassScreenElement.SelectionStroke.Parent = newOption;
 					end
 

@@ -411,21 +411,21 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		end
 	end
 
-	function binds.AddDynamic(class, name, basePart)
-		local id = `{class}_{name}`
-		if dynamicObjects[id] then 
-			dynamicObjects[id].Object = basePart;
-			dynamicObjects[id].Update();
+	function binds.AddDynamic(class, id, basePart)
+		local key = `{class}_{id}`
+		if dynamicObjects[key] then 
+			dynamicObjects[key].Object = basePart;
+			dynamicObjects[key].Update();
 			return
 		end;
 		
 		local new = {};
 		new.Class = class;
-		new.Name = name;
+		new.Name = id;
 		new.Object = basePart;
 		
 		new.Frame = templatePlayerPointer:Clone();
-		new.Frame.Name = id;
+		new.Frame.Name = key;
 		new.Frame.Size = UDim2.new(0, 10, 0, 10) -- UDim2.new(0, 2 * scaleRatio, 0, 2 * scaleRatio);
 		
 		if class == "Player" then
@@ -433,7 +433,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			uiStroke.Parent = new.Frame;
 			uiStroke.Enabled = false;
 
-			if name ~= localPlayer.Name then
+			if id ~= localPlayer.Name then
 				local uiCorner = Instance.new("UICorner");
 				uiCorner.CornerRadius = UDim.new(1, 0);
 				uiCorner.Parent = new.Frame;
@@ -454,12 +454,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				local activeSquadType = localPlayerClass.Properties.ActiveTeamType or "Squad";
 				local squadTeam: TeamClass = modTeamsManager.getTeamByPlayer(localPlayer, activeSquadType);
 
-				local playerClass = shared.modPlayers.getByName(name);
+				local playerClass = shared.modPlayers.getByName(id);
 				if playerClass and (new.Object == nil or not game:IsAncestorOf(new.Object)) then
 					new.Object = playerClass.RootPart;
 				end
 
-				if name == localPlayer.Name then
+				if id == localPlayer.Name then
 					new.Frame.Size = UDim2.new(0, 6, 0, 6);
 					new.Frame.ImageColor3 = Color3.fromRGB(255, 238, 0);
 					new.ZIndex = 5;
@@ -468,7 +468,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					new.Frame.Size = UDim2.new(0, 25, 0, 25);
 					new.Frame.ImageColor3 = Color3.fromRGB(255, 255, 255);
 					
-					local memberData = squadTeam and squadTeam.Members[name] or nil;
+					local memberData = squadTeam and squadTeam.Members[id] or nil;
 					if memberData and memberData.Values.Color then
 						if uiStroke then
 							uiStroke.Enabled = true;
@@ -511,6 +511,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				itemToolTip.Frame.Parent = mapMenu;
 				
 				function itemToolTip:CustomUpdate()
+					local character = basePart.Parent;
+					
 					self.Frame.Size = UDim2.new(0, 200, 0, 260);
 					
 					local defaultFrame = self.Frame:WaitForChild("default");
@@ -520,16 +522,15 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					customFrame.Visible = true;
 					
 					local nameTag = self.Frame:WaitForChild("NameTag");
-					nameTag.Text = name;
+					nameTag.Text = `{character.Name} {id}`;
 					
 					customFrame:ClearAllChildren();
 					
 					local viewportFrame = templateNpcToolTip:Clone();
 					viewportFrame.Parent = customFrame;
 					
-					local prefab = workspace.Entity:FindFirstChild(name);
-					if prefab then
-						local npcPrefab = prefab:Clone();
+					if character then
+						local npcPrefab = character:Clone();
 						
 						local vpCamera = Instance.new("Camera");
 						npcPrefab.Parent = viewportFrame;
@@ -547,7 +548,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			end);
 		end
 		
-		dynamicObjects[id] = new;
+		dynamicObjects[key] = new;
 		return new;
 	end
 
@@ -898,24 +899,25 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	end)
 
 
-	local enemyCounter = 0;
 	interface.Garbage:Tag(workspace.Entity.ChildAdded:Connect(function(child)
 		if not child:IsA("Model") then return end;
 		task.wait(0.5);
 		
+		local entityName = child.Name;
 		local npcLib = modNpcProfileLibrary:Find(child.Name);
 		local npcHumanoid = child:FindFirstChildWhichIsA("Humanoid");
 		
-		if child.PrimaryPart then
-			if npcLib and npcLib.Class ~= "Hidden" then
-				binds.AddDynamic(npcLib.Class, child.Name, child.PrimaryPart);
-				
-			elseif modConfigurations.AutoMarkEnemies == true and npcHumanoid and (npcHumanoid.Name == "Zombie" or npcHumanoid.Name == "Bandit") then
-				enemyCounter = enemyCounter +1;
-				binds.AddDynamic("Enemy", child.Name..enemyCounter, child.PrimaryPart);
-				
-			end
-		end;
+		if child.PrimaryPart == nil then return end;
+		
+		if modConfigurations.AutoMarkEnemies == true 
+		and npcHumanoid and (npcHumanoid.Name == "Zombie" or npcHumanoid.Name == "Bandit") then
+			local entityId = child:GetAttribute("EntityId") or 0;
+			binds.AddDynamic("Enemy", entityId, child.PrimaryPart);
+			
+		elseif npcLib and npcLib.Class ~= "Hidden" then
+			binds.AddDynamic(npcLib.Class, child.Name, child.PrimaryPart);
+			
+		end
 	end))
 	interface.Garbage:Tag(workspace.Entity.ChildRemoved:Connect(function(child)
 		for id, _ in pairs(dynamicObjects) do

@@ -111,7 +111,7 @@ if RunService:IsServer() then
 					local bannerPart = factionbannerPrefab:WaitForChild("banner");
 					for _, decal in pairs(bannerPart:GetChildren()) do
 						if decal:IsA("Decal") then
-							decal.Texture = "rbxassetid://".. factionIcon;
+							decal.Texture = `rbxassetid://{factionIcon or "9890634236"}`;
 						end
 					end
 					for _, obj in pairs(factionbannerPrefab:GetChildren()) do
