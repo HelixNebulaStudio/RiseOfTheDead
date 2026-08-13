@@ -1,23 +1,25 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Client Variables;
-local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local localPlayer = game.Players.LocalPlayer;
+
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modDamageTag = shared.require(game.ReplicatedStorage.Library.DamageTag);
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
+local modPlayerNpcs = shared.require(game.ReplicatedStorage.Library.PlayerNpcs);
 
---== Variables;
 local MISSION_ID = 43;
+--== Variables;
 
 if RunService:IsServer() then
 	modNpcs = shared.modNpcs;
 	modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
+	cutsceneAssets = script.Parent:WaitForChild("CutsceneAssets");
 	
-	if modBranchConfigurations.IsWorld("Office") then
+	if shared.WorldName == "Office" then
 		shared.modEventService:OnInvoked("GameModeManager_BindGameModeComplete", function(event: EventPacket, packet)
 			local room = packet.Room;
 			if room.Type ~= "Raid" or room.Stage ~= "Office" then return end;
@@ -34,7 +36,7 @@ if RunService:IsServer() then
 			end)
 		end)
 
-	elseif modBranchConfigurations.IsWorld("TheMall") then
+	elseif shared.WorldName == "TheMall" then
 		shared.modEventService:OnInvoked("Npcs_BindDeath", function(event: EventPacket, ...)
 			local npcClass: NpcClass = ...;
 			if npcClass == nil or npcClass.Name ~= "Zombie" then return end;
@@ -97,7 +99,7 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	if modBranchConfigurations.IsWorld("TheWarehouse") then
+	if shared.WorldName == "TheWarehouse" then
 
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
@@ -105,26 +107,21 @@ return function(CutsceneSequence)
 			local mission = modMission:GetMission(player, MISSION_ID);
 			if mission == nil then return end;
 				
-			if not modMission:IsComplete(player, MISSION_ID) and mission.ProgressionPoint < 4 then
-				local jackreap = modNpcs.getPlayerNpc(player, "Jack Reap");
-				if jackreap == nil then
-					local npc = modNpcs.spawn("Jack Reap", nil, function(npc, npcModule)
-						npcModule.Player = player;
-						jackreap = npcModule;
-					end);
-					modReplicationManager.ReplicateOut(player, npc);
-				end
-			end
+			if modMission:IsComplete(player, MISSION_ID) or mission.ProgressionPoint >= 4 then return end;
+			
+			local jackReapPlayerNpc: PlayerNpc = modPlayerNpcs.getPlayerNpc(player, "Jack Reap");
+			jackReapPlayerNpc:SetCFrame{
+				MissionId = MISSION_ID;
+				CFrame = CFrame.new(654.246, 57.75, 262.849) * CFrame.Angles(0, math.rad(90), 0);
+			};
 		end)
 
 
-	elseif modBranchConfigurations.IsWorld("TheMall") then
-
-		local npcPrefabs = game.ServerStorage.Prefabs.Npc;
-		local triggerPrefab = script.Parent:WaitForChild("summonTrigger");
-		local jackReapPrefab = npcPrefabs:WaitForChild("Jack Reap");
+	elseif shared.WorldName == "TheMall" then
 		
 		CutsceneSequence:Initialize(function()
+			local triggerPrefab = cutsceneAssets:WaitForChild("summonTrigger");
+			
 			local players = CutsceneSequence:GetPlayers();
 			local player: Player = players[1];
 			local mission = modMission:GetMission(player, MISSION_ID);
@@ -162,17 +159,17 @@ return function(CutsceneSequence)
 						modNpcs.spawn2{
 							Name = "Zombie";
 							CFrame = CFrame.new(440.02, 103.431, -651.14);
+							Properties = {
+								PresetShirt = {Id="rbxassetid://119132632"};
+								PresetPants = {Id="rbxassetid://119133558"};
+								JackReapZombie = true;
+								ForgetEnemies = false;
+								TargetableDistance = 4096;
+								HordeAggression = true;
+							};
 							BindSetup = function(npcClass: NpcClass)
 								npcClass.NetworkOwners = {player};
 
-								local properties = npcClass.Properties;
-								properties.FullNekron = true;
-								properties.NekronAppearance = jackReapPrefab;
-								properties.JackReapZombie = true;
-								properties.ForgetEnemies = false;
-								properties.Properties.TargetableDistance = 4096;
-								properties.HordeAggression = true;
-								
 								local targetHandlerComp = npcClass:GetComponent("TargetHandler");
 								targetHandlerComp:AddTarget(player.Character);
 
@@ -186,11 +183,10 @@ return function(CutsceneSequence)
 							ReplicateOut = true;
 						};
 
-						
 					end
 				elseif mission.Type == 3 then -- OnComplete
-
 					mission.OnChanged:Disconnect(OnChanged);
+
 				end
 			end
 			mission.OnChanged:Connect(OnChanged);

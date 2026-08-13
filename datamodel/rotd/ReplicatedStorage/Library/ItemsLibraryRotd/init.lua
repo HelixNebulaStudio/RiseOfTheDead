@@ -530,9 +530,9 @@ function modItemsLibrary.onRequire()
     new(customizationPack, {Id="skinice"; Icon="rbxassetid://8532443079"; Tags={"Skin Pack"}; UnlockPack={Type="SkinsPacks"; Id="Ice";};});
     new(customizationPack, {Id="skinwindtrails"; Icon="rbxassetid://14250975612"; Tags={"Skin Pack"}; UnlockPack={Type="SkinsPacks"; Id="Windtrails";};});
     new(customizationPack, {Id="skinfancy"; Icon="rbxassetid://17281999442"; Tags={"Skin Pack"}; UnlockPack={Type="SkinsPacks"; Id="Fancy";};});
+    new(customizationPack, {Id="skinstuds"; Icon="rbxassetid://77832781029970"; Tags={"Skin Pack"; "Unobtainable"}; UnlockPack={Type="SkinsPacks"; Id="Studs";};});
 
-
-
+    
     local usableBase = {
         Type = modItemsLibrary.Types.Usable;
         Tradable = modItemsLibrary.Tradable.Tradable;
@@ -788,6 +788,9 @@ function modItemsLibrary.onRequire()
     -- czevo3
     new(skinPermBase, {Id="czevo3asiimov"; Icon="rbxassetid://13810605651"; SkinPerm="Asiimov"; TargetItemId="czevo3"; });
 
+    -- dualuzi
+    new(skinPermBase, {Id="dualuzichevrons"; Icon="rbxassetid://136750752938445"; SkinPerm="Chevrons"; TargetItemId="dualuzi"; Tags={"Unobtainable"}; });
+
     -- rusty48
     new(skinPermBase, {Id="rusty48blaze"; Icon="rbxassetid://13822423304"; SkinPerm="Blaze"; TargetItemId="rusty48"; });
 
@@ -850,15 +853,11 @@ function modItemsLibrary.onRequire()
     new(skinPermBase, {Id="dufflebagfirstaidgreen"; Icon="rbxassetid://8828351670"; SkinPerm="Green First Aid"; TargetItemId="dufflebag"; });
     new(skinPermBase, {Id="dufflebagorigins"; Icon="rbxassetid://13975619757"; SkinPerm="Origins"; TargetItemId="dufflebag"; });
     new(skinPermBase, {Id="dufflebagfancy"; Icon="rbxassetid://17291182326"; SkinPerm="Fancy"; TargetItemId="dufflebag"; });
+    new(skinPermBase, {Id="dufflebaghighvis"; Icon="rbxassetid://134470965030613"; SkinPerm="High Vis"; TargetItemId="dufflebag"; Tags={"Unobtainable"}; });
 
     -- fedora
     new(skinPermBase, {Id="fedorauvunwrapped"; Icon="rbxassetid://17275939280"; SkinPerm="UV Unwrapped"; TargetItemId="fedora"; });
     new(skinPermBase, {Id="fedoraxmasred"; Icon="rbxassetid://74409810426341"; SkinPerm="Xmas Red"; TargetItemId="fedora"; });
-
-    -- greytshirt
-    new(skinPermBase, {Id="greytshirtcamo"; Icon="rbxassetid://6665474794"; SkinPerm="Camo"; TargetItemId="greytshirt"; });
-    new(skinPermBase, {Id="greytshirticyblue"; Icon="rbxassetid://8532617699"; SkinPerm="Icy Blue"; TargetItemId="greytshirt"; });
-    new(skinPermBase, {Id="greytshirticyred"; Icon="rbxassetid://8532659745"; SkinPerm="Icy Red"; TargetItemId="greytshirt"; });
 
     -- gasmask
     new(skinPermBase, {Id="gasmaskwhite"; Icon="rbxassetid://7021688682"; SkinPerm="White"; TargetItemId="gasmask"; });
@@ -867,31 +866,50 @@ function modItemsLibrary.onRequire()
     new(skinPermBase, {Id="gasmaskunionjack"; Icon="rbxassetid://7021608469"; SkinPerm="Union Jack"; TargetItemId="gasmask"; });
     new(skinPermBase, {Id="gasmasksovietfumes"; Icon="rbxassetid://17205637981"; SkinPerm="Soviet Style Fumes"; TargetItemId="gasmask"; });
 
+    -- greavesandsabatons
+    new(skinPermBase, {Id="greavesandsabatonscorrupted"; Icon="rbxassetid://95436624441324"; SkinPerm="Corrupted"; TargetItemId="greavesandsabatons"; Tags={"Unobtainable"}; });
+
+    -- greytshirt
+    new(skinPermBase, {Id="greytshirtcamo"; Icon="rbxassetid://6665474794"; SkinPerm="Camo"; TargetItemId="greytshirt"; });
+    new(skinPermBase, {Id="greytshirticyblue"; Icon="rbxassetid://8532617699"; SkinPerm="Icy Blue"; TargetItemId="greytshirt"; });
+    new(skinPermBase, {Id="greytshirticyred"; Icon="rbxassetid://8532659745"; SkinPerm="Icy Red"; TargetItemId="greytshirt"; });
+
     -- hardhat
     new(skinPermBase, {Id="hardhatorigins"; Icon="rbxassetid://13974944299"; SkinPerm="Origins"; TargetItemId="hardhat"; });
     new(skinPermBase, {Id="hardhatsilver"; Icon="rbxassetid://17485221629"; SkinPerm="Silver"; TargetItemId="hardhat"; });
 
     -- highvisjacket
     new(skinPermBase, {Id="highvisjacketsuits"; Icon="rbxassetid://17275772207"; SkinPerm="Suits"; TargetItemId="highvisjacket"; });
+    new(skinPermBase, {Id="highvisjacketterra"; Icon="rbxassetid://92945163586060"; SkinPerm="Terra"; TargetItemId="highvisjacket"; });
 
     -- inflatablebuoy
     new(skinPermBase, {Id="inflatablebuoyrat"; Icon="rbxassetid://13021723780"; SkinPerm="R.A.T."; TargetItemId="inflatablebuoy"; });
 
+    -- knightshelmet
+    new(skinPermBase, {Id="knightshelmetcorrupted"; Icon="rbxassetid://74972780972351"; SkinPerm="Corrupted"; TargetItemId="knightshelmet"; Tags={"Unobtainable"}; });
+
     -- leathergloves
     new(skinPermBase, {Id="leatherglovesred"; Icon="rbxassetid://16994275555"; SkinPerm="Red"; TargetItemId="leathergloves";});
     new(skinPermBase, {Id="leatherglovesultraviolet"; Icon="rbxassetid://17275591636"; SkinPerm="Ultra Violet"; TargetItemId="leathergloves"; });
+    new(skinPermBase, {Id="leatherglovessurgical"; Icon="rbxassetid://93743776957032"; SkinPerm="Surgical"; TargetItemId="leathergloves"; Tags={"Unobtainable"}; });
 
+    
     -- maraudersmask
     new(skinPermBase, {Id="maraudersmaskblue"; Icon="rbxassetid://11269657288"; SkinPerm="Blue"; TargetItemId="maraudersmask"; Tags={"Slaughterfest";};});
     new(skinPermBase, {Id="maraudersmaskrisingsun"; Icon="rbxassetid://17218272962"; SkinPerm="Rising Sun"; TargetItemId="maraudersmask"; });
+
+    -- militarygloves
+    new(skinPermBase, {Id="militaryglovesastrogaunts"; Icon="rbxassetid://72399854619835"; SkinPerm="Astrogaunts"; TargetItemId="militarygloves"; Tags={"Unobtainable"}; });
 
     -- militaryboots
     new(skinPermBase, {Id="militarybootsdesert"; Icon="rbxassetid://17022737460"; SkinPerm="Desert"; TargetItemId="militaryboots"; });
     new(skinPermBase, {Id="militarybootsforest"; Icon="rbxassetid://17022741672"; SkinPerm="Forest"; TargetItemId="militaryboots"; });
     new(skinPermBase, {Id="militarybootsgold"; Icon="rbxassetid://17275098172"; SkinPerm="Gold"; TargetItemId="militaryboots"; });
-
+    new(skinPermBase, {Id="militarybootsjades"; Icon="rbxassetid://128547458224092"; SkinPerm="Jades"; TargetItemId="militaryboots"; Tags={"Unobtainable"}; });
+        
     -- mercskneepads
     new(skinPermBase, {Id="mercskneepadscarbonfiberblack"; Icon="rbxassetid://17218761557"; SkinPerm="Black Carbon Fiber"; TargetItemId="mercskneepads"; });
+    new(skinPermBase, {Id="mercskneepadsastropads"; Icon="rbxassetid://138438567335329"; SkinPerm="Astropads"; TargetItemId="mercskneepads"; Tags={"Unobtainable"}; });
 
     -- nekrostrench
     new(skinPermBase, {Id="nekrostrenchblue"; Icon="rbxassetid://17291808230"; SkinPerm="Blue"; TargetItemId="nekrostrench";});
@@ -914,7 +932,8 @@ function modItemsLibrary.onRequire()
     -- tirearmor
     new(skinPermBase, {Id="tirearmorred"; Icon="rbxassetid://16791569263"; SkinPerm="Red"; TargetItemId="tirearmor"; });
     new(skinPermBase, {Id="tirearmorgoldplating"; Icon="rbxassetid://17255685451"; SkinPerm="Gold Plating"; TargetItemId="tirearmor"; });
-
+    new(skinPermBase, {Id="tirearmorlegion"; Icon="rbxassetid://130515655327772"; SkinPerm="Legion"; TargetItemId="tirearmor"; Tags={"Unobtainable"}; });
+    
     -- tophat
     new(skinPermBase, {Id="tophatgrey"; Icon="rbxassetid://7647922681"; SkinPerm="Grey"; TargetItemId="tophat"; Tags={"Slaughterfest";};});
     new(skinPermBase, {Id="tophatpurple"; Icon="rbxassetid://7647923912"; SkinPerm="Purple"; TargetItemId="tophat"; Tags={"Slaughterfest";};});
@@ -931,6 +950,7 @@ function modItemsLibrary.onRequire()
 
     -- vexgloves
     new(skinPermBase, {Id="vexglovesinferno"; Icon="rbxassetid://13974365409"; SkinPerm="Inferno"; TargetItemId="vexgloves";});
+    new(skinPermBase, {Id="vexglovesdisposal"; Icon="rbxassetid://106977694971313"; SkinPerm="Disposal"; TargetItemId="vexgloves"; Tags={"Unobtainable"};});
 
     -- watch
     new(skinPermBase, {Id="watchyellow"; Icon="rbxassetid://13022192307"; SkinPerm="Yellow"; TargetItemId="watch";});

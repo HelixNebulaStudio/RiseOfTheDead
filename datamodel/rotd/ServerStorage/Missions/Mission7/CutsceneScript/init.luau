@@ -5,10 +5,10 @@ local RunService = game:GetService("RunService");
 
 local localPlayer = game.Players.LocalPlayer;
 
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modPlayers = shared.require(game.ReplicatedStorage.Library.Players);
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
+local modPlayerNpcs = shared.require(game.ReplicatedStorage.Library.PlayerNpcs);
 
 --== Variables;
 local MISSION_ID = 7;
@@ -21,7 +21,7 @@ if RunService:IsServer() then
 	modItemDrops = shared.require(game.ServerScriptService.ServerLibrary.ItemDrops);
 	modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
-	if modBranchConfigurations.IsWorld("TheWarehouse") then
+	if shared.WorldName == "TheWarehouse" then
 		
         shared.modEventService:OnInvoked("GameModeManager_BindGameModeStart", function(eventPacket: EventPacket, packet)
 			local room = packet.Room;
@@ -152,9 +152,11 @@ else
 	
 end
 
+local WAREHOUSE_SIT_CF = CFrame.new(15.6800423, 57.6597404, 42.3099594, 1, 0, 0, 0, 1, 0, 0, 0, 1);
+
 --== Script;
 return function(CutsceneSequence)
-	if not modBranchConfigurations.IsWorld("TheWarehouse") then return; end;
+	if shared.WorldName ~= "TheWarehouse" then return; end;
 	
 	CutsceneSequence:Initialize(function()
 		local players = CutsceneSequence:GetPlayers();
@@ -162,16 +164,13 @@ return function(CutsceneSequence)
 		local mission = modMission:GetMission(player, MISSION_ID);
 		if mission == nil then return end;
 		
-		
-		local robertNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Robert");
-		if robertNpcClass == nil then
-			robertNpcClass = shared.modNpcs.spawn2{
-				Name = "Robert";
-				Player = player;
-				ReplicateOut = true;
-			};
-		end
-		local warehouseSitCf = CFrame.new(15.6800423, 57.6597404, 42.3099594, 1, 0, 0, 0, 1, 0, 0, 0, 1);
+		local robertPlayerNpc: PlayerNpc = modPlayerNpcs.getPlayerNpc(player, "Robert");
+		robertPlayerNpc:SetCFrame{
+			MissionId = MISSION_ID;
+			CFrame = WAREHOUSE_SIT_CF;
+		};
+
+		local robertNpcClass: NpcClass = robertPlayerNpc.NpcClass;
 
 		
 		local function OnChanged(firstRun)
@@ -192,7 +191,11 @@ return function(CutsceneSequence)
 				
 				robertNpcClass:ToggleInteractable(false);
 				
-				robertNpcClass:SetCFrame(CFrame.new(58.4135704, 57.6597404, -28.7544289, -0.573575675, 0, 0.819152594, 0, 1, 0, -0.819152594, 0, -0.573575675));
+				robertPlayerNpc:SetCFrame{
+					MissionId = MISSION_ID;
+					CFrame = CFrame.new(58.4135704, 57.6597404, -28.7544289, -0.573575675, 0, 0.819152594, 0, 1, 0, -0.819152594, 0, -0.573575675);
+				};
+
 				robertNpcClass.Move:Stop();
 				task.wait(0.3);
 				
@@ -203,7 +206,10 @@ return function(CutsceneSequence)
 				robertNpcClass.Move.OnMoveToEnded:Wait(10);
 				robertNpcClass.Move:Stop(1);
 				
-				robertNpcClass:SetCFrame(CFrame.new(15.6800423, 57.6597404, 42.3099594));
+				robertPlayerNpc:SetCFrame{
+					MissionId = MISSION_ID;
+					CFrame = CFrame.new(15.6800423, 57.6597404, 42.3099594);
+				};
 				
 				robertNpcClass.Move:Face(Vector3.new(15.6800423, 57.6597404, 37.0099602));
 				robertNpcClass.Chat(robertNpcClass.Player, "");
@@ -221,7 +227,10 @@ return function(CutsceneSequence)
 				end
 				
 				if mission.ProgressionPoint == 1 then
-					robertNpcClass:SetCFrame(warehouseSitCf);
+					robertPlayerNpc:SetCFrame{
+						MissionId = MISSION_ID;
+						CFrame = WAREHOUSE_SIT_CF;
+					};
 					robertNpcClass.StopAnimation("Holding");
 
 					robertNpcClass.Move:SetMoveSpeed("set", "default", 20);
@@ -262,7 +271,11 @@ return function(CutsceneSequence)
 					robertNpcClass.Move:Face("Player");
 
 					-- Dialogue;
-					robertNpcClass:SetCFrame(CFrame.new(304.6, 57.7, 66.7));
+					robertPlayerNpc:SetCFrame{
+						MissionId = MISSION_ID;
+						CFrame = CFrame.new(304.6, 57.7, 66.7);
+					};
+
 					robertNpcClass:GetComponent("WaitForPlayer")(50);
 					robertNpcClass.Chat(player, "Lets go in and put it out of it's misery!");
 					playerClass.Properties.EnemyDetectionRange = nil;
@@ -277,7 +290,10 @@ return function(CutsceneSequence)
 						local face = robertNpcClass.Character:FindFirstChild("face", true);
 						if face then face.Texture = "rbxassetid://277939506" end;
 					end
-					robertNpcClass:SetCFrame(CFrame.new(304.6, 57.7, 66.7));
+					robertPlayerNpc:SetCFrame{
+						MissionId = MISSION_ID;
+						CFrame = CFrame.new(304.6, 57.7, 66.7);
+					};
 					robertNpcClass:GetComponent("WaitForPlayer")(50);
 					if firstRun then
 						robertNpcClass.Chat(player, "Where have you been man? We need to kill this zombie.");
@@ -420,7 +436,10 @@ return function(CutsceneSequence)
 					robertNpcClass.Move:MoveTo(Vector3.new(636.112, 55.8, 9.348));
 					robertNpcClass.Move.OnMoveToEnded:Wait(32);
 					
-					robertNpcClass:SetCFrame(CFrame.new(636.112, 57.7, 9.348));
+					robertPlayerNpc:SetCFrame{
+						MissionId = MISSION_ID;
+						CFrame = CFrame.new(636.112, 57.7, 9.348);
+					};
 					robertNpcClass.Move:Face(Vector3.new(624.712, 55.8, 11.148));
 					robertNpcClass.Chat(player, "Hurry, get in.");
 				end

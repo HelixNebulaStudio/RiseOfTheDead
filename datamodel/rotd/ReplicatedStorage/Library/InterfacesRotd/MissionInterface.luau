@@ -22,6 +22,7 @@ local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumb
 local modRewardsLibrary = shared.require(game.ReplicatedStorage.Library.RewardsLibrary);
 local modDropRateCalculator = shared.require(game.ReplicatedStorage.Library.DropRateCalculator);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
+local modVector = shared.require(game.ReplicatedStorage.Library.Util.Vector);
 
 local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.Library.NpcProfileLibrary);
 local modHeadIcons = shared.require(game.ReplicatedStorage.Library.HeadIcons);
@@ -62,6 +63,8 @@ local BP_COLORS = {
 	LockedPassOwner = Color3.fromRGB(110, 60, 60);
 	LockedPremium = Color3.fromRGB(80, 72, 49);
 };
+
+local MISSION_MARKER_KEY = "PinMissionMarker";
 local MISSION_MARKER_COLOR = Color3.fromRGB(251, 255, 0);
 
 local REWARDS_PRESETS = {
@@ -1808,6 +1811,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				pinHudData.setActive(true);
 			end
 			binds.UpdatePinnedHud();
+			if missionData == nil then return end;
 
 			local function destroyTaskList()
 				if pinHudData.TaskList then
@@ -2350,20 +2354,37 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			local function setPinnedMarker(missionWorld, markInfo)
 				if missionWorld == nil or missionWorld == modBranchConfigurations.WorldName then
 					if markInfo.Type == modMarkers.MarkerTypes.Waypoint then
-						modMarkers.SetMarker("PinMissionMarker", markInfo.Target, markInfo.Label, markInfo.Type);
+						modMarkers.SetMarker(MISSION_MARKER_KEY, markInfo.Target, markInfo.Label, markInfo.Type);
 
 					elseif markInfo.Type == modMarkers.MarkerTypes.Npc then
 						local npcModel = getNpc(markInfo.Target);
 
 						if npcModel then
-							modMarkers.SetMarker("PinMissionMarker", npcModel.PrimaryPart, markInfo.Label, markInfo.Type);
+							local isHidden = modVector.isInBoundingBox(
+								CFrame.new(10000, 270, 10000), 
+								Vector3.one*16,
+								npcModel:GetPivot().Position
+							);
+
+							if not isHidden then
+								modMarkers.SetMarker(
+									MISSION_MARKER_KEY, 
+									npcModel.PrimaryPart, 
+									markInfo.Label, 
+									markInfo.Type
+								);
+							else
+								modMarkers.ClearMarker(MISSION_MARKER_KEY);
+							end
+						else
+							modMarkers.ClearMarker(MISSION_MARKER_KEY);
 						end
 					end
 				else
-					modMarkers.SetMarker("PinMissionMarker", missionWorld, modBranchConfigurations.GetWorldDisplayName(missionWorld), modMarkers.MarkerTypes.Travel);
+					modMarkers.SetMarker(MISSION_MARKER_KEY, missionWorld, modBranchConfigurations.GetWorldDisplayName(missionWorld), modMarkers.MarkerTypes.Travel);
 				end
-				modMarkers.SetColor("PinMissionMarker", markInfo.Color or MISSION_MARKER_COLOR);
-				modMarkers.SetGlowing("PinMissionMarker", true);
+				modMarkers.SetColor(MISSION_MARKER_KEY, markInfo.Color or MISSION_MARKER_COLOR);
+				modMarkers.SetGlowing(MISSION_MARKER_KEY, true);
 			end
 
 			if pinnedMissionLib and pinnedMission.Type == 2 then -- Available
@@ -2372,20 +2393,20 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					local npcModel = getNpc(pinnedMissionLib.From);
 
 					if npcModel then
-						modMarkers.SetMarker("PinMissionMarker", npcModel.PrimaryPart, pinnedMissionLib.From, modMarkers.MarkerTypes.Npc);
-						modMarkers.SetColor("PinMissionMarker", MISSION_MARKER_COLOR);
-						modMarkers.SetGlowing("PinMissionMarker", true);
+						modMarkers.SetMarker(MISSION_MARKER_KEY, npcModel.PrimaryPart, pinnedMissionLib.From, modMarkers.MarkerTypes.Npc);
+						modMarkers.SetColor(MISSION_MARKER_KEY, MISSION_MARKER_COLOR);
+						modMarkers.SetGlowing(MISSION_MARKER_KEY, true);
 
 					else
 						local npcLib = modNpcProfileLibrary:Find(pinnedMissionLib.From);
 						local npcWorld = pinnedMissionLib.NpcWorld or (npcLib and npcLib.World) or nil;
 
 						if npcWorld ~= modBranchConfigurations.WorldName then
-							modMarkers.SetMarker("PinMissionMarker", npcWorld, modBranchConfigurations.GetWorldDisplayName(npcWorld), modMarkers.MarkerTypes.Travel);
-							modMarkers.SetColor("PinMissionMarker", MISSION_MARKER_COLOR);
-							modMarkers.SetGlowing("PinMissionMarker", true);
+							modMarkers.SetMarker(MISSION_MARKER_KEY, npcWorld, modBranchConfigurations.GetWorldDisplayName(npcWorld), modMarkers.MarkerTypes.Travel);
+							modMarkers.SetColor(MISSION_MARKER_KEY, MISSION_MARKER_COLOR);
+							modMarkers.SetGlowing(MISSION_MARKER_KEY, true);
 						else
-							modMarkers.ClearMarker("PinMissionMarker");
+							modMarkers.ClearMarker(MISSION_MARKER_KEY);
 						end
 					end
 					
@@ -2398,7 +2419,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						local missionWorld = markInfo.World or pinnedMissionLib.World;
 						setPinnedMarker(missionWorld, markInfo);
 					else
-						modMarkers.ClearMarker("PinMissionMarker");
+						modMarkers.ClearMarker(MISSION_MARKER_KEY);
 					end
 
 				elseif pinnedMissionLib.Objectives then
@@ -2414,20 +2435,20 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						local missionWorld = markInfo.World or pinnedMissionLib.World;
 						setPinnedMarker(missionWorld, markInfo);
 					else
-						modMarkers.ClearMarker("PinMissionMarker");
+						modMarkers.ClearMarker(MISSION_MARKER_KEY);
 					end
 
 				else
-					modMarkers.ClearMarker("PinMissionMarker");
+					modMarkers.ClearMarker(MISSION_MARKER_KEY);
 				end
 			else
-				modMarkers.ClearMarker("PinMissionMarker");
+				modMarkers.ClearMarker(MISSION_MARKER_KEY);
 			end
 
 			pinnedMission.OnChanged:Fire();
 
 		else
-			modMarkers.ClearMarker("PinMissionMarker");
+			modMarkers.ClearMarker(MISSION_MARKER_KEY);
 			pinHudData.setActive(false);
 			cancelAllMissionFunctions();
 

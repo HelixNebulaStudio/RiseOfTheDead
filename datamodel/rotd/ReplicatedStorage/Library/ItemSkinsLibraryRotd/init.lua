@@ -48,6 +48,9 @@ function modItemSkinsLibrary.onRequire()
     for _, obj in pairs(script:WaitForChild("SurfaceAppearances"):GetChildren()) do
         obj.Parent = modItemSkinsLibrary.Script;
     end
+    for _, obj in pairs(script:WaitForChild("Textures"):GetChildren()) do
+        obj.Parent = modItemSkinsLibrary.Script;
+    end
 
     --== MARK: Pattern Skins
     modItemSkinsLibrary:Add{
@@ -338,6 +341,7 @@ function modItemSkinsLibrary.onRequire()
             {Id="v4"; Name="Bevel"; Image="rbxassetid://18142697244"; ScaleRatio=Vector2.new(2, 2); };
         };
     };
+
     modItemSkinsLibrary:Add{
         Id="skinoffline";
         Type=modItemSkinsLibrary.SkinType.Pattern;
@@ -350,6 +354,20 @@ function modItemSkinsLibrary.onRequire()
             {Id="v1"; Name="Colored Static"; Image="rbxassetid://7866772353"; ScaleRatio=Vector2.new(1, 1); };
             {Id="v2"; Name="Mono Static"; Image="rbxassetid://76807511469529"; ScaleRatio=Vector2.new(8, 8); };
         };
+    };
+
+    modItemSkinsLibrary:Add{
+        Id = "skinstuds";
+        Type = modItemSkinsLibrary.SkinType.Pattern;
+        
+        Name = "Studs";
+        Icon = "rbxassetid://77832781029970";
+    
+        Patterns = {
+            {Id="v1"; Name="Colored"; Image="rbxassetid://128524285748047"; NormalTex="rbxassetid://120872503058745"; RoughTex="rbxassetid://88132264784192"; };
+            {Id="v2"; Name="Greyscaled"; Image="rbxassetid://129146483503150"; NormalTex="rbxassetid://120872503058745"; RoughTex="rbxassetid://88132264784192"; };
+        };
+        TemplateInstance=true;
     };
     
     --== MARK: Animated Patterns;
@@ -645,7 +663,20 @@ function modItemSkinsLibrary.onRequire()
             ["flamethrower"]={Id="flamethrowerblaze"; Image="rbxassetid://17229432117"; Icon="rbxassetid://17229367894"; };
         };
     };
+
+    modItemSkinsLibrary:Add{
+        Id="chevrons";
+        Type=modItemSkinsLibrary.SkinType.Texture;
+
+        Name="Chevrons";
+        Icon="rbxassetid://136750752938445";
+        Tintable = true;
     
+        Textures={
+            ["dualuzi"]={Id="dualuzichevrons"; Image="rbxassetid://96020919137018"; Icon="rbxassetid://136750752938445"; };
+        };
+    };
+
     modItemSkinsLibrary:Add{
         Id="slaughterwoods";
         Type=modItemSkinsLibrary.SkinType.Texture;

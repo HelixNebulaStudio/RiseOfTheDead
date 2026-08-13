@@ -4,8 +4,8 @@ local RunService = game:GetService("RunService");
 
 local localPlayer = game.Players.LocalPlayer;
 
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
+local modPlayerNpcs = shared.require(game.ReplicatedStorage.Library.PlayerNpcs);
 
 local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 
@@ -20,7 +20,7 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	if modBranchConfigurations.IsWorld("TheUnderground") then
+	if shared.WorldName == "TheUnderground" then
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
 			local player = players[1];
@@ -38,18 +38,19 @@ return function(CutsceneSequence)
 				return true;
 			end);
 			
-			local stanNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Stan");
-			if stanNpcClass == nil then
-				stanNpcClass = modNpcs.spawn2{
-					Name = "Stan";
-					Player = player;
-					ReplicateOut = true;
-				};
-			end
+			local stanPlayerNpc: PlayerNpc = modPlayerNpcs.getPlayerNpc(player, "Stan");
+			stanPlayerNpc:SetCFrame{
+				MissionId = MISSION_ID;
+			};
+			local stanNpcClass: NpcClass = stanPlayerNpc.NpcClass;
 			
 			local function OnChanged(firstRun)
 				if mission.Type == 2 then -- OnAvailable
-					stanNpcClass:SetCFrame(CFrame.new(235.934204, -22.3296394, 92.4541245, 1, 0, 0, 0, 1, 0, 0, 0, 1));
+					stanPlayerNpc:SetCFrame{
+						MissionId = MISSION_ID;
+						CFrame = CFrame.new(235.934204, -22.3296394, 92.4541245, 1, 0, 0, 0, 1, 0, 0, 0, 1);
+					};
+					
 					if stanNpcClass.WieldComp.ItemId == nil then
 						stanNpcClass.WieldComp:Equip{
 							ItemId = "czevo3";
@@ -153,11 +154,17 @@ return function(CutsceneSequence)
 						end)
 						
 					elseif mission.ProgressionPoint == 2 then
-						stanNpcClass:SetCFrame(CFrame.new(235.310089, 9.83002663, 10.3999949, 1, 0, 0, 0, 1, 0, 0, 0, 1));
+						stanPlayerNpc:SetCFrame{
+							MissionId = MISSION_ID;
+							CFrame = CFrame.new(235.310089, 9.83002663, 10.3999949, 1, 0, 0, 0, 1, 0, 0, 0, 1);
+						};
 						
 					elseif mission.ProgressionPoint == 3 then
 						stanNpcClass:ToggleInteractable(false);
-						stanNpcClass:SetCFrame(CFrame.new(235.310089, 9.83002663, 10.3999949, 1, 0, 0, 0, 1, 0, 0, 0, 1));
+						stanPlayerNpc:SetCFrame{
+							MissionId = MISSION_ID;
+							CFrame = CFrame.new(235.310089, 9.83002663, 10.3999949, 1, 0, 0, 0, 1, 0, 0, 0, 1);
+						};
 
 						task.wait(2);
 						if stanNpcClass == nil then return end;
@@ -243,26 +250,35 @@ return function(CutsceneSequence)
 			local mallPatrickSpawn = patrickNpcClass.SpawnCFrame;
 			
 			local mallStanSpawn = CFrame.new(755.640137, 59.1950226, -805.369812, -1, 0, 0, 0, 1, 0, 0, 0, -1);
-			local stanNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Stan");
+
+			local stanPlayerNpc: PlayerNpc = modPlayerNpcs.getPlayerNpc(player, "Stan");
+			stanPlayerNpc:SetCFrame{
+				MissionId = MISSION_ID;
+			};
+			local stanNpcClass: NpcClass = stanPlayerNpc.NpcClass;
 			
 			local function OnChanged(firstRun)
 				if mission.Type == 1 then -- OnActive
-					if firstRun and mission.ProgressionPoint >= 4 and stanNpcClass == nil then
-						stanNpcClass = modNpcs.spawn2{
-							Name = "Stan";
+					if firstRun and mission.ProgressionPoint >= 4 then
+						stanPlayerNpc:SetCFrame{
+							MissionId = MISSION_ID;
 							CFrame = mallStanSpawn;
-							Player = player;
-							ReplicateOut = true;
 						};
 					end
 					
 					if mission.ProgressionPoint == 4 then
-						stanNpcClass:SetCFrame(mallStanSpawn);
+						stanPlayerNpc:SetCFrame{
+							MissionId = MISSION_ID;
+							CFrame = mallStanSpawn;
+						};
 						modReplicationManager.SetClientParent(player, patrickNpcClass.Character, workspace.Entity);
 						
 					elseif mission.ProgressionPoint == 5 then
 						stanNpcClass:ToggleInteractable(false);
-						stanNpcClass:SetCFrame(mallStanSpawn);
+						stanPlayerNpc:SetCFrame{
+							MissionId = MISSION_ID;
+							CFrame = mallStanSpawn;
+						};
 						
 						task.wait(2);
 						stanNpcClass.Move:SetMoveSpeed("set", "default", 25);
@@ -297,7 +313,10 @@ return function(CutsceneSequence)
 						
 					elseif mission.ProgressionPoint == 6 then
 						stanNpcClass:ToggleInteractable(false);
-						stanNpcClass:SetCFrame(CFrame.new(793.235, 162.6, -726.123));
+						stanPlayerNpc:SetCFrame{
+							MissionId = MISSION_ID;
+							CFrame = CFrame.new(793.235, 162.6, -726.123);
+						};
 
 						local waitForPlayer = stanNpcClass:GetComponent("WaitForPlayer");
 						waitForPlayer.FacePlayerWhileWaiting = false;
@@ -334,13 +353,19 @@ return function(CutsceneSequence)
 						
 					elseif mission.ProgressionPoint == 7 then
 						stanNpcClass:ToggleInteractable(false);
-						stanNpcClass:SetCFrame(CFrame.new(793.235, 162.6, -726.123));
+						stanPlayerNpc:SetCFrame{
+							MissionId = MISSION_ID;
+							CFrame = CFrame.new(793.235, 162.6, -726.123);
+						};
 						stanNpcClass:GetComponent("WaitForPlayer")(20);
 						stanNpcClass.Move:Face("Player");
 						
 					elseif mission.ProgressionPoint == 8 then
 						stanNpcClass:ToggleInteractable(false);
-						stanNpcClass:SetCFrame(CFrame.new(793.235, 162.6, -726.123));
+						stanPlayerNpc:SetCFrame{
+							MissionId = MISSION_ID;
+							CFrame = CFrame.new(793.235, 162.6, -726.123);
+						};
 						stanNpcClass:GetComponent("WaitForPlayer")(20);
 						stanNpcClass.Move:Face("Player");
 						

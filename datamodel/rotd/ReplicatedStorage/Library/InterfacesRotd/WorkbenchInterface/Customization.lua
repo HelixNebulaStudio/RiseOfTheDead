@@ -10,6 +10,9 @@ local modCustomizationData = shared.require(game.ReplicatedStorage.Library.Custo
 local modColorsLibrary = shared.require(game.ReplicatedStorage.Library.ColorsLibrary);
 local modItemSkinsLibrary = shared.require(game.ReplicatedStorage.Library.ItemSkinsLibrary)
 local modItemSkinWear = shared.require(game.ReplicatedStorage.Library.ItemSkinWear);
+local modItemUnlockablesLibrary = shared.require(game.ReplicatedStorage.Library.ItemUnlockablesLibrary);
+local modItemLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
+local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 local modDropdownList = shared.require(game.ReplicatedStorage.Library.UI.DropdownList);
 local modComponents = shared.require(game.ReplicatedStorage.Library.UI.Components);
@@ -36,7 +39,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 	local inspectWindow: InterfaceWindow = interface:GetWindow("ItemInspect");
 
 	local binds = workbenchWindow.Binds;
-	function WorkbenchClass.new(itemId, appearanceLib, storageItem)
+	function WorkbenchClass.new(itemId, _, storageItem)
 		local isDevBranch = shared.gameConfig.BranchName == "Dev";
 		if firstSync == false then
 			firstSync = true;
@@ -56,8 +59,18 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 		local itemViewport = inspectWindow.Binds.ItemViewport;
 
 		if itemViewport.PartDataList == nil then
-			Debugger:StudioWarn("Selected ("..itemId..") not customizable.");
-			return;
+			local expectedSiid = storageItem.ID;
+			local timeout = tick() + 5;
+			while itemViewport.PartDataList == nil and tick() < timeout do
+				if itemViewport.OnDisplayID ~= expectedSiid then
+					return;
+				end
+				task.wait();
+			end
+			if itemViewport.PartDataList == nil then
+				Debugger:StudioWarn("Selected ("..itemId..") not customizable.");
+				return;
+			end
 		end
 
 		local customPlansCache = {};
@@ -66,6 +79,20 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 		customPlansCache["[All]"] = baseCustomPlan;
 
 		modCustomizationData.ClientLoadCustomizations(storageItem, itemViewport.PartDataList, customPlansCache);
+
+		-- Clothing mode detection
+		local isClothing = false;
+		for a=1, #itemViewport.PartDataList do
+			if itemViewport.PartDataList[a].PartIsAccessory then
+				isClothing = true;
+				break;
+			end
+		end
+
+		local activeSkinId = storageItem.Values.ActiveSkin;
+		local activeUnlockableLib = activeSkinId and modItemUnlockablesLibrary:Find(activeSkinId) or nil;
+		local showSkinTint = activeUnlockableLib ~= nil and activeUnlockableLib.Tintable == true;
+		local showEmissiveTint = activeUnlockableLib ~= nil and activeUnlockableLib.EmissiveTint == true;
 
 		-- MARK: generateSerialized()
 		local function generateSerialized()
@@ -146,6 +173,12 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 		
 		-- listMenu:Refresh();
 		function listMenu:Refresh()
+			for _, obj in pairs(scrollFrame:GetChildren()) do
+				if obj:IsA("GuiObject") then
+					obj:Destroy();
+				end
+			end
+
 			local itemWear, _itemWearTitle = 0, "";
 
 			if storageItem.Values.SkinWearId then
@@ -162,18 +195,20 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 			local groupsList = {};
 
 			do -- load list of modelParts and part list
-				for a=1, #itemViewport.PartDataList do
-					local partData = itemViewport.PartDataList[a];
-			
-					if partData.PredefinedGroup and table.find(groupsList, partData.PredefinedGroup) == nil then
-						table.insert(groupsList, partData.PredefinedGroup);
-					end
-			
-					if partData.Group and table.find(groupsList, partData.Group) == nil then
-						table.insert(groupsList, partData.Group);
-					end
+				if itemViewport.PartDataList then
+					for a=1, #itemViewport.PartDataList do
+						local partData = itemViewport.PartDataList[a];
+				
+						if partData.PredefinedGroup and table.find(groupsList, partData.PredefinedGroup) == nil then
+							table.insert(groupsList, partData.PredefinedGroup);
+						end
+				
+						if partData.Group and table.find(groupsList, partData.Group) == nil then
+							table.insert(groupsList, partData.Group);
+						end
 
-					table.insert(groupPartList, partData.Key);
+						table.insert(groupPartList, partData.Key);
+					end
 				end
 				table.sort(groupPartList);
 				table.sort(groupsList);
@@ -226,6 +261,16 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 
 			local function getUnlockedSkins()
 				local unlockedSkins = {};
+				if isClothing then
+					if storageItem.Values.Skins then
+						for _, skinId in pairs(storageItem.Values.Skins) do
+							unlockedSkins[skinId] = true;
+						end
+					end
+
+					return unlockedSkins;
+				end
+
 				if storageItem.Values.Skins then
 					for _, oldSkinId in pairs(storageItem.Values.Skins) do
 						local skinId = modItemSkinsLibrary.GetSkinIdFromOldId(oldSkinId);
@@ -238,12 +283,16 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 					for skinId, _ in pairs(modData.Profile.SkinsPacks) do
 						if modItemSkinsLibrary:Find(skinId) then
 							unlockedSkins[skinId] = true;
-							break;
 						end
 
-						skinId = modItemSkinsLibrary.GetSkinIdFromOldId(skinId);
-						if skinId then
-							unlockedSkins[skinId] = true;
+						local skinLib = modItemSkinsLibrary:GetItemSkinPackList(skinId);
+						if skinLib then
+							unlockedSkins[skinLib.Id] = true;
+						end
+
+						local oldSkinId = modItemSkinsLibrary.GetSkinIdFromOldId(skinId);
+						if oldSkinId then
+							unlockedSkins[oldSkinId] = true;
 						end
 					end
 				end
@@ -514,11 +563,16 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 			end
 
 			local unlockedSkins = getUnlockedSkins();
-			for index, skinInfo in pairs(modItemSkinsLibrary:GetIndexList()) do
-				if skinInfo.Rare ~= true then continue end;
-				-- Rare skins;
-				if unlockedSkins[skinInfo.Id] == nil and (skinInfo.UnlockPack and unlockedSkins[skinInfo.UnlockPack] == nil) then continue end; --  not isDevBranch and
-				table.insert(rareSkinsList, skinInfo.Id);
+			if not isClothing then
+				for index, skinInfo in pairs(modItemSkinsLibrary:GetIndexList()) do
+					if skinInfo.Rare ~= true then continue end;
+					-- Rare skins;
+					if unlockedSkins[skinInfo.Id] == nil
+					and (skinInfo.UnlockPack and unlockedSkins[skinInfo.UnlockPack] == nil) then
+						continue
+					end; --  not isDevBranch and
+					table.insert(rareSkinsList, skinInfo.Id);
+				end
 			end
 
 			local function refreshSkinPerm()
@@ -644,6 +698,158 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 				end
 
 				refreshSkinPerm();
+			end
+
+			if isClothing then
+				local unlockableLib = modItemUnlockablesLibrary:Find(itemId);
+				if unlockableLib then
+					local itemUnlockables = modItemUnlockablesLibrary:ListByKeyValue("ItemId", itemId);
+					if itemUnlockables then
+						local newLabel = templateDropDownLabel:Clone();
+						newLabel.TextLabel.Text = "Unlockables";
+						newLabel.Parent = baseSkinFrame;
+
+						local unlockableData = storageItem.Values.Skins or {};
+						local chargesData = modData.Profile and modData.Profile.ItemUnlockables[itemId] or {};
+						local refreshButtonFuncs = {};
+						for b=1, #itemUnlockables do
+							local unlockItemLib = itemUnlockables[b];
+
+							local isUnlocked = table.find(unlockableData, unlockItemLib.Id);
+							if unlockItemLib.Name == "Default" or unlockItemLib.Unlocked == true then
+								isUnlocked = true;
+							elseif typeof(unlockItemLib.Unlocked) == "string" and table.find(unlockableData, unlockItemLib.Unlocked) then
+								isUnlocked = true;
+							end
+
+							if unlockItemLib.Hidden ~= true or shared.gameConfig.BranchName == "Dev" or localPlayer.UserId == 16170943 then
+								local unlockButton = templateTitledSkin:Clone();
+								local txrLabel = unlockButton:WaitForChild("TextureLabel");
+								local selectedLabel = unlockButton:WaitForChild("SelectedLabel");
+								local titleLabel = unlockButton:WaitForChild("TitleLabel");
+								local chargeLabel = unlockButton:WaitForChild("ChargesLabel");
+
+								local unlockableIcon = unlockItemLib.Icon;
+								local unlockableItemId = unlockItemLib.Id;
+								local unlockableItemLib2 = modItemLibrary:Find(unlockableItemId);
+								if unlockableItemLib2 then
+									unlockableIcon = unlockableItemLib2.Icon;
+								end
+
+								local hasCharges = chargesData[unlockableItemId] ~= nil;
+								if hasCharges then
+									chargeLabel.Text = `∞`;
+								end
+
+								txrLabel.Image = unlockableIcon or "";
+								titleLabel.Text = unlockItemLib.Name;
+								unlockButton.LayoutOrder = unlockItemLib.Name == "Default" and 0 or unlockItemLib.LayoutOrder or 1;
+								unlockButton.LayoutOrder = isUnlocked and unlockButton.LayoutOrder or unlockButton.LayoutOrder + 999;
+								unlockButton.ImageColor3 = isUnlocked and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(100, 100, 100);
+								txrLabel.ImageColor3 = isUnlocked and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(100, 100, 100);
+
+								local function refresh()
+									if storageItem.Values.ActiveSkin == nil and unlockItemLib.Name == "Default" then
+										selectedLabel.Visible = true;
+									else
+										selectedLabel.Visible = storageItem.Values.ActiveSkin == unlockableItemId;
+									end
+								end
+								table.insert(refreshButtonFuncs, refresh);
+								refresh();
+
+								unlockButton.MouseButton1Click:Connect(function()
+									interface:PlayButtonClick();
+
+									if isUnlocked == nil and hasCharges then
+										-- MARK: Use infinite;
+										local name = unlockableItemLib2 and unlockableItemLib2.Name or `{unlockItemLib.ItemId}:{unlockItemLib.Name}`;
+										local icon = unlockableItemLib2 and unlockableItemLib2.Icon or unlockItemLib.Icon;
+
+										modClientGuis.promptDialogBox({
+											Title=`Apply {name} Skin?`;
+											Desc=`You are about to apply {name} skin on {unlockableItemLib2.Name}?`;
+											Icon=icon;
+											Buttons={
+												{
+													Text="Apply";
+													Style="Confirm";
+													OnPrimaryClick=function(dialogWindow, textButton)
+														local statusLabel = dialogWindow.Binds.StatusLabel;
+														statusLabel.Text = "Applying<...>";
+														remoteCustomizationData:InvokeServer("setbaseskin", {
+															WorkbenchPart = binds.InteractPart;
+															Siid = storageItem.ID;
+															SkinId = unlockableItemId;
+															ApplyCharge = true;
+														});
+														task.delay(0.5, function()
+															listMenu:Refresh();
+														end)
+													end;
+												};
+												{
+													Text="Cancel";
+													Style="Cancel";
+												};
+											}
+										});
+
+										return;
+									end
+
+									if isUnlocked == nil then
+										interface:ToggleWindow("GoldMenu", true, unlockableItemId);
+										return;
+									end
+
+									local oldActiveId = storageItem.Values.ActiveSkin;
+									local setSkinId = unlockableItemId;
+									if storageItem.Values.ActiveSkin == unlockableItemId then
+										setSkinId = "None";
+									end
+
+									local rPacket = remoteCustomizationData:InvokeServer("setbaseskin", {
+										WorkbenchPart = binds.InteractPart;
+										Siid = storageItem.ID;
+										SkinId = setSkinId;
+									});
+
+									if rPacket and rPacket.Success then
+										if setSkinId == "None" then
+											storageItem.Values.ActiveSkin = nil;
+										else
+											storageItem.Values.ActiveSkin = setSkinId;
+										end
+									end
+
+									for a=1, 5, 0.1 do
+										storageItem = modData.GetItemById(storageItem.ID);
+										if storageItem.Values.ActiveSkin ~= oldActiveId then break; end;
+										task.wait(0.1);
+									end
+
+									itemViewport:SetDisplay({
+										ID = storageItem.ID;
+										ItemId = itemId;
+										Index = 1;
+										Values = {
+											ActiveSkin = storageItem.Values.ActiveSkin;
+										};
+									});
+
+									for c=1, #refreshButtonFuncs do
+										if type(refreshButtonFuncs[c]) == "function" then
+											refreshButtonFuncs[c]();
+										end
+									end
+								end)
+
+								unlockButton.Parent = baseSkinFrame;
+							end
+						end
+					end
+				end
 			end
 
 			local hintLabel: TextLabel = mainFrame:WaitForChild("HintLabel");
@@ -838,9 +1044,9 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 
 				end
 
-				modCustomizationData.ApplyCustomPlans(customPlansCache, itemViewport.PartDataList);
-
 				if markForSave then
+					modCustomizationData.ApplyCustomPlans(customPlansCache, itemViewport.PartDataList);
+
 					markForSave = false;
 					saveCustomizations();
 					updateSerializeText();
@@ -1352,6 +1558,98 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 			colorButton.TouchLongPress:Connect(resetPartColor);
 
 			local templateDarkenFrame = colorButton.Darken;
+			
+
+			-- MARK: Skin Tint;
+			local skinTintFrame = editPanel.SkinTintFrame;
+			local skinTintButton = skinTintFrame.Button;
+			local function OnSkinTintSelect(selectColor: Color3 | any, force)
+				skinTintButton.BackgroundColor3 = selectColor or Color3.fromRGB(150, 150, 150);
+				skinTintButton.TextColor3 = modColorPicker.GetBackColor(selectColor or Color3.fromRGB(150, 150, 150));
+
+				if baseCustomPlan.BaseSkin then
+					local skinId, variantId = modCustomizationData.GetSkinIds(baseCustomPlan.BaseSkin);
+					local skinLib, skinVariantData = modItemSkinsLibrary:FindVariant(skinId, variantId);
+					local hasAlphaTexture = skinLib and skinLib.HasAlphaTexture;
+
+					if selectColor and hasAlphaTexture ~= true then
+						skinTintButton.ImageLabel.Image = "";
+						
+					elseif skinVariantData and skinVariantData.Icon then
+						skinTintButton.ImageLabel.Image = skinVariantData.Icon;
+
+					elseif skinVariantData and skinVariantData.Image then
+						skinTintButton.ImageLabel.Image = skinVariantData.Image;
+
+					end
+				else
+					local partData = activePartSelection and #activePartSelection > 0 and activePartSelection[1];
+					if partData and partData.Part:GetAttribute("BaseTexture") and selectColor == nil then
+						skinTintButton.ImageLabel.Image = partData.Part:GetAttribute("BaseTexture");
+					else
+						skinTintButton.ImageLabel.Image = "";
+					end
+				end
+				skinTintButton.Text = skinTintButton.ImageLabel.Image == "" and 
+					`#{(selectColor or Color3.fromRGB(150, 150, 150)):ToHex()}` or "";
+
+				updateCustomization(function(customPlan)
+					if customPlan.Skin == nil and baseCustomPlan.BaseSkin then
+						customPlan.Skin = baseCustomPlan.BaseSkin;
+					end
+					customPlan.SkinTint = selectColor;
+				end)
+			end
+			skinTintButton.MouseButton1Click:Connect(function()
+				if skinTintButton.Darken.Visible then return end;
+				interface:PlayButtonClick();
+
+				markForSave = true;
+				OpenColorCustomizations(OnSkinTintSelect);
+				refreshConfigActive();
+			end)
+			local function resetPartSkinColor()
+				if skinTintButton.Darken.Visible then return end;
+				interface:PlayButtonClick();
+
+				markForSave = true;
+				OnSkinTintSelect(nil);
+				refreshConfigActive();
+			end
+			skinTintButton.MouseButton2Click:Connect(resetPartSkinColor);
+			skinTintButton.TouchLongPress:Connect(resetPartSkinColor);
+
+			
+			-- MARK: EmissiveTint
+			local emissiveTintFrame = editPanel.EmissiveTintFrame;
+			local emissiveTintButton = emissiveTintFrame.Button;
+			local function OnEmissiveTintSelect(selectColor, force)
+				emissiveTintButton.BackgroundColor3 = selectColor or Color3.fromRGB(150, 150, 150);
+				emissiveTintButton.TextColor3 = modColorPicker.GetBackColor(selectColor or Color3.fromRGB(150, 150, 150));
+
+				updateCustomization(function(customPlan)
+					customPlan.EmissiveTint = selectColor;
+				end)
+			end
+			emissiveTintButton.MouseButton1Click:Connect(function()
+				if emissiveTintButton.Darken.Visible then return end;
+				interface:PlayButtonClick();
+
+				markForSave = true;
+				OpenColorCustomizations(OnEmissiveTintSelect);
+				refreshConfigActive();
+			end)
+			local function resetEmissiveTint()
+				if emissiveTintButton.Darken.Visible then return end;
+				interface:PlayButtonClick();
+
+				markForSave = true;
+				OnEmissiveTintSelect(nil);
+				refreshConfigActive();
+			end
+			emissiveTintButton.MouseButton2Click:Connect(resetEmissiveTint);
+			emissiveTintButton.TouchLongPress:Connect(resetEmissiveTint);
+			
 			
 			-- MARK: Part Transparency
 			local transparencySlider = modComponents.NewSliderButton() :: TextButton;
@@ -1913,9 +2211,36 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 			local fnWear = 0.1;
 
 			function refreshConfigActive()
-				if isDevBranch or localPlayer.UserId == 16170943 then 
+				if isDevBranch or localPlayer.UserId == 16170943 then
 					itemWear = 0;
 				end
+
+				if isClothing then
+					editPanel.HWLine.Visible = false;
+					editPanel.IMLine.Visible = false;
+					editPanel.MCLine.Visible = false;
+					editPanel.FNLine.Visible = false;
+					editPanel.ColorFrame.Visible = activeUnlockableLib and activeUnlockableLib.IsColorable;
+					editPanel.SkinTintFrame.Visible = showSkinTint;
+					emissiveTintFrame.Visible = showEmissiveTint;
+
+					local hiddenFrames = {
+						"SkinFrame"; "SkinColorFrame"; "SkinOffsetFrame"; "SkinScaleFrame";
+						"SkinTransparencyFrame"; "TransparencyFrame"; "ReflectanceFrame";
+						"MaterialFrame"; "PartOffsetFrame"; "PartScaleFrame";
+					};
+					for a=1, #hiddenFrames do
+						local f = editPanel:FindFirstChild(hiddenFrames[a]);
+						if f then f.Visible = false; end
+					end
+					return;
+				end
+
+				editPanel.ColorFrame.Visible = true;
+				editPanel.HWLine.Visible = true;
+				editPanel.IMLine.Visible = true;
+				editPanel.MCLine.Visible = true;
+				editPanel.FNLine.Visible = true;
 
 				local skinLib = modItemSkinsLibrary:Find(editPanel.SkinFrame.Button:GetAttribute("SkinId"));
 				local canEditPatternData = false;
@@ -1929,6 +2254,24 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 				editPanel.ColorFrame.Button.AutoButtonColor = canEdit;
 				editPanel.ColorFrame.Button.Darken.Visible = not canEdit;
 				editPanel.ColorFrame.NameLabel.TextColor3 = canEdit and canEditColor or disabledColor;
+
+				-- Skin Tint
+				if skinLib and skinLib.Tintable then
+					editPanel.SkinTintFrame.Visible = true;
+
+				elseif baseCustomPlan and baseCustomPlan.BaseSkin then
+					local baseSkinId, baseVariantId = modCustomizationData.GetSkinIds(baseCustomPlan.BaseSkin);
+					local baseSkinLib, _skinVariantData = modItemSkinsLibrary:FindVariant(baseSkinId, baseVariantId);
+					if baseSkinLib and baseSkinLib.Tintable then
+						editPanel.SkinTintFrame.Visible = true;
+					else
+						editPanel.SkinTintFrame.Visible = false;
+					end
+
+				else
+					editPanel.SkinTintFrame.Visible = false;
+
+				end
 
 				-- Part Material
 				editPanel.MaterialFrame.Button.AutoButtonColor = canEdit;
@@ -2418,7 +2761,18 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						customPlan = getCustomPlan(GetCustomPlanEnum.Part, partData.Key);
 					end
 					
-					if customPlan then
+					if isClothing then
+						if customPlan then
+							OnColorSelect(customPlan.Color);
+							OnSkinTintSelect(customPlan.SkinTint);
+							OnEmissiveTintSelect(customPlan.EmissiveTint);
+						else
+							OnColorSelect();
+							OnSkinTintSelect();
+							OnEmissiveTintSelect();
+						end
+
+					elseif customPlan then
 						OnColorSelect(customPlan.Color);
 
 						local newSkin = customPlan.Skin;
@@ -2655,7 +3009,9 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 				newSelection();
 			end
 
-			modCustomizationData.ApplyCustomPlans(customPlansCache, itemViewport.PartDataList);
+			if itemViewport.PartDataList then
+				modCustomizationData.ApplyCustomPlans(customPlansCache, itemViewport.PartDataList);
+			end
 		end
 		
 		function listMenu:OnVisiblityChanged()

@@ -8,6 +8,7 @@ local modDialogueService = shared.require(game.ReplicatedStorage.Library.Dialogu
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
+local modPlayerNpcs = shared.require(game.ReplicatedStorage.Library.PlayerNpcs);
 
 --== Variables;
 local MISSION_ID = 87;
@@ -107,84 +108,20 @@ return function(CutsceneSequence)
 			
 		local playerClass: PlayerClass = shared.modPlayers.get(player);
 
-		local worldJosephModel;
-		if worldJosephModel == nil and shared.WorldCore.JosephClass then
-			worldJosephModel = shared.WorldCore.JosephClass.Character;
-		end
-		local josephClass: NpcClass = modNpcs.getPlayerNpc(player, "Joseph");
-		local function spawnLocalJosephClass()
-			if josephClass and josephClass.Player ~= player then josephClass = nil :: any; end;
-			if josephClass then return end;
-
-			if worldJosephModel then
-				modReplicationManager.SetClientParent(player, worldJosephModel, game.ReplicatedStorage);
-			end
-
-			local spawnCf = playerClass:GetCFrame();
-			if worldJosephModel then
-				spawnCf = worldJosephModel:GetPivot();
-			end
-			josephClass = shared.modNpcs.spawn2{
-				Name = "Joseph";
-				Player = player;
-				CFrame = spawnCf;
-				Properties = {
-					CutsceneActive = true;
-				};
-				ReplicateOut = shared.WorldName == "TheResidentials" or shared.WorldName == "TheHarbor";
-			};
-			if josephClass == nil then return end;
-
-			if shared.WorldName == "TheResidentials" and josephClass then
-				modReplicationManager.ReplicateOut(player, josephClass.Character);
-			end
-			task.delay(1, function()
-				local remotes = game.ReplicatedStorage:WaitForChild("Remotes");
-				local remoteSetHeadIcon = remotes:WaitForChild("SetHeadIcon");
-				remoteSetHeadIcon:FireAllClients(0, "Joseph", "Heal");
-			end)
-		end
+		local josephPlayerNpc: PlayerNpc = modPlayerNpcs.getPlayerNpc(player, "Joseph");
+		local josephNpcClass: NpcClass = josephPlayerNpc.NpcClass;
 		
-		local caitlinClass: NpcClass = modNpcs.getPlayerNpc(player, "Caitlin");
-		local worldCaitlinModel;
-		if worldCaitlinModel == nil and shared.WorldCore.CaitlinClass then
-			worldCaitlinModel = shared.WorldCore.CaitlinClass.Character;
-		end
-		local function spawnLocalCaitlinClass()
-			if caitlinClass and caitlinClass.Player ~= player then caitlinClass = nil :: any; end;
-			if caitlinClass then return end;
-
-			if worldCaitlinModel then
-				modReplicationManager.SetClientParent(player, worldCaitlinModel, game.ReplicatedStorage);
-			end
-
-			local spawnCf = playerClass:GetCFrame();
-			if worldCaitlinModel then
-				spawnCf = worldCaitlinModel:GetPivot();
-			end
-			caitlinClass = shared.modNpcs.spawn2{
-				Name = "Caitlin";
-				Player = player;
-				CFrame = spawnCf;
-				Properties = {
-					CutsceneActive = true;
-				};
-				ReplicateOut = shared.WorldName == "TheResidentials" or shared.WorldName == "TheHarbor";
-			};
-			if caitlinClass == nil then return end;
-
-			Debugger:StudioWarn(`Spawned local caitlin {caitlinClass.Id}`);
-		end
+		local caitlinPlayerNpc: PlayerNpc = modPlayerNpcs.getPlayerNpc(player, "Caitlin");
+		local caitlinNpcClass: NpcClass = caitlinPlayerNpc.NpcClass;
+		caitlinPlayerNpc:SetCFrame{
+			MissionId = MISSION_ID;
+		}
 
 		if shared.WorldName == "TheHarbor" then
-			caitlinClass = modNpcs.matchNpc(function(npcClass: NpcClass)
-				if npcClass.Player then return end;
-				if npcClass.Name ~= "Caitlin" then return end;
-				return true;
-			end);
-
 		elseif shared.WorldName == "TheResidentials" then
-
+			josephPlayerNpc:SetCFrame{
+				MissionId = MISSION_ID;
+			};
 		end
 
 		local pp11Active = false;
@@ -192,24 +129,20 @@ return function(CutsceneSequence)
 		local function OnChanged(firstRun)
 			if mission.Type == 3 then
 				if shared.WorldName == "TheResidentials" then
-					spawnLocalCaitlinClass();
-					caitlinClass:SetCFrame(CFrame.new(1127.165, 55.389, 107.03) * CFrame.Angles(0, math.rad(90), 0));
+					caitlinPlayerNpc:SetCFrame{
+						MissionId = MISSION_ID;
+						CFrame = CFrame.new(1149.165, 57.87, 26.979) * CFrame.Angles(0, math.rad(10), 0);
+					};
 					
 				elseif shared.WorldName == "TheHarbor" then
 					if shared.WorldCore.CaitlinClass then
-						modReplicationManager.SetClientParent(player, shared.WorldCore.CaitlinClass.Character, game.ReplicatedStorage);
+						--modReplicationManager.SetClientParent(player, shared.WorldCore.CaitlinClass.Character, game.ReplicatedStorage);
 					end
 					
 				end
 				return;
 			end
 			if mission.Type ~= 1 then return end;
-
-			if josephClass == nil then
-				if mission.ProgressionPoint >= 2 and (shared.WorldName == "TheResidentials" or shared.WorldName == "TheHarbor") then
-					spawnLocalJosephClass();
-				end
-			end
 
 			if shared.WorldName == "TheResidentials" then
 				if firstRun then
@@ -218,15 +151,15 @@ return function(CutsceneSequence)
 							mission.ProgressionPoint = 10;
 						end)
 					end
-					if mission.ProgressionPoint >= 10 then
-						spawnLocalCaitlinClass();
-					end
 				end
 
 			elseif shared.WorldName == "TheHarbor" then
 				if firstRun then
 					if mission.ProgressionPoint >= 4 and mission.ProgressionPoint <= 7 then
-						josephClass:SetCFrame(CFrame.new(-306.58, 63.046, 219.337) * CFrame.Angles(0, math.rad(22), 0));
+						josephPlayerNpc:SetCFrame{
+							MissionId = MISSION_ID;
+							CFrame = CFrame.new(-306.58, 63.046, 219.337) * CFrame.Angles(0, math.rad(22), 0);
+						};
 					end
 
 					if mission.ProgressionPoint >= 3 and mission.ProgressionPoint < 7 then
@@ -243,69 +176,75 @@ return function(CutsceneSequence)
 				--MARK: TheResidentials
 				if mission.ProgressionPoint == 2 then
 					if firstRun then
-						josephClass:SetCFrame(CFrame.new(787.386, 41.301, 441.39) * CFrame.Angles(0, math.rad(-53), 0));
+						josephPlayerNpc:SetCFrame{
+							MissionId = MISSION_ID;
+							CFrame = CFrame.new(787.386, 41.301, 441.39) * CFrame.Angles(0, math.rad(-53), 0);
+						};
 						return;
 					end
 
-					josephClass:ToggleInteractable(false);
-					josephClass.Properties.CutsceneWalkTo = Vector3.new(1127.235, 56.218, 113.167);
-					josephClass.Move.OnMoveToEnded:Wait(15);
+					josephNpcClass:ToggleInteractable(false);
+					josephNpcClass.Properties.CutsceneWalkTo = Vector3.new(1127.235, 56.218, 113.167);
+					josephNpcClass.Move.OnMoveToEnded:Wait(15);
 
-					local waitForPlayerComp = josephClass:GetComponent("WaitForPlayer");
+					local waitForPlayerComp = josephNpcClass:GetComponent("WaitForPlayer");
 					waitForPlayerComp(15);
 					if not game.Players:IsAncestorOf(player) then return end;
 
-					josephClass:SetCFrame(CFrame.new(1127.235, 55.389 + 1.35, 124.978));
+					josephPlayerNpc:SetCFrame{
+						MissionId = MISSION_ID;
+						CFrame = CFrame.new(1127.235, 55.389 + 1.35, 124.978);
+					};
 					task.wait(1);
 
-					josephClass.Properties.CutsceneWalkToInteract = "insuranceEntrance";
+					josephNpcClass.Properties.CutsceneWalkToInteract = "insuranceEntrance";
 					task.wait(0.2);
-					josephClass.Move.OnMoveToEnded:Wait(60);
-					josephClass.Properties.CutsceneWalkTo = nil;
-            		josephClass:UseInteractable("insuranceEntrance");
+					josephNpcClass.Move.OnMoveToEnded:Wait(60);
+					josephNpcClass.Properties.CutsceneWalkTo = nil;
+            		josephNpcClass:UseInteractable("insuranceEntrance");
 					task.wait(1);
 
-					josephClass.Move:MoveTo(Vector3.new(893.156, 57.887, 268.553));
-					josephClass.Move.OnMoveToEnded:Wait(5);
+					josephNpcClass.Move:MoveTo(Vector3.new(893.156, 57.887, 268.553));
+					josephNpcClass.Move.OnMoveToEnded:Wait(5);
 					waitForPlayerComp(15);
 					if not game.Players:IsAncestorOf(player) then return end;
 
 					task.wait(1);
 
-					josephClass.Chat(player, "See that there hole in the wall?");
+					josephNpcClass.Chat(player, "See that there hole in the wall?");
 					task.wait(5);
 					if not game.Players:IsAncestorOf(player) then return end;
 
-					josephClass.Chat(player, "Go through it and it leads to the water treatment station..");
+					josephNpcClass.Chat(player, "Go through it and it leads to the water treatment station..");
 					task.wait(4);
 					if not game.Players:IsAncestorOf(player) then return end;
 
-					josephClass.Properties.CutsceneWalkToInteract = "waterTreatmentEnter";
+					josephNpcClass.Properties.CutsceneWalkToInteract = "waterTreatmentEnter";
 					task.wait(0.2);
-					josephClass.Move.OnMoveToEnded:Wait(5);
-					josephClass.Properties.CutsceneWalkTo = nil;
-            		josephClass:UseInteractable("waterTreatmentEnter");
+					josephNpcClass.Move.OnMoveToEnded:Wait(5);
+					josephNpcClass.Properties.CutsceneWalkTo = nil;
+            		josephNpcClass:UseInteractable("waterTreatmentEnter");
 					task.wait(1);
 
-					josephClass.Properties.CutsceneWalkTo = Vector3.new(838.091, 41.301, 426.829);
+					josephNpcClass.Properties.CutsceneWalkTo = Vector3.new(838.091, 41.301, 426.829);
 					task.wait(0.2);
-					josephClass.Move.OnMoveToEnded:Wait(4);
-					josephClass.Properties.CutsceneLookAt = Vector3.new(834.991, 41.301, 413.429);
+					josephNpcClass.Move.OnMoveToEnded:Wait(4);
+					josephNpcClass.Properties.CutsceneLookAt = Vector3.new(834.991, 41.301, 413.429);
 
 					task.wait(2);
-					josephClass.Properties.CutsceneWalkTo = nil;
-					josephClass.Properties.CutsceneLookAt = nil;
+					josephNpcClass.Properties.CutsceneWalkTo = nil;
+					josephNpcClass.Properties.CutsceneLookAt = nil;
 
-					josephClass.Chat(player, "There's the door..");
-					josephClass.Move:SetMoveSpeed("set", "cutscene", 5, josephClass.Move.MoveSpeedPriority.Action, 5);
-					josephClass.Move:MoveTo(Vector3.new(787.386, 41.301, 441.39));
-					josephClass.Move.OnMoveToEnded:Wait(5);
+					josephNpcClass.Chat(player, "There's the door..");
+					josephNpcClass.Move:SetMoveSpeed("set", "cutscene", 5, josephNpcClass.Move.MoveSpeedPriority.Action, 5);
+					josephNpcClass.Move:MoveTo(Vector3.new(787.386, 41.301, 441.39));
+					josephNpcClass.Move.OnMoveToEnded:Wait(5);
 					task.wait(0.5);
 
-					josephClass.Properties.CutsceneWalkTo = nil;
-					josephClass.Properties.CutsceneLookAt = nil;
+					josephNpcClass.Properties.CutsceneWalkTo = nil;
+					josephNpcClass.Properties.CutsceneLookAt = nil;
 
-					josephClass:ToggleInteractable(true);
+					josephNpcClass:ToggleInteractable(true);
 					waitForPlayerComp(15);
 
 
@@ -328,10 +267,8 @@ return function(CutsceneSequence)
 
 
 				elseif mission.ProgressionPoint == 9 then
-					spawnLocalCaitlinClass();
-
-					josephClass:ToggleInteractable(true);
-					caitlinClass:ToggleInteractable(true);
+					josephNpcClass:ToggleInteractable(true);
+					caitlinNpcClass:ToggleInteractable(true);
 
 					task.wait(0.5);
 
@@ -358,73 +295,85 @@ return function(CutsceneSequence)
 					end
 
 					local tpCf = CFrame.new(pickEntrance.MatchPos);
-					josephClass:SetCFrame(tpCf * CFrame.new(math.random(-3, 3), 0, math.random(-3, 3)));
-					caitlinClass:SetCFrame(tpCf * CFrame.new(math.random(-3, 3), 0, math.random(-3, 3)));
+					josephPlayerNpc:SetCFrame{
+						MissionId = MISSION_ID;
+						CFrame = tpCf * CFrame.new(math.random(-3, 3), 0, math.random(-3, 3));
+					};
+					caitlinPlayerNpc:SetCFrame{
+						MissionId = MISSION_ID;
+						CFrame = tpCf * CFrame.new(math.random(-3, 3), 0, math.random(-3, 3));
+					};
 
-					josephClass.Move:MoveTo(pickEntrance.JosephPos);
-					josephClass.Move:SetMoveSpeed("set", "cutscene", 10, josephClass.Move.MoveSpeedPriority.Action, 8);
-					josephClass:ToggleInteractable(false);
+					josephNpcClass.Move:MoveTo(pickEntrance.JosephPos);
+					josephNpcClass.Move:SetMoveSpeed("set", "cutscene", 10, josephNpcClass.Move.MoveSpeedPriority.Action, 8);
+					josephNpcClass:ToggleInteractable(false);
 					task.spawn(function()
-						josephClass.Move.OnMoveToEnded:Wait(8);
-						josephClass.Move:HeadTrack(caitlinClass.Head, 10);
+						josephNpcClass.Move.OnMoveToEnded:Wait(8);
+						josephNpcClass.Move:HeadTrack(caitlinNpcClass.Head, 10);
 					end)
 					task.delay(4, function()
-						caitlinClass.Chat(player, "So this is it.. The community safehouse.");
+						caitlinNpcClass.Chat(player, "So this is it.. The community safehouse.");
 					end)
-					caitlinClass:ToggleInteractable(false);
-					caitlinClass.Move:MoveTo(pickEntrance.CaitlinPos);
-					caitlinClass.Move:SetMoveSpeed("set", "cutscene", 10, josephClass.Move.MoveSpeedPriority.Action, 8);
-					caitlinClass.Move.OnMoveToEnded:Wait(12);
-					caitlinClass.Move:HeadTrack(josephClass.Head, 3);
+					caitlinNpcClass:ToggleInteractable(false);
+					caitlinNpcClass.Move:MoveTo(pickEntrance.CaitlinPos);
+					caitlinNpcClass.Move:SetMoveSpeed("set", "cutscene", 10, josephNpcClass.Move.MoveSpeedPriority.Action, 8);
+					caitlinNpcClass.Move.OnMoveToEnded:Wait(12);
+					caitlinNpcClass.Move:HeadTrack(josephNpcClass.Head, 3);
 
-					josephClass.Chat(player, "Yeah, this is it.");
-					josephClass:ToggleInteractable(true);
-					caitlinClass:ToggleInteractable(true);
+					josephNpcClass.Chat(player, "Yeah, this is it.");
+					josephNpcClass:ToggleInteractable(true);
+					caitlinNpcClass:ToggleInteractable(true);
 
 
 				elseif mission.ProgressionPoint == 10 then
 					if firstRun then
-						josephClass:SetCFrame(CFrame.new(1128.658, 57.66, 14.02) * CFrame.Angles(0, math.rad(180), 0))
-						caitlinClass:SetCFrame(CFrame.new(1137.93, 57.87, 24.89));
+						josephPlayerNpc:SetCFrame{
+							MissionId = MISSION_ID;
+							CFrame = CFrame.new(1128.658, 57.66, 14.02) * CFrame.Angles(0, math.rad(180), 0);
+						};
+						caitlinPlayerNpc:SetCFrame{
+							MissionId = MISSION_ID;
+							CFrame = CFrame.new(1137.93, 57.87, 24.89) * CFrame.Angles(0, math.rad(180), 0);
+						};
 					end
-					caitlinClass.Move:Face(Vector3.new(955.496, 89.461, -17.857));
-					caitlinClass.PlayAnimation("Point");
+					caitlinNpcClass.Move:Face(Vector3.new(955.496, 89.461, -17.857));
+					caitlinNpcClass.PlayAnimation("Point");
 
 
 				elseif mission.ProgressionPoint == 11 then
-					caitlinClass:ToggleInteractable(false);
-					josephClass:ToggleInteractable(false);
+					caitlinNpcClass:ToggleInteractable(false);
+					josephNpcClass:ToggleInteractable(false);
 
-					local josephFollowPlayerComp = josephClass:GetComponent("FollowPlayer");
+					local josephFollowPlayerComp = josephNpcClass:GetComponent("FollowPlayer");
 					josephFollowPlayerComp(nil, function()
 						return mission.Type == 1 and mission.ProgressionPoint == 11;
 					end)
-					caitlinClass.Move:SetMoveSpeed("set", "cutscene", 18, caitlinClass.Move.MoveSpeedPriority.Action);
+					caitlinNpcClass.Move:SetMoveSpeed("set", "cutscene", 18, caitlinNpcClass.Move.MoveSpeedPriority.Action);
 
 					task.wait(2);
-					josephClass.Chat(player, "About time..");
+					josephNpcClass.Chat(player, "About time..");
 
 					local interactable: InteractableInstance = modInteractables.getById("resCommunityExit");
 					local interactPart = interactable.Part;
 					local pathFindAtt = interactPart:FindFirstChild("PathToInteract");
 
 					
-					caitlinClass.Properties.CutsceneWalkTo = pathFindAtt.WorldPosition;
-					caitlinClass.Move.OnMoveToEnded:Wait(20);
-					caitlinClass.Properties.CutsceneWalkTo = nil;
+					caitlinNpcClass.Properties.CutsceneWalkTo = pathFindAtt.WorldPosition;
+					caitlinNpcClass.Move.OnMoveToEnded:Wait(20);
+					caitlinNpcClass.Properties.CutsceneWalkTo = nil;
 
-					caitlinClass:GetComponent("WaitForPlayer")(20);
-					caitlinClass:UseInteractable(interactable.Config, {});
+					caitlinNpcClass:GetComponent("WaitForPlayer")(20);
+					caitlinNpcClass:UseInteractable(interactable.Config, {});
 
-					caitlinClass.Properties.CutsceneWalkTo = Vector3.new(950.263, 56.695, -10.288);
-					caitlinClass.Move.OnMoveToEnded:Wait(35);
-					caitlinClass.Properties.CutsceneWalkTo = nil;
+					caitlinNpcClass.Properties.CutsceneWalkTo = Vector3.new(950.263, 56.695, -10.288);
+					caitlinNpcClass.Move.OnMoveToEnded:Wait(35);
+					caitlinNpcClass.Properties.CutsceneWalkTo = nil;
 
-					caitlinClass:GetComponent("WaitForPlayer")(20);
+					caitlinNpcClass:GetComponent("WaitForPlayer")(20);
 					task.wait(1);
-					caitlinClass.Move:SetMoveSpeed("remove", "cutscene");
-					caitlinClass.Chat(player, "Okay.. Look around and see if any of the boxes have anything..");
-					caitlinClass.Move:Face(Vector3.new(894.504, 77.51, -20.137));
+					caitlinNpcClass.Move:SetMoveSpeed("remove", "cutscene");
+					caitlinNpcClass.Chat(player, "Okay.. Look around and see if any of the boxes have anything..");
+					caitlinNpcClass.Move:Face(Vector3.new(894.504, 77.51, -20.137));
 					task.wait(2);
 
 					modMission:Progress(player, MISSION_ID, function()
@@ -439,14 +388,17 @@ return function(CutsceneSequence)
 					pp11Active = true;
 
 					if firstRun then
-						caitlinClass:SetCFrame(CFrame.new(950.263, 56.695, -10.288));
+						caitlinPlayerNpc:SetCFrame{
+							MissionId = MISSION_ID;
+							CFrame = CFrame.new(950.263, 56.695, -10.288);
+						};
 					end
 
-					caitlinClass:ToggleInteractable(false);
-					josephClass:ToggleInteractable(false);
+					caitlinNpcClass:ToggleInteractable(false);
+					josephNpcClass:ToggleInteractable(false);
 
-					josephClass.Properties.CutsceneWalkTo = Vector3.new(951.116, 57.7, -17.514);
-					caitlinClass.Move:HeadTrack(josephClass.Head, 10);
+					josephNpcClass.Properties.CutsceneWalkTo = Vector3.new(951.116, 57.7, -17.514);
+					caitlinNpcClass.Move:HeadTrack(josephNpcClass.Head, 10);
 
 					local function newBoxInteractable()
 						local newBoxInteractConfig = modInteractables.createInteractable("ButtonRotd");
@@ -472,145 +424,151 @@ return function(CutsceneSequence)
 						modReplicationManager.ReplicateOut(player, boxModel);
 					end
 					
-					caitlinClass.Properties.CutsceneWalkTo = Vector3.new(950.263, 56.695, -10.288);
-					josephClass.Properties.CutsceneWalkTo = Vector3.new(951.116, 57.7, -17.514);
+					caitlinNpcClass.Properties.CutsceneWalkTo = Vector3.new(950.263, 56.695, -10.288);
+					josephNpcClass.Properties.CutsceneWalkTo = Vector3.new(951.116, 57.7, -17.514);
 					task.wait(3);
-					josephClass.Properties.CutsceneWalkTo = Vector3.new(951.116, 57.7, -17.514);
-					josephClass.Properties.CutsceneLookAt = caitlinClass:GetCFrame().Position;
-					caitlinClass.Properties.CutsceneLookAt = josephClass:GetCFrame().Position;
+					josephNpcClass.Properties.CutsceneWalkTo = Vector3.new(951.116, 57.7, -17.514);
+					josephNpcClass.Properties.CutsceneLookAt = caitlinNpcClass:GetCFrame().Position;
+					caitlinNpcClass.Properties.CutsceneLookAt = josephNpcClass:GetCFrame().Position;
 					if not player:IsDescendantOf(game.Players) or mission.ProgressionPoint ~= 12 then return end;
 
-					josephClass.Chat(player, "Hmmm, why here?..");
+					josephNpcClass.Chat(player, "Hmmm, why here?..");
 
 					task.wait(6);
 					if not player:IsDescendantOf(game.Players) or mission.ProgressionPoint ~= 12 then return end;
-					caitlinClass.Chat(player, "Cooper told us a story about how he once stole a bunch of money and hid it in a library...");
-					caitlinClass.Move:HeadTrack(josephClass.Head, 3);
+					caitlinNpcClass.Chat(player, "Cooper told us a story about how he once stole a bunch of money and hid it in a library...");
+					caitlinNpcClass.Move:HeadTrack(josephNpcClass.Head, 3);
 
 					task.wait(15);
 					if not player:IsDescendantOf(game.Players) or mission.ProgressionPoint ~= 12 then return end;
-					josephClass.Chat(player, "Is this before the apocalypse? And why a library?");
-					josephClass.Move:HeadTrack(caitlinClass.Head, 3);
+					josephNpcClass.Chat(player, "Is this before the apocalypse? And why a library?");
+					josephNpcClass.Move:HeadTrack(caitlinNpcClass.Head, 3);
 
 					task.wait(15);
 					if not player:IsDescendantOf(game.Players) or mission.ProgressionPoint ~= 12 then return end;
-					caitlinClass.Chat(player, "It was years ago, he said he got on a plane after the robbery...");
-					caitlinClass.Move:HeadTrack(josephClass.Head, 3);
+					caitlinNpcClass.Chat(player, "It was years ago, he said he got on a plane after the robbery...");
+					caitlinNpcClass.Move:HeadTrack(josephNpcClass.Head, 3);
 
 					task.wait(15);
 					if not player:IsDescendantOf(game.Players) or mission.ProgressionPoint ~= 12 then return end;
-					caitlinClass.Chat(player, "and then jumped off while the plane was mid-flight...");
-					caitlinClass.Move:HeadTrack(josephClass.Head, 3);
-					josephClass.Move:HeadTrack(caitlinClass.Head, 3);
+					caitlinNpcClass.Chat(player, "and then jumped off while the plane was mid-flight...");
+					caitlinNpcClass.Move:HeadTrack(josephNpcClass.Head, 3);
+					josephNpcClass.Move:HeadTrack(caitlinNpcClass.Head, 3);
 
 					task.wait(15);
 					if not player:IsDescendantOf(game.Players) or mission.ProgressionPoint ~= 12 then return end;
-					josephClass.Chat(player, "I don't buy any of this.. He's just making this up..");
-					caitlinClass.Move:HeadTrack(josephClass.Head, 3);
+					josephNpcClass.Chat(player, "I don't buy any of this.. He's just making this up..");
+					caitlinNpcClass.Move:HeadTrack(josephNpcClass.Head, 3);
 
 					task.wait(15);
 					if not player:IsDescendantOf(game.Players) or mission.ProgressionPoint ~= 12 then return end;
-					caitlinClass.Chat(player, "That's what I thought to, but I remember a newspaper article talking about something similar..");
-					caitlinClass.Move:HeadTrack(josephClass.Head, 3);
+					caitlinNpcClass.Chat(player, "That's what I thought to, but I remember a newspaper article talking about something similar..");
+					caitlinNpcClass.Move:HeadTrack(josephNpcClass.Head, 3);
 
 					task.wait(15);
 					if not player:IsDescendantOf(game.Players) or mission.ProgressionPoint ~= 12 then return end;
-					josephClass.Chat(player, "Hmmm.. So why a library?..");
-					caitlinClass.Move:HeadTrack(josephClass.Head, 3);
+					josephNpcClass.Chat(player, "Hmmm.. So why a library?..");
+					caitlinNpcClass.Move:HeadTrack(josephNpcClass.Head, 3);
 
 					task.wait(8);
 					if not player:IsDescendantOf(game.Players) or mission.ProgressionPoint ~= 12 then return end;
-					caitlinClass.Chat(player, "I don't know, maybe he was a librarian before or something...");
-					caitlinClass.Move:HeadTrack(josephClass.Head, 3);
+					caitlinNpcClass.Chat(player, "I don't know, maybe he was a librarian before or something...");
+					caitlinNpcClass.Move:HeadTrack(josephNpcClass.Head, 3);
 
 					task.wait(15);
 					if not player:IsDescendantOf(game.Players) or mission.ProgressionPoint ~= 12 then return end;
-					caitlinClass.Chat(player, "There's this one time, Cooper asked David to bet a book on the Fall of the Living card game...");
-					caitlinClass.Move:HeadTrack(josephClass.Head, 3);
+					caitlinNpcClass.Chat(player, "There's this one time, Cooper asked David to bet a book on the Fall of the Living card game...");
+					caitlinNpcClass.Move:HeadTrack(josephNpcClass.Head, 3);
 
 					task.wait(15);
 					if not player:IsDescendantOf(game.Players) or mission.ProgressionPoint ~= 12 then return end;
-					caitlinClass.Chat(player, "Cooper won it, so I guess he wanted the book for something..");
-					caitlinClass.Move:HeadTrack(josephClass.Head, 3);
+					caitlinNpcClass.Chat(player, "Cooper won it, so I guess he wanted the book for something..");
+					caitlinNpcClass.Move:HeadTrack(josephNpcClass.Head, 3);
 
 					task.wait(15);
 					if not player:IsDescendantOf(game.Players) or mission.ProgressionPoint ~= 12 then return end;
-					caitlinClass.Chat(player, "Thing is.. I never saw Cooper read it, or any books for that matter..");
-					caitlinClass.Move:HeadTrack(josephClass.Head, 3);
+					caitlinNpcClass.Chat(player, "Thing is.. I never saw Cooper read it, or any books for that matter..");
+					caitlinNpcClass.Move:HeadTrack(josephNpcClass.Head, 3);
 
 					task.wait(15);
 					if not player:IsDescendantOf(game.Players) or mission.ProgressionPoint ~= 12 then return end;
-					caitlinClass.Chat(player, "Maybe he just liked the book smell..");
-					caitlinClass.Move:HeadTrack(josephClass.Head, 3);
+					caitlinNpcClass.Chat(player, "Maybe he just liked the book smell..");
+					caitlinNpcClass.Move:HeadTrack(josephNpcClass.Head, 3);
 
 					task.wait(10);
 					if not player:IsDescendantOf(game.Players) or mission.ProgressionPoint ~= 12 then return end;
-					josephClass.Chat(player, ".. mhmm..");
+					josephNpcClass.Chat(player, ".. mhmm..");
 
 					task.wait(6);
 					if not player:IsDescendantOf(game.Players) or mission.ProgressionPoint ~= 12 then return end;
-					caitlinClass.Chat(player, "Unfortunately for him, it looks like this place is entirely runned down..");
-					caitlinClass.Move:HeadTrack(josephClass.Head, 3);
+					caitlinNpcClass.Chat(player, "Unfortunately for him, it looks like this place is entirely runned down..");
+					caitlinNpcClass.Move:HeadTrack(josephNpcClass.Head, 3);
 
 					task.wait(15);
 					if not player:IsDescendantOf(game.Players) or mission.ProgressionPoint ~= 12 then return end;
-					caitlinClass.Chat(player, "People probably looted the books as kindling for fire..");
-					caitlinClass.Move:HeadTrack(josephClass.Head, 3);
+					caitlinNpcClass.Chat(player, "People probably looted the books as kindling for fire..");
+					caitlinNpcClass.Move:HeadTrack(josephNpcClass.Head, 3);
 
 
 				elseif mission.ProgressionPoint == 13 then
 					if firstRun then
-						caitlinClass:SetCFrame(CFrame.new(950.263, 56.695, -10.288));
-						josephClass:SetCFrame(CFrame.new(951.116, 57.7, -17.514));
+						caitlinPlayerNpc:SetCFrame{
+							MissionId = MISSION_ID;
+							CFrame = CFrame.new(950.263, 56.695, -10.288);
+						};
+						josephPlayerNpc:SetCFrame{
+							MissionId = MISSION_ID;
+							CFrame = CFrame.new(951.116, 57.7, -17.514);
+						};
 					end
 
-					josephClass.Properties.CutsceneLookAt = nil;
-					caitlinClass.Properties.CutsceneLookAt = nil;
-					caitlinClass:ToggleInteractable(false);
-					josephClass:ToggleInteractable(false);
+					josephNpcClass.Properties.CutsceneLookAt = nil;
+					caitlinNpcClass.Properties.CutsceneLookAt = nil;
+					caitlinNpcClass:ToggleInteractable(false);
+					josephNpcClass:ToggleInteractable(false);
 
 					task.wait(4);
-					caitlinClass.Chat(player, "Wait, I have an idea of where it could be...");
+					caitlinNpcClass.Chat(player, "Wait, I have an idea of where it could be...");
 					
 					task.wait(1);
 
 					task.delay(2, function()
-						josephClass.Properties.CutsceneWalkTo = Vector3.new(870.286, 57.751, -31.345);
-						josephClass.Move:SetMoveSpeed("set", "cutscene", 5, josephClass.Move.MoveSpeedPriority.Action, 8);
-						josephClass.Move.OnMoveToEnded:Wait(10);
-						josephClass.Move:HeadTrack(playerClass.Head, 3);
-						josephClass.PlayAnimation("CrossedArm");
+						josephNpcClass.Properties.CutsceneWalkTo = Vector3.new(870.286, 57.751, -31.345);
+						josephNpcClass.Move:SetMoveSpeed("set", "cutscene", 5, josephNpcClass.Move.MoveSpeedPriority.Action, 8);
+						josephNpcClass.Move.OnMoveToEnded:Wait(10);
+						josephNpcClass.Move:HeadTrack(playerClass.Head, 3);
+						josephNpcClass.PlayAnimation("CrossedArm");
 					end)
 
-					caitlinClass.Properties.CutsceneWalkTo = Vector3.new(857.425, 57.751, -37.106);
-					caitlinClass.Move.OnMoveToEnded:Wait(10);
+					caitlinNpcClass.Properties.CutsceneWalkTo = Vector3.new(857.425, 57.751, -37.106);
+					caitlinNpcClass.Move.OnMoveToEnded:Wait(10);
 
-					caitlinClass:GetComponent("WaitForPlayer")(10);
-					caitlinClass.Move:HeadTrack(playerClass.Head, 3);
-					caitlinClass.Chat(player, "It's more likely to be in here.");
+					caitlinNpcClass:GetComponent("WaitForPlayer")(10);
+					caitlinNpcClass.Move:HeadTrack(playerClass.Head, 3);
+					caitlinNpcClass.Chat(player, "It's more likely to be in here.");
 
 					task.wait(3);
 
-					caitlinClass.Properties.CutsceneWalkTo = Vector3.new(856.506, 57.751, -44.418);
-					caitlinClass.Move.OnMoveToEnded:Wait(4);
+					caitlinNpcClass.Properties.CutsceneWalkTo = Vector3.new(856.506, 57.751, -44.418);
+					caitlinNpcClass.Move.OnMoveToEnded:Wait(4);
 
-					caitlinClass.Move:Face(Vector3.new(816.252, 60.25, -42.672));
+					caitlinNpcClass.Move:Face(Vector3.new(816.252, 60.25, -42.672));
 					task.wait(0.3);
-					caitlinClass.Properties.CutsceneWalkTo = nil;
+					caitlinNpcClass.Properties.CutsceneWalkTo = nil;
 
-					caitlinClass.Chat(player, "Just let me pick open this locked door..");
-					caitlinClass.PlayAnimation("LockPicking");
+					caitlinNpcClass.Chat(player, "Just let me pick open this locked door..");
+					caitlinNpcClass.PlayAnimation("LockPicking");
 					task.wait(10);
 					if not player:IsDescendantOf(game.Players) or mission.ProgressionPoint ~= 13 then return end;
 
-					modAudio.Play("KeyLock", caitlinClass.RootPart).PlaybackSpeed = 1.4;
+					modAudio.Play("KeyLock", caitlinNpcClass.RootPart).PlaybackSpeed = 1.4;
 					task.wait(1);
-					caitlinClass.StopAnimation("LockPicking");
+					caitlinNpcClass.StopAnimation("LockPicking");
 					task.wait(2);
 					
-					caitlinClass.Chat(player, "Alright, it's unlocked.");
-					caitlinClass.Properties.CutsceneWalkTo = Vector3.new(858.618, 57.751, -37.175);
-					caitlinClass.Move:HeadTrack(playerClass.Head, 3);
+					caitlinNpcClass.Chat(player, "Alright, it's unlocked.");
+					caitlinNpcClass.Properties.CutsceneWalkTo = Vector3.new(858.618, 57.751, -37.175);
+					caitlinNpcClass.Move:HeadTrack(playerClass.Head, 3);
 
 					local newStaffDoor = script:WaitForChild("libraryStaffDoor"):Clone();
 					newStaffDoor.Parent = workspace.Interactables;
@@ -640,43 +598,49 @@ return function(CutsceneSequence)
 
 
 				elseif mission.ProgressionPoint == 16 then
-					josephClass.Properties.CutsceneLookAt = nil;
-					caitlinClass.Properties.CutsceneLookAt = nil;
-					caitlinClass:ToggleInteractable(false);
-					josephClass:ToggleInteractable(false);
+					josephNpcClass.Properties.CutsceneLookAt = nil;
+					caitlinNpcClass.Properties.CutsceneLookAt = nil;
+					caitlinNpcClass:ToggleInteractable(false);
+					josephNpcClass:ToggleInteractable(false);
 
-					josephClass.Properties.CutsceneActive = true;
-					josephClass:SetCFrame(CFrame.new(851.427, 57.751, -42.472) * CFrame.Angles(0, math.rad(90), 0));
+					josephNpcClass.Properties.CutsceneActive = true;
+					josephPlayerNpc:SetCFrame{
+						MissionId = MISSION_ID;
+						CFrame = CFrame.new(851.427, 57.751, -42.472) * CFrame.Angles(0, math.rad(90), 0);
+					};
 
 					task.wait(1);
-					josephClass.Chat(player, "This room feels eriee..");
-					josephClass.PlayAnimation("LookAround");
+					josephNpcClass.Chat(player, "This room feels eriee..");
+					josephNpcClass.PlayAnimation("LookAround");
 
 					task.wait(4);
 					if mission.ProgressionPoint ~= 16 then return end;
 
-					josephClass.Properties.CutsceneWalkTo = Vector3.new(840.627, 57.751, -42.472);
+					josephNpcClass.Properties.CutsceneWalkTo = Vector3.new(840.627, 57.751, -42.472);
 					task.wait(1);
 					
-					josephClass.Chat(player, "Oh, you found the walkies!");
+					josephNpcClass.Chat(player, "Oh, you found the walkies!");
 					p16Skip = true;
 
 					task.wait(3);
-					josephClass.PlayAnimation("CrouchPickup");
+					josephNpcClass.PlayAnimation("CrouchPickup");
 
 					task.wait(0.1);
-					josephClass.Properties.CutsceneEquip = "walkietalkie";
+					josephNpcClass.Properties.CutsceneEquip = "walkietalkie";
 
 					task.wait(3.3);
 					if mission.ProgressionPoint ~= 16 then return end;
-					josephClass.Properties.CutsceneEquip = nil;
+					josephNpcClass.Properties.CutsceneEquip = nil;
 
 					task.wait(3);
 					if mission.ProgressionPoint ~= 16 then return end;
 
-					josephClass.Properties.CutsceneWalkTo = Vector3.new(853.909, 60.15, -42.522);
-					josephClass.Move.OnMoveToEnded:Wait(3);
-					josephClass:SetCFrame(CFrame.new(868.818, 57.751, -46.898) * CFrame.Angles(0, math.rad(158), 0));
+					josephNpcClass.Properties.CutsceneWalkTo = Vector3.new(853.909, 60.15, -42.522);
+					josephNpcClass.Move.OnMoveToEnded:Wait(3);
+					josephPlayerNpc:SetCFrame{
+						MissionId = MISSION_ID;
+						CFrame = CFrame.new(868.818, 57.751, -46.898) * CFrame.Angles(0, math.rad(158), 0);
+					};
 
 					if mission.ProgressionPoint ~= 16 then return end;
 
@@ -687,26 +651,32 @@ return function(CutsceneSequence)
 					end)
 
 				elseif mission.ProgressionPoint == 18 then
-					caitlinClass:ToggleInteractable(false);
-					josephClass:ToggleInteractable(false);
+					caitlinNpcClass:ToggleInteractable(false);
+					josephNpcClass:ToggleInteractable(false);
 
-					caitlinClass:SetCFrame(CFrame.new(869.506, 57.751, -33.018) * CFrame.Angles(0, math.rad(43), 0));
-					josephClass:SetCFrame(CFrame.new(868.818, 57.751, -46.898) * CFrame.Angles(0, math.rad(158), 0));
-					josephClass.Properties.CutsceneWalkTo = Vector3.new(868.818, 57.751, -46.898);
+					caitlinPlayerNpc:SetCFrame{
+						MissionId = MISSION_ID;
+						CFrame = CFrame.new(869.506, 57.751, -33.018) * CFrame.Angles(0, math.rad(43), 0);
+					};
+					josephPlayerNpc:SetCFrame{
+						MissionId = MISSION_ID;
+						CFrame = CFrame.new(868.818, 57.751, -46.898) * CFrame.Angles(0, math.rad(158), 0);
+					};
+					josephNpcClass.Properties.CutsceneWalkTo = Vector3.new(868.818, 57.751, -46.898);
 
 					if p16Skip ~= true then
-						josephClass.Chat(player, "Good, you found the walkies!");
+						josephNpcClass.Chat(player, "Good, you found the walkies!");
 					end
-					caitlinClass.Chat(player, "I knew it was somewhere around here..");
+					caitlinNpcClass.Chat(player, "I knew it was somewhere around here..");
 
 					task.wait(4);
-					caitlinClass.Chat(player, "Alright, let's go..");
+					caitlinNpcClass.Chat(player, "Alright, let's go..");
 
 					task.wait(3);
-					josephClass.Properties.CutsceneWalkTo = Vector3.new(1123.452, 57.701, 119.099);
+					josephNpcClass.Properties.CutsceneWalkTo = Vector3.new(1123.452, 57.701, 119.099);
 					task.wait(1);
-					caitlinClass.Properties.CutsceneWalkTo = Vector3.new(1123.452, 57.701, 119.099);
-					josephClass.Move.OnMoveToEnded:Wait(40);
+					caitlinNpcClass.Properties.CutsceneWalkTo = Vector3.new(1123.452, 57.701, 119.099);
+					josephNpcClass.Move.OnMoveToEnded:Wait(40);
 
 					task.spawn(function() 
 						while mission.ProgressionPoint == 18 do
@@ -726,18 +696,24 @@ return function(CutsceneSequence)
 
 
 				elseif mission.ProgressionPoint == 19 then
-					caitlinClass:ToggleInteractable(false);
-					josephClass:ToggleInteractable(false);
-					josephClass.Properties.CutsceneWalkTo = nil;
-					caitlinClass.Properties.CutsceneWalkTo = nil;
+					caitlinNpcClass:ToggleInteractable(false);
+					josephNpcClass:ToggleInteractable(false);
+					josephNpcClass.Properties.CutsceneWalkTo = nil;
+					caitlinNpcClass.Properties.CutsceneWalkTo = nil;
 					task.wait(0.5);
 
-					josephClass:SetCFrame(CFrame.new(1127.165, 55.389, 107.03) * CFrame.Angles(0, math.rad(90), 0));
-					caitlinClass:SetCFrame(CFrame.new(1127.165, 55.389, 107.03) * CFrame.Angles(0, math.rad(90), 0));
+					josephPlayerNpc:SetCFrame{
+						MissionId = MISSION_ID;
+						CFrame = CFrame.new(1127.165, 55.389, 107.03) * CFrame.Angles(0, math.rad(90), 0);
+					};
+					caitlinPlayerNpc:SetCFrame{
+						MissionId = MISSION_ID;
+						CFrame = CFrame.new(1127.165, 55.389, 107.03) * CFrame.Angles(0, math.rad(90), 0);
+					};
 
-					caitlinClass.Properties.CutsceneWalkTo = Vector3.new(1143.839, 57.916, 28.544);
-					josephClass.Properties.CutsceneWalkTo = Vector3.new(1132.459, 57.839, 26.241);
-					josephClass.Move.OnMoveToEnded:Wait(25);
+					caitlinNpcClass.Properties.CutsceneWalkTo = Vector3.new(1143.839, 57.916, 28.544);
+					josephNpcClass.Properties.CutsceneWalkTo = Vector3.new(1132.459, 57.839, 26.241);
+					josephNpcClass.Move.OnMoveToEnded:Wait(25);
 
 					modMission:Progress(player, MISSION_ID, function()
 						if mission.ProgressionPoint <= 20 then
@@ -748,36 +724,40 @@ return function(CutsceneSequence)
 
 				elseif mission.ProgressionPoint == 20 then
 					
-					caitlinClass:ToggleInteractable(false);
-					josephClass:ToggleInteractable(false);
-					josephClass:SetCFrame(CFrame.new(1132.459, 57.839, 26.241) * CFrame.Angles(0, math.rad(-90), 0));
-					caitlinClass:SetCFrame(CFrame.new(1143.839, 57.916, 28.544) * CFrame.Angles(0, math.rad(0), 0));
+					caitlinNpcClass:ToggleInteractable(false);
+					josephNpcClass:ToggleInteractable(false);
+					josephPlayerNpc:SetCFrame{
+						MissionId = MISSION_ID;
+						CFrame = CFrame.new(1132.459, 57.839, 26.241) * CFrame.Angles(0, math.rad(-90), 0);
+					};
+					caitlinPlayerNpc:SetCFrame{
+						MissionId = MISSION_ID;
+						CFrame = CFrame.new(1143.839, 57.916, 28.544) * CFrame.Angles(0, math.rad(0), 0);
+					};
 
 					task.wait(1);
-					caitlinClass.Properties.CutsceneWalkTo = Vector3.new(1143.839, 57.916, 28.544);
-					caitlinClass.Properties.CutsceneLookAt = josephClass:GetCFrame().Position;
-					josephClass.Properties.CutsceneWalkTo = caitlinClass:GetCFrame().Position;
+					caitlinNpcClass.Properties.CutsceneWalkTo = Vector3.new(1143.839, 57.916, 28.544);
+					caitlinNpcClass.Properties.CutsceneLookAt = josephNpcClass:GetCFrame().Position;
+					josephNpcClass.Properties.CutsceneWalkTo = caitlinNpcClass:GetCFrame().Position;
 
-					caitlinClass.Chat(player, "Alright, I helped you guys out, can I stay here for a while?");
-					caitlinClass.Move:HeadTrack(playerClass.Head, 10);
-					josephClass.Move:HeadTrack(josephClass.Head, 3);
+					caitlinNpcClass.Chat(player, "Alright, I helped you guys out, can I stay here for a while?");
+					caitlinNpcClass.Move:HeadTrack(playerClass.Head, 10);
+					josephNpcClass.Move:HeadTrack(josephNpcClass.Head, 3);
 					task.wait(0.2);
-					caitlinClass:ToggleInteractable(true);
-					caitlinClass.Properties.CutsceneLookAt = playerClass:GetCFrame().Position;
+					caitlinNpcClass:ToggleInteractable(true);
+					caitlinNpcClass.Properties.CutsceneLookAt = playerClass:GetCFrame().Position;
 
 				elseif mission.ProgressionPoint == 21 then
-					caitlinClass.Properties.CutsceneWalkTo = Vector3.new(1143.839, 57.916, 28.544);
-					caitlinClass.Properties.CutsceneLookAt = playerClass:GetCFrame().Position;
+					caitlinNpcClass.Properties.CutsceneWalkTo = Vector3.new(1143.839, 57.916, 28.544);
+					caitlinNpcClass.Properties.CutsceneLookAt = playerClass:GetCFrame().Position;
 					
-					josephClass.Properties.CutsceneWalkTo = nil;
-					josephClass.Properties.CutsceneLookAt = nil;
+					josephNpcClass.Properties.CutsceneWalkTo = nil;
+					josephNpcClass.Properties.CutsceneLookAt = nil;
 					
 					task.spawn(function()
-						josephClass.Properties.CutsceneWalkTo = worldJosephModel:GetPivot().Position;
-						josephClass.Move.OnMoveToEnded:Wait(45);
-						josephClass.Character:Destroy();
-
-						modReplicationManager.SetClientParent(player, worldJosephModel, workspace.Entity);
+						josephPlayerNpc:SetCFrame{
+							MissionId = MISSION_ID;
+						};
 					end)
 
 				end
@@ -786,35 +766,36 @@ return function(CutsceneSequence)
 			elseif shared.WorldName == "TheHarbor" then
 				--MARK: TheHarbor
 				if mission.ProgressionPoint == 2 then
-					spawnLocalJosephClass();
-
-					josephClass:ToggleInteractable(false);
-					josephClass:SetCFrame(CFrame.new(-271.475, 40.961, 230.21) * CFrame.Angles(0, math.rad(90), 0));
+					josephNpcClass:ToggleInteractable(false);
+					josephPlayerNpc:SetCFrame{
+						MissionId = MISSION_ID;
+						CFrame = CFrame.new(-271.475, 40.961, 230.21) * CFrame.Angles(0, math.rad(90), 0);
+					};
 					task.wait(0.5);
 
-					local waitForPlayerComp = josephClass:GetComponent("WaitForPlayer");
+					local waitForPlayerComp = josephNpcClass:GetComponent("WaitForPlayer");
 					waitForPlayerComp(8, function(playerDistance) 
-						playerClass:SetCFrame(josephClass:GetCFrame());
+						playerClass:SetCFrame(josephNpcClass:GetCFrame());
 					end);
 					if not game.Players:IsAncestorOf(player) then return end;
 
-					josephClass.Chat(player, "This should be their basement..");
+					josephNpcClass.Chat(player, "This should be their basement..");
 					task.wait(4);
 					if not game.Players:IsAncestorOf(player) then return end;
 					
-					josephClass.Properties.CutsceneWalkToInteract = "ratTunnelExit";
+					josephNpcClass.Properties.CutsceneWalkToInteract = "ratTunnelExit";
 					task.wait(0.2);
-					josephClass.Move.OnMoveToEnded:Wait(5);
-					josephClass.Properties.CutsceneWalkTo = nil;
-            		josephClass:UseInteractable("ratTunnelExit");
+					josephNpcClass.Move.OnMoveToEnded:Wait(5);
+					josephNpcClass.Properties.CutsceneWalkTo = nil;
+            		josephNpcClass:UseInteractable("ratTunnelExit");
 
 					task.wait(0.5);
 					if not game.Players:IsAncestorOf(player) then return end;
 
-					josephClass:ToggleInteractable(true);
-					josephClass.Chat(player, "Okay, let's look for the walkies and get out quick..");
-					josephClass.Properties.CutsceneWalkTo = Vector3.new(-370.416, 40.961, 240.159);
-					josephClass.Move.OnMoveToEnded:Wait(10);
+					josephNpcClass:ToggleInteractable(true);
+					josephNpcClass.Chat(player, "Okay, let's look for the walkies and get out quick..");
+					josephNpcClass.Properties.CutsceneWalkTo = Vector3.new(-370.416, 40.961, 240.159);
+					josephNpcClass.Move.OnMoveToEnded:Wait(10);
 					
 					modMission:Progress(player, MISSION_ID, function(mission)
 						mission.ProgressionPoint = 3;
@@ -822,7 +803,7 @@ return function(CutsceneSequence)
 
 
 				elseif mission.ProgressionPoint == 3 then
-					josephClass.PlayAnimation("CrossedArm");
+					josephNpcClass.PlayAnimation("CrossedArm");
 
 					local newBoxInteractConfig: Configuration = modInteractables.createInteractable("ButtonRotd");
 					newBoxInteractConfig:SetAttribute("_Animation", "OpenStorage");
@@ -837,7 +818,7 @@ return function(CutsceneSequence)
 					boxModel.Parent = workspace.Interactables;
 					modReplicationManager.ReplicateOut(player, boxModel);
 
-					local waitForPlayerComp = josephClass:GetComponent("WaitForPlayer");
+					local waitForPlayerComp = josephNpcClass:GetComponent("WaitForPlayer");
 					local boxInteractable: InteractableInstance = modInteractables.getOrNew(newBoxInteractConfig);
 					waitForPlayerComp(nil, function(playerDistance) 
 						return boxInteractable.Values.IsOpened == true;
@@ -855,63 +836,66 @@ return function(CutsceneSequence)
 
 
 				elseif mission.ProgressionPoint == 4 then
-					spawnLocalCaitlinClass();
+					josephNpcClass.Properties.CutsceneWalkTo = nil;
+					caitlinNpcClass.Properties.CutsceneEquip = "mp7";
+					caitlinNpcClass:UseInteractable("ratDormitoryEntrance");
+					caitlinNpcClass:GetComponent("AvatarFace"):Set("Angry");
 
-					josephClass.Properties.CutsceneWalkTo = nil;
-					caitlinClass.Properties.CutsceneEquip = "mp7";
-					caitlinClass:UseInteractable("ratDormitoryEntrance");
-					caitlinClass:GetComponent("AvatarFace"):Set("Angry");
+					caitlinPlayerNpc:SetCFrame{
+						MissionId = MISSION_ID;
+						CFrame = CFrame.new(-368.642, 40.123, 226.758) * CFrame.Angles(0, math.rad(-90), 0);
+					};
 					task.wait(0.5);
 
-					josephClass.Chat(player, "*hmmf* ... uh.. hello..");
-					josephClass.Move:Face(caitlinClass:GetCFrame().Position);
-					josephClass.StopAnimation("CrossedArm");
-					josephClass.PlayAnimation("Surrender");
+					josephNpcClass.Chat(player, "*hmmf* ... uh.. hello..");
+					josephNpcClass.Move:Face(caitlinNpcClass:GetCFrame().Position);
+					josephNpcClass.StopAnimation("CrossedArm");
+					josephNpcClass.PlayAnimation("Surrender");
 					task.wait(3);
 					if not game.Players:IsAncestorOf(player) then return end;
 
-					caitlinClass.Move:Face(josephClass:GetCFrame().Position);
-					modStatusEffects.DirectCamera(player, caitlinClass.Head.Position, 3.5);
+					caitlinNpcClass.Move:Face(josephNpcClass:GetCFrame().Position);
+					modStatusEffects.DirectCamera(player, caitlinNpcClass.Head.Position, 3.5);
 
-					local waitForPlayerComp = caitlinClass:GetComponent("WaitForPlayer");
+					local waitForPlayerComp = caitlinNpcClass:GetComponent("WaitForPlayer");
 					waitForPlayerComp(64);
-					caitlinClass.Chat(player, "Stop right there!");
+					caitlinNpcClass.Chat(player, "Stop right there!");
 
 
 				elseif mission.ProgressionPoint == 5 then
-					josephClass.Move:MoveTo(Vector3.new(-369.49, 40.9, 231.19));
-					josephClass.Move:SetMoveSpeed("set", "cutscene", 5, josephClass.Move.MoveSpeedPriority.Action, 5);
-					josephClass.StopAnimation("Surrender");
-					josephClass:ToggleInteractable(false);
+					josephNpcClass.Move:MoveTo(Vector3.new(-369.49, 40.9, 231.19));
+					josephNpcClass.Move:SetMoveSpeed("set", "cutscene", 5, josephNpcClass.Move.MoveSpeedPriority.Action, 5);
+					josephNpcClass.StopAnimation("Surrender");
+					josephNpcClass:ToggleInteractable(false);
 
 					task.wait(4);
 					if player.Parent == nil then return end;
-					caitlinClass.Properties.CutsceneEquip = nil;
-					josephClass.Move:Face(caitlinClass.RootPart);
-					caitlinClass.Move:Face(josephClass.RootPart);
-					caitlinClass.Chat(player, "... Your name sounds familar, have we met before?");
-					caitlinClass.Move:HeadTrack(josephClass.Head, 3);
+					caitlinNpcClass.Properties.CutsceneEquip = nil;
+					josephNpcClass.Move:Face(caitlinNpcClass.RootPart);
+					caitlinNpcClass.Move:Face(josephNpcClass.RootPart);
+					caitlinNpcClass.Chat(player, "... Your name sounds familar, have we met before?");
+					caitlinNpcClass.Move:HeadTrack(josephNpcClass.Head, 3);
 
 					task.wait(5);
 					if player.Parent == nil then return end;
-					josephClass.Chat(player, "... I don't believe we have..");
-					josephClass.Move:HeadTrack(caitlinClass.Head, 3);
+					josephNpcClass.Chat(player, "... I don't believe we have..");
+					josephNpcClass.Move:HeadTrack(caitlinNpcClass.Head, 3);
 
 					task.wait(3);
 					if player.Parent == nil then return end;
-					caitlinClass.Chat(player, "...");
+					caitlinNpcClass.Chat(player, "...");
 
 					task.wait(2);
 					if player.Parent == nil then return end;
-					caitlinClass.Chat(player, "Nevermind...");
-					caitlinClass.Move:HeadTrack(josephClass.Head, 3);
+					caitlinNpcClass.Chat(player, "Nevermind...");
+					caitlinNpcClass.Move:HeadTrack(josephNpcClass.Head, 3);
 
 					task.wait(3);
 					if player.Parent == nil then return end;
-					caitlinClass.Move:HeadTrack(playerClass.Head, 3);
+					caitlinNpcClass.Move:HeadTrack(playerClass.Head, 3);
 
 					task.wait(0.5);
-					caitlinClass.Chat(player, `Alright {player.Name}, I can help you, but first you will have to take me to your friend's safehouse.`);
+					caitlinNpcClass.Chat(player, `Alright {player.Name}, I can help you, but first you will have to take me to your friend's safehouse.`);
 
 					modMission:Progress(player, MISSION_ID, function(mission)
 						if mission.ProgressionPoint <= 6 then
@@ -921,26 +905,26 @@ return function(CutsceneSequence)
 					task.wait(0.5);
 					if player.Parent == nil then return end;
 					modDialogueService:InvokeDialogue(player, "talk", {
-						NpcModel = caitlinClass.Character;
+						NpcModel = caitlinNpcClass.Character;
 					});
 
 
 				elseif mission.ProgressionPoint == 6 then
-					caitlinClass.Move:HeadTrack(playerClass.Head, 3);
+					caitlinNpcClass.Move:HeadTrack(playerClass.Head, 3);
 					
 
 				elseif mission.ProgressionPoint == 7 then
-					caitlinClass.Move:HeadTrack(josephClass.Head, 3);
-					josephClass:ToggleInteractable(true);
+					caitlinNpcClass.Move:HeadTrack(josephNpcClass.Head, 3);
+					josephNpcClass:ToggleInteractable(true);
 
 					if not firstRun then
 						task.wait(5);
-						caitlinClass.Chat(player, "Heh, I'm not like the idiots upstairs. When you're ready, let's go.");
-						caitlinClass.Move:HeadTrack(playerClass.Head, 3);
+						caitlinNpcClass.Chat(player, "Heh, I'm not like the idiots upstairs. When you're ready, let's go.");
+						caitlinNpcClass.Move:HeadTrack(playerClass.Head, 3);
 						
 						task.wait(5);
 						modDialogueService:InvokeDialogue(player, "talk", {
-							NpcModel = josephClass.Character;
+							NpcModel = josephNpcClass.Character;
 						});
 					end
 
@@ -951,23 +935,21 @@ return function(CutsceneSequence)
 
 			--MARK: All worlds
 			if mission.ProgressionPoint == 8 then
-				spawnLocalCaitlinClass();
-
-				local caitlinFollowPlayerComp = caitlinClass:GetComponent("FollowPlayer");
+				local caitlinFollowPlayerComp = caitlinNpcClass:GetComponent("FollowPlayer");
 				local caitlinFollowDist = 13;
 				caitlinFollowPlayerComp(nil, function()
 					return mission.Type == 1 and mission.ProgressionPoint == 8;
 				end, caitlinFollowDist)
 				if not game.Players:IsAncestorOf(player) then return end;
 
-				local josephFollowPlayerComp = josephClass:GetComponent("FollowPlayer");
+				local josephFollowPlayerComp = josephNpcClass:GetComponent("FollowPlayer");
 				josephFollowPlayerComp(nil, function()
 					return mission.Type == 1 and mission.ProgressionPoint == 8;
 				end)
 				if not game.Players:IsAncestorOf(player) then return end;
 
-				josephClass:ToggleInteractable(false);
-				caitlinClass:ToggleInteractable(false);
+				josephNpcClass:ToggleInteractable(false);
+				caitlinNpcClass:ToggleInteractable(false);
 			end
 
 

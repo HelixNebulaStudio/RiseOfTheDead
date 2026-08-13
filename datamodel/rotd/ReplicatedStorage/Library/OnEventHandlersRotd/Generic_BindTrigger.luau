@@ -22,11 +22,6 @@ return function(event: EventPacket, ...)
 				modUnlockPack.UnlockPack(player, "SkinsPacks", "Camo");
 			end
 
-		elseif triggerId == "UnlockHalloweenPack" then
-			if profile.SkinsPacks.Halloween == nil then
-				modUnlockPack.UnlockPack(player, "SkinsPacks", "Halloween");
-			end
-				
 		elseif triggerId == "RandomDisguise30" then
 			local model = interactable.Part and interactable.Part.Parent;
 

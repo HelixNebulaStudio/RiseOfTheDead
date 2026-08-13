@@ -309,13 +309,21 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			end
 
 			for key, wb in pairs(binds.Workbenches) do
-				if key == "Appearance" and itemLib.Type ~= modItemLibrary.Types.Clothing then
-					continue;
+				if key == "Appearance" then
+					continue; -- deprecated; clothing now uses Customization
 				end
 
 				if wb.Library and wb.Workbench then
-					if wb.Library[itemId] or (modItemUnlockablesLibrary:Find(itemId) and key == "Appearance") then
+					local hasUnlockable = modItemUnlockablesLibrary:Find(itemId) ~= nil;
 
+					local shouldCreate = false;
+					if key == "Customization" then
+						shouldCreate = wb.Library[itemId] ~= nil or hasUnlockable;
+					else
+						shouldCreate = wb.Library[itemId] ~= nil;
+					end
+
+					if shouldCreate then
 						binds.ActiveWorkbenches[key] = wb.Workbench.new(itemId, binds.Workbenches[key].Library[itemId], binds.SelectedSlot.Item);
 						if binds.ActiveWorkbenches[key] then
 							binds.ActiveWorkbenches[key].Menu.Parent = pageFrame;
@@ -329,7 +337,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					binds.ActiveWorkbenches.Blueprints = nil;
 				end
 			end
-			if (itemLib.Type == modItemLibrary.Types.Tool or itemLib.Type == modItemLibrary.Types.Clothing) and binds.ActiveWorkbenches.Upgrades then
+			if (itemLib.Type == modItemLibrary.Types.Tool or itemLib.Type == modItemLibrary.Types.Clothing) 
+			and binds.ActiveWorkbenches.Upgrades then
 				binds.SetPage(binds.ActiveWorkbenches.Upgrades.Menu);
 
 			elseif itemLib.Type == modItemLibrary.Types.Mod then
@@ -526,18 +535,21 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			end
 		end)
 
+		local lastVisible = self.Menu.Visible;
 		self.Menu:GetPropertyChangedSignal("Visible"):Connect(function()
+			if lastVisible == self.Menu.Visible then return end;
+			lastVisible = self.Menu.Visible;
+
 			if self.OnVisiblityChanged then
 				task.spawn(function()
 					self:OnVisiblityChanged();
 				end)
 			end
-			if self.Menu.Visible then
-				if self.Refresh then
-					self:Refresh();
-				end
-				self:ClearSearches();
+
+			if self.Refresh then
+				self:Refresh();
 			end
+			self:ClearSearches();
 		end)
 
 		setmetatable(self, ListMenu);
@@ -733,4 +745,5 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 end
 
 return interfacePackage;
+
 

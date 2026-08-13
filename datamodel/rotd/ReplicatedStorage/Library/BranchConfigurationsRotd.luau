@@ -448,7 +448,7 @@ local WORLDS = {
         CanTravelTo = true;
         PublicWorld = true;
     };
-    HalloweenBasement = {
+    WitherweenBasement = {
         DisplayName = "Witherween: Basement";
         PlaceIds = {
             [LEGACY_GAME_ID] = 5894210737;
@@ -625,7 +625,7 @@ local SPAWN_LIBRARY = {
 		mallToRadio = {};
 		trainToResidential = {};
 		warehouseToResidential = {};
-		halloweenbasement = {};
+		witherweenbasement = {};
 		sectorDToRes = {};
 		ratTunnelHarbor = {};
 	};

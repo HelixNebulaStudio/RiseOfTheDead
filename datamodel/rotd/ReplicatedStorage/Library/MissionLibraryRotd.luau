@@ -1462,33 +1462,33 @@ MissionLibrary.New{
 };
 
 
--- MARK: 43 - Missing Body 1 TODO
+-- MARK: 43 - Missing Body 1
 MissionLibrary.New{
-	MissionId=43;
+	MissionId = 43;
 	MissionType = MissionLibrary.MissionTypes.Event;
-	Name="Missing Body 1";
-	From="Jack Reap";
-	Description="A mysterious man needs your help searching for something..";
-	Persistent=true;
-	Progression={
+	Name = "Missing Body 1";
+	From = "Jack Reap";
+	Description = "A mysterious man needs your help searching for something..";
+	Persistent = true;
+	Progression = {
 		"Complete the office raid";
 		"Talk to Jack Reap";
 		"Head to the mall";
 		"Go to the marker and find a way in";
 		"Kill Jack the zombie";
 	};
-	World={"TheWarehouse"; "TheMall"};
-	SaveData={};
-	GuideText="Talk to Jack Reap";
-	AddRequirements={
+	World = {"TheWarehouse"; "TheMall"};
+	SaveData = {};
+	GuideText = "Talk to Jack Reap";
+	AddRequirements = {
 		{Type="SpecialEvent"; Value="Halloween"};
 	};
-	Rewards={
+	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Side};
 		{Type="Mission"; Id=44};
 	};
-	LinkNextMission=44;
-	Markers={
+	LinkNextMission = 44;
+	Markers = {
 		[1]={World="TheWarehouse"; Label="The Office Raid"; Target=Vector3.new(643.575, 60.15, 276.25); Type=modMarkers.MarkerTypes.Waypoint;};
 		[4]={World="TheMall"; Label="Marker"; Target=Vector3.new(443.31, 95.481, -660.39); Type=modMarkers.MarkerTypes.Waypoint;};
 	};

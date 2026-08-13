@@ -1,10 +1,10 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Client Variables;
-local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
-local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
+local localPlayer = game.Players.LocalPlayer;
+
+local modPlayerNpcs = shared.require(game.ReplicatedStorage.Library.PlayerNpcs);
 
 --== Variables;
 local MISSION_ID = 18;
@@ -54,21 +54,19 @@ end
 return function(CutsceneSequence)
 	
 	--MARK: TheWarehouse
-	if modBranchConfigurations.IsWorld("TheWarehouse") then
+	if shared.WorldName == "TheWarehouse" then
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
 			local player: Player = players[1];
 			local mission = modMission:GetMission(player, MISSION_ID);
 			if mission == nil then return end;
 
-			local robertNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Robert");
-			if robertNpcClass == nil then
-				robertNpcClass = shared.modNpcs.spawn2{
-					Name = "Robert";
-					Player = player;
-					ReplicateOut = true;
-				};
-			end
+			local robertPlayerNpc: PlayerNpc = modPlayerNpcs.getPlayerNpc(player, "Robert");
+			robertPlayerNpc:SetCFrame{
+				MissionId = MISSION_ID;
+				CFrame = CFrame.new(662.87, 57.81, -13.28);
+			};
+			local robertNpcClass: NpcClass = robertPlayerNpc.NpcClass;
 
 		
 			local function OnChanged(firstRun)
@@ -156,7 +154,7 @@ return function(CutsceneSequence)
 		end)
 		
 	--MARK: TheUnderground
-	elseif modBranchConfigurations.IsWorld("TheUnderground") then
+	elseif shared.WorldName == "TheUnderground" then
 		CutsceneSequence:Initialize(function()
 			local players = CutsceneSequence:GetPlayers();
 			local player: Player = players[1];
@@ -191,15 +189,12 @@ return function(CutsceneSequence)
 				};
 			end
 
-			local robertNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Robert");
-			if robertNpcClass == nil then
-				robertNpcClass = shared.modNpcs.spawn2{
-					Name = "Robert";
-					CFrame = CFrame.new(1.65, 15, -2.57);
-					Player = player;
-					ReplicateOut = true;
-				};
-			end
+			local robertPlayerNpc: PlayerNpc = modPlayerNpcs.getPlayerNpc(player, "Robert");
+			robertPlayerNpc:SetCFrame{
+				MissionId = MISSION_ID;
+				CFrame = CFrame.new(1.65, 15, -2.57);
+			};
+			local robertNpcClass: NpcClass = robertPlayerNpc.NpcClass;
 			
 			local function OnChanged(firstRun)
 				if mission.Type == 2 then -- OnAvailable
@@ -228,7 +223,10 @@ return function(CutsceneSequence)
 						elseif mission.ProgressionPoint >= 9 then
 							robertNpcClass:TeleportHide();
 						elseif mission.ProgressionPoint >= 7 then
-							robertNpcClass:SetCFrame(CFrame.new(-81.5, 8.682, 290));
+							robertPlayerNpc:SetCFrame{
+								MissionId = MISSION_ID;
+								CFrame = CFrame.new(-81.5, 8.682, 290);
+							};
 						end
 					end
 
@@ -236,7 +234,10 @@ return function(CutsceneSequence)
 						local robertFace = robertNpcClass.Character:FindFirstChild("face", true);
 						if robertFace then robertFace.Texture = "rbxassetid://416829404" end; 
 
-						robertNpcClass:SetCFrame(CFrame.new(1.65, 15, -2.57));
+						robertPlayerNpc:SetCFrame{
+							MissionId = MISSION_ID;
+							CFrame = CFrame.new(1.65, 15, -2.57);
+						};
 						robertNpcClass:ToggleInteractable(false);
 						
 						local exitPosition = Vector3.new(-25.5, 7.5, 159.0);
@@ -304,8 +305,11 @@ return function(CutsceneSequence)
 
 						robertNpcClass.Move:MoveTo(Vector3.new(5.2, 8.65, 177.85));
 						robertNpcClass.Move.OnMoveToEnded:Wait(5);
-						
-						robertNpcClass:SetCFrame(CFrame.new(5.2, 8.65, 177.85));
+
+						robertPlayerNpc:SetCFrame{
+							MissionId = MISSION_ID;
+							CFrame = CFrame.new(5.2, 8.65, 177.85);
+						};
 						if mission.ProgressionPoint ~= 4 then return end;
 
 						robertNpcClass.Move:Face(Vector3.new(-7.35, 8.65, 167.4));
@@ -317,8 +321,11 @@ return function(CutsceneSequence)
 
 						robertNpcClass.Move:MoveTo(Vector3.new(3.15, 8.071, 257.45));
 						robertNpcClass.Move.OnMoveToEnded:Wait(6);
-						
-						robertNpcClass:SetCFrame(CFrame.new(3.15, 8.071, 257.45));
+
+						robertPlayerNpc:SetCFrame{
+							MissionId = MISSION_ID;
+							CFrame = CFrame.new(3.15, 8.071, 257.45);
+						};
 						if mission.ProgressionPoint ~= 4 then return end;
 
 						robertNpcClass.Chat(robertNpcClass.Player, "Woah, look at this place..");
@@ -332,7 +339,10 @@ return function(CutsceneSequence)
 						
 					elseif mission.ProgressionPoint == 5 then
 						if firstRun then
-							robertNpcClass:SetCFrame(CFrame.new(-50.795, 8.232, 279.45));
+							robertPlayerNpc:SetCFrame{
+								MissionId = MISSION_ID;
+								CFrame = CFrame.new(-50.795, 8.232, 279.45);
+							};
 						end
 						
 						robertNpcClass.Move:Stop();
@@ -375,7 +385,10 @@ return function(CutsceneSequence)
 							robertNpcClass.Move.OnMoveToEnded:Wait(10);
 							
 						else
-							robertNpcClass:SetCFrame(CFrame.new(-81.5, 8.682, 290));
+							robertPlayerNpc:SetCFrame{
+								MissionId = MISSION_ID;
+								CFrame = CFrame.new(-81.5, 8.682, 290);
+							};
 						end
 						
 					elseif mission.ProgressionPoint == 8 then

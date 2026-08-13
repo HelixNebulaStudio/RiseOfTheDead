@@ -16,6 +16,7 @@ local modCharacterInteractions = shared.require(game.ReplicatedStorage.Library.C
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 local modDoors = shared.require(game.ReplicatedStorage.Entity.Doors);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
+local modPlayerNpcs = shared.require(game.ReplicatedStorage.Library.PlayerNpcs);
 
 local modHealthComponent = shared.require(game.ReplicatedStorage.Components.HealthComponent);
 
@@ -64,7 +65,8 @@ if RunService:IsServer() then
 			local player = playerClass and playerClass:GetInstance() or nil;
 			if player == nil then return end;
 
-			local patrickNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Patrick");
+			local patrickPlayerNpc: PlayerNpc = modPlayerNpcs.getPlayerNpc(player, "Patrick");
+			local patrickNpcClass: NpcClass = patrickPlayerNpc.NpcClass;
 			if patrickNpcClass == nil then return end;
 
 			patrickNpcClass.StopAnimation("carriedinjured");
@@ -247,11 +249,14 @@ return function(CutsceneSequence)
 
 			initEventPackge(player);
 			local choiceEventObj = modEvents:GetEvent(player, "mission58choice");
-			local caitlinNpcClass: NpcClass = modNpcs.matchNpc(function(npcClass: NpcClass)
-				if npcClass.Player then return end;
-				if npcClass.Name ~= "Caitlin" then return end;
-				return true;
-			end);
+
+			local caitlinPlayerNpc: PlayerNpc = modPlayerNpcs.getPlayerNpc(player, "Caitlin");
+			caitlinPlayerNpc:SetCFrame{
+				MissionId = MISSION_ID;
+				CFrame = CFrame.new(-308.741, 63.055, 206.642) * CFrame.Angles(0, math.rad(180), 0);
+			};
+
+			local caitlinNpcClass: NpcClass = caitlinPlayerNpc.NpcClass;
 
 			local revasNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Revas");
 			if revasNpcClass == nil then
@@ -266,44 +271,36 @@ return function(CutsceneSequence)
 			
 			local function OnChanged(firstRun)
 				if mission.Type == 2 then -- OnAvailable
+					caitlinPlayerNpc:SetCFrame();
 
 				elseif mission.Type == 1 then -- OnActive
 					if mission.ProgressionPoint == 1 then
-
+						caitlinPlayerNpc:SetCFrame();
 					elseif mission.ProgressionPoint == 2 then
-						if caitlinNpcClass then
+						caitlinNpcClass.Chat(player, "Is that so.. I'll pass the information up the chain, if he wants to talk to you, he will let you know.");
+						task.wait(8);
 
-							caitlinNpcClass.Chat(player, "Is that so.. I'll pass the information up the chain, if he wants to talk to you, he will let you know.");
-							task.wait(8);
+						caitlinNpcClass.Character:SetAttribute("LookAtClient", false);
+						caitlinNpcClass.Properties.CutsceneEquip = "walkietalkie";
+						task.wait(0.3);
 
-							caitlinNpcClass.Character:SetAttribute("LookAtClient", false);
-							caitlinNpcClass.WieldComp:Equip{
-								ItemId = "walkietalkie";
-							};
-							task.wait(0.3);
+						caitlinNpcClass.WieldComp:InvokeToolAction("PrimaryUse", true);
+						task.wait(1);
 
-							caitlinNpcClass.WieldComp:InvokeToolAction("PrimaryUse", true);
-							task.wait(1);
+						caitlinNpcClass.Chat(player, "...");
+						task.wait(5);
 
-							caitlinNpcClass.Chat(player, "...");
-							task.wait(5);
+						caitlinNpcClass.Chat(player, "Mhm..");
+						task.wait(5);
 
-							caitlinNpcClass.Chat(player, "Mhm..");
-							task.wait(5);
+						caitlinNpcClass.Chat(player, "Yes, sir");
+						task.wait(5);
 
-							caitlinNpcClass.Chat(player, "Yes, sir");
-							task.wait(5);
+						caitlinNpcClass.WieldComp:InvokeToolAction("PrimaryUse", false);
+						caitlinNpcClass.Character:SetAttribute("LookAtClient", nil);
 
-							caitlinNpcClass.WieldComp:InvokeToolAction("PrimaryUse", false);
-							caitlinNpcClass.Character:SetAttribute("LookAtClient", nil);
+						caitlinNpcClass.Chat(player, "Looks like it's your lucky day..");
 
-							caitlinNpcClass.Chat(player, "Looks like it's your lucky day..");
-
-						else
-							Debugger:Log("Missing caitlin");
-							task.wait(5);
-
-						end
 						modMission:Progress(player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint < 3 then
 								mission.ProgressionPoint = 3;
@@ -323,7 +320,8 @@ return function(CutsceneSequence)
 						
 						local waitForPlayerComp = revasNpcClass:GetComponent("WaitForPlayer");
 						waitForPlayerComp(40);
-
+						if mission.ProgressionPoint ~= 4 or not game.Players:IsAncestorOf(player) then return end;
+						
 						revasNpcClass.Move:SetMoveSpeed("set", "default", 6);
 						revasNpcClass.Chat(player, "So you are the person I've been hearing so much about...");
 						task.wait(1);
@@ -340,6 +338,7 @@ return function(CutsceneSequence)
 						end)
 
 					elseif mission.ProgressionPoint == 5 then
+						caitlinNpcClass.Properties.CutsceneEquip = nil;
 						
 						local revasDoor = modReplicationManager.getReplicated(player, "RevasDoorway")[1];
 
@@ -451,13 +450,12 @@ return function(CutsceneSequence)
 			};
 			zarkNpcClass:TeleportHide();
 
-			local patrickNpcClass: NpcClass = modNpcs.spawn2{
-				Name = "Patrick";
-				Player = player;
-				CFrame = CFrame.new(4.555336, 3, 91.5086823, 0.358367682, 0, -0.933580518, 0, 1, 0, 0.933580518, 0, 0.358367682);
+			
+			local patrickPlayerNpc: PlayerNpc = modPlayerNpcs.getPlayerNpc(player, "Patrick");
+			patrickPlayerNpc:SetCFrame{
+				MissionId = MISSION_ID;
 			};
-			patrickNpcClass:TeleportHide();
-			patrickNpcClass.Properties.CutsceneActive = true;
+			local patrickNpcClass: NpcClass = patrickPlayerNpc.NpcClass;
 
 			local eugeneNpcClass: NpcClass = modNpcs.spawn2{
 				Name = "Eugene";
@@ -1545,7 +1543,15 @@ return function(CutsceneSequence)
 
 			local playerClass: PlayerClass = shared.modPlayers.get(player);
 
-			local patrickNpcClass: NpcClass;
+			local patrickPlayerNpc: PlayerNpc = modPlayerNpcs.getPlayerNpc(player, "Patrick");
+			patrickPlayerNpc:SetCFrame{
+				MissionId = MISSION_ID;
+			};
+			local patrickNpcClass: NpcClass = patrickPlayerNpc.NpcClass;
+			patrickNpcClass.HealthComp:SetHealth(10);
+			safehomeClass:AddNpc(patrickNpcClass);
+			
+			
 			local function OnChanged(firstRun)
 				local spawnPatrick = 0;
 
@@ -1564,39 +1570,26 @@ return function(CutsceneSequence)
 				elseif mission.Type == 3 then -- OnComplete
 					spawnPatrick = 2;
 					
-					if patrickNpcClass then
-						local spawnAtt = safehomeClass:GetNpcSpot("Patrick");
-						patrickNpcClass.Move:MoveTo(spawnAtt.WorldPosition);
-						task.spawn(function()
-							task.wait(0.1);
-							patrickNpcClass.Move:Face(patrickNpcClass.RootPart.Position + spawnAtt.WorldCFrame.LookVector);
-						end)
-
-					end
+					local spawnAtt = safehomeClass:GetNpcSpot("Patrick");
+					patrickNpcClass.Move:MoveTo(spawnAtt.WorldPosition);
+					task.spawn(function()
+						task.wait(0.1);
+						patrickNpcClass.Move:Face(patrickNpcClass.RootPart.Position + spawnAtt.WorldCFrame.LookVector);
+					end)
 				end
 
 				if spawnPatrick > 0 then
-					patrickNpcClass = modNpcs.getPlayerNpc(player, "Patrick");
+					patrickNpcClass.Properties.InSafehome = true;
+					patrickNpcClass:AddComponent("SafehomeSurvivor");
 
-					if patrickNpcClass == nil then
-						local spawnAtt = safehomeClass:GetNpcSpot("Patrick");
-						modNpcs.spawn2{
-							Name = "Patrick";
-							CFrame = spawnPatrick == 2 and spawnAtt.WorldCFrame or playerClass:GetCFrame();
-							Player = player;
-							Properties = {
-								InSafehome = true;
-							};
-							AddComponents = {
-								"SafehomeSurvivor";
-							};
-							BindSetup = function(npcClass: NpcClass)
-								npcClass.HealthComp:SetHealth(10);
-								safehomeClass:AddNpc(npcClass);
-							end;
-						};
+					local spawnAtt = safehomeClass:GetNpcSpot("Patrick");
+					local spawnCf = spawnPatrick == 2 and spawnAtt.WorldCFrame or playerClass:GetCFrame();
 
-					end
+					patrickPlayerNpc:SetCFrame{
+						MissionId = MISSION_ID;
+						CFrame = spawnCf;
+					};
+
 				end
 			end
 

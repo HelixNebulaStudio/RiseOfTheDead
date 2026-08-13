@@ -1,9 +1,10 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Client Variables;
-local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local localPlayer = game.Players.LocalPlayer;
+
+local modPlayerNpcs = shared.require(game.ReplicatedStorage.Library.PlayerNpcs);
 
 --== Variables;
 local MISSION_ID = 38;
@@ -46,23 +47,23 @@ return function(CutsceneSequence)
 			local mission = modMission:GetMission(player, MISSION_ID);
 			if mission == nil then return end;
 
-			local robertNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Robert");
+			local robertPlayerNpc: PlayerNpc = modPlayerNpcs.getPlayerNpc(player, "Robert");
+			robertPlayerNpc:SetCFrame{
+				MissionId = MISSION_ID;
+			};
+			local robertNpcClass: NpcClass = robertPlayerNpc.NpcClass;
+
 
 			local function OnChanged(firstRun)
 				if mission.Type == 2 then -- OnAvailable
 
 				elseif mission.Type == 1 then -- OnActive
 					if mission.ProgressionPoint == 2 then
-						if robertNpcClass == nil then
-							robertNpcClass = modNpcs.spawn2{
-								Name = "Robert";
-								Player = player;
-								CFrame = CFrame.new(345.23999, 8.55466652, -7.92925215, 1, 0, 0, 0, 1, 0, 0, 0, 1);
-								ReplicateOut = true;
-							};
-						end
+						robertPlayerNpc:SetCFrame{
+							MissionId = MISSION_ID;
+							CFrame = CFrame.new(345.23999, 8.55466652, -7.92925215, 1, 0, 0, 0, 1, 0, 0, 0, 1);
+						};
 
-						robertNpcClass:SetCFrame(CFrame.new(345.23999, 8.55466652, -7.92925215, 1, 0, 0, 0, 1, 0, 0, 0, 1));
 						robertNpcClass.Move:SetMoveSpeed("set", "default", 30);
 
 						robertNpcClass:ToggleInteractable(false);
@@ -129,34 +130,28 @@ return function(CutsceneSequence)
 			local mission = modMission:GetMission(player, MISSION_ID);
 			if mission == nil then return end;
 
-			local robertNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Robert");
-			local function spawnRobert()
-				if robertNpcClass == nil then
-					robertNpcClass = modNpcs.spawn2{
-						Name = "Robert";
-						Player = player;
-						CFrame = CFrame.new(1127.07922, 57.5696716, -108.439293, -1, 0, 0, 0, 1, 0, 0, 0, -1);
-						ReplicateOut = true;
-					};
-					robertNpcClass.SetAnimation("LookBack", {script.LookbackAnim});
-					robertNpcClass:GetComponent("AvatarFace").Default = "rbxassetid://141728515";
-				end
-			end
-
+			local robertPlayerNpc: PlayerNpc = modPlayerNpcs.getPlayerNpc(player, "Robert");
+			robertPlayerNpc:SetCFrame{
+				MissionId = MISSION_ID;
+			};
+			local robertNpcClass: NpcClass = robertPlayerNpc.NpcClass;
 
 			local function OnChanged(firstRun)
 				if mission.Type == 2 then -- OnAvailable
 
 				elseif mission.Type == 1 then -- OnActive
+					local RESIDENTIALSAFEHOUSE_CF = CFrame.new(1127.07922, 57.5696716, -108.439293, -1, 0, 0, 0, 1, 0, 0, 0, -1);
+
 					if mission.ProgressionPoint >= 5 then
-						spawnRobert();
-						Debugger:Warn("Spawn robert");
+						robertPlayerNpc:SetCFrame{
+							MissionId = MISSION_ID;
+							CFrame = RESIDENTIALSAFEHOUSE_CF;
+						};
+						robertNpcClass.SetAnimation("LookBack", {script.LookbackAnim});
+						robertNpcClass:GetComponent("AvatarFace").Default = "rbxassetid://141728515";
 					end
 
-					local postCf = CFrame.new(1127.07922, 57.5696716, -108.439293, -1, 0, 0, 0, 1, 0, 0, 0, -1);
 					if mission.ProgressionPoint == 5 then
-						robertNpcClass:SetCFrame(postCf);
-
 						robertNpcClass.Move:SetMoveSpeed("set", "default", 15);
 						robertNpcClass.Move:Face(Vector3.new(1126.967, 58.25, -70.092));
 						
@@ -174,7 +169,6 @@ return function(CutsceneSequence)
 						end)
 
 					elseif mission.ProgressionPoint == 6 then
-						robertNpcClass:SetCFrame(postCf)
 						task.spawn(function()
 							local face = robertNpcClass.Head:WaitForChild("face");
 							face.Texture = "rbxassetid://5195838286";
@@ -182,7 +176,6 @@ return function(CutsceneSequence)
 						robertNpcClass.PlayAnimation("LookBack");
 
 					elseif mission.ProgressionPoint == 7 then
-						robertNpcClass:SetCFrame(postCf)
 						robertNpcClass.StopAnimation("LookBack");
 						task.spawn(function()
 							-- rbxassetid://141728515 original face
@@ -227,7 +220,10 @@ return function(CutsceneSequence)
 					end
 
 					if robertNpcClass then
-						robertNpcClass:SetCFrame(CFrame.new(1138.83765, 60.4196625, -126.609146, -0.0202159919, 0, -0.999795616, 0, 1, 0, 0.999795616, 0, -0.0202159919));
+						robertPlayerNpc:SetCFrame{
+							MissionId = MISSION_ID;
+							CFrame = CFrame.new(1138.83765, 60.4196625, -126.609146, -0.0202159919, 0, -0.999795616, 0, 1, 0, 0.999795616, 0, -0.0202159919);
+						};
 						robertNpcClass:GetComponent("AvatarFace"):Set("Confident");
 
 					else

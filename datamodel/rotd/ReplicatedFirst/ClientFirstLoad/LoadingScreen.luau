@@ -207,7 +207,7 @@ local WORLDS_INFO_LIBRARY = {
 		TitleTexts = "Easter: Butchery";
 		DescTexts = "Bunnyman wants to know your location..";
 	};
-	["HalloweenBasement"] = {
+	["WitherweenBasement"] = {
 		Images = {"rbxassetid://105212585938594"};
 		HeaderTexts = WD_HEADER;
 		TitleTexts = "Witherween: Basement";

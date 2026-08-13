@@ -4,12 +4,12 @@ local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
 local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.Library.NpcProfileLibrary);
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modGameModeLibrary = shared.require(game.ReplicatedStorage.Library.GameModeLibrary);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
 local modDialogueService = shared.require(game.ReplicatedStorage.Library.DialogueService);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
+local modPlayerNpcs = shared.require(game.ReplicatedStorage.Library.PlayerNpcs);
 
 local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 
@@ -92,6 +92,8 @@ else
 	
 end
 
+local STAN_MALL_SPAWNCF = CFrame.new(755.090332, 94.8246002, -653.329224, -1, 0, 0, 0, 1, 0, 0, 0, -1);
+
 --== Script;
 return function(CutsceneSequence)
 	-- MARK: TheMall
@@ -105,42 +107,31 @@ return function(CutsceneSequence)
 			local mission = modMission:GetMission(player, MISSION_ID);
 			if mission == nil then return end;
 
-			local stanNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Stan");
-			local stanMallShopSpawnCf = CFrame.new(755.090332, 94.8246002, -653.329224, -1, 0, 0, 0, 1, 0, 0, 0, -1);
-			if stanNpcClass == nil and (mission.Type == 4 or mission.ProgressionPoint <= 13) then
-				stanNpcClass = modNpcs.spawn2{
-					Name = "Stan";
-					CFrame = stanMallShopSpawnCf;
-					Player = player;
-					ReplicateOut = true;
-				};
-			end
+			local stanPlayerNpc: PlayerNpc = modPlayerNpcs.getPlayerNpc(player, "Stan");
+			stanPlayerNpc:SetCFrame{
+				MissionId = MISSION_ID;
+			};
+			local stanNpcClass: NpcClass = stanPlayerNpc.NpcClass;
 
 			local function OnChanged(firstRun)
 				if mission.Type == 2 then -- OnAvailable
 
 				elseif mission.Type == 4 and firstRun then
-					stanNpcClass:SetCFrame(stanMallShopSpawnCf);
+					stanPlayerNpc:SetCFrame{
+						MissionId = MISSION_ID;
+						CFrame = STAN_MALL_SPAWNCF;
+					};
 					modMission:Progress(player, MISSION_ID, function(mission)
 						mission.ProgressionPoint = 3;
 					end)
 
 				elseif mission.Type == 1 then -- OnActive
 					if mission.ProgressionPoint == 1 then
-						
-						if mission.Redo then
-							Debugger:Warn("Redo");
-							if stanNpcClass == nil then
-								stanNpcClass = modNpcs.spawn2{
-									Name = "Stan";
-									CFrame = stanMallShopSpawnCf;
-									Player = player;
-									ReplicateOut = true;
-								};
-							end
-						end
-							
-						stanNpcClass:SetCFrame(stanMallShopSpawnCf);
+						stanPlayerNpc:SetCFrame{
+							MissionId = MISSION_ID;
+							CFrame = STAN_MALL_SPAWNCF;
+						};
+
 						stanNpcClass:ToggleInteractable(false);
 
 						stanNpcClass.Move:SetMoveSpeed("set", "default", 25);
@@ -185,7 +176,10 @@ return function(CutsceneSequence)
 
 					elseif mission.ProgressionPoint == 2 then
 						stanNpcClass:ToggleInteractable(false);
-						stanNpcClass:SetCFrame(CFrame.new(Vector3.new(793.870911, 162.633194, -727.308044)));
+						stanPlayerNpc:SetCFrame{
+							MissionId = MISSION_ID;
+							CFrame = CFrame.new(793.870911, 162.633194, -727.308044);
+						};
 						
 						local waitForPlayer = stanNpcClass:GetComponent("WaitForPlayer");
 						waitForPlayer.FacePlayerWhileWaiting = false;
@@ -205,7 +199,10 @@ return function(CutsceneSequence)
 
 					end
 				elseif mission.Type == 3 then -- OnComplete
-
+					stanPlayerNpc:SetCFrame{
+						MissionId = MISSION_ID;
+					};
+					
 				end
 			end
 			mission.OnChanged:Connect(OnChanged);
@@ -237,15 +234,13 @@ return function(CutsceneSequence)
 			end)
 			if modMission:IsComplete(player, MISSION_ID) then return end;
 
-			local stanNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Stan");
-			if stanNpcClass == nil then
-				stanNpcClass = modNpcs.spawn2{
-					Name = "Stan";
-					CFrame = CFrame.new(-0.0199999996, 163.47496, -38.7299995, 1, 0, 0, 0, 1, 0, 0, 0, 1);
-					Player = player;
-				};
-				stanNpcClass.HealthComp:SetCanBeHurtBy("Zark");
-			end
+			local stanPlayerNpc: PlayerNpc = modPlayerNpcs.getPlayerNpc(player, "Stan");
+			stanPlayerNpc:SetCFrame{
+				MissionId = MISSION_ID;
+				CFrame = CFrame.new(-0.0199999996, 163.47496, -38.7299995, 1, 0, 0, 0, 1, 0, 0, 0, 1);
+			};
+			local stanNpcClass: NpcClass = stanPlayerNpc.NpcClass;
+			stanNpcClass.HealthComp:SetCanBeHurtBy("Zark");
 			
 			local zarkNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Zark");
 			if zarkNpcClass == nil then
@@ -730,7 +725,6 @@ return function(CutsceneSequence)
 			local mission = modMission:GetMission(player, MISSION_ID);
 			if mission == nil then return end;
 			
-			local patrickNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Patrick");
 			if modMission:IsComplete(player, MISSION_ID) then return end;
 			
 			local hostageSpawn = workspace.Environment:WaitForChild("Game"):WaitForChild("HostageSpawn");
@@ -758,6 +752,12 @@ return function(CutsceneSequence)
 				modMission:FailMission(player, MISSION_ID, "You died.");
 				modServerManager:Travel(player, "TheMall");
 			end)
+		
+			local patrickPlayerNpc: PlayerNpc = modPlayerNpcs.getPlayerNpc(player, "Patrick");
+			patrickPlayerNpc:SetCFrame{
+				MissionId = MISSION_ID;
+			};
+			local patrickNpcClass: NpcClass = patrickPlayerNpc.NpcClass;
 
 			local function OnChanged(firstRun)
 				if mission.Type == 2 then -- OnAvailable
@@ -766,13 +766,11 @@ return function(CutsceneSequence)
 					Debugger:Log("Mission progression point, ",mission.ProgressionPoint);
 
 					if firstRun and mission.ProgressionPoint >= 13 then
-						if patrickNpcClass == nil then
-							patrickNpcClass = modNpcs.spawn2{
-								Name = "Patrick";
-								CFrame = CFrame.new(31.509, 40.911, 12.906) * CFrame.Angles(0, math.rad(92.957), 0);
-								Player = player;
-							};
-						end
+						patrickPlayerNpc:SetCFrame{
+							MissionId = MISSION_ID;
+							CFrame = CFrame.new(31.509, 40.911, 12.906) * CFrame.Angles(0, math.rad(92.957), 0);
+						};
+
 						patrickNpcClass.WieldComp:Equip{
 							ItemId = "ak47";
 							OnSuccessFunc = function(toolHandler: ToolHandlerInstance)

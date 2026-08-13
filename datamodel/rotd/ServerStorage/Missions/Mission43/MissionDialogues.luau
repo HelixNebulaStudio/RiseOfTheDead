@@ -7,13 +7,13 @@ local Dialogues = {
 	["Jack Reap"]={};
 };
 
-local missionId = 43;
+local MISSION_ID = 43;
 --==
 
 -- MARK: Jack Reap Dialogues
 Dialogues["Jack Reap"].DialogueStrings = {
 	["missingbody_init"]={
-		CheckMission=missionId;
+		CheckMission = MISSION_ID;
 		Say="Hey.. You look really pale. Are you alright?";
 		Reply="You.. Help me.. I am finding something.. Head in, you will find it..";
 	};
@@ -69,7 +69,7 @@ if RunService:IsServer() then
 		elseif mission.Type == 2 then -- Available
 			dialog:SetInitiate("Memories.. Last breath.. Where?..", "Happy");
 			dialog:AddChoice("missingbody_init", function(dialog)
-				modMission:StartMission(player, missionId);
+				modMission:StartMission(player, MISSION_ID);
 			end);
 			
 		end

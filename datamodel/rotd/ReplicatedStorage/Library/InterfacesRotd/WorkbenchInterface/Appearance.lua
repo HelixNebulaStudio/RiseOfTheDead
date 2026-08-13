@@ -38,6 +38,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 
 	local firstSync = false;
 	function WorkbenchClass.new(itemId, library, storageItem)
+		Debugger:Warn(`Deprecated Appearance menu`);
 		local itemDisplay = inspectWindow.Binds.ItemViewport;
 
 		if firstSync == false then
@@ -147,6 +148,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						local titleLabel = unlockButton:WaitForChild("TitleLabel");
 						local chargeLabel = unlockButton:WaitForChild("ChargesLabel");
 						local goldIcon = unlockButton:WaitForChild("GoldIcon");
+						local editButton = unlockButton:WaitForChild("Edit");
 
 						local unlockableIcon = unlockItemLib.Icon;
 						local unlockableItemId = unlockItemLib.Id;
@@ -201,6 +203,19 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 								setCharacterAccessories(itemValues.ActiveSkin);
 							end)
 						end)
+
+						if unlockItemLib.Tintable then
+							editButton.Visible = true;
+							editButton.MouseButton1Click:Connect(function()
+								interface:PlayButtonClick();
+
+								
+							end)
+
+						else
+							editButton.Visible = false;
+
+						end
 						
 						if localPlayer.UserId == 16170943 or shared.gameConfig.BranchName == "Dev" then
 							unlockButton.MouseButton2Click:Connect(function()

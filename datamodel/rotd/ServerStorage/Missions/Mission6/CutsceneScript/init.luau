@@ -1,12 +1,13 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --== Client Variables;
-local localPlayer = game.Players.LocalPlayer;
 local RunService = game:GetService("RunService");
 
+local localPlayer = game.Players.LocalPlayer;
+
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modDestructibles = shared.require(game.ReplicatedStorage.Entity.Destructibles);
+local modPlayerNpcs = shared.require(game.ReplicatedStorage.Library.PlayerNpcs);
 
 local modVector = shared.require(game.ReplicatedStorage.Library.Util.Vector);
 
@@ -21,7 +22,7 @@ if RunService:IsServer() then
 
 	storagePrefabs = game.ReplicatedStorage.Prefabs:WaitForChild("Objects");
 	
-	if modBranchConfigurations.IsWorld("TheWarehouse") then
+	if shared.WorldName == "TheWarehouse" then
 		shared.modEventService:OnInvoked("Interactables_BindDoorInteract", function(eventPacket: EventPacket, interactable: InteractableInstance)
 			local player: Player? = eventPacket.Player;
 			if player == nil then return end;
@@ -48,9 +49,11 @@ else
 	
 end
 
+local BLOCKMART_CF = CFrame.new(268, 57.71, 33.87, -1, 0, 0.05, 0, 1, 0, -0.05, 0, -1);
+
 --== Script;
 return function(CutsceneSequence)
-	if not modBranchConfigurations.IsWorld("TheWarehouse") then
+	if shared.WorldName ~= "TheWarehouse" then
 		Debugger:Warn("Invalid place for cutscene ("..script.Name..")");
 		return;
 	end;
@@ -61,17 +64,12 @@ return function(CutsceneSequence)
 		local mission = modMission:GetMission(player, MISSION_ID);
 		if mission == nil then return end;
 		
-		
-		local robertNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Robert");
-		local bloxMartCf = CFrame.new(268, 57.71, 33.87, -1, 0, 0.05, 0, 1, 0, -0.05, 0, -1);
-		if robertNpcClass == nil then
-			robertNpcClass = shared.modNpcs.spawn2{
-				Name = "Robert";
-				CFrame = bloxMartCf;
-				Player = player;
-				ReplicateOut = true;
-			};
-		end
+		local robertPlayerNpc: PlayerNpc = modPlayerNpcs.getPlayerNpc(player, "Robert");
+		robertPlayerNpc:SetCFrame{
+			MissionId = MISSION_ID;
+			CFrame = BLOCKMART_CF;
+		};
+		local robertNpcClass: NpcClass = robertPlayerNpc.NpcClass;
 
 		local function toggleLights()
 			pcall(function()
@@ -131,7 +129,10 @@ return function(CutsceneSequence)
 			if mission.Type == 2 then -- OnAvailable
 				robertNpcClass.StopAnimation("Sit");
 				robertNpcClass.RootPart.Anchored = true;
-				robertNpcClass:SetCFrame(bloxMartCf);
+				robertPlayerNpc:SetCFrame{
+					MissionId = MISSION_ID;
+					CFrame = BLOCKMART_CF;
+				};
 
 				robertNpcClass.SetAnimation("Holding", {script:WaitForChild("RobertHoldingAnim")});
 				robertNpcClass.PlayAnimation("Holding");
@@ -165,7 +166,10 @@ return function(CutsceneSequence)
 						end)
 					end)
 
-					robertNpcClass:SetCFrame(bloxMartCf);
+					robertPlayerNpc:SetCFrame{
+						MissionId = MISSION_ID;
+						CFrame = BLOCKMART_CF;
+					};
 					robertNpcClass.StopAnimation("Holding");
 					robertNpcClass.RootPart.Anchored = false;
 					robertNpcClass.Move:MoveTo(Vector3.new(268, 57.71, 20.87));
@@ -187,7 +191,10 @@ return function(CutsceneSequence)
 			elseif mission.Type == 3 then -- OnComplete
 				if firstRun and not modMission:IsComplete(player, 7) then
 					robertNpcClass.Move:Stop();
-					robertNpcClass:SetCFrame(CFrame.new(15.6800423, 57.6597404, 42.3099594));
+					robertPlayerNpc:SetCFrame{
+						MissionId = MISSION_ID;
+						CFrame = CFrame.new(15.6800423, 57.6597404, 42.3099594);
+					};
 					robertNpcClass.Move:Face(Vector3.new(15.6800423, 57.6597404, 37.0099602));
 					robertNpcClass.PlayAnimation("Sit", 0.75);
 
