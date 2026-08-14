@@ -152,7 +152,8 @@ function treePackage.Attack(npcClass: NpcClass)
     else
         local attackComp = npcClass:GetComponent("ZombieBasicMeleeAttack");
         if attackComp then
-            attackComp();
+            local attackSpeed = (configurations.AttackSpeed * math.random(100, 120)/100);
+            attackComp(enemyTargetData.TargetPart, math.min(attackSpeed, 0.5));
         end
 
     end

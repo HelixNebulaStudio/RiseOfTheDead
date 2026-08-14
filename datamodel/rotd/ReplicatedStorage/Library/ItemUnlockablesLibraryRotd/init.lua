@@ -338,6 +338,29 @@ function library.onRequire()
 		SurfaceAppearanceParent=script;
 	};
 	
+	--== MARK: cowboyhat
+	library:Add{
+		Id="cowboyhat";
+		ItemId="cowboyhat";
+		Name="Default";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://129090695307501";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="cowboyhattreasures";
+		ItemId="cowboyhat";
+		Name="Treasures";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://131044384036827";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	
+
 	--== MARK: cultisthood
 	library:Add{
 		Id="cultisthood";
@@ -713,7 +736,22 @@ function library.onRequire()
 		};
 		SurfaceAppearanceParent=script;
 	};
+
+	library:Add{
+		Id="gasmaskjades";
+		ItemId="gasmask";
+		Name="Jades";
+		DefaultPackage=true;
+		
+		SurfaceAppearance={
+			ColorMap="rbxassetid://97966753741594";
+		};
+		SurfaceAppearanceParent=script;
+
+		Tintable=true;
+	};
 	
+
 	--MARK: greavesandsabatons
 	library:Add{
 		Id="greavesandsabatons";

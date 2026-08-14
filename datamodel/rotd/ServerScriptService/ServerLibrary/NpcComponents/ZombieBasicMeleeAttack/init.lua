@@ -169,7 +169,8 @@ function NpcComponent.new(npcClass: NpcClass)
 			end
 		end
 
-		task.wait(attackSpeed-0.2);
+		attackSpeed = attackSpeed or 1;
+		task.wait(math.max(attackSpeed-0.2, 0.1));
 		if npcClass.HealthComp.IsDead then return end;
 
 		targetPosition = targetPart.Position;

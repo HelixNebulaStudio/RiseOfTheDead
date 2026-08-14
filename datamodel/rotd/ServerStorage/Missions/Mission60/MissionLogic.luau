@@ -5,7 +5,7 @@ local RunService = game:GetService("RunService");
 
 local modItemLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+
 local modGpsLibrary = shared.require(game.ReplicatedStorage.Library.GpsLibrary);
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 local modDestructibles = shared.require(game.ReplicatedStorage.Entity.Destructibles);
@@ -70,7 +70,7 @@ if RunService:IsServer() then
 		
 		local gpsLib = modGpsLibrary:FindByKeyValue("Name", mission.SaveData.Location);
 		
-		if not modBranchConfigurations.IsWorld(gpsLib.WorldName) then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
+		if shared.WorldName ~= gpsLib.WorldName then return end;
 		
 		local spawnPart = workspace:FindFirstChild(gpsLib.SetSpawn);
 		
@@ -80,13 +80,15 @@ if RunService:IsServer() then
 			elseif mission.Type == 1 then -- OnActive
 				if mission.ProgressionPoint == 1 then
 					
+					local factionbannerPrefab = game.ReplicatedStorage.Prefabs.Items.factionbanner:Clone();
+
 					for _, obj in pairs(bannersFolder:GetChildren()) do
 						if obj.Name == factionTitle then
-							game.Debris:AddItem(obj, 0);
+							modReplicationManager.UnreplicateFrom(player, obj);
 						end
 					end
 					
-					local factionbannerPrefab = game.ReplicatedStorage.Prefabs.Items.factionbanner:Clone();
+					mission.Cache.BannerPrefab = factionbannerPrefab;
 					
 					local factionBannerInteractConfig = modInteractables.createInteractable("Button");
 					factionBannerInteractConfig:SetAttribute("_Id", "mission60RepairBanner");
@@ -125,9 +127,7 @@ if RunService:IsServer() then
 					pos = pos + Vector3.new(math.random(-halfSize.X, halfSize.X), halfSize.Y, math.random(-halfSize.Z, halfSize.Z));
 					
 					factionbannerPrefab:PivotTo(CFrame.new(pos) * CFrame.Angles(0, math.rad(math.random(0, 360)), 0));
-					
 					factionbannerPrefab.Name = factionTitle;
-
 					factionbannerPrefab:SetAttribute("FactionTag", factionTag);
 					factionbannerPrefab.PrimaryPart = factionbannerPrefab:WaitForChild("root");
 					factionbannerPrefab.Parent = bannersFolder;
@@ -152,7 +152,8 @@ if RunService:IsServer() then
 					end)
 					
 				elseif mission.ProgressionPoint == 2 then
-					local factionbannerPrefab = bannersFolder:FindFirstChild(factionTitle);
+
+					local factionbannerPrefab = mission.Cache.BannerPrefab;
 					if factionbannerPrefab then
 						factionbannerPrefab:SetAttribute("Repaired", true);
 						
@@ -162,6 +163,7 @@ if RunService:IsServer() then
 						if bannerDestructible then
 							bannerDestructible:SetEnabled(true);
 						end
+						
 					end
 					
 					--======

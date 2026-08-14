@@ -825,12 +825,15 @@ function modItemsLibrary.onRequire()
     -- clothbagmask
     new(skinPermBase, {Id="clothbagmasksuits"; Icon="rbxassetid://13985408173"; SkinPerm="Suits"; TargetItemId="clothbagmask"; });
 
-    -- cultisthood
-    new(skinPermBase, {Id="cultisthoodnekros"; Icon="rbxassetid://14970995011"; SkinPerm="Nekros"; TargetItemId="cultisthood"; });
-
     -- clownmask
     new(skinPermBase, {Id="clownmaskus"; Icon="rbxassetid://8367268572"; SkinPerm="Star Spangled Banner"; TargetItemId="clownmask"; Tags={"Slaughterfest";};});
     new(skinPermBase, {Id="clownmaskmissjoyful"; Icon="rbxassetid://11269655306"; SkinPerm="Miss Joyful"; TargetItemId="clownmask"; Tags={"Slaughterfest";};});
+
+    -- cowboyhat
+    new(skinPermBase, {Id="cowboyhattreasures"; Icon="rbxassetid://94599465285510"; SkinPerm="Treasures"; TargetItemId="cowboyhat"; Tags={"Unobtainable"}; });
+
+    -- cultisthood
+    new(skinPermBase, {Id="cultisthoodnekros"; Icon="rbxassetid://14970995011"; SkinPerm="Nekros"; TargetItemId="cultisthood"; });
 
     -- disguisekit
     new(skinPermBase, {Id="disguisekitwhite"; Icon="rbxassetid://8379064603"; SkinPerm="White"; TargetItemId="disguisekit"; });
@@ -865,6 +868,7 @@ function modItemsLibrary.onRequire()
     new(skinPermBase, {Id="gasmaskyellow"; Icon="rbxassetid://7021576890"; SkinPerm="Yellow"; TargetItemId="gasmask"; });
     new(skinPermBase, {Id="gasmaskunionjack"; Icon="rbxassetid://7021608469"; SkinPerm="Union Jack"; TargetItemId="gasmask"; });
     new(skinPermBase, {Id="gasmasksovietfumes"; Icon="rbxassetid://17205637981"; SkinPerm="Soviet Style Fumes"; TargetItemId="gasmask"; });
+    new(skinPermBase, {Id="gasmaskjades"; Icon="rbxassetid://112939967926324"; SkinPerm="Jades"; TargetItemId="gasmask"; Tags={"Unobtainable"}; });
 
     -- greavesandsabatons
     new(skinPermBase, {Id="greavesandsabatonscorrupted"; Icon="rbxassetid://95436624441324"; SkinPerm="Corrupted"; TargetItemId="greavesandsabatons"; Tags={"Unobtainable"}; });

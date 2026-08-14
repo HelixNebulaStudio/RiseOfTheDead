@@ -59,6 +59,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
     local binds = window.Binds;
     local openSettings = {
+        OpeningStorageId = nil;
         StorageId = nil;
         SetVanitySiid = nil;
         Interactable = nil;
@@ -94,6 +95,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         if page == 1 then page = nil; end
         
         Debugger:StudioLog(`OpenStorage storageId({storageId})`);
+        openSettings.OpeningStorageId = storageId;
+
         local storage = modData.RequestStorage{
             Action = "GetStorage";
             StorageId = storageId;
@@ -102,6 +105,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         };
 
         if storage then
+            if openSettings.OpeningStorageId ~= storage.Id then return end;
             openSettings.StorageId = storage.Id;
         end
 

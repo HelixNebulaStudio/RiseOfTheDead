@@ -146,10 +146,11 @@ return function(CutsceneSequence)
 
 			if shared.WorldName == "TheResidentials" then
 				if firstRun then
-					if mission.ProgressionPoint > 10 and mission.ProgressionPoint <= 12 then
+					if mission.ProgressionPoint > 10 and mission.ProgressionPoint <= 18 then
 						modMission:Progress(player, MISSION_ID, function(mission)
 							mission.ProgressionPoint = 10;
 						end)
+
 					end
 				end
 
@@ -595,7 +596,6 @@ return function(CutsceneSequence)
 							mission.ProgressionPoint = 14;
 						end
 					end)
-
 
 				elseif mission.ProgressionPoint == 16 then
 					josephNpcClass.Properties.CutsceneLookAt = nil;
