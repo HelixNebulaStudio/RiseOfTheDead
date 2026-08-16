@@ -24,8 +24,8 @@ if RunService:IsServer() then
 
 		task.spawn(function()
 			if id == "mission60RepairBanner" then
-				local interactPart = interactable.Part;
-				local interactObjectFactionTag = interactPart.Parent:GetAttribute("FactionTag");
+				local interactConfig = interactable.Config;
+				local interactObjectFactionTag = interactConfig.Parent.Name;
 				
 				for _, oPlayer in pairs(game.Players:GetPlayers()) do
 					local profile = shared.modProfile:Get(oPlayer);
