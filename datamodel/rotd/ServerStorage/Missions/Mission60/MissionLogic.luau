@@ -114,11 +114,15 @@ if RunService:IsServer() then
 					for _, decal in pairs(bannerPart:GetChildren()) do
 						if decal:IsA("Decal") then
 							decal.Texture = `rbxassetid://{factionIcon or "9890634236"}`;
+							
+							if decal.Texture == `rbxassetid://9890634236` then
+								decal.Color3 = Color3.fromHex(factionColor or "3c3c3c");
+							end
 						end
 					end
 					for _, obj in pairs(factionbannerPrefab:GetChildren()) do
 						if obj.Name == "flag" then
-							obj.Color = Color3.fromHex(factionColor);
+							obj.Color = Color3.fromHex(factionColor or "3c3c3c");
 						end
 					end
 					
@@ -218,9 +222,9 @@ if RunService:IsServer() then
 					local bannerPart = enemyBanner:WaitForChild("banner");
 					for _, decal in pairs(bannerPart:GetChildren()) do
 						if decal:IsA("Decal") then
-							decal.Texture = `rbxassetid://{enemyFacInfo.Icon or "7702620744"}`;
+							decal.Texture = `rbxassetid://{enemyFacInfo.Icon or "9890634236"}`;
 
-							if decal.Texture == `rbxassetid://7702620744` then
+							if decal.Texture == `rbxassetid://9890634236` then
 								decal.Color3 = Color3.fromHex(enemyFacInfo.Color or "ff3c3c");
 							end
 							
