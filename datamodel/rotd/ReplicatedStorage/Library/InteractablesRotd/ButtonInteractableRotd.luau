@@ -4,8 +4,6 @@ local RunService = game:GetService("RunService");
 
 local localPlayer = game.Players.LocalPlayer;
 
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
-
 local interactablePackage = {};
 --==
 function interactablePackage.init(super) -- Server/Client
@@ -23,6 +21,17 @@ function interactablePackage.init(super) -- Server/Client
     end
 
     function ButtonRotd.BindPrompt(interactable: InteractableInstance, info: InteractInfo)
+        if interactable.Values.FactionTag and info.Action == "Client" then
+            local playerFactionTag = localPlayer:GetAttribute("FactionTag");
+            if playerFactionTag == nil or playerFactionTag.Tag ~= interactable.Values.FactionTag then
+
+                interactable.CanInteract = false;
+                interactable.Label = `This belongs to another faction.`;
+
+                return;
+            end
+        end
+
         ButtonRotd.TypePackage.BindPrompt(interactable, info);
     end
 

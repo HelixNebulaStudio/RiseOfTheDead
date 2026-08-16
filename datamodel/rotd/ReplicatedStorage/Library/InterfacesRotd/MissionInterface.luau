@@ -20,6 +20,7 @@ local modTableManager = shared.require(game.ReplicatedStorage.Library.TableManag
 local modBattlePassLibrary = shared.require(game.ReplicatedStorage.Library.BattlePassLibrary);
 local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumber);
 local modRewardsLibrary = shared.require(game.ReplicatedStorage.Library.RewardsLibrary);
+local modStoriesLibrary = shared.require(game.ReplicatedStorage.Library.StoriesLibrary);
 local modDropRateCalculator = shared.require(game.ReplicatedStorage.Library.DropRateCalculator);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 local modVector = shared.require(game.ReplicatedStorage.Library.Util.Vector);
@@ -33,6 +34,7 @@ local modRadialImage = shared.require(game.ReplicatedStorage.Library.UI.RadialIm
 local modRichFormatter = shared.require(game.ReplicatedStorage.Library.UI.RichFormatter);
 local modComponents = shared.require(game.ReplicatedStorage.Library.UI.Components);
 local modScrollingPageUI = shared.require(game.ReplicatedStorage.Library.UI.ScrollingPageUI);
+local modChatBoardUI = shared.require(game.ReplicatedStorage.Library.UI.ChatBoardUI);
 
 local TIMER_RADIAL_CONFIG = '{"version":1,"size":128,"count":128,"columns":8,"rows":8,"images":["rbxassetid://10606346824","rbxassetid://10606347195"]}';
 local BAR_COLORS = {
@@ -89,6 +91,33 @@ local interfacePackage = {
     Type = "Character";
 };
 --==
+
+function interfacePackage.onRequire()
+	if RunService:IsStudio() then
+		shared.modCommandsLibrary.bind{
+			["missionui"]={
+				Permission = shared.modCommandsLibrary.PermissionLevel.DevBranch;
+				Description = [[MissionUI commands.
+				/missionui teststory
+				]];
+
+				RequiredArgs = 0;
+				UsageInfo = "/missionui action";
+				Function = function() end;
+				ClientFunction = function(player, args)
+					local interface = modClientGuis.ActiveInterface;
+					local window: InterfaceWindow = interface:GetWindow("Missions");
+
+					local action = args[1];
+					if action == "teststory" then
+						local storyPackage = modStoriesLibrary:Find(`storyaccessgranted`);
+						window.Binds.PlayStoryPackage("storyaccessgranted", math.random(1, #storyPackage.Plots));
+					end
+				end;
+			};
+		};
+	end
+end
 
 
 function interfacePackage.newInstance(interface: InterfaceInstance)
@@ -155,13 +184,14 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local missionMapTemplate = script:WaitForChild("MissionsMap");
 	local mapEntryTemplate = script:WaitForChild("mapEntry");
 	
+	local storyScreenTemplate = script:WaitForChild("StoryScreen");
+
 	local listTemplate = script:WaitForChild("listTemplate");
 	local tabTemplate = script:WaitForChild("tabTemplate");
 
 	local availableDetailsFrameTemplate = script:WaitForChild("AvailableMissionFrame");
 
 	local RightFrame = windowFrame:WaitForChild("RightBackground");
-	local MissionDisplayFrame = RightFrame;
 
 
 	for id, lib in pairs(modMissionsLibrary.List()) do
@@ -422,7 +452,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				highlightAnimGradiant = nil;
 			end
 			itemToolTip.Frame.Visible = false;
-			MissionDisplayFrame:ClearAllChildren();
+			RightFrame:ClearAllChildren();
 			modData:SaveSettings();
 
 		end
@@ -480,7 +510,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		
 		local activeHighlightEntry = nil;
 		local function highlightMapEntry()
-			local missionMap = MissionDisplayFrame.MissionsMap;
+			local missionMap = RightFrame.MissionsMap;
 			local backButton: TextButton = missionMap.BackMission;
 			local nextButton: TextButton = missionMap.NextMission;
 			local scrollFrame = missionMap.ScrollingFrame;
@@ -524,10 +554,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			end)
 		end
 		
-		local missionMap = MissionDisplayFrame:FindFirstChild("MissionsMap");
+		local missionMap = RightFrame:FindFirstChild("MissionsMap");
 		if missionMap == nil then
 			missionMap = missionMapTemplate:Clone();
-			missionMap.Parent = MissionDisplayFrame;
+			missionMap.Parent = RightFrame;
 			
 			local backButton:TextButton = missionMap:WaitForChild("BackMission");
 			local nextButton:TextButton = missionMap:WaitForChild("NextMission");
@@ -569,7 +599,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					interface:PlayButtonClick();
 					currentStoryline = button.Name;
 
-					local missionMap = MissionDisplayFrame:FindFirstChild("MissionsMap");
+					local missionMap = RightFrame:FindFirstChild("MissionsMap");
 					if missionMap then
 						missionMap:Destroy();
 					end
@@ -722,7 +752,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					interface:PlayButtonClick();
 					binds.Select(id);
 
-					local missionMap = MissionDisplayFrame:FindFirstChild("MissionsMap");
+					local missionMap = RightFrame:FindFirstChild("MissionsMap");
 					if missionMap then
 						missionMap:Destroy();
 					end
@@ -784,7 +814,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						
 						currentStoryline = info.Storyline;
 
-						local missionMap = MissionDisplayFrame:FindFirstChild("MissionsMap");
+						local missionMap = RightFrame:FindFirstChild("MissionsMap");
 						if missionMap then
 							missionMap:Destroy();
 						end
@@ -903,8 +933,66 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		highlightMapEntry();
 	end
 	
+	function binds.PlayStoryPackage(id, index, skipDelay)
+		local storyLib = modStoriesLibrary:Find(id);
+		if storyLib == nil then Debugger:Warn(`No storylib for {id}:{index}.`); return end;
+
+		RightFrame:ClearAllChildren();
+
+		local storyScreen = RightFrame:FindFirstChild("StoryScreen");
+		if storyScreen == nil then
+			storyScreen = storyScreenTemplate:Clone();
+			storyScreen.Parent = RightFrame;
+		end
+
+		local sceneLineLabel = storyScreen:WaitForChild("SceneLine");
+		sceneLineLabel.Text = `<b>{storyLib.Title}</b>: Plot {index}`;
+
+		local statePanel = storyScreen:WaitForChild("StatePanel");
+		statePanel.Visible = false;
+
+		local scrollingFrame = storyScreen:WaitForChild("ScrollingFrame");
+
+		local plotList = storyLib.Plots;
+		local scenePlot = plotList[index];
+		
+		task.spawn(function()
+			local chatBoard = modChatBoardUI.new(scrollingFrame);
+			chatBoard.SkipDelay = skipDelay == true;
+
+			chatBoard.OnUpdate:Connect(function()
+				if chatBoard.TweeningChat then
+					statePanel.Visible = true;
+					scrollingFrame.Size = UDim2.new(1, 0, 1, -80);
+				else
+					statePanel.Visible = false;
+					scrollingFrame.Size = UDim2.new(1, 0, 1, -30);
+				end
+			end)
+
+			storyScreen.Destroying:Connect(function()
+				chatBoard:Destroy();
+			end)
+
+			for a=1, #scenePlot do
+				local chatInfo = scenePlot[a];
+				if chatInfo.N then
+					local npcProfileLib = modNpcProfileLibrary:Find(chatInfo.N);
+					if npcProfileLib then
+						chatInfo.AvatarImage = npcProfileLib.Avatar;
+					end
+				end
+			end
+
+			chatBoard:Render(scenePlot);
+			if index ~= #scenePlot then
+				chatBoard:Add({L="To be continued..";}, {Order=99;});
+			end
+		end)
+	end
+
 	function binds.Select(id)
-		MissionDisplayFrame:ClearAllChildren();
+		RightFrame:ClearAllChildren();
 		
 		if id == nil then return end
 		local data = getMissionData(id);
@@ -925,7 +1013,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			
 			local closeButton = menu:WaitForChild("closeButton");
 			closeButton.MouseButton1Click:Connect(function()
-				MissionDisplayFrame:ClearAllChildren();
+				RightFrame:ClearAllChildren();
 				binds.RefreshMissionMap();
 			end)
 
@@ -960,7 +1048,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					end);
 				end)
 
-				newRedoButton.Parent = MissionDisplayFrame;
+				newRedoButton.Parent = RightFrame;
 			end
 
 			if book.MissionType == modMissionsLibrary.MissionTypes.Board then
@@ -990,7 +1078,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						-- COMPLETE mission;
 						if debounce then return end;
 						debounce = true;
-						MissionDisplayFrame:ClearAllChildren();
+						RightFrame:ClearAllChildren();
 						binds.RefreshMissionMap();
 
 						local _r = remoteMissionRemote:InvokeServer("MarkForCompletion", id);
@@ -1254,7 +1342,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				rewardsList.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y);
 			end
 
-			menu.Parent = MissionDisplayFrame;
+			menu.Parent = RightFrame;
 			
 			
 		else
@@ -1265,11 +1353,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			titleTag.Text = book.Name;
 			fromTag.Text = book.From or "";
 			descTag.Text = book.Description;
-			menu.Parent = MissionDisplayFrame;
+			menu.Parent = RightFrame;
 
 			local closeButton = menu:WaitForChild("closeButton");
 			closeButton.MouseButton1Click:Connect(function()
-				MissionDisplayFrame:ClearAllChildren();
+				RightFrame:ClearAllChildren();
 				binds.RefreshMissionMap();
 			end)
 			
@@ -2136,14 +2224,14 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					end
 					repeatableTab:WaitForChild("titleLabel").Text = "Missions Board: "..countRepeatableMissions
 
-					MissionDisplayFrame:ClearAllChildren();
+					RightFrame:ClearAllChildren();
 
 					local missionBoard = templateMissionBoard:Clone();
-					missionBoard.Parent = MissionDisplayFrame;
+					missionBoard.Parent = RightFrame;
 					
 					local closeButton = missionBoard:WaitForChild("closeButton");
 					closeButton.MouseButton1Click:Connect(function()
-						MissionDisplayFrame:ClearAllChildren();
+						RightFrame:ClearAllChildren();
 						binds.RefreshMissionMap();
 					end)
 					
@@ -2550,7 +2638,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			end)
 			passButton.MouseButton1Click:Connect(function()
 				interface:PlayButtonClick();
-				local bpFrame = MissionDisplayFrame:FindFirstChild("BpFrame");
+				local bpFrame = RightFrame:FindFirstChild("BpFrame");
 				if bpFrame and bpFrame:FindFirstChild("ScrollFrame") and bpFrame.ScrollFrame.CanvasPosition.Y > 0 then
 					bpFrame.ScrollFrame.CanvasPosition = Vector2.new(0, (bpFrame.ScrollFrame.AbsoluteWindowSize.Y/2)-1);
 
@@ -2575,11 +2663,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				bpButtonFunc = function()
 					refreshData();
 
-					MissionDisplayFrame:ClearAllChildren();
+					RightFrame:ClearAllChildren();
 
 					local passRewardFrame = templatePassReward:Clone();
 					passRewardFrame.Name = "BpFrame";
-					passRewardFrame.Parent = MissionDisplayFrame;
+					passRewardFrame.Parent = RightFrame;
 
 					local titleLabel = passRewardFrame:WaitForChild("Title");
 					titleLabel.Text =  '<font size="14">'.."Event Pass</font>\n<b>".. battlepassLib.Title .."</b>";
@@ -2810,10 +2898,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 									refreshData();
 									interface:PlayButtonClick();
 
-									MissionDisplayFrame:ClearAllChildren();
+									RightFrame:ClearAllChildren();
 
 									local passRewardFrame = templatePassReward:Clone();
-									passRewardFrame.Parent = MissionDisplayFrame;
+									passRewardFrame.Parent = RightFrame;
 
 									local titleLabel = passRewardFrame:WaitForChild("Title");
 									local titleStr = '<font size="10">'.."Level "..lvl
@@ -3075,10 +3163,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 								refreshData();
 								interface:PlayButtonClick();
 
-								MissionDisplayFrame:ClearAllChildren();
+								RightFrame:ClearAllChildren();
 
 								local passRewardFrame = templatePassReward:Clone();
-								passRewardFrame.Parent = MissionDisplayFrame;
+								passRewardFrame.Parent = RightFrame;
 
 								local titleLabel = passRewardFrame:WaitForChild("Title");
 								local titleStr = "<b>Post Rewards!</b>";
@@ -3241,10 +3329,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 									refreshData();
 									interface:PlayButtonClick();
 
-									MissionDisplayFrame:ClearAllChildren();
+									RightFrame:ClearAllChildren();
 
 									local passRewardFrame = templatePassReward:Clone();
-									passRewardFrame.Parent = MissionDisplayFrame;
+									passRewardFrame.Parent = RightFrame;
 
 									local titleLabel = passRewardFrame:WaitForChild("Title");
 									titleLabel.Text = '<font size="12">'.."Level "..lvl.."</font>\n<b>".. itemLib.Name .."</b>";
@@ -3509,9 +3597,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 								refreshData();
 								interface:PlayButtonClick();
 
-								MissionDisplayFrame:ClearAllChildren();
+								RightFrame:ClearAllChildren();
 								local passRewardFrame = templatePassReward:Clone();
-								passRewardFrame.Parent = MissionDisplayFrame;
+								passRewardFrame.Parent = RightFrame;
 
 								local titleLabel = passRewardFrame:WaitForChild("Title");
 								local titleStr = "<b>Gift Shop!</b>";

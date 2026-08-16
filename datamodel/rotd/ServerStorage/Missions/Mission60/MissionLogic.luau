@@ -83,21 +83,21 @@ if RunService:IsServer() then
 					local factionbannerPrefab = game.ReplicatedStorage.Prefabs.Items.factionbanner:Clone();
 
 					for _, obj in pairs(bannersFolder:GetChildren()) do
-						if obj.Name == factionTitle then
+						if obj.Name == factionTag then
 							modReplicationManager.UnreplicateFrom(player, obj);
 						end
 					end
 					
 					mission.Cache.BannerPrefab = factionbannerPrefab;
 					
-					local factionBannerInteractConfig = modInteractables.createInteractable("Button");
+					local factionBannerInteractConfig = modInteractables.createInteractable("ButtonRotd");
 					factionBannerInteractConfig:SetAttribute("_Id", "mission60RepairBanner");
 					factionBannerInteractConfig:SetAttribute("_Label", "Repair Faction Banner");
 					factionBannerInteractConfig:SetAttribute("_InteractDuration", 5);
+					factionBannerInteractConfig:SetAttribute("FactionTag", factionTag);
 					factionBannerInteractConfig.Parent = factionbannerPrefab;
 
 					local factionBannerInteractable: InteractableInstance = modInteractables.getOrNew(factionBannerInteractConfig);
-					factionBannerInteractable.Values.FactionTag = factionTag;
 
 					local saveData = mission.SaveData;
 					local itemLib = modItemLibrary:Find(saveData.RepairItemId);
@@ -127,8 +127,7 @@ if RunService:IsServer() then
 					pos = pos + Vector3.new(math.random(-halfSize.X, halfSize.X), halfSize.Y, math.random(-halfSize.Z, halfSize.Z));
 					
 					factionbannerPrefab:PivotTo(CFrame.new(pos) * CFrame.Angles(0, math.rad(math.random(0, 360)), 0));
-					factionbannerPrefab.Name = factionTitle;
-					factionbannerPrefab:SetAttribute("FactionTag", factionTag);
+					factionbannerPrefab.Name = factionTag;
 					factionbannerPrefab.PrimaryPart = factionbannerPrefab:WaitForChild("root");
 					factionbannerPrefab.Parent = bannersFolder;
 
@@ -219,13 +218,22 @@ if RunService:IsServer() then
 					local bannerPart = enemyBanner:WaitForChild("banner");
 					for _, decal in pairs(bannerPart:GetChildren()) do
 						if decal:IsA("Decal") then
-							decal.Texture = "rbxassetid://".. enemyFacInfo.Icon;
+							decal.Texture = `rbxassetid://{enemyFacInfo.Icon or "7702620744"}`;
+
+							if decal.Texture == `rbxassetid://7702620744` then
+								decal.Color3 = Color3.fromHex(enemyFacInfo.Color or "ff3c3c");
+							end
+							
 						end
 					end
 					
 					for _, obj in pairs(enemyBanner:GetChildren()) do
+						if not obj:IsA("BasePart") then continue end;
 						if obj.Name == "flag" then
-							obj.Color = Color3.fromHex(enemyFacInfo.Color);
+							obj.Color = Color3.fromRGB(163, 75, 75);
+						end
+						if obj.Material == Enum.Material.Wood then
+							obj.Color = Color3.fromRGB(86, 36, 36);
 						end
 					end
 
