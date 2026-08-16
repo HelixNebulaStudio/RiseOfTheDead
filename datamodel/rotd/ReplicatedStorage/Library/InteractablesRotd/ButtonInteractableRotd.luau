@@ -23,7 +23,7 @@ function interactablePackage.init(super) -- Server/Client
     function ButtonRotd.BindPrompt(interactable: InteractableInstance, info: InteractInfo)
         if interactable.Values.FactionTag and info.Action == "Client" then
             local playerFactionTag = localPlayer:GetAttribute("FactionTag");
-            if playerFactionTag == nil or playerFactionTag.Tag ~= interactable.Values.FactionTag then
+            if playerFactionTag == nil or playerFactionTag ~= interactable.Values.FactionTag then
 
                 interactable.CanInteract = false;
                 interactable.Label = `This belongs to another faction.`;
