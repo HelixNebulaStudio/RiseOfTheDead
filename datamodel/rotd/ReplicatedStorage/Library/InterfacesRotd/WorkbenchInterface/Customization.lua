@@ -982,7 +982,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 			end
 
 			-- MARK: UpdateCustomizations;
-			local function updateCustomization(func)
+			local function updateCustomization(func, forceApplyPlans)
 				
 				local function clean(customPlan, basePart)
 					if customPlan.PatternData.Offset == Vector2.zero then
@@ -1044,9 +1044,25 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 
 				end
 
-				if markForSave then
-					modCustomizationData.ApplyCustomPlans(customPlansCache, itemViewport.PartDataList);
+				if markForSave or forceApplyPlans == true then
+					local partDataList = {};
 
+					if activeGroupName then
+						for a=1, #itemViewport.PartDataList do
+							local partData = itemViewport.PartDataList[a];
+							if partData.Group == activeGroupName then
+								table.insert(partDataList, partData);
+							end
+						end
+
+					elseif activePartSelection and #activePartSelection >0 then
+						table.insert(partDataList, activePartSelection[1]);
+
+					end
+					modCustomizationData.ApplyCustomPlans(customPlansCache, partDataList);
+				end
+
+				if markForSave then
 					markForSave = false;
 					saveCustomizations();
 					updateSerializeText();
@@ -1663,7 +1679,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 				--Debugger:StudioWarn("Set Transparency=", v);
 				updateCustomization(function(customPlan)
 					customPlan.Transparency = v;
-				end)
+				end, true)
 
 				return v;
 			end
@@ -1789,7 +1805,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						customPlan.PatternData.Offset = Vector2.zero;
 					end
 					customPlan.PatternData.Offset = Vector2.new(v, customPlan.PatternData.Offset.Y);
-				end)
+				end, true)
 
 				return v;
 			end
@@ -1800,7 +1816,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						customPlan.PatternData.Offset = Vector2.zero;
 					end
 					customPlan.PatternData.Offset = Vector2.new(customPlan.PatternData.Offset.X, v);
-				end)
+				end, true)
 
 				return v;
 			end
@@ -1842,7 +1858,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						customPlan.PatternData.Scale = Vector2.new(1, 1);
 					end
 					customPlan.PatternData.Scale = Vector2.new(v, customPlan.PatternData.Scale.Y);
-				end)
+				end, true)
 
 				return v;
 			end
@@ -1853,7 +1869,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						customPlan.PatternData.Scale = Vector2.new(1, 1);
 					end
 					customPlan.PatternData.Scale = Vector2.new(customPlan.PatternData.Scale.X, v);
-				end)
+				end, true)
 
 				return v;
 			end
@@ -1887,7 +1903,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 				--Debugger:StudioWarn("Set TextureAlpha=", v);
 				updateCustomization(function(customPlan)
 					customPlan.PatternData.Transparency = v;
-				end)
+				end, true)
 
 				return v;
 			end
@@ -1930,7 +1946,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						customPlan.PositionOffset.Y,
 						customPlan.PositionOffset.Z
 					);
-				end)
+				end, true)
 
 				return v;
 			end
@@ -1954,7 +1970,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						v,
 						customPlan.PositionOffset.Z
 					);
-				end)
+				end, true)
 
 				return v;
 			end
@@ -1978,7 +1994,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						customPlan.PositionOffset.Y,
 						v
 					);
-				end)
+				end, true)
 
 				return v;
 			end
@@ -2021,7 +2037,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						customPlan.Scale.Y,
 						customPlan.Scale.Z
 					);
-				end)
+				end, true)
 
 				return v;
 			end
@@ -2046,7 +2062,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						v,
 						customPlan.Scale.Z
 					);
-				end)
+				end, true)
 
 				return v;
 			end
@@ -2071,7 +2087,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						customPlan.Scale.Y,
 						v
 					);
-				end)
+				end, true)
 
 				return v;
 			end
@@ -2097,7 +2113,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 				--Debugger:StudioWarn("Set Reflectance=", v);
 				updateCustomization(function(customPlan)
 					customPlan.Reflectance = v;
-				end)
+				end, true)
 
 				return v;
 			end
@@ -2124,7 +2140,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 					else
 						customPlan.Material = nil;
 					end
-				end)
+				end, true)
 
 				if materialName == nil then
 					materialName = part and part.Material.Name or "Default";

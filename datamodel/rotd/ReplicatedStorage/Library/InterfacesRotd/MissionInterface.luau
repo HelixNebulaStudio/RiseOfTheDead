@@ -53,12 +53,12 @@ local BORDER_MISSION_COLORS = {
 };
 
 local BP_COLORS = {
-	CurrentNormal = Color3.fromRGB(135, 255, 135);
-	CurrentPassOwner = Color3.fromRGB(255, 112, 112);
-	CurrentPremium = Color3.fromRGB(255, 220, 112);
+	CurrentNormal = Color3.fromRGB(0, 255, 34);
+	CurrentPassOwner = Color3.fromRGB(230, 50, 50);
+	CurrentPremium = Color3.fromRGB(255, 255, 0);
 	
-	Normal = Color3.fromRGB(90, 120, 90);
-	PassOwner = Color3.fromRGB(130, 70, 70);
+	Normal = Color3.fromRGB(60, 120, 60);
+	PassOwner = Color3.fromRGB(150, 60, 60);
 	Premium = Color3.fromRGB(120, 103, 53);
 	
 	LockedNormal = Color3.fromRGB(80, 80, 80);
@@ -130,6 +130,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
     local templateLevelSlot = script:WaitForChild("LevelSlot");
     local templateStartSlot = script:WaitForChild("LevelSlotStart");
+	local templateLvlUIGradient = script:WaitForChild("LvlUIGradient");
 
     local templateMissionBoard = script:WaitForChild("MissionsBoard");
     local templateRMissionButton = script:WaitForChild("RMissionButton");
@@ -193,6 +194,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 	local RightFrame = windowFrame:WaitForChild("RightBackground");
 
+	local curBpLib;
 
 	for id, lib in pairs(modMissionsLibrary.List()) do
 		if lib.Rewards and lib.RewardText == nil then
@@ -933,7 +935,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		highlightMapEntry();
 	end
 	
+	local curStoryPlaying, curStoryIndex = nil;
 	function binds.PlayStoryPackage(id, index, skipDelay)
+		if curStoryPlaying == id and curStoryIndex == index then return end;
+
+		curStoryPlaying = id;
+		curStoryIndex = index;
+
 		local storyLib = modStoriesLibrary:Find(id);
 		if storyLib == nil then Debugger:Warn(`No storylib for {id}:{index}.`); return end;
 
@@ -957,6 +965,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		local scenePlot = plotList[index];
 		
 		task.spawn(function()
+			local cSP = id;
+			local cSI = index;
+
 			local chatBoard = modChatBoardUI.new(scrollingFrame);
 			chatBoard.SkipDelay = skipDelay == true;
 
@@ -986,7 +997,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 			chatBoard:Render(scenePlot);
 			if index ~= #scenePlot then
-				chatBoard:Add({L="To be continued..";}, {Order=99;});
+				chatBoard:Add({L="To be continued.."; SkipWaits=true;}, {Order=99;});
+			end
+			
+			if cSP == curStoryPlaying and cSI == curStoryIndex then
+				curStoryPlaying = nil;
+				curStoryIndex = nil;
 			end
 		end)
 	end
@@ -2286,9 +2302,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 						local newButton = templateRMissionButton:Clone() :: TextButton;
 						local titleLabel = newButton:WaitForChild("Title");
-						local descLabel = newButton:WaitForChild("Desc");
-						local rewardLabel = newButton:WaitForChild("Reward");
+						local contentFrame = newButton:WaitForChild("ContentFrame");
+						local descLabel = contentFrame:WaitForChild("Desc");
 
+						local generalRewardsFrame = contentFrame:WaitForChild("GeneralRewards");
+						
 						local skipHoldDownObj = modComponents.CreateHoldDownButton(interface, {
 							Text="";
 						});
@@ -2311,23 +2329,85 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						descLabel.Text = missionLib.Description;
 						newButton:SetAttribute("Tier", missionLib.Tier);
 						
-						local rewardStrList = {};
+						local perksReward;
+						local cardsRewardInfo;
+						local itemRewardsList = {};
+
 						for b=1, #missionLib.Rewards do
 							local rewardInfo = missionLib.Rewards[b];
 							if rewardInfo.Type == "Perks" then
-								table.insert(rewardStrList, rewardInfo.Amount.." Perks");
+								perksReward = rewardInfo.Amount;
 
 							elseif rewardInfo.Type == "Item" then
-								local itemLib = modItemsLibrary:Find(rewardInfo.ItemId);
-								if itemLib then
-									table.insert(rewardStrList, itemLib.Name.. (rewardInfo.Quantity > 1 and " x"..rewardInfo.Quantity or ""));
-								else
-									table.insert(rewardStrList, "Unknown item: "..(rewardInfo.ItemId or ""));
-								end
+								table.insert(itemRewardsList, rewardInfo);
+								-- local itemLib = modItemsLibrary:Find(rewardInfo.ItemId);
+								-- if itemLib then
+								-- 	table.insert(rewardStrList, itemLib.Name.. (rewardInfo.Quantity > 1 and " x"..rewardInfo.Quantity or ""));
+								-- else
+								-- 	table.insert(rewardStrList, "Unknown item: "..(rewardInfo.ItemId or ""));
+								-- end
+
+							elseif rewardInfo.Type == "Card" then
+								cardsRewardInfo = rewardInfo;
 							end
 						end
 						
-						rewardLabel.Text = table.concat(rewardStrList, ", ");
+						local perksLabel = generalRewardsFrame:WaitForChild("PerksReward");
+						if perksReward ~= nil then
+							perksLabel.Visible = true;
+							perksLabel.TextLabel.Text = `{perksReward}`;
+						else
+							perksLabel.Visible = false;
+						end
+
+						local cardsRewardFrame = generalRewardsFrame:WaitForChild("CardsReward");
+						if curBpLib and curBpLib.CardsActive and cardsRewardInfo then
+							cardsRewardFrame.Visible = true;
+
+							local bpData = modData.Profile and modData.Profile.BattlePassSave or nil;
+							local seasonData = bpData and bpData.Passes and bpData.Passes[curBpLib.Id];
+							local bpLvl = seasonData and seasonData.Level or 0;
+
+							local bpRRandom = Random.new(localPlayer.UserId + bpLvl);
+							local rewardDrops = {};
+
+							local dropAmt = bpRRandom:NextInteger(cardsRewardInfo.Amount.Min, cardsRewardInfo.Amount.Max);
+							for a=1, dropAmt do
+								local pick = cardsRewardInfo.Types[bpRRandom:NextInteger(1, #cardsRewardInfo.Types)];
+								table.insert(rewardDrops, pick);
+							end
+							for a=1, #rewardDrops do
+								local cardType = rewardDrops[a];
+								local newImage = Instance.new("ImageLabel");
+								newImage.Size = UDim2.new(0, 35, 0, 35);
+								newImage.BackgroundTransparency = 1;
+								newImage.Image = `{modBattlePassLibrary.BpCardsList[cardType].Image}`;
+								newImage.Parent = cardsRewardFrame;
+							end
+
+						else
+							cardsRewardFrame.Visible = false;
+						end
+
+						if #itemRewardsList > 0 then
+							local startPos = 60;
+							
+							for a=1, #itemRewardsList do
+								local rewardInfo = itemRewardsList[a];
+								
+								local itemButtonObj = modItemInterface.newItemButton(rewardInfo.ItemId);
+								local itemImgButton = itemButtonObj.ImageButton;
+								itemImgButton.Size = UDim2.new(0, 40, 0, 40);
+								local uiAspect = Instance.new("UIAspectRatioConstraint");
+								uiAspect.Parent = itemImgButton;
+				
+								itemImgButton.Position = UDim2.new(0, startPos, 0, 0); startPos += 50;
+								itemImgButton.Parent = generalRewardsFrame;
+				
+								itemImgButton.ZIndex = 1;
+								itemButtonObj:Update();
+							end
+						end
 
 						newButton.Parent = listFrame;
 						newButton.MouseButton1Click:Connect(function()
@@ -2609,21 +2689,39 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			LeftFrame.Size = UDim2.new(leftFrameSizeXAnchor, 0, 0.9, 0);
 			LeftFrame.Position = UDim2.new(0, 0, 1, 0);
 			RightFrame.Size = UDim2.new(rightFrameSizeXAnchor, 0, 0.9, 0);
-			RightFrame.Position = UDim2.new(1, 0, 1, 0);
+			RightFrame.Position = UDim2.new(1, 0, 0.1, 0);
 			
 			hintLabel.Text = "Event Pass has ended";
 			
 		else
+			curBpLib = battlepassLib;
 			BottomFrame.Visible = true;
 			LeftFrame.Size = UDim2.new(leftFrameSizeXAnchor, 0, 0.9, -150);
 			LeftFrame.Position = UDim2.new(0, 0, 1, -150);
-			RightFrame.Size = UDim2.new(rightFrameSizeXAnchor, 0, 0.9, -60);
-			RightFrame.Position = UDim2.new(1, 0, 1, -60);
+			RightFrame.Size = UDim2.new(rightFrameSizeXAnchor, 0, 0.9, battlepassLib.CardsActive == true and -105 or -60);
+			RightFrame.Position = UDim2.new(1, 0, 0.1, 0);
 			
 			hintLabel.Text = "Event Pass: ".. daysLeft .." Days Left";
 			
 			titleLabel.Text = battlepassLib.Title;
 			passIconLabel.Image = battlepassLib.Icon;
+
+			--== MARK: BpCards
+			local templateBpCardListing = script:WaitForChild("CardListing");
+			local cardsListFrame = BottomFrame:WaitForChild("CardsList");
+			cardsListFrame.Visible = battlepassLib.CardsActive == true;
+			for _, obj in pairs(cardsListFrame:GetChildren()) do
+				if not obj:IsA("GuiObject") then continue end;
+				obj:Destroy();
+			end
+			for id, cardInfo in pairs(modBattlePassLibrary.BpCardsList) do
+				local new = templateBpCardListing:Clone();
+				new.Name = id;
+				new.LayoutOrder = cardInfo.Order;
+				new:WaitForChild("ImageLabel").Image = cardInfo.Image;
+				new:WaitForChild("TextLabel").Text = ``;
+				new.Parent = cardsListFrame;
+			end
 
 			local bpButtonFunc;
 
@@ -2648,7 +2746,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				end
 			end)
 			
+			for _, obj in pairs(battlePassContent:GetChildren()) do
+				if not obj:IsA("GuiObject") then continue end;
+				obj:Destroy();
+			end
 			table.clear(levelSlotsInfo);
+			
 			function binds.UpdateBattlePass(action)
 				local battlePassData, seasonData;
 
@@ -2703,10 +2806,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 					end
 					
-					local bpPrice = 1000;
+					local bpPrice = 2450;
 
 					local claimButton = contentFrame:WaitForChild("ClaimButton");
-					claimButton.Text = "Unlock for ".. modFormatNumber.Beautify(bpPrice) .." Gold";
+					claimButton.Text = `Unlock for {modFormatNumber.Beautify(bpPrice)} Gold`;
 					
 					claimButton.TextScaled = false;
 					claimButton.Position = UDim2.new(0.5, 0, 1, -40);
@@ -2724,7 +2827,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						refreshData();
 						interface:PlayButtonClick();
 
-						local goldTxt = "<b><font color='rgb(170, 120, 0)'> ".. bpPrice.." Gold</font></b>";
+						local goldTxt = `<b><font color='rgb(170, 120, 0)'> {bpPrice} Gold</font></b>`;
 						modClientGuis.promptDialogBox({
 							Title=`Unlock Event Pass for {goldTxt}?`;
 							Desc=`Are you sure you want to unlock Event Pass: {battlepassLib.Title} for {goldTxt}?`;
@@ -2810,8 +2913,17 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					end)
 				end
 
+				--MARK: refresh bpCards
+				for _, obj in pairs(cardsListFrame:GetChildren()) do
+					if not obj:IsA("Frame") then continue end;
+					local id = obj.Name;
+					local seasonCards = seasonData.Cards or {};
 
-				local seasonLevel = seasonData.Level;
+					local cardLabel = obj:WaitForChild("TextLabel");
+					cardLabel.Text = `{seasonCards[id] or 0}`;
+				end
+
+				local pSeasonLevel = seasonData.Level;
 				local seasonTokens = seasonData.Tokens or 0;
 				local treeList = battlepassLib.Tree;
 				local treeCount = #treeList;
@@ -2834,13 +2946,15 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					local lvlSlot = lvlSlotInfo.LevelSlot;
 					
 					local leafLib = treeList[lvl] or {};
+
 					local rewardInfo = leafLib.Reward;
+					local storyInfo = leafLib.Story;
 					
 					if leafLib.Empty == true then
 						lvlSlot.Size = UDim2.new(0, 20, 1, 0);
 						
 					else
-						lvlSlot.Size = UDim2.new(0, 80, 1, 0);
+						lvlSlot.Size = UDim2.new(0, 0, 1, 0);
 						
 						if lvl == 0 and lvlSlotInfo.btStart == nil then
 							lvlSlotInfo.btStart = true;
@@ -2860,6 +2974,74 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 							-- bpIconButton.MouseButton1Click:Connect(bpButtonFunc);
 						end
 						
+						if storyInfo then
+							local buttonState = "Locked";
+
+							local storyButton = lvlSlotInfo.StoryButton;
+							if storyButton == nil then
+								storyButton = Instance.new("ImageButton");
+								storyButton.Name = `StoryButton`;
+								storyButton.BackgroundTransparency = 1;
+								storyButton.Image = `rbxassetid://85915197880272`;
+								storyButton.Size = UDim2.new(0, 40, 0, 40);
+								storyButton.Parent = lvlSlot;
+
+								
+								lvlSlotInfo.GetStoryState = function(l)
+									refreshData();
+									pSeasonLevel = seasonData.Level;
+									
+									if pSeasonLevel > (lvl+1) then
+										buttonState = "Viewed"
+									elseif pSeasonLevel == (lvl+1) then
+										buttonState = "New";
+									end
+
+									return buttonState or "Locked";
+								end
+								
+								storyButton.MouseButton1Click:Connect(function()
+									lvlSlotInfo.GetStoryState();
+									if buttonState == "Locked" then return end;
+									itemToolTip.Frame.Visible = false;
+									refreshData();
+									interface:PlayButtonClick();
+
+									binds.PlayStoryPackage(storyInfo.Id, storyInfo.Index);
+
+									if storyButton:FindFirstChild("ClaimGlow") then
+										storyButton.ClaimGlow:Destroy();
+									end
+								end);
+
+								lvlSlotInfo.StoryButton = storyButton;
+							end
+
+							buttonState = lvlSlotInfo.GetStoryState();
+
+							if buttonState == "New" then
+								storyButton.ImageColor3 = Color3.fromRGB(255, 255, 255);
+								local newGlow = storyButton:FindFirstChild("ClaimGlow") or modItemInterface.newGlowEffect();
+								newGlow.Name = "ClaimGlow"
+								newGlow.ImageColor3 = Color3.fromRGB(255, 255, 255);
+								newGlow.ImageTransparency = 0.6;
+								newGlow:WaitForChild("Rays").ImageColor3 = Color3.fromRGB(255, 255, 255);
+								newGlow.Parent = storyButton;
+								lvlSlotInfo.GlowLabel = newGlow;
+
+							elseif buttonState == "Viewed" then
+								local parColor3H, parColor3S, parColor3V = storyButton.Parent.ImageColor3:ToHSV();
+								storyButton.ImageColor3 = Color3.fromHSV(parColor3H, parColor3S, math.min(1, parColor3V+0.2));
+								
+								if lvlSlotInfo.GlowLabel then
+									lvlSlotInfo.GlowLabel:Destroy();
+								end
+
+							else
+								storyButton.ImageColor3 = Color3.fromRGB(50, 50, 50);
+							end
+						end
+
 						if rewardInfo then
 							if lvlSlotInfo.ItemButton == nil then
 								local itemButtonObj = modItemInterface.newItemButton(rewardInfo.ItemId);
@@ -2877,10 +3059,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 								
 								lvlSlotInfo.GetClaimState = function(l)
 									refreshData();
-									seasonLevel = seasonData.Level;
+									pSeasonLevel = seasonData.Level;
 									
 									local r = "n/a";
-									if seasonLevel > l then
+									if pSeasonLevel > l then
 										if table.find(seasonData.Claim, l) then
 											r = "Claimed";
 										else
@@ -3064,12 +3246,21 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						end
 					end
 
-					if lvl <= seasonLevel then
+					if lvl <= pSeasonLevel then
 						totalDist = totalDist + lvlSlot.AbsoluteSize.X;
 					end
 						
+
+					if pSeasonLevel >= lvl then
+						local gradHighlight = lvlSlot:FindFirstChild("LvlUIGradient");
+						if gradHighlight == nil then
+							gradHighlight = templateLvlUIGradient:Clone();
+							gradHighlight.Parent = lvlSlot;
+						end
+					end
 					
-					if seasonLevel > lvl then
+					if pSeasonLevel > lvl then
+						-- passed
 						if rewardInfo == nil then
 							lvlSlot.ImageColor3 = BP_COLORS.Normal
 							
@@ -3086,7 +3277,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 							end
 						end
 						
-					elseif seasonLevel == lvl then
+					elseif pSeasonLevel == lvl then
+						-- current
 						if rewardInfo == nil then
 							lvlSlot.ImageColor3 = BP_COLORS.CurrentNormal
 
@@ -3104,6 +3296,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						end
 						
 					else
+						-- locked
 						if rewardInfo == nil then
 							lvlSlot.ImageColor3 = BP_COLORS.LockedNormal
 
@@ -3125,7 +3318,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					lvlSlot.Parent = battlePassContent;
 				end
 				
-				lvlLabel.Text = `Pass Level: {modFormatNumber.Beautify(seasonLevel or 0)}`;
+				lvlLabel.Text = `Pass Level: {modFormatNumber.Beautify(pSeasonLevel or 0)}`;
 				--== MARK: Post Rewards
 				local giftShopRewards = modBattlePassLibrary.GiftShop;
 
@@ -3244,7 +3437,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						info.LevelSlot.Parent = battlePassContent;
 					end
 					
-					if seasonLevel > treeCount then
+					if pSeasonLevel > treeCount then
 						lvlSlotInfo.LevelSlot.ImageColor3 = BP_COLORS.CurrentPassOwner;
 						
 					else
@@ -3253,7 +3446,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					end
 					
 					local postRewards = seasonData.PostRewards;
-					if seasonLevel > treeCount then
+					if pSeasonLevel > treeCount then
 						for lvl, rewardInfo in pairs(postRewards) do
 							local postLvlSlotInfo = levelSlotsInfo[lvl];
 
@@ -3285,7 +3478,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 								postLvlSlotInfo.GetClaimState = function(l)
 									refreshData();
-									seasonLevel = seasonData.Level;
+									pSeasonLevel = seasonData.Level;
 
 									local r = "n/a";
 									if seasonData.PostRewards[l] ~= nil then
@@ -3734,7 +3927,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				end
 
 				--== MARK: Final Level 
-				if seasonLevel > treeCount then
+				if pSeasonLevel > treeCount then
 					if finalSlotInfo.Slot == nil then
 						finalSlotInfo.Slot = templateLevelSlot:Clone();
 						finalSlotInfo.Slot.Size = UDim2.new(0, 160, 1, 0);
@@ -3762,7 +3955,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					end
 
 					finalSlotInfo.BackgroundColor3 = BP_COLORS.CurrentPassOwner;
-					finalSlotInfo.Label.Text = "<b>Level ".. tostring(seasonLevel) .."</b>";
+					finalSlotInfo.Label.Text = "<b>Level ".. tostring(pSeasonLevel) .."</b>";
 					finalSlotInfo.Slot.Parent = battlePassContent;
 					
 					battlePassContent.UIPadding.PaddingRight = UDim.new(0, 0);
@@ -3772,7 +3965,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				end 
 				
 
-				if seasonLevel > treeCount then
+				if pSeasonLevel > treeCount then
 					battlePassContent.CanvasPosition = battlePassContent.AbsoluteCanvasSize;
 						
 				else

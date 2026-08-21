@@ -1,6 +1,9 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
+local RunService = game:GetService("RunService");
+
 local library = shared.require(game.ReplicatedStorage.Library.BattlePassLibrary);
+local StoryIndexCounter = {};
 
 local function newTree(list)
 	local lastLvl = list[#list].Index;
@@ -20,11 +23,19 @@ local function leaf(index, data)
 
 	data.Index = index;
 
+	if data.Story then
+		local storyId = data.Story.Id;
+		local storyIndex = (StoryIndexCounter[storyId] or 0) +1;
+		StoryIndexCounter[storyId] = storyIndex;
+
+		data.Story.Index = storyIndex;
+	end
+
 	return data;
 end
 
 function library.onRequire()
-	library.Active = "";
+	library.Active = RunService:IsStudio() and "rotd3" or "";
 
 	-- Event pass Token shop
 	-- library.GiftShop = {
@@ -615,6 +626,7 @@ function library.onRequire()
 
 
 	-- MARK: rotd3
+	local STORY_ACCCESSGRANTED = "storyaccessgranted";
 	library:Add{
 		Id="rotd3";
 		EndUnixTime=1790726400;
@@ -623,18 +635,44 @@ function library.onRequire()
 		Icon="rbxassetid://79371010030621";
 		Desc="Unlock the Revived 3.0 Event Pass to claim more rewards!";
 
+		CardsActive=true;
+
 		Tree = newTree{
 			leaf(0, {
-				Reward={ItemId="santahat";};
+				Story={Id=STORY_ACCCESSGRANTED;};
 			});
 			--
-			leaf(3, {
-				Reward={ItemId="p250toygun";};
+			leaf(1, {
+				Story={Id=STORY_ACCCESSGRANTED;};
 			});
-			leaf(7, {
-				Reward={ItemId="xmassweater";};
+			leaf(3, {
+				Story={Id=STORY_ACCCESSGRANTED;};
+				Reward={ItemId="dufflebaghighvis"; PassOwner=true;};
+			});
+			leaf(5, {
+				Story={Id=STORY_ACCCESSGRANTED;};
+			});
+			leaf(6, {
+				Story={Id=STORY_ACCCESSGRANTED;};
+			});
+			leaf(9, {
+				Story={Id=STORY_ACCCESSGRANTED;};
+				Reward={ItemId="knightshelmetcorrupted"; PassOwner=true;};
+			});
+			leaf(10, {
+				Story={Id=STORY_ACCCESSGRANTED;};
 			});
 			
+			leaf(12, {
+				Story={Id=STORY_ACCCESSGRANTED;};
+			});
+			leaf(15, {
+				Story={Id=STORY_ACCCESSGRANTED;};
+				Reward={ItemId="leatherglovessurgical";};
+			});
+			leaf(18, {
+				Story={Id=STORY_ACCCESSGRANTED;};
+			});
 		};
 	};
 end

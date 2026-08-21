@@ -35,7 +35,8 @@ function library.onRequire()
 	library:Add{Id="Rat"; Class="Rat";};
 	
 	-- Blank Avatar: rbxassetid://15641359355
-	library:Add{Id="Tom Greyman"; Avatar="rbxassetid://15641359355";};
+	library:Add{Id="Unknown"; Avatar="rbxassetid://15641359355";};
+	library:Add{Id="Tom Greyman"; Class="EntityZ"; Avatar="rbxassetid://15641359355";};
 	--==
 	library:Add{Id="Mason"; Class="Survivor"; World="TheWarehouse"; Avatar="rbxassetid://15641265681";
 		Descriptors={
@@ -201,6 +202,7 @@ function library.onRequire()
 
 	--== Wanderer
 	library:Add{Id="Icarus"; Class="Trader"; Avatar="rbxassetid://13192700114"};
+	library:Add{Id="Valeria"; Class="Unknown"; Avatar="rbxassetid://127592506524326"};
 
 	--== Cutscene
 	library:Add{Id="Revas"; Class="Rat"; World="TheHarbor"; Avatar="rbxassetid://18932917905"; };

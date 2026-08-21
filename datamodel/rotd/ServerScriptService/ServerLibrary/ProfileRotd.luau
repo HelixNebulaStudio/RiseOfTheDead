@@ -21,7 +21,7 @@ shared.coreBind(modProfile, "_new", function(profile: ProfileRotd, profileMeta: 
     profile.Trader = modTraderProfile.new(player);
 
     profile.Safehome = modSafehomeData.new(player); profile.Safehome:Init();
-    profile.BattlePassSave = modBattlePassSave.new(profile, function() profile:Sync("BattlePassSave"); end);
+    profile.BattlePassSave = modBattlePassSave.new(player, profile, function() profile:Sync("BattlePassSave"); end);
     
     profile.NpcTaskData = modNpcTaskData.new(player);
     

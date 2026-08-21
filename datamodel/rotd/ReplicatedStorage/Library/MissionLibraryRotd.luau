@@ -568,6 +568,7 @@ MissionLibrary.New{
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Normal};
 		{Type="Item"; ItemId="deagleparts"; Quantity=1;};
+		{Type="Card"; Amount=NumberRange.new(1, 2); Types={"wolf"; "rat"};};
 	};
 	AddRequirements={
 		{Type="MissionCompleted"; Value={16}};
@@ -701,6 +702,7 @@ MissionLibrary.New{
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Easy};
 		{Type="EventFlag"; Id="SafePage4"};
+		{Type="Card"; Amount=NumberRange.new(1, 1); Types={"wolf"; "zombie"};};
 	};
 	AddRequirements={
 		{Type="Level"; Value=30};
@@ -861,6 +863,7 @@ MissionLibrary.New{
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Normal};
 		{Type="Item"; ItemId="deagleparts"; Quantity=1;};
+		{Type="Card"; Amount=NumberRange.new(1, 2); Types={"rat"; "zombie"};};
 	};
 	AddRequirements={
 		{Type="Level"; Value=40};
@@ -1134,6 +1137,7 @@ MissionLibrary.New{
 	Tier = "Hard";
 	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Hard};
+		{Type="Card"; Amount=NumberRange.new(2, 2); Types={"boar"; "rabbit"; "lion"};};
 	};
 	AddRequirements = {
 		{Type="Level"; Value=60};
@@ -1640,6 +1644,7 @@ MissionLibrary.New{
 	Tier="Normal";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Normal};
+		{Type="Card"; Amount=NumberRange.new(1, 2); Types={"boar"; "bear"; "lion"};};
 	};
 	AddRequirements={
 		{Type="Level"; Value=60};
@@ -1914,6 +1919,7 @@ MissionLibrary.New{
 	Tier="Easy";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Easy};
+		{Type="Card"; Amount=NumberRange.new(1, 1); Types={"rat"; "snake";};};
 	};
 	Markers={
 	};
@@ -2342,6 +2348,7 @@ MissionLibrary.New{
 	Tier = "Normal";
 	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Normal};
+		{Type="Card"; Amount=NumberRange.new(1, 2); Types={"zombie"; "rabbit";};};
 	};
 	AddRequirements = {
 		{Type="Level"; Value=30};
@@ -2371,6 +2378,7 @@ MissionLibrary.New{
 	Tier="Hard";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Hard};
+		{Type="Card"; Amount=NumberRange.new(2, 2); Types={"rabbit"; "bear";};};
 	};
 	AddRequirements={
 		{Type="Level"; Value=30};
@@ -2397,6 +2405,7 @@ MissionLibrary.New{
 	Tier="Normal";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Normal};
+		{Type="Card"; Amount=NumberRange.new(1, 2); Types={"wolf"; "rat";};};
 	};
 	AddRequirements={
 		{Type="Level"; Value=30};
@@ -2422,6 +2431,7 @@ MissionLibrary.New{
 	Tier="Normal";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Normal};
+		{Type="Card"; Amount=NumberRange.new(1, 2); Types={"bear"; "snake";};};
 	};
 	AddRequirements={
 		{Type="Level"; Value=30};
@@ -2452,6 +2462,7 @@ MissionLibrary.New{
 	Tier="Normal";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Normal};
+		{Type="Card"; Amount=NumberRange.new(1, 2); Types={"boar"; "lion";};};
 	};
 	AddRequirements={
 		{Type="Level"; Value=30};
@@ -2478,6 +2489,7 @@ MissionLibrary.New{
 	Tier = "Normal";
 	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Normal};
+		{Type="Card"; Amount=NumberRange.new(1, 2); Types={"boar"; "zombie";};};
 	};
 	AddRequirements = {
 		{Type="Level"; Value=30};
@@ -2508,6 +2520,7 @@ MissionLibrary.New{
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Hard};
 		{Type="Item"; ItemId="deagleparts"; Quantity=1;};
+		{Type="Card"; Amount=NumberRange.new(2, 2); Types={"wolf"; "bear";};};
 	};
 	AddRequirements={
 		{Type="Level"; Value=30};
@@ -2597,6 +2610,7 @@ MissionLibrary.New{
 	Tier="Hard";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Hard};
+		{Type="Card"; Amount=NumberRange.new(2, 2); Types={"wolf"; "boar";};};
 	};
 	AddRequirements={
 		{Type="Level"; Value=30};
@@ -2667,6 +2681,7 @@ MissionLibrary.New{
 	Tier="Normal";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Normal};
+		{Type="Card"; Amount=NumberRange.new(1, 2); Types={"zombie"; "rabbit";};};
 	};
 	AddRequirements={
 		{Type="MissionCompleted"; Value={75}};
@@ -2754,6 +2769,7 @@ MissionLibrary.New{
 	Tier = "Normal";
 	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Normal};
+		{Type="Card"; Amount=NumberRange.new(1, 2); Types={"bear"; "lion";};};
 	};
 	AddRequirements = {
 		{Type="Level"; Value=30};
@@ -3005,6 +3021,7 @@ MissionLibrary.New{
 	Tier = "Easy";
 	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Easy};
+		{Type="Card"; Amount=NumberRange.new(1, 1); Types={"snake"; "rat";};};
 	};
 	AddRequirements = {
 		{Type="Level"; Value=30};
@@ -3234,6 +3251,7 @@ MissionLibrary.New{
 	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Normal};
 		{Type="EventFlag"; Id="SafePage6"};
+		{Type="Card"; Amount=NumberRange.new(1, 2); Types={"lion"; "rabbit";};};
 	};
 	AddRequirements = {
 		{Type="Level"; Value=200};
@@ -3269,6 +3287,7 @@ MissionLibrary.New{
 	Tier = "Normal";
 	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Normal};
+		{Type="Card"; Amount=NumberRange.new(1, 2); Types={"snake";};};
 	};
 	AddRequirements = {
 		{Type="Level"; Value=200};
