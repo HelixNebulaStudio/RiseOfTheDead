@@ -2126,6 +2126,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 				SaveFunc=sliderMarkForSave;
 			});
 
+
 			-- MARK: Part Material
 			local materialButton = editPanel.MaterialFrame.Button;
 			templateDarkenFrame:Clone().Parent = materialButton;
@@ -2231,14 +2232,22 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 					itemWear = 0;
 				end
 
+				local customizeOptionsAvailable = 0;
+
 				if isClothing then
 					editPanel.HWLine.Visible = false;
 					editPanel.IMLine.Visible = false;
 					editPanel.MCLine.Visible = false;
 					editPanel.FNLine.Visible = false;
+
 					editPanel.ColorFrame.Visible = activeUnlockableLib and activeUnlockableLib.IsColorable;
+					if editPanel.ColorFrame.Visible then customizeOptionsAvailable += 1; end;
+
 					editPanel.SkinTintFrame.Visible = showSkinTint;
+					if editPanel.SkinTintFrame.Visible then customizeOptionsAvailable += 1; end;
+
 					emissiveTintFrame.Visible = showEmissiveTint;
+					if emissiveTintFrame.Visible then customizeOptionsAvailable += 1; end;
 
 					local hiddenFrames = {
 						"SkinFrame"; "SkinColorFrame"; "SkinOffsetFrame"; "SkinScaleFrame";
@@ -2249,14 +2258,30 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						local f = editPanel:FindFirstChild(hiddenFrames[a]);
 						if f then f.Visible = false; end
 					end
+
+					if customizeOptionsAvailable > 0 then
+						editPanel.ButtonsFrame.Visible = true;
+						editPanel.serializeText.Visible = true;
+						editPanel.line2.Visible = true;
+						editPanel.noOptionsHint.Visible = false;
+					else
+						editPanel.ButtonsFrame.Visible = false;
+						editPanel.serializeText.Visible = false;
+						editPanel.line2.Visible = false;
+						editPanel.noOptionsHint.Visible = true;
+					end
+
 					return;
 				end
 
+				editPanel.ButtonsFrame.Visible = true;
+				editPanel.serializeText.Visible = true;	
 				editPanel.ColorFrame.Visible = true;
 				editPanel.HWLine.Visible = true;
 				editPanel.IMLine.Visible = true;
 				editPanel.MCLine.Visible = true;
 				editPanel.FNLine.Visible = true;
+				editPanel.noOptionsHint.Visible = false;
 
 				local skinLib = modItemSkinsLibrary:Find(editPanel.SkinFrame.Button:GetAttribute("SkinId"));
 				local canEditPatternData = false;
@@ -2411,7 +2436,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 
 				updateSerializeText();
 			end
-
+			refreshConfigActive();
 
 			local function saveGroupName()
 				activeGroupName = selectTextbox.Text;
@@ -3006,6 +3031,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 					end
 
 					newSelection(selectionPartData, selectGroupName);
+					refreshConfigActive();
 				end
 		
 				newDropDownList:LoadOptions(groupPartList);

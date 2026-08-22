@@ -40,7 +40,7 @@ function Objective:Tick()
     if tick()-self.LastSpawnTick <= math.min(math.max(self.Controller.IsHard and 0.1 or 0.5, activeEnemyCount/40), 1) then
         canSpawn = false;
     end
-    if activeEnemyCount > 80 then
+    if activeEnemyCount > 50 then
         canSpawn = false;
     end
 	if self.PauseTick and tick() < self.PauseTick then

@@ -94,6 +94,7 @@ if RunService:IsServer() then
 					factionBannerInteractConfig:SetAttribute("_Id", "mission60RepairBanner");
 					factionBannerInteractConfig:SetAttribute("_Label", "Repair Faction Banner");
 					factionBannerInteractConfig:SetAttribute("_InteractDuration", 5);
+					factionBannerInteractConfig:SetAttribute("FactionTitle", factionTitle);
 					factionBannerInteractConfig:SetAttribute("FactionTag", factionTag);
 					factionBannerInteractConfig.Parent = factionbannerPrefab;
 
@@ -104,6 +105,27 @@ if RunService:IsServer() then
 						
 					factionBannerInteractable.Label = `Repair Faction Banner with {saveData.RepairCost} {itemLib.Name}.`;
 					factionBannerInteractable:Sync();
+
+					factionBannerInteractable:SetZScript([[
+local interactPackage = {};
+
+function interactPackage.BindPrompt(interactable: Interactable, interactData: InteractionData)
+	local player: Player = interactData.Player;
+	
+	local playerData = PlayerService:GetPlayerData(player);
+	local missionData = playerData:GetMission(60);
+
+    if missionData == nil 
+    or missionData.Type ~= 1 
+    or missionData.ProgressionPoint ~= 1 then
+        interactable.Label = `Join {interactable:GetValue("FactionTitle")}! ({interactable:GetValue("FactionTag")})`;
+		interactable.CanInteract = false;
+        return true;
+    end
+end
+
+return interactPackage;
+					]]);
 					
 					local primaryPart = factionbannerPrefab:WaitForChild("Handle");
 					primaryPart.Anchored = true;

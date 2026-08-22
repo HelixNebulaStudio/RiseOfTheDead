@@ -27,10 +27,10 @@ shared.coreBind(modProfile, "_new", function(profile: ProfileRotd, profileMeta: 
     
     --== Faction Integration
     profile.Faction = {
-        FactionTitle="n/a";
-        FactionIcon="9890634236";
-        FactionColor="c8c8c8";
-    }
+        FactionTitle = "n/a";
+        FactionIcon = "9890634236";
+        FactionColor = "c8c8c8";
+    };
 
 	profile.Flags:HookGet("CustomColors", function(customColorsData)
 		if customColorsData == nil then return end;
@@ -67,6 +67,16 @@ shared.coreBind(modProfile, "_new", function(profile: ProfileRotd, profileMeta: 
 end)
 
 shared.coreBind(modProfile, "_key_load", function(profile: ProfileRotd, key: string, data: any, loadOverwrite: anydict?)
+
+	if key == "Faction" and data then
+		local factionData = profile.Faction;
+
+		for k, v in pairs(data) do
+			factionData[k] = v;
+		end
+
+		return true;
+	end
 
     return false;
 end)

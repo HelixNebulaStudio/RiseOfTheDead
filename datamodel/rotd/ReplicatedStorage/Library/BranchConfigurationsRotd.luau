@@ -906,7 +906,7 @@ function modBranchConfigurations.onRequire()
             modConfigurations.Set("SpawnProtectionTimer", 120);
             modConfigurations.Set("DisableMapItems", false);
             modConfigurations.Set("ExpireDeployables", true);
-            modConfigurations.Set("NaturalSpawnLimit", 60);
+            modConfigurations.Set("NaturalSpawnLimit", 50);
             workspace:SetAttribute("RecomputePathThreshold", 1);
             
         else

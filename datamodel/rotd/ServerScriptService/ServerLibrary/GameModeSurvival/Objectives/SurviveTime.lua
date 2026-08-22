@@ -36,7 +36,7 @@ function Objective:Tick()
 	local timeRemain = math.max(self.EndTime-tick(), 0);
 	local maxSpawnRate = math.min(math.max(timeRemain*0.05, 1/(math.max(controller.Wave/5, 1)), 0.1), 1);
 	
-	local canSpawn = timeRemain > 1 and tick()-self.LastSpawn > maxSpawnRate and #controller.EnemyNpcClasses <= 80;
+	local canSpawn = timeRemain > 1 and tick()-self.LastSpawn > maxSpawnRate and #controller.EnemyNpcClasses <= 50;
 	if self.PauseTick and tick() < self.PauseTick then
 		canSpawn = false;
 	end

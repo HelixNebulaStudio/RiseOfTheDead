@@ -250,11 +250,44 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		MissionData = nil;
 	};
 
+	local function loadObjectiveDescription(mission, objName, obj)
+		local missionSaveData = mission.SaveData;
+		local itemId = missionSaveData.ItemId;
+		local itemlib = missionSaveData.ItemId and modItemsLibrary:Find(itemId);
+		local desc = obj.Description;
+
+		local needCount = tonumber(mission.ObjectivesCompleted[objName]);
+		local objectiveAmount = obj.Amount or missionSaveData.Amount or 1;
+		desc = string.gsub(desc, "$Amount", needCount and objectiveAmount and objectiveAmount == needCount and needCount or (objectiveAmount - (needCount or 0)).."/"..objectiveAmount);
+		desc = string.gsub(desc, "$ItemName", itemlib and itemlib.Name or itemId or "");
+		
+		for k, v in pairs(missionSaveData) do
+			if desc:find("$"..k) then
+				local newVal = v;
+
+				if tonumber(newVal) then
+					newVal = modFormatNumber.Beautify(tonumber(newVal));
+				end
+
+				if ("$"..k):sub(1, 5) == "$Item" then
+					local saveDataItemlib = modItemsLibrary:Find(newVal);
+					desc = desc:gsub("$"..k, saveDataItemlib and saveDataItemlib.Name or newVal);
+				else
+					desc = desc:gsub("$"..k, newVal);
+				end
+			end
+		end
+
+		return desc;
+	end
+
 	function pinHudData.setActive(isActive)
 		pinHudData.Active = isActive;
 
 		local taskHudWindow: InterfaceWindow = interface:GetWindow("TaskListHud");
 		missionHudTask = taskHudWindow and taskHudWindow.Binds.getOrNewTask(HUD_TASK_ID) or nil;
+
+		local pinnedTaskList = pinHudData.TaskList;
 
 		if not isActive then
 			pinHudData.TitleText = ``;
@@ -264,6 +297,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			if missionHudTask then
 				taskHudWindow.Binds.destroyHudTask(HUD_TASK_ID);
 				missionHudTask = nil;
+			end
+			if pinHudData.TaskList then
+				pinnedTaskList.Visible = false;
 			end
 			return;
 		end
@@ -275,6 +311,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		missionHudTask.Properties.DescText = pinHudData.TaskText;
 
 		local missionData = pinHudData.MissionData;
+		if missionData == nil then return; end
+
+		local missionLib = modMissionsLibrary.Get(missionData.Id);
+		if missionLib == nil then return end;
 
 		if missionData.SaveData.Timers then
 			for k, v in pairs(missionData.SaveData.Timers) do
@@ -291,6 +331,41 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			table.clear(missionHudTask.Properties.Bars);
 		end
 		
+		if pinHudData.TaskList then
+			pinnedTaskList.Visible = false;
+			
+			local incomplete = false;
+			for name, objective in pairs(missionLib.Objectives) do
+				local newTask = pinnedTaskList:FindFirstChild(name);
+				if newTask == nil then
+					newTask = taskTemplate:Clone();
+					newTask.Name = name;
+				end
+
+				newTask.LayoutOrder = objective.Index;
+				newTask.Text = loadObjectiveDescription(missionData, name, objective);
+				newTask.Parent = pinnedTaskList;
+
+				if missionData.ObjectivesCompleted[name] == true then
+					newTask.Text = `<s>{newTask.Text}</s>`
+				else
+					incomplete = true;
+				end
+			end
+
+			if incomplete then
+				pinnedTaskList.Visible = true;
+				pinHudData.TaskText = "Complete the objectives";
+
+			else
+				pinnedTaskList.Visible = false;
+
+				local itemlib = missionData.SaveData.ItemId and modItemsLibrary:Find(missionData.SaveData.ItemId);
+				pinHudData.TaskText = missionLib.ObjectivesCompleteText:gsub("$ItemName", itemlib and itemlib.Name or missionData.SaveData.ItemId or "");
+			
+			end
+		end
+
 		missionHudTask:Update();
 	end
 
@@ -353,37 +428,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		end
 
 		return;
-	end
-
-	local function loadObjectiveDescription(mission, objName, obj)
-		local missionSaveData = mission.SaveData;
-		local itemId = missionSaveData.ItemId;
-		local itemlib = missionSaveData.ItemId and modItemsLibrary:Find(itemId);
-		local desc = obj.Description;
-
-		local needCount = tonumber(mission.ObjectivesCompleted[objName]);
-		local objectiveAmount = obj.Amount or missionSaveData.Amount or 1;
-		desc = string.gsub(desc, "$Amount", needCount and objectiveAmount and objectiveAmount == needCount and needCount or (objectiveAmount - (needCount or 0)).."/"..objectiveAmount);
-		desc = string.gsub(desc, "$ItemName", itemlib and itemlib.Name or itemId or "");
-		
-		for k, v in pairs(missionSaveData) do
-			if desc:find("$"..k) then
-				local newVal = v;
-
-				if tonumber(newVal) then
-					newVal = modFormatNumber.Beautify(tonumber(newVal));
-				end
-
-				if ("$"..k):sub(1, 5) == "$Item" then
-					local saveDataItemlib = modItemsLibrary:Find(newVal);
-					desc = desc:gsub("$"..k, saveDataItemlib and saveDataItemlib.Name or newVal);
-				else
-					desc = desc:gsub("$"..k, newVal);
-				end
-			end
-		end
-
-		return desc;
 	end
 
 	local function getNpc(npcName)
@@ -1964,7 +2008,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 							else
 								incomplete = true;
 							end
-							newTask.Text = "• "..taskStr;
+							newTask.Text = `• {taskStr}`;
 						end
 
 						
@@ -1988,7 +2032,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 							compText = string.gsub(compText, "$ItemName", itemlib and itemlib.Name or missionData.SaveData.ItemId or "");
 							
 							newTask.LayoutOrder = 99;
-							newTask.Text = "• "..compText;
+							newTask.Text = `• {compText}`;
 							newTask.Parent = pinnedTaskList;
 						end
 						
@@ -2091,38 +2135,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						pinnedTaskList = templateHudTaskList:Clone();
 						pinnedTaskList.Parent = missionHudTask.Frame.Content;
 						pinHudData.TaskList = pinnedTaskList;
-					end
-
-					for _, obj in pairs(pinnedTaskList:GetChildren()) do
-						if obj:IsA("GuiObject") then
-							obj:Destroy();
-						end
-					end
-
-					local incomplete = false;
-					for name, objective in pairs(missionLib.Objectives) do
-						local newTask = taskTemplate:Clone();
-
-						newTask.LayoutOrder = objective.Index;
-						newTask.Text = loadObjectiveDescription(missionData, name, objective);
-						newTask.Parent = pinnedTaskList;
-
-						if missionData.ObjectivesCompleted[name] == true then
-							newTask.Text = "<s>"..newTask.Text.."</s>"
-						else
-							incomplete = true;
-						end
-					end
-
-					if incomplete then
-						pinnedTaskList.Visible = true;
-						pinHudData.TaskText = "Complete the objectives";
-
-					else
-						pinnedTaskList.Visible = false;
-
-						local itemlib = missionData.SaveData.ItemId and modItemsLibrary:Find(missionData.SaveData.ItemId);
-						pinHudData.TaskText = missionLib.ObjectivesCompleteText:gsub("$ItemName", itemlib and itemlib.Name or missionData.SaveData.ItemId or "");
 					end
 
 				else

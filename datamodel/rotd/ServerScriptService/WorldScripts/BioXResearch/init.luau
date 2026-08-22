@@ -6,6 +6,7 @@ local modProjectile = shared.require(game.ReplicatedStorage.Library.Projectile);
 local modTeamsManager = shared.require(game.ReplicatedStorage.Library.TeamsManager);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modEntity = shared.require(game.ReplicatedStorage.Entity);
+local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 
 if RunService:IsServer() then
     modRegionMission = shared.require(game.ServerScriptService.ServerLibrary.RegionMission);
@@ -121,6 +122,32 @@ function WorldCore.onRequire()
                 });
             end
         end)
+    end
+
+    if RunService:IsServer() then
+            
+        local shopInteractable: InteractableInstance = modInteractables.getById("MsgInteractableA");
+        shopInteractable:SetZScript([[
+local interactPackage = {};
+
+function interactPackage.BindPrompt(interactable: Interactable, interactData: InteractionData)
+	local player: Player = interactData.Player;
+	
+	local playerData = PlayerService:GetPlayerData(player);
+	local missionData = playerData:GetMission(6);
+
+    if missionData == nil 
+    or missionData.Type ~= 1 
+    or missionData.ProgressionPoint ~= 1 then
+        interactable.Label = nil;
+		interactable.CanInteract = false;
+        return true;
+    end
+end
+
+return interactPackage;
+        ]]);
+
     end
 end
 

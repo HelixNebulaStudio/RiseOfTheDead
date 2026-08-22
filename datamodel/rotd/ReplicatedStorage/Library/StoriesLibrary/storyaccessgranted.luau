@@ -36,7 +36,7 @@ local storyPackage = {
             {N="Russell"; L=`Wait wait wait, hold on. What's in it for you?`; F="Suspicious";};
             {N="Lennon"; L=`What's in it for me? I get to see what's behind that door. That's payment enough.`; F="Hehe";};
             {N="Mason"; L=`You're a strange man, Lennon.`; F="Bored";};
-            {N="Lennon"; L=`Strange is what keeps you alive out here. Now come on, the tunnel entrance is about a hundred yards east.`; F="Serious";};
+            {N="Lennon"; L=`Strange is what keeps you alive out here. Now come on, there's an entrance about down the tunnel.`; F="Serious";};
             {L=`*Lennon starts walking, flashlight cutting through the dark*`;};
             {N="Russell"; L=`I don't trust him, Mason.`; F="Suspicious";};
             {N="Mason"; L=`I don't trust anyone. But he's got a way in, and we've got nothing.`; F="Ugh";};
@@ -71,8 +71,22 @@ local storyPackage = {
         };
         {--9
             {L=`*They move quietly closer towards the doorway as the rustling sound grows louder.`};
-            {L=`*Mason peaks into the  *`};
+            {L=`*Mason peaks into the room with his revolver over and flashlight under pointing at a person crouched over a container*`};
+            {N="Mason"; L=`Hands where I can see 'em!`; F="Skeptical";};
+            {N="Valeria"; UnknownName=true; L=`*Slowly turns around with both her hands carefully raised*`; F="Serious";};
+            {N="Russell"; L=`State your name, and who you are affiliated!`; F="Angry";};
+            {N="Lennon"; L=`*Looks around the room, noticing scratches and dented all over.*`; F="Surprise"};
+            {N="Valeria"; UnknownName=true; L=`*Does not respond and appears unfazed.*`; F="Serious";};
         };
+        {--10;
+            {N="Mason"; L=`Look, we are just looking for medical supplies here.. If you let use know who you're with or what you are doing here, maybe we could help each other.`; F="Suspicious";};
+            {N="Valeria"; UnknownName=true; L=`*Still non-responding to the question, but slowly side steps towards the other doorway*`; F="Suspicious";};
+            {L=`*The stranger slips out the door and ran away. Mason and Russell lowers their guard.`};
+            {N="Russell"; L=`What the heck was that?`; F="Ugh";};
+            {N="Mason"; L=`Hmmm, can't blame them. It's everyone for themselves nowadays.`; F="Surprise";};
+            {N="Mason"; L=`We should probably start searching quickly, she might be in a group and they might not be so kind.`; F="Surprise";};
+            {N="Russell"; L=`I want to be out of this place ASAP. This place gives me the creeps.`; F="Ugh";};
+        }
     };
 };
 
