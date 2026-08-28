@@ -659,6 +659,7 @@ function library.onRequire()
 				Story={Id=STORY_ACCCESSGRANTED;};
 				Reward={ItemId="knightshelmetcorrupted"; PassOwner=true;};
 			});
+
 			leaf(10, {
 				Story={Id=STORY_ACCCESSGRANTED;};
 			});
@@ -670,8 +671,38 @@ function library.onRequire()
 				Story={Id=STORY_ACCCESSGRANTED;};
 				Reward={ItemId="leatherglovessurgical";};
 			});
+
 			leaf(18, {
 				Story={Id=STORY_ACCCESSGRANTED;};
+			});
+			leaf(21, {
+				Story={Id=STORY_ACCCESSGRANTED;};
+			});
+			leaf(24, {
+				Story={Id=STORY_ACCCESSGRANTED;};
+				Reward={ItemId="vexglovesdisposal"; PassOwner=true;};
+			});
+
+			leaf(27, {
+				Story={Id=STORY_ACCCESSGRANTED;};
+			});
+			leaf(30, {
+				Story={Id=STORY_ACCCESSGRANTED;};
+			});
+			leaf(33, {
+				Story={Id=STORY_ACCCESSGRANTED;};
+				Reward={ItemId="greavesandsabatonscorrupted"; PassOwner=true;};
+			});
+
+			leaf(36, {
+				Story={Id=STORY_ACCCESSGRANTED;};
+			});
+			leaf(39, {
+				Story={Id=STORY_ACCCESSGRANTED;};
+			});
+			leaf(42, {
+				Story={Id=STORY_ACCCESSGRANTED;};
+				Reward={ItemId="dualuzichevrons";};
 			});
 		};
 	};

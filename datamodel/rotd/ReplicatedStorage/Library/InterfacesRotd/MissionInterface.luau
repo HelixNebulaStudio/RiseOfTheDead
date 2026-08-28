@@ -2352,12 +2352,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 							elseif rewardInfo.Type == "Item" then
 								table.insert(itemRewardsList, rewardInfo);
-								-- local itemLib = modItemsLibrary:Find(rewardInfo.ItemId);
-								-- if itemLib then
-								-- 	table.insert(rewardStrList, itemLib.Name.. (rewardInfo.Quantity > 1 and " x"..rewardInfo.Quantity or ""));
-								-- else
-								-- 	table.insert(rewardStrList, "Unknown item: "..(rewardInfo.ItemId or ""));
-								-- end
 
 							elseif rewardInfo.Type == "Card" then
 								cardsRewardInfo = rewardInfo;
@@ -2710,7 +2704,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			BottomFrame.Visible = true;
 			LeftFrame.Size = UDim2.new(leftFrameSizeXAnchor, 0, 0.9, -150);
 			LeftFrame.Position = UDim2.new(0, 0, 1, -150);
-			RightFrame.Size = UDim2.new(rightFrameSizeXAnchor, 0, 0.9, battlepassLib.CardsActive == true and -105 or -60);
+			RightFrame.Size = UDim2.new(rightFrameSizeXAnchor, 0, 0.9, battlepassLib.CardsActive == true and -90 or -60);
 			RightFrame.Position = UDim2.new(1, 0, 0.1, 0);
 			
 			hintLabel.Text = "Event Pass: ".. daysLeft .." Days Left";
@@ -2970,20 +2964,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						
 						if lvl == 0 and lvlSlotInfo.btStart == nil then
 							lvlSlotInfo.btStart = true;
-							
-							-- local frame = Instance.new("Frame");
-							-- frame.BackgroundTransparency = 1;
-							-- frame.Size = UDim2.new(0, 70, 0, 70);
-							-- local bpIconButton = Instance.new("ImageButton");
-							-- bpIconButton.BackgroundTransparency = 1;
-							-- bpIconButton.Rotation = 1;
-							-- bpIconButton.AnchorPoint = Vector2.new(0.5, 0.5);
-							-- bpIconButton.Position = UDim2.new(0.5, 0, 0.5, 0);
-							-- bpIconButton.Size = UDim2.new(0, 70, 0, 70);
-							-- bpIconButton.Image = battlepassLib.Icon;
-							-- bpIconButton.Parent = frame;
-							-- frame.Parent = lvlSlot;
-							-- bpIconButton.MouseButton1Click:Connect(bpButtonFunc);
 						end
 						
 						if storyInfo then
@@ -2996,6 +2976,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 								storyButton.BackgroundTransparency = 1;
 								storyButton.Image = `rbxassetid://85915197880272`;
 								storyButton.Size = UDim2.new(0, 40, 0, 40);
+								storyButton.ScaleType = Enum.ScaleType.Fit;
 								storyButton.Parent = lvlSlot;
 
 								
@@ -3007,9 +2988,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 										buttonState = "Viewed"
 									elseif pSeasonLevel == (lvl+1) then
 										buttonState = "New";
+									elseif pSeasonLevel == lvl then
+										buttonState = "Next";
 									end
 
-									return buttonState or "Locked";
+									local bS = buttonState or "Locked";
+									return bS;
 								end
 								
 								storyButton.MouseButton1Click:Connect(function()
@@ -3032,7 +3016,15 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 							buttonState = lvlSlotInfo.GetStoryState();
 
 							if buttonState == "New" then
+								for _, obj in pairs(storyButton:GetChildren()) do
+									if not obj:IsA("GuiObject") and obj.Name ~= "UIPadding" then continue end;
+									obj:Destroy();
+								end
+
+								storyButton.AutomaticSize = Enum.AutomaticSize.None;
+								storyButton.Size = UDim2.new(0, 40, 0, 40);
 								storyButton.ImageColor3 = Color3.fromRGB(255, 255, 255);
+
 								local newGlow = storyButton:FindFirstChild("ClaimGlow") or modItemInterface.newGlowEffect();
 								newGlow.Name = "ClaimGlow"
 								newGlow.ImageColor3 = Color3.fromRGB(255, 255, 255);
@@ -3041,7 +3033,15 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 								newGlow.Parent = storyButton;
 								lvlSlotInfo.GlowLabel = newGlow;
 
+
 							elseif buttonState == "Viewed" then
+								for _, obj in pairs(storyButton:GetChildren()) do
+									if not obj:IsA("GuiObject") and obj.Name ~= "UIPadding" then continue end;
+									obj:Destroy();
+								end
+								
+								storyButton.AutomaticSize = Enum.AutomaticSize.None;
+								storyButton.Size = UDim2.new(0, 40, 0, 40);
 								local parColor3H, parColor3S, parColor3V = storyButton.Parent.ImageColor3:ToHSV();
 								storyButton.ImageColor3 = Color3.fromHSV(parColor3H, parColor3S, math.min(1, parColor3V+0.2));
 								
@@ -3049,8 +3049,113 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 									lvlSlotInfo.GlowLabel:Destroy();
 								end
 
-							else
+
+							elseif buttonState == "Next" then
+								for _, obj in pairs(storyButton:GetChildren()) do
+									if not obj:IsA("GuiObject") and obj.Name ~= "UIPadding"then continue end;
+									obj:Destroy();
+								end
+								
+								storyButton.AutomaticSize = Enum.AutomaticSize.X;
 								storyButton.ImageColor3 = Color3.fromRGB(50, 50, 50);
+								storyButton.Size = UDim2.new(0, 50, 0, 50);
+
+								local cardRng = Random.new(localPlayer.UserId + lvl);
+								local qty = cardRng:NextInteger(2, 3) + (cardRng:NextNumber(0, 1) <= 0.1 and 1 or 0);
+								local cardCost = {};
+								for a=1, qty do
+									local c = modBattlePassLibrary.BpCardIdsList[cardRng:NextInteger(1, #modBattlePassLibrary.BpCardIdsList)];
+									table.insert(cardCost, c);
+								end
+								
+								local uiPadding = Instance.new("UIPadding");
+								uiPadding.PaddingLeft = UDim.new(0, 30);
+								uiPadding.PaddingRight = UDim.new(0, 30);
+								uiPadding.Parent = storyButton;
+								local newUnlockButton = script:WaitForChild("LvlUnlockCost"):Clone();
+								newUnlockButton.Parent = storyButton;
+								newUnlockButton.Size = UDim2.new(0, (#cardCost*35)+10, 0, 45);
+
+								newUnlockButton.MouseButton1Click:Connect(function()
+									interface:PlayButtonClick();
+
+									local r = remoteBattlepassRemote:InvokeServer("unlockwithcards", lvl);
+									if r and r.Success then
+										newUnlockButton:Destroy();
+									end
+
+								end)
+
+								local cardCount = {};
+								for a=1, #cardCost do
+									local cKey = cardCost[a];
+									local cardLib = modBattlePassLibrary.BpCardsList[cKey];
+
+									cardCount[cKey] = (cardCount[cKey] or 0) +1;
+
+									local newCard = Instance.new("ImageLabel");
+									newCard.Size = UDim2.new(0, 35, 0, 35);
+									newCard.LayoutOrder = cardLib.Order;
+									newCard.BackgroundTransparency = 1;
+									newCard.Image = cardLib.Image;
+									newCard.Parent = newUnlockButton;
+
+									newCard:GetPropertyChangedSignal("GuiState"):Connect(function()
+										if newCard.GuiState == Enum.GuiState.Hover then
+											local cardListing = cardsListFrame:FindFirstChild(cKey);
+											if cardListing then
+												local uiShadow = cardListing:WaitForChild("UIShadow");
+												uiShadow.Enabled = true;
+												uiShadow.Transparency = 1;
+
+												TweenService:Create(
+													uiShadow, 
+													TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.In, -1, true, 0), 
+													{Transparency = 0;}
+												):Play();
+											end
+											
+										else
+											local cardListing = cardsListFrame:FindFirstChild(cKey);
+											if cardListing then
+												local uiShadow = cardListing:WaitForChild("UIShadow");
+												uiShadow.Enabled = false;
+											end
+
+										end
+									end)
+									
+									local uiGlow = Instance.new("UIShadow");
+									uiGlow.BlurRadius = UDim.new(0, 10);
+									uiGlow.Color = Color3.new(1, 1, 1);
+									uiGlow.Spread = UDim2.new(0, 4, 0, 4);
+									uiGlow.Transparency = 0;
+									uiGlow.Parent = newCard;
+
+									TweenService:Create(
+										uiGlow, 
+										TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, -1, true, 0), 
+										{Transparency = 1;}
+									):Play();
+													
+									local seasonCards = seasonData.Cards or {};
+									local hasCard = (seasonCards[cKey] or 0) >= cardCount[cKey];
+									
+									newCard.ImageColor3 = hasCard and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150);
+									uiGlow.Enabled = hasCard;
+									
+								end
+
+							else
+								for _, obj in pairs(storyButton:GetChildren()) do
+									if not obj:IsA("GuiObject") and obj.Name ~= "UIPadding" then continue end;
+									obj:Destroy();
+								end
+								
+								storyButton.AutomaticSize = Enum.AutomaticSize.None;
+								storyButton.Size = UDim2.new(0, 40, 0, 40);
+								storyButton.ImageColor3 = Color3.fromRGB(50, 50, 50);
+
 							end
 						end
 

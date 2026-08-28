@@ -834,8 +834,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                         selectionWorldName = (modBranchConfigurations.GetWorldName(binds.FriendsList[curPlayerName].PlaceId) or "Unknown");
                     end
                     
-                    local travelDisabled = false;
-                    if selectionWorldName ~= modBranchConfigurations.WorldName or game.Players:FindFirstChild(curPlayerName) == nil then
+                    local travelDisabled;
+                    if selectionWorldName ~= shared.WorldName or game.Players:FindFirstChild(curPlayerName) == nil then
                         local worldInfo = modBranchConfigurations.Worlds[selectionWorldName];
                         if worldInfo and worldInfo.CanTravelTo and binds.FriendsList[curPlayerName] then
                             if binds.FriendsList[curPlayerName].SearchedPlayer then
@@ -850,8 +850,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                                         remoteWorldTravelRequest:InvokeServer("TravelRequest", curPlayerName)
                                     end
                                 )
-                                
-                            elseif binds.FriendsList[curPlayerName].TravelRequest then
+                            end
+                            
+                            if binds.FriendsList[curPlayerName].TravelRequest then
                                 newOptionButton(
                                     curPlayerName ~= localPlayer.Name,
                                     "Accept Travel Request",
@@ -881,22 +882,25 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                                     curPlayerName ~= localPlayer.Name and game.Players:FindFirstChild(curPlayerName) == nil,
                                     "Travel to Player",
                                     function()
-                                        if travelDisabled then return end;
+                                        if travelDisabled and tick()-travelDisabled <= 10 then return end;
                                         interface:PlayButtonClick();
+
                                         if mission1Data == nil or mission1Data.Type ~= 3 then
                                             modClientGuis.promptWarning("Please complete the first mission.");
                                             return;
                                         end
                                         
-                                        local promptWindow = modClientGuis.promptQuestion("You are about to leave this world",
-                                            "Are you sure you want to travel to ".. modBranchConfigurations.GetWorldDisplayName(selectionWorldName) .."?");
+                                        local promptWindow = modClientGuis.promptQuestion(
+                                            "You are about to leave this world",
+                                            `Are you sure you want to travel to {modBranchConfigurations.GetWorldDisplayName(selectionWorldName)}?`
+                                        );
                                         local YesClickedSignal, NoClickedSignal;
                                         
                                         YesClickedSignal = promptWindow.Frame.Yes.MouseButton1Click:Connect(function()
                                             interface:PlayButtonClick();
                                             promptWindow:Close();
                                             if remoteWorldTravelRequest:InvokeServer("Social", curPlayerName) == true then
-                                                travelDisabled = true;
+                                                travelDisabled = tick();
                                             end
                                             YesClickedSignal:Disconnect();
                                             NoClickedSignal:Disconnect();
@@ -906,8 +910,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                                             promptWindow:Close();
                                             YesClickedSignal:Disconnect();
                                             NoClickedSignal:Disconnect();
-                                    end);
-                                end)
+                                        end);
+                                    end
+                                )
                             end
                         end
                     end

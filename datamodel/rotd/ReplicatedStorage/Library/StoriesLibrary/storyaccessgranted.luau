@@ -75,18 +75,88 @@ local storyPackage = {
             {N="Mason"; L=`Hands where I can see 'em!`; F="Skeptical";};
             {N="Valeria"; UnknownName=true; L=`*Slowly turns around with both her hands carefully raised*`; F="Serious";};
             {N="Russell"; L=`State your name, and who you are affiliated!`; F="Angry";};
-            {N="Lennon"; L=`*Looks around the room, noticing scratches and dented all over.*`; F="Surprise"};
+            {N="Lennon"; L=`*Looks around the room, noticing scratches and dented all over.*`; F="Surprise";};
             {N="Valeria"; UnknownName=true; L=`*Does not respond and appears unfazed.*`; F="Serious";};
         };
         {--10;
-            {N="Mason"; L=`Look, we are just looking for medical supplies here.. If you let use know who you're with or what you are doing here, maybe we could help each other.`; F="Suspicious";};
+            {N="Mason"; L=`Look, we are just looking for medical supplies here.. If you let us know who you're with or what you are doing here, maybe we could help each other.`; F="Suspicious";};
             {N="Valeria"; UnknownName=true; L=`*Still non-responding to the question, but slowly side steps towards the other doorway*`; F="Suspicious";};
-            {L=`*The stranger slips out the door and ran away. Mason and Russell lowers their guard.`};
+            {L=`*The stranger slips out the door and ran away. Mason and Russell lowers their guard.*`};
             {N="Russell"; L=`What the heck was that?`; F="Ugh";};
             {N="Mason"; L=`Hmmm, can't blame them. It's everyone for themselves nowadays.`; F="Surprise";};
             {N="Mason"; L=`We should probably start searching quickly, she might be in a group and they might not be so kind.`; F="Surprise";};
             {N="Russell"; L=`I want to be out of this place ASAP. This place gives me the creeps.`; F="Ugh";};
-        }
+        };
+        {--11
+            {L=`*They sweep the room, overturning crates and rifling through cabinets. Russell stops at a dented locker.*`};
+            {N="Russell"; L=`Hey, you two might want to see this.`; F="Serious";};
+            {N="Mason"; L=`What is it?`; F="Question";};
+            {N="Russell"; L=`A keycard..`; F="Surprised";};
+            {N="Russell"; L=`Dr. Baileys.. Know anyone by that name?`; F="Suspicious";};
+            {N="Mason"; L=`No clue, regardless, try the keycard on that panel over there. *Pointing at a screen and panel on the wall with a keycard reader*`; F="Confident";};
+            {N="Lennon"; L=`Umm guys.. *Calling out for attention while being carefully loud to not alert anything else*`; F="Serious";};
+        };
+        {--12
+            {L=`*A LOUD ROAR ECHOS at the entrance, drawing Russell's attention before he reached the panel.*`};
+            {N="Lennon"; L=`WATCH OOO..`; F="Surprise";};
+            {L=`*Before Lennon could finish alerting them, a creature the size larger than a door charges at Russell*`};
+            {L=`Slamming on to the metal plated walls of the facility, knocking Russell off his feet.`};
+            {N="Mason"; L=`HOLY ####!`; F="Angry";};
+            {N="Mason"; L=`*Mag dumps onto the creature with green goo sizzling out at every point where the bullets land.*`; F="Frustrated";};
+            {N="Lennon"; L=`Go get 'em! *Cheering as he peeks over from behind some crates..`; F="Joyful"};
+            {N="Russell"; L=`*Scrabbling backwards over broken cables, moving away from the creature as it slowly regain conscious after slamming onto the wall*`};
+        };
+        {--13
+            {L=`*Sizzling goo drips onto the floor as Russell regains his footing.*`};
+            {N="Mason"; L=`Russell!! Get out!`; F="Angry";};
+            {N="Russell"; L=`*Swiftly picks up the keycard he dropped but realizes his pistol is half melted away by its goo*`; F="Frustrated";};
+            {N="Russell"; L=`We got to use the keycard Mason! We need to get something out of this!`; F="Angry";};
+            {N="Mason"; L=`*Reluctantly agrees* Fine! *Takes another shot at the goo spewing giant.*`; F="Serious"};
+            {L="*The huge beast regains mobility and slowly turns towards Mason*"};
+            {N="Lennon"; L=`Oh now he mad!!`; F="Hehe"};
+        };
+        {--14
+            {N="Mason"; L=`Over here big guy!`; F="Smirk"};
+            {L=`*The big guy growls as it readys to charge.*`};
+            {N="Russell"; L=`*Slowly inching closer to an opening to get to the access panel.*`; F="Skeptical";};
+            {L=`*As the massive zombie starts charging, its leg gets tangled with a broken cable, but it forces through and drags the cable along as it charges towards Mason.*`};
+            {L=`*In a twist of fate, the coiled cables Russell was stepping over tightens around his foot.*`};
+            {N="Russell"; L=`*Gets knocked over, dropping the keycard and dragged along where the goo-titan was charging.*`};
+        };
+        {--15
+            {N="Mason"; L=`*Leaps and slide away a hair's breadth of collision and watches as the unstoppable force slams onto the metal plated walls.*`; F="Surprise"};
+            {N="Russell"; L=`Get this off me! *Struggling to untie himself from the old cable strangling his foot`; F="Frustrated"};
+            {N="Lennon"; L=`I'll help Russell, go get the keycard!`; F="Confident"};
+            {N="Mason"; L=`*Sprints towards the keycard, however a horde of zombies floods into the room, walking over the keycard.`; F="Skeptical";};
+            {N="Mason"; L=`This is not good, we are getting surrounded.`; F="Serious"};
+            {N="Lennon"; L=`*Untangles Russell from the cables and pulls out a rusty-but-trusty Grand Garand.`; F="Hehe"};
+        };
+        {--16
+            {N="Russell"; L=`Where have you been hiding that?!`; F="Question"};
+            {N="Lennon"; L=`Well, this piece of master craftmenship is actually a piece of antique passed down from generations to generation..`; F="Joyful"};
+            {N="Russell"; L=`Nevermind me asking.`; F="Bored"};
+            {N="Lennon"; L=`*Adjusts his scope and aim's down the sight.`; F="Yeesh"};
+            {N="Lennon"; L=`*Chambers a bullet and pulls the trigger.*`; F="Smirk"};
+        };
+        {--17
+            {L=`*As the Garand's clings echo, the projectile flies through head after heads of zombies.*`;};
+            {L=`*The bullet leaves glowing streak as it sparks hitting the wall and a loud zzzing, the bullet ricochets onto a few more zombies.*`;};
+            {N="Mason"; L=`Wow, look at it go!`; F="Surprise"};
+            {N="Russell"; L=`How on earth?!`; F="Surprise"};
+            {N="Mason"; L=`You sure are full of surprises Lennon..`; F="Smirk"};
+            {L=`*The corrosive gaint regains consciousness shaking and roaring and the room continues to flood with zombies.*`};
+        };
+        {--18
+            {N="Lennon"; L="There're way too many of them!"; F="Frustrated"};
+            {N="Mason"; L="Guess now it's a good of time as ever. *Pulls out a pear shaped device.*"; F="Serious"};
+            {N="Russell"; L="Is that what I think it is?"; F="Joyful"};
+            {N="Mason"; L="Yep, haha got it from the vending machine."; F="Smirk"};
+            {N="Mason"; L="Alright, get ready! That thing's going to charge at us, and I will drop this nade below him."};
+            {N="Lennon"; L="AND BLOW THEM ALL TO SMITHEREENS!"; F="Joyful"};
+        };
+        {--19
+            {L="**";};
+        };
     };
 };
 

@@ -51,7 +51,8 @@ function WorldCore.onRequire()
                 if playerClass == nil then continue end;
                 local playerCf = playerClass:GetCFrame();
                 if playerCf == nil or playerCf.Position.Y > 229 then continue end;
-
+                if math.abs(playerCf.Position.X) > 1000 or math.abs(playerCf.Position.Z) > 1000 then continue end;
+                
                 table.insert(validPlayers, playerClass);
             end
 

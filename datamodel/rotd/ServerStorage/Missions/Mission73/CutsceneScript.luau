@@ -4,8 +4,6 @@ local RunService = game:GetService("RunService");
 
 local localPlayer = game.Players.LocalPlayer;
 
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
-
 --== Variables;
 local MISSION_ID = 73;
 
