@@ -252,10 +252,10 @@ function remoteBlueprintHandler.OnServerInvoke(player, action, packet)
 		return rPacket;
 
 	elseif action == "build" then
-		local storageItemId = packet.StorageItemId; -- Is bp item if exist.
+		local siid = packet.StorageItemId; -- Is bp item if exist.
 		local itemId = packet.ItemId;
 
-		local bpStorageItem = storageItemId and inventory:Find(storageItemId) or nil;
+		local bpStorageItem = siid and inventory:Find(siid) or nil;
 		local bpLib;
 		
 		if bpStorageItem then
@@ -295,7 +295,7 @@ function remoteBlueprintHandler.OnServerInvoke(player, action, packet)
 		
 		ConsumeBlueprintCost(player, fulfillment);
 		if bpStorageItem then
-			inventory:Remove(storageItemId, 1, function()
+			inventory:Remove(siid, 1, function()
 				shared.Notify(player, string.gsub("$Item removed from your Inventory.", "$Item", bpStorageItem.Library.Name), "Negative");
 			end);
 		end

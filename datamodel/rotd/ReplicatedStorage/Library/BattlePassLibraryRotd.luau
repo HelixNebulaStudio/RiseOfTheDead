@@ -35,7 +35,8 @@ local function leaf(index, data)
 end
 
 function library.onRequire()
-	library.Active = RunService:IsStudio() and "rotd3" or "";
+	--MARK: ACTIVE EVENT PASS
+	library.Active = "rotd3";
 
 	-- Event pass Token shop
 	-- library.GiftShop = {
@@ -628,15 +629,22 @@ function library.onRequire()
 	-- MARK: rotd3
 	local STORY_ACCCESSGRANTED = "storyaccessgranted";
 	library:Add{
-		Id="rotd3";
-		EndUnixTime=1790726400;
+		Id = "rotd3";
+		EndUnixTime = 1798808400; --1790726400;
 
-		Title="Revived 3.0";
-		Icon="rbxassetid://79371010030621";
-		Desc="Unlock the Revived 3.0 Event Pass to claim more rewards!";
+		Title = "Revived 3.0";
+		Icon = "rbxassetid://79371010030621";
+		Desc = "Unlock the Revived 3.0 Event Pass to claim more rewards!";
 
-		CardsActive=true;
+		FreeUnlockInfo = {
+			Label = "Unlock for free if you are a player before 1st June 2026.";
+			DateStr = "June 1st 2026";
+			UnixTime = 1780318800;
+		};
 
+		CardsActive = true;
+
+		
 		Tree = newTree{
 			leaf(0, {
 				Story={Id=STORY_ACCCESSGRANTED;};
@@ -703,6 +711,77 @@ function library.onRequire()
 			leaf(42, {
 				Story={Id=STORY_ACCCESSGRANTED;};
 				Reward={ItemId="dualuzichevrons";};
+			});
+
+			leaf(45, {
+				Story={Id=STORY_ACCCESSGRANTED;};
+			});
+			leaf(48, {
+				Story={Id=STORY_ACCCESSGRANTED;};
+			});
+			leaf(51, {
+				Story={Id=STORY_ACCCESSGRANTED;};
+				Reward={ItemId="tirearmorlegion"; PassOwner=true;};
+			});
+
+			leaf(54, {
+				Story={Id=STORY_ACCCESSGRANTED;};
+			});
+			leaf(57, {
+				Story={Id=STORY_ACCCESSGRANTED;};
+			});
+			leaf(60, {
+				Story={Id=STORY_ACCCESSGRANTED;};
+				Reward={ItemId="militarybootsjades"; PassOwner=true;};
+			});
+			
+			leaf(63, {
+				Story={Id=STORY_ACCCESSGRANTED;};
+			});
+			leaf(66, {
+				Story={Id=STORY_ACCCESSGRANTED;};
+			});
+			leaf(69, {
+				Story={Id=STORY_ACCCESSGRANTED;};
+				Reward={ItemId="skinstuds";};
+			});
+
+			leaf(72, {
+				Story={Id=STORY_ACCCESSGRANTED;};
+			});
+			leaf(75, {
+				Story={Id=STORY_ACCCESSGRANTED;};
+			});
+			leaf(78, {
+				Story={Id=STORY_ACCCESSGRANTED;};
+				Reward={ItemId="mercskneepadsastropads"; PassOwner=true;};
+			});
+
+			leaf(81, {
+				Story={Id=STORY_ACCCESSGRANTED;};
+			});
+			leaf(84, {
+				Story={Id=STORY_ACCCESSGRANTED;};
+			});
+			leaf(87, {
+				Story={Id=STORY_ACCCESSGRANTED;};
+				Reward={ItemId="gasmaskjades"; PassOwner=true;};
+			});
+			
+			leaf(90, {
+				Story={Id=STORY_ACCCESSGRANTED;};
+			});
+			leaf(93, {
+				Story={Id=STORY_ACCCESSGRANTED;};
+			});
+			leaf(96, {
+				Story={Id=STORY_ACCCESSGRANTED;};
+				Reward={ItemId="highvisjacketterra";};
+			});
+
+			leaf(99, {
+				Story={Id=STORY_ACCCESSGRANTED;};
+				Reward={ItemId="militaryglovesastrogaunts"; PassOwner=true;};
 			});
 		};
 	};

@@ -1175,7 +1175,7 @@ MissionLibrary.New{
 	FactionRewards = {
 		{Type="Resource"; Id="Food"; Value=30;};
 		{Type="Score"; Value=1;};
-		{Type="Money"; Value=12000;};
+		{Type="Money"; Value=8000;};
 		{Type="SetFlag"; FlagKey="DistUnlocked_juggernog"; NewValue=true; Desc="Unlock Juggernog Distribution"};
 	};
 	FactionSuccessCriteria = {
@@ -1333,7 +1333,7 @@ MissionLibrary.New{
 		["addWall4"]={Index=4; Description="Build a spiked fence";};
 		["addWall5"]={Index=5; Description="Build a spiked fence";};
 	};
-	ObjectivesCompleteText="Return to Danny";
+	ObjectivesCompleteText = "Return to Danny";
 	GuideText="Talk to Danny to start";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Side};

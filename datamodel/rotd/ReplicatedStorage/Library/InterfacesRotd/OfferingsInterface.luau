@@ -8,10 +8,13 @@ local localPlayer = game.Players.LocalPlayer;
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibraryRotd);
+local modRewardsLibrary = shared.require(game.ReplicatedStorage.Library.RewardsLibrary);
+
 local modComponents = shared.require(game.ReplicatedStorage.Library.UI.Components);
 local modRadialImage = shared.require(game.ReplicatedStorage.Library.UI.RadialImage);
 local modUIUtil = shared.require(game.ReplicatedStorage.Library.UI.UIUtil);
 local modItemInterface = shared.require(game.ReplicatedStorage.Library.UI.ItemInterface);
+local modStorageInterface = shared.require(game.ReplicatedStorage.Library.UI.StorageInterface);
 
 local buttonRadialConfig = '{"version":1,"size":128,"count":256,"columns":8,"rows":8,"images":["rbxassetid://4744240077", "rbxassetid://4744242814", "rbxassetid://4744244749", "rbxassetid://4744244960"]}';
 
@@ -23,10 +26,21 @@ local interfacePackage = {
     };
 };
 interfacePackage.SigilChars.Default = interfacePackage.SigilChars.Greek;
+
+local TierColors = {
+    Color3.fromRGB(255, 255, 255);
+    Color3.fromRGB(0, 145, 255);
+    Color3.fromRGB(85, 0, 255);
+    Color3.fromRGB(212, 0, 255);
+    Color3.fromRGB(255, 0, 0);
+    Color3.fromRGB(255, 170, 0);
+};
 --==
 
 
 function interfacePackage.newInstance(interface: InterfaceInstance)
+    local modData = shared.require(localPlayer:WaitForChild("DataModule"));
+
     local remoteShopService = modRemotesManager:Get("ShopService");
     local swivelTemplate = script:WaitForChild("swivelTemplate");
     local priceFrameTemplate = script:WaitForChild("priceFrameTemplate");
@@ -42,16 +56,16 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     itemOfferSlot.Visible = false;
     local titleLabel = mainFrame:WaitForChild("TitleFrame"):WaitForChild("Title");
 
-	local window: InterfaceWindow = interface:NewWindow("OfferingsWindow", windowFrame);
-    window.BoolStringWhenActive = {String="!CharacterHud"; Priority=2;};
-	window.CompactFullscreen = true;
-    window.CloseWithInteract = true;
-    window.DisableInteractables = true;
-	window:SetClosePosition(UDim2.new(0.5, 0, -1.5, 0), UDim2.new(0.5, 0, 0.5, 0));
+	local offeringsWindow: InterfaceWindow = interface:NewWindow("OfferingsWindow", windowFrame);
+    offeringsWindow.BoolStringWhenActive = {String="!CharacterHud"; Priority=2;};
+	offeringsWindow.CompactFullscreen = true;
+    offeringsWindow.CloseWithInteract = true;
+    offeringsWindow.DisableInteractables = true;
+	offeringsWindow:SetClosePosition(UDim2.new(0.5, 0, -1.5, 0), UDim2.new(0.5, 0, 0.5, 0));
 
     mainFrame:WaitForChild("TitleFrame"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
         interface:PlayButtonClick();
-        window:Close();
+        offeringsWindow:Close();
     end)
 
     local acceptButtonObj = modComponents.CreateHoldDownButton(interface, {
@@ -80,7 +94,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
     local openSnd: Sound = nil;
 
-    local binds = window.Binds;
+    local binds = offeringsWindow.Binds;
     binds.Colors = setmetatable({}, {__index={
         Base = Color3.fromRGB(128, 0, 0);
         Ground = Color3.fromRGB(80, 0, 0);
@@ -181,14 +195,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             local raysImage = newGlowImage:WaitForChild("Rays");
             raysImage.Size = UDim2.new(2, 0, 2, 0);
             if rewardInfo.Tier then
-                local TierColors = {
-                    Color3.fromRGB(255, 255, 255);
-                    Color3.fromRGB(0, 145, 255);
-                    Color3.fromRGB(85, 0, 255);
-                    Color3.fromRGB(212, 0, 255);
-                    Color3.fromRGB(255, 0, 0);
-                    Color3.fromRGB(255, 170, 0);
-                };
                 local tC = TierColors[rewardInfo.Tier];
                 local th, ts, tv = tC:ToHSV();
                 raysImage.ImageColor3 = tC;
@@ -311,13 +317,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
             local rPacket = binds.RemoteInvoke("offeringsaccept", storageItem, storageItem.ID);
             if rPacket.Success then
-                window:Close();
+                offeringsWindow:Close();
                 modAudio.Play("Purchase",  windowFrame);
                 interface:ToggleWindow("Inventory", true);
 
             else
                 Debugger:Warn("Failed to accept offering", rPacket);
-                window:Close();
+                offeringsWindow:Close();
                 if rPacket.Fail == 5 then
                     Debugger:Warn("Insufficient gold");
                     interface:ToggleWindow("GoldMenu", true, "GoldPage");
@@ -335,7 +341,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             denyButtonObjButton.Visible = false;
             acceptButtonObjButton.Visible = false;
             if storageItem.Values.OL <= 0 then
-                window:Close();
+                offeringsWindow:Close();
             end
             modAudio.Play("ConcreteSmash", windowFrame).PlaybackSpeed = 1.5;
             task.delay(0.15, function()    
@@ -346,21 +352,24 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         end
     end
 
+    local function preload()
+        if openSnd == nil then
+            modAudio.Preload("HaloSpawn");
+            modAudio.Preload("GrandOpen");
+            modAudio.Preload("ConcreteSmash");
+            modAudio.Preload("FireBallBurst");
+            modAudio.Preload("Purchase");
+            modAudio.Preload("IntenseWooshImpact", 5);
+            openSnd = modAudio.Get("IntenseWooshImpact"):Clone();
+            openSnd.Parent = interface.ScreenGui;
+        end
+    end
 
     --MARK: OnToggle
-    window.OnToggle:Connect(function(visible, storageItem)
+    offeringsWindow.OnToggle:Connect(function(visible, storageItem)
         if visible then
-            if openSnd == nil then
-                modAudio.Preload("HaloSpawn");
-                modAudio.Preload("GrandOpen");
-                modAudio.Preload("ConcreteSmash");
-                modAudio.Preload("FireBallBurst");
-                modAudio.Preload("Purchase");
-                modAudio.Preload("IntenseWooshImpact", 5);
-                openSnd = modAudio.Get("IntenseWooshImpact"):Clone();
-                openSnd.Parent = windowFrame;
-            end
-            interface:HideAll{[window.Name]=true;};
+            preload();
+            interface:HideAll{[offeringsWindow.Name]=true;};
 
             local itemLib = storageItem.Library;
             titleLabel.Text = `{itemLib.Name}`;
@@ -409,7 +418,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             local offerCount = itemValues.O;
             if offerCount == nil then
                 Debugger:Warn(`Offering not properly initialized`);
-                window:Close();
+                offeringsWindow:Close();
                 return;
             end
 
@@ -513,6 +522,519 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
         end
     end)
+
+
+
+    --MARK: TradeUp
+	local tradeUpWindowFrame = script:WaitForChild("OfferingsWindow"):Clone();
+    tradeUpWindowFrame.Name = `TradeUpWindow`;
+	tradeUpWindowFrame.Parent = interface.ScreenGui;
+    
+    local tradeUpFrame = tradeUpWindowFrame:WaitForChild("Frame");
+    local tradeUpStroke = tradeUpFrame:WaitForChild("UIStroke");
+
+    local tradeUpPivotOptions = tradeUpFrame:WaitForChild("OptionsPivot");
+    local tradeUpFlashDecal = tradeUpFrame:WaitForChild("Flash");
+    local tradeUpBkgroundItem = tradeUpFrame:WaitForChild("BackgroundItem");
+    tradeUpBkgroundItem.Visible = false;
+    local tradeUpInfoFrame = tradeUpFrame:WaitForChild("TradeUpInfo");
+    tradeUpInfoFrame.Visible = true;
+    local tradeUpGlowContainer = tradeUpInfoFrame:WaitForChild("GlowContainer");
+    local tradeUpCounterLabel = tradeUpInfoFrame:WaitForChild("TradeUpCounter");
+    local descLabel = tradeUpInfoFrame:WaitForChild("Desc");
+    local tradeUpItemOfferSlot = tradeUpFrame:WaitForChild("ItemOfferSlot");
+    tradeUpItemOfferSlot.Visible = false;
+    local tradeUpTitleLabel = tradeUpFrame:WaitForChild("TitleFrame"):WaitForChild("Title");
+    
+	local tradeUpWindow: InterfaceWindow = interface:NewWindow("SkinTradeUp", tradeUpWindowFrame);
+    tradeUpWindow.BoolStringWhenActive = {String="!CharacterHud"; Priority=2;};
+	tradeUpWindow.CompactFullscreen = true;
+    tradeUpWindow.CloseWithInteract = true;
+    tradeUpWindow.DisableInteractables = true;
+	tradeUpWindow:SetClosePosition(UDim2.new(0.5, 0, -1.5, 0), UDim2.new(0.5, 0, 0.5, 0));
+
+    tradeUpFrame:WaitForChild("TitleFrame"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
+        interface:PlayButtonClick();
+        tradeUpWindow:Close();
+    end)
+
+    local lockInButton = tradeUpInfoFrame:WaitForChild("LockInButton");
+    local lockInStroke = lockInButton:WaitForChild("UIStroke");
+
+    --MARK: OnToggle
+    binds.TradeUpList = {};
+    binds.TradeUpTier = 1;
+
+    binds.TradeUpPacket = nil;
+
+    local optionButtonsList = {};
+    local lockInAlpha = 0;
+    local lockInLoop = false;
+
+    function binds.SubmitTradeUp()
+        local tradeUpPacket = binds.TradeUpPacket;
+        local tradeUpTier = binds.TradeUpTier;
+        binds.TradeUpPacket = nil;
+
+        task.spawn(function()
+            local rPacket = remoteShopService:InvokeServer("skintradeup", tradeUpPacket);
+            if rPacket == 5 then return end;
+
+            if rPacket and rPacket.Success then
+                local outputItemId = rPacket.OutputItemId;
+                if tradeUpWindow.Visible == false then return end;
+
+                local itemButtonObj = modItemInterface.newItemButton(outputItemId);
+                local itemImgButton = itemButtonObj.ImageButton;
+                itemImgButton.Name = "OutputItem";
+                itemImgButton.AnchorPoint = Vector2.new(0.5, 0.5);
+                itemImgButton.Position = UDim2.new(0.5, 0, 0.5, 0);
+                itemImgButton.Size = UDim2.new(0.8, 0, 0.8, 0);
+                local uiAspect = Instance.new("UIAspectRatioConstraint");
+                uiAspect.Parent = itemImgButton;
+
+                tradeUpGlowContainer:ClearAllChildren();
+                local newGlowImage = modItemInterface.newGlowEffect();
+                newGlowImage.Name = "ClaimGlow"
+                newGlowImage.ImageColor3 = Color3.fromRGB(255, 255, 255);
+                newGlowImage.ImageTransparency = 0.2;
+                local raysImage = newGlowImage:WaitForChild("Rays");
+                raysImage.Size = UDim2.new(2, 0, 2, 0);
+                if tradeUpTier then
+                    local tC = TierColors[tradeUpTier+1] or Color3.fromRGB(0, 255, 0);
+                    local th, ts, tv = tC:ToHSV();
+                    raysImage.ImageColor3 = tC;
+                    newGlowImage.ImageColor3 = Color3.fromHSV(th, ts*0.5, tv);
+                end
+                newGlowImage.ImageTransparency = 0.5;
+                newGlowImage.Size = UDim2.new(3, 0, 3, 0);
+                newGlowImage.Parent = tradeUpGlowContainer;
+                modAudio.Play("HaloSpawn", windowFrame);
+                
+                TweenService:Create(
+                    newGlowImage, 
+                    TweenInfo.new(10, Enum.EasingStyle.Linear, Enum.EasingDirection.In, -1, true), 
+                    {Size=UDim2.new(3.3, 0, 3.3, 0)}
+                ):Play();
+
+                for _, button in pairs(optionButtonsList) do
+                    button:WaitForChild("ItemIcon").ImageColor3 = Color3.fromRGB(150, 150, 150);
+                end
+
+                itemImgButton.MouseButton1Click:Connect(function()
+                    table.clear(binds.TradeUpList);
+                    binds.TradeUpPacket = nil;
+
+                    itemImgButton:Destroy();
+                    newGlowImage:Destroy();
+
+                    binds.TradeUpTier = nil;
+
+                    local invStorageInterface = modStorageInterface.getByName("DefaultInterface");
+                    if invStorageInterface then
+                        invStorageInterface:Update();
+                    end
+                    local premStorageInterface = modStorageInterface.getByName("PremiumInterface");
+                    if premStorageInterface then
+                        premStorageInterface:Update();
+                    end
+
+                    binds.RefreshTradeUpScreen();
+                end)
+
+                itemImgButton.Parent = tradeUpInfoFrame;
+                itemButtonObj:Update();
+            end
+        end)
+    end
+
+    lockInButton.MouseButton1Down:Connect(function()
+        interface:PlayButtonClick();
+
+        if lockInLoop == false then
+            lockInLoop = true;
+
+            task.spawn(function()
+                while lockInButton.Parent do
+                    local d = task.wait();
+                    if lockInButton.Parent == nil then return end;
+
+                    if interface.Properties.PrimaryInputDown == false then
+                        lockInAlpha -= d;
+                    end
+
+                    lockInAlpha = math.clamp(lockInAlpha, 0, 1);
+                    
+                    lockInStroke.Thickness = math.clamp((1-lockInAlpha) * 0.5, 0, 0.5);
+                end
+            end)
+        end
+        
+        task.spawn(function()
+            while lockInButton.Visible do
+                local d = task.wait();
+
+                lockInAlpha += d*2;
+
+                if lockInAlpha >= 0.65 and openSnd.IsPlaying ~= true then
+                    openSnd:Play();
+                end
+                if lockInAlpha >= 1 then
+                    lockInButton.Visible = false;
+                    
+                    binds.TradeUpPacket = {
+                        Ids = binds.TradeUpList;
+                    };
+
+                    --MARK: Trade Up Animation
+                    local preFire = false;
+                    task.spawn(function()
+                        local radialObjsList = {};
+
+                        for _, button in pairs(optionButtonsList) do
+                            button.AutoButtonColor = false;
+
+                            local progressRadialBar = button:WaitForChild("processBar") :: ImageLabel;
+                            local radialObj = modRadialImage.new(buttonRadialConfig, progressRadialBar);
+                            radialObj:UpdateLabel(0);
+                            progressRadialBar.Visible = true;
+
+                            table.insert(radialObjsList, radialObj);
+                        end
+
+                        for a=0, 1, 1/60 do
+                            task.wait();
+
+                            local alpha = TweenService:GetValue(a, Enum.EasingStyle.Quad, Enum.EasingDirection.Out);
+                            for b=1, #radialObjsList do
+                                local rObj = radialObjsList[b];
+                                rObj:UpdateLabel(alpha);
+                            end
+                            if tradeUpWindow.Visible == false then break; end;
+
+                            if a > 0.75 and preFire ~= true then
+                                preFire = true;
+
+                                modAudio.Play("FireBallBurst", windowFrame);
+                                binds.SubmitTradeUp();
+                            end
+                        end
+                    end)
+
+                    if not preFire then
+                        task.wait(0.89);
+                        binds.SubmitTradeUp();
+                    end
+
+                    break;
+                end
+                if not interface.Properties.PrimaryInputDown or not modUIUtil.IsMouseOver(lockInButton) then
+                    openSnd:Stop();
+                    break;
+                end
+
+            end
+        end)
+    end)
+
+
+    function binds.AddToTradeUp(siid)
+        if #binds.TradeUpList >= 5 then return end;
+
+        local storageItem = modData.GetItemById(siid);
+        if storageItem == nil then
+            Debugger:Warn(`Attempt to add non-existent item`, siid);
+            return;
+        end
+
+        local collectionRewardId = storageItem.Library.CollectionRewardId;
+        if collectionRewardId == nil then
+            Debugger:Warn(`Attempt to add non-tradeup-able.`, siid);
+            return;
+        end
+
+        local rewardLib = modRewardsLibrary:Find(collectionRewardId);
+        if rewardLib == nil then
+            Debugger:Warn(`Missing reward lib`);
+            return;
+        end
+
+        local firstTier = binds.TradeUpList[1];
+        if firstTier == nil then
+            binds.TradeUpTier = nil;
+        end
+
+        local tierInCollection = storageItem.Library.CollectionTier;
+        if binds.TradeUpTier and tierInCollection ~= binds.TradeUpTier then
+            Debugger:Warn(`Tier mismatch`, siid);
+            shared.Notify(localPlayer, "You can only add matching skin tiers to the upgrade.", "Negative");
+            return;
+        end
+        if tierInCollection >= rewardLib.MaxCollectionTier then
+            shared.Notify(localPlayer, `{storageItem.Library.Name} is already max tier.`, "Negative");
+            return;
+        end
+
+        binds.TradeUpTier = tierInCollection;
+
+
+        local maxQty = storageItem.Quantity;
+        local countExist = 0;
+        for a=1, #binds.TradeUpList do
+            if binds.TradeUpList[a] == siid then
+                countExist += 1;
+            end
+        end
+        if countExist >= maxQty then
+            Debugger:StudioWarn(`Attempt to add more {siid}`);
+            return;
+        end
+
+        tradeUpGlowContainer:ClearAllChildren();
+        table.insert(binds.TradeUpList, siid);
+
+
+        local invStorageInterface = modStorageInterface.getByName("DefaultInterface");
+        if invStorageInterface then
+            invStorageInterface:Update();
+        end
+        local premStorageInterface = modStorageInterface.getByName("PremiumInterface");
+        if premStorageInterface then
+            premStorageInterface:Update();
+        end
+
+        Debugger:Warn(`Add to trade:`, siid);
+    end
+
+    local function updateBind(storageInterface)
+        for id, buttonTable in pairs(storageInterface.Buttons) do
+            local itemLib = buttonTable.Item.Library;
+            
+            local isValid = false;
+            if itemLib.CollectionRewardId
+            and (binds.TradeUpTier == nil or itemLib.CollectionTier == binds.TradeUpTier) then
+                local rewardLib = modRewardsLibrary:Find(itemLib.CollectionRewardId);
+                if rewardLib and itemLib.CollectionTier < rewardLib.MaxCollectionTier then
+                    isValid = true;
+                end
+            end
+
+            buttonTable.ItemButtonObject.DimOut = not isValid;
+            buttonTable.ItemButtonObject:Update(buttonTable.Item);
+        end
+    end
+
+    local function bindItemClick(_, slot)
+        interface:PlayButtonClick();
+
+        local slotId = (slot and slot.ID or 0);
+        if slot.ItemButtonObject.DimOut ~= true then
+            binds.AddToTradeUp(slotId);
+            binds.RefreshTradeUpScreen();
+        end
+    end
+
+    function binds.BindInvUpdateReact()
+        local invStorageInterface = modStorageInterface.getByName("DefaultInterface");
+        if invStorageInterface then
+            invStorageInterface:HookUpdateBind(updateBind);
+            invStorageInterface:Update();
+        end
+
+        local premStorageInterface = modStorageInterface.getByName("PremiumInterface");
+        if premStorageInterface then
+            premStorageInterface:HookUpdateBind(updateBind);
+            premStorageInterface:Update();
+        end
+
+        local clothingStorageInterface = modStorageInterface.getByName("ClothingInterface");
+        if clothingStorageInterface then
+            clothingStorageInterface:HookUpdateBind(updateBind);
+            clothingStorageInterface:Update();
+        end
+        
+        for a=1, #interface.StorageInterfaces do
+            local storageInterface: StorageInterface? = interface.StorageInterfaces[a];
+            if storageInterface == nil or storageInterface.StorageId ~= "Inventory" and storageInterface.StorageId ~= "Clothing" then
+                continue;
+            end
+            storageInterface.OnItemButton1Click = bindItemClick;
+        end
+    end
+
+    function binds.UnbindInvUpdateReact()
+        local invStorageInterface = modStorageInterface.getByName("DefaultInterface");
+        if invStorageInterface then
+            invStorageInterface:UnhookUpdateBind(updateBind);
+            invStorageInterface:Update();
+        end
+
+        local premStorageInterface = modStorageInterface.getByName("PremiumInterface");
+        if premStorageInterface then
+            premStorageInterface:UnhookUpdateBind(updateBind);
+            premStorageInterface:Update();
+        end
+
+        local clothingStorageInterface = modStorageInterface.getByName("ClothingInterface");
+        if clothingStorageInterface then
+            clothingStorageInterface:UnhookUpdateBind(updateBind);
+            clothingStorageInterface:Update();
+        end
+        
+        for a=#interface.StorageInterfaces, 1, -1 do
+            local storageInterface: StorageInterface = interface.StorageInterfaces[a];
+            if storageInterface == nil then continue end;
+            if storageInterface.StorageId ~= "Inventory" and storageInterface.StorageId ~= "Clothing" then
+                continue;
+            end
+            storageInterface.OnItemButton1Click = storageInterface.BeginDragItem;
+
+            for id, buttonTable in pairs(storageInterface.Buttons) do
+                local itemLib = buttonTable.Item.Library;
+                
+                buttonTable.ItemButtonObject.DimOut = false;
+                buttonTable.ItemButtonObject:Update(buttonTable.Item);
+            end
+
+        end
+    end
+
+    function binds.RefreshTradeUpScreen()
+        tradeUpPivotOptions:ClearAllChildren();
+        table.clear(optionButtonsList);
+
+        for _, obj in pairs(tradeUpInfoFrame:GetChildren()) do
+            if obj.Name ~= "OutputItem" then continue end;
+            obj:Destroy();
+        end
+
+        
+        local tradeUpTier = binds.TradeUpTier or 1;
+        
+        local tierColor = modItemsLibrary.TierColors[tradeUpTier];
+        local tcH, tcS, tcV = tierColor:ToHSV();
+
+        tradeUpStroke.Color = Color3.fromHSV(tcH, tcS, 20/255);
+        tradeUpFrame.BackgroundColor3 = tradeUpStroke.Color;
+
+        local startRot = 180;
+        for a=#binds.TradeUpList, 1, -1 do
+            local siid = binds.TradeUpList[a];
+
+            local newOption = swivelTemplate:Clone();
+            newOption.LayoutOrder = a;
+            newOption.Rotation = startRot + (a * 72);
+            newOption.Size = UDim2.new(0, 10, 1, 40);
+            
+            local storageItem = modData.GetItemById(siid);
+            if storageItem == nil or storageItem.Quantity <= 0 then
+                table.remove(binds.TradeUpList, a);
+                continue;
+            end
+
+            local slotFrame = newOption:WaitForChild("Slot");
+            slotFrame.Rotation = -newOption.Rotation;
+            local button = slotFrame:WaitForChild("TextButton");
+            table.insert(optionButtonsList, button);
+
+            local itemLib = storageItem.Library;
+            local itemIcon = button:WaitForChild("ItemIcon");
+            itemIcon.Image = itemLib.Icon;
+            itemIcon.Visible = true;
+
+            newOption.Parent = tradeUpPivotOptions;
+            button.MouseButton1Click:Connect(function()
+                if binds.TradeUpPacket then return end;
+
+                interface:PlayButtonClick();
+
+                for a=#binds.TradeUpList, 1, -1 do
+                    if binds.TradeUpList[a] == siid then
+                        table.remove(binds.TradeUpList, a);
+                        break;
+                    end
+                end
+
+                if #binds.TradeUpList <= 0 then
+                    binds.TradeUpTier = nil;
+
+                    local invStorageInterface = modStorageInterface.getByName("DefaultInterface");
+                    if invStorageInterface then
+                        invStorageInterface:Update();
+                    end
+                    local premStorageInterface = modStorageInterface.getByName("PremiumInterface");
+                    if premStorageInterface then
+                        premStorageInterface:Update();
+                    end
+                end
+
+                Debugger:StudioWarn(`binds.TradeUpList`, binds.TradeUpList);
+                binds.RefreshTradeUpScreen();
+            end)
+
+            button.BackgroundColor3 = Color3.fromHSV(tcH, tcS, 50/255);
+            button:WaitForChild("processBar").ImageColor3 = Color3.fromHSV(tcH, tcS, 0.5);
+        end
+
+        if #binds.TradeUpList < 5 then
+            local addButtonFrame = swivelTemplate:Clone();
+            addButtonFrame.Name = `AddToTradeUp`;
+            addButtonFrame.LayoutOrder = 0;
+            addButtonFrame.Rotation = 180;
+            addButtonFrame.Size = UDim2.new(0, 10, 1, 40);
+            addButtonFrame.Parent = tradeUpPivotOptions;
+
+            local slotFrame = addButtonFrame:WaitForChild("Slot");
+            slotFrame.Rotation = -180;
+            local button = addButtonFrame:WaitForChild("Slot"):WaitForChild("TextButton");
+
+            button.MouseButton1Click:Connect(function()
+                interface:PlayButtonClick();
+                interface:ToggleWindow("Inventory", true);
+
+                binds.BindInvUpdateReact();
+
+                Debugger:StudioWarn(`binds.TradeUpList`, binds.TradeUpList);
+                binds.RefreshTradeUpScreen();
+            end)
+
+            button.BackgroundColor3 = Color3.fromHSV(tcH, tcS, 50/255);
+
+            local addPlusDecor = button:WaitForChild("AddPlus");
+            addPlusDecor.Visible = true;
+            addPlusDecor.BackgroundColor3 = Color3.fromHSV(tcH, tcS, 20/255);
+            addPlusDecor:WaitForChild("Frame").BackgroundColor3 = Color3.fromHSV(tcH, tcS, 20/255);
+        end
+        
+        tradeUpCounterLabel.Visible = #binds.TradeUpList < 5;
+        tradeUpCounterLabel.Text = `{#binds.TradeUpList}/5`;
+        descLabel.Visible = #binds.TradeUpList < 5;
+
+        lockInButton.BackgroundColor3 = Color3.fromHSV(tcH, tcS, 20/255);
+        lockInButton:WaitForChild("UIStroke").Color = Color3.fromHSV(tcH, tcS, 100/255);
+        lockInButton.Visible = #binds.TradeUpList >= 5;
+    end
+ 
+    tradeUpWindow.OnToggle:Connect(function(visible, storageItem)
+        if visible then
+            preload();
+
+            if storageItem then
+                binds.AddToTradeUp(storageItem.ID);
+                binds.BindInvUpdateReact();
+            end
+            binds.RefreshTradeUpScreen();
+
+        else
+            tradeUpGlowContainer:ClearAllChildren();
+            tradeUpPivotOptions:ClearAllChildren();
+            binds.UnbindInvUpdateReact();
+
+        end
+    end)
+
+
+
 
     modAudio.Preload("IntenseWooshImpact");
 end

@@ -368,6 +368,129 @@ if RunService:IsServer() then
 		return rPacket;
 	end)
 
+    --MARK: skintradeup
+    modShopSystem.RegisterActionHandler("skintradeup", function(player, ...)
+		local tradeUpPacket = ...;
+
+		local rPacket = {};
+
+		if tradeUpPacket == nil or tradeUpPacket.Ids == nil then
+			return rPacket;
+		end
+
+		local profile = shared.modProfile:Get(player);
+		local inventory = profile.ActiveInventory;
+
+		local tradeUpSiids = tradeUpPacket.Ids;
+		if #tradeUpSiids < 5 then
+			shared.Notify(player, "Failed to complete trade up. Missing trade up amount.", "Negative");
+			return rPacket;
+		end
+		
+		local siidCount = {};
+		
+		for a=1, #tradeUpSiids do
+			local siid = tradeUpSiids[a];
+			siidCount[siid] = (siidCount[siid] or 0) +1; 
+		end
+
+		local rewardCollections = {};
+		local tradingTier;
+
+		for a=1, #tradeUpSiids do
+			local siid = tradeUpSiids[a];
+			local needCount = siidCount[siid];
+			local storageItem = inventory:Find(siid);
+			if storageItem == nil or storageItem.Quantity < needCount then
+				shared.Notify(player, "Failed to complete trade up. Insufficient trade up items.", "Negative");
+				return rPacket;
+			end
+
+			local itemlib = storageItem.Library;
+			local collectionId = itemlib.CollectionRewardId;
+			if collectionId == nil or itemlib.CollectionTier == nil then
+				shared.Notify(player, "Failed to complete trade up. Trade up item missing collection data.", "Negative");
+				return rPacket;
+			end
+
+			local itemTier = itemlib.CollectionTier;
+			if tradingTier == nil then
+				tradingTier = itemTier;
+			else
+				if tradingTier ~= itemTier then
+					shared.Notify(player, "Failed to complete trade up. Trade up item invalid tier.", "Negative");
+					return rPacket;
+				end
+			end
+
+			local rewardLib = modRewardsLibrary:Find(collectionId);
+			if rewardLib == nil then
+				shared.Notify(player, `Failed to complete trade up. {storageItem.Library.Name} is missing collection library.`, "Negative");
+				return rPacket;
+			end
+
+			if itemTier >= rewardLib.MaxCollectionTier then
+				shared.Notify(player, `{storageItem.Library.Name} is already max tier.`, "Negative");
+				return rPacket;
+			end
+			
+			table.insert(rewardCollections, collectionId);
+		end
+
+		if #rewardCollections <= 0 then
+			shared.Notify(player, "Failed to complete trade up. Trade up item invalid collections.", "Negative");
+			return rPacket;
+		end
+
+		local nextTierRewards = {};
+		for a=1, #rewardCollections do
+			local rewardId = rewardCollections[a];
+
+			local rewardLib = modRewardsLibrary:Find(rewardId);
+			if rewardLib == nil then
+				shared.Notify(player, "Failed to complete trade up. Trade up collection missing library.", "Negative");
+				return rPacket;
+			end
+
+			for b=1, #rewardLib.Rewards do
+				local rewardInfo = rewardLib.Rewards[b];
+				if rewardInfo.Tier ~= (tradingTier+1) then continue end;
+				
+				table.insert(nextTierRewards, rewardInfo);
+			end
+		end
+
+
+		local pickRewardInfo = nextTierRewards[math.random(1, #nextTierRewards)];
+		if pickRewardInfo == nil then
+			shared.Notify(player, "Failed to complete trade up. No rewards.", "Negative");
+			return rPacket;
+		end
+		Debugger:StudioWarn(`nextTierRewards`, nextTierRewards, `pickRewardInfo`, pickRewardInfo);
+
+		for siid, qty in pairs(siidCount) do
+			local si = inventory:Find(siid);
+			if si == nil then
+				shared.Notify(player, "Failed to complete trade up. Missing trade up items.", "Negative");
+				return;
+			end
+			inventory:Remove(siid, qty, function()
+				shared.Notify(player, `{si.Library.Name} removed from your inventory.`, "Negative");
+			end);
+		end
+
+		rPacket.Success = true;
+		local rewardItemId = pickRewardInfo.ItemId;
+		local rewardItemLib = modItemsLibrary:Find(rewardItemId);
+
+		inventory:Add(rewardItemId, nil, function()
+			shared.Notify(player, `You received a {rewardItemLib.Name}.`, "Reward");
+		end);
+
+		rPacket.OutputItemId = pickRewardInfo.ItemId;
+
+		return rPacket;
+	end)
 end
 
 return UsablePreset;

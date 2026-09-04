@@ -16,6 +16,25 @@ local quan2m4 = {Min=2; Max=4};
 --==
 
 function library.onRequire()
+	library:SetOnAdd(function(data)
+		if data.CollectionName == nil then return end
+
+		local maxTier = 1;
+		for a=1, #data.Rewards do
+			local rewardInfo = data.Rewards[a];
+
+			local itemLib = modItemsLibrary:Find(rewardInfo.ItemId);
+			if itemLib == nil then continue end;
+
+			itemLib.CollectionRewardId = data.Id;
+			itemLib.CollectionTier = rewardInfo.Tier;
+
+			maxTier = math.max(maxTier, rewardInfo.Tier);
+		end
+
+		data.MaxCollectionTier = maxTier;
+	end)
+	
 	library:Add{
 		Id = "hordeattack_default";
 		Name = "World Event: Horde Attack";
@@ -429,6 +448,30 @@ function library.onRequire()
 		Id="frostivus2024";
 		Rewards={
 			{ItemId="xmaspresent2024"; Quantity=1; Chance=1;}; -- TokensAmount=5;
+		};
+	};
+
+	library:Add{
+		Id="rotd3";
+		CollectionName = "Revive 3.0";
+		Rewards={
+			{ItemId="leatherglovessurgical"; Tier=1; Quantity=1; Chance=1;};
+			{ItemId="dualuzichevrons"; Tier=1; Quantity=1; Chance=1;};
+			{ItemId="skinstuds"; Tier=1; Quantity=1; Chance=1;};
+			{ItemId="vexglovesdisposal"; Tier=1; Quantity=1; Chance=1;};
+			{ItemId="knightshelmetcorrupted"; Tier=1; Quantity=1; Chance=1;};
+
+			{ItemId="militarybootsjades"; Tier=2; Quantity=1; Chance=1/6;};
+			{ItemId="mercskneepadsastropads"; Tier=2; Quantity=1; Chance=1/6;};
+			{ItemId="greavesandsabatonscorrupted"; Tier=2; Quantity=1; Chance=1/6;};
+			{ItemId="gasmaskjades"; Tier=2; Quantity=1; Chance=1/6;};
+
+			{ItemId="highvisjacketterra"; Tier=3; Quantity=1; Chance=1/20;};
+			{ItemId="tirearmorlegion"; Tier=3; Quantity=1; Chance=1/20;};
+			{ItemId="dufflebaghighvis"; Tier=3; Quantity=1; Chance=1/20;};
+
+			{ItemId="militaryglovesastrogaunts"; Tier=4; Quantity=1; Chance=1/100;};
+			{ItemId="cowboyhattreasures"; Tier=4; Quantity=1; Chance=1/100;};
 		};
 	};
 

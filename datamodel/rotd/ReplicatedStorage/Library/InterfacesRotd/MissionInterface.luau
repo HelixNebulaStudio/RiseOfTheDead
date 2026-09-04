@@ -360,9 +360,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			else
 				pinnedTaskList.Visible = false;
 
-				local itemlib = missionData.SaveData.ItemId and modItemsLibrary:Find(missionData.SaveData.ItemId);
-				pinHudData.TaskText = missionLib.ObjectivesCompleteText:gsub("$ItemName", itemlib and itemlib.Name or missionData.SaveData.ItemId or "");
-			
+				if missionLib.ObjectivesCompleteText then
+					local itemlib = missionData.SaveData.ItemId and modItemsLibrary:Find(missionData.SaveData.ItemId);
+					pinHudData.TaskText = missionLib.ObjectivesCompleteText:gsub("$ItemName", itemlib and itemlib.Name or missionData.SaveData.ItemId or "");
+				end
+				
 			end
 		end
 
@@ -2785,6 +2787,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					local slotFrame = contentFrame:WaitForChild("Slot");
 					local descLabel = contentFrame:WaitForChild("Description");
 
+					local descStr = "";
+
 					if battlepassLib.BpPage then
 						contentFrame.Visible = false;
 						titleLabel.Visible = false;
@@ -2808,14 +2812,25 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						descLabel.Position = UDim2.new(0, 0, 0.6, 0);
 						descLabel.Size = UDim2.new(1, 0, 0, 0);
 						descLabel.ClipsDescendants = false;
-						descLabel.Text = battlepassLib.Desc;
 
+						descStr = battlepassLib.Desc;
 					end
 					
 					local bpPrice = 2450;
 
 					local claimButton = contentFrame:WaitForChild("ClaimButton");
 					claimButton.Text = `Unlock for {modFormatNumber.Beautify(bpPrice)} Gold`;
+
+					if curBpLib.FreeUnlockInfo then
+						descStr = descStr..`  Players joined before {curBpLib.FreeUnlockInfo.DateStr} can unlock for free!`;
+
+						if modData.Profile and modData.Profile.FirstJoined and modData.Profile.FirstJoined <= curBpLib.FreeUnlockInfo.UnixTime then
+							claimButton.Text = `Unlock for free!`;
+							bpPrice = 0;
+						end
+					end
+
+					descLabel.Text = descStr;
 					
 					claimButton.TextScaled = false;
 					claimButton.Position = UDim2.new(0.5, 0, 1, -40);
@@ -4045,7 +4060,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 				--== MARK: Final Level 
 				if pSeasonLevel > treeCount then
-					if finalSlotInfo.Slot == nil then
+					if finalSlotInfo.Slot == nil or finalSlotInfo.Slot.Parent == nil then
 						finalSlotInfo.Slot = templateLevelSlot:Clone();
 						finalSlotInfo.Slot.Size = UDim2.new(0, 160, 1, 0);
 						finalSlotInfo.Slot.LayoutOrder = 9999;
@@ -4066,13 +4081,17 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						padding.PaddingTop = UDim.new(0, 15);
 						padding.PaddingBottom = UDim.new(0, 15);
 						padding.Parent = finalLabel;
+
+						local uiSizeConstraint = Instance.new("UISizeConstraint");
+						uiSizeConstraint.MaxSize = Vector2.new(200, math.huge);
+						uiSizeConstraint.Parent = finalSlotInfo.Slot;
 						
 						finalSlotInfo.Label = finalLabel;
 						finalLabel.Parent = finalSlotInfo.Slot;
 					end
 
 					finalSlotInfo.BackgroundColor3 = BP_COLORS.CurrentPassOwner;
-					finalSlotInfo.Label.Text = "<b>Level ".. tostring(pSeasonLevel) .."</b>";
+					finalSlotInfo.Label.Text = `<b>Level {pSeasonLevel}</b>`;
 					finalSlotInfo.Slot.Parent = battlePassContent;
 					
 					battlePassContent.UIPadding.PaddingRight = UDim.new(0, 0);

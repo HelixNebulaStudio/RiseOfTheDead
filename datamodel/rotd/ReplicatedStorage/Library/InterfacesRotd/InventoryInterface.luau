@@ -481,6 +481,27 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	};
 	clothingStorageInterface:AddContextOption(clothingContextOption);
 
+
+	local tradeUpContextOption = {
+		Text = "Trade Up Skin";
+		Check = function(Table)
+			local itemLib = Table.Library;
+			return itemLib.CollectionRewardId ~= nil;
+		end;
+		Click = function(Table)
+			local skinTradeUpWindow = interface:GetWindow("SkinTradeUp");
+			if skinTradeUpWindow.Visible then
+				skinTradeUpWindow.OnToggle:Fire(true, Table.Item);
+			else
+				skinTradeUpWindow:Toggle(true, Table.Item);
+			end
+			
+		end
+	};
+	defaultStorageInterface:AddContextOption(tradeUpContextOption);
+	premiumStorageInterface:AddContextOption(tradeUpContextOption);
+
+
 	--== Storage extension;
 	local portableStorageInterfaces: {[string]: StorageInterface} = {};
 	local linkStorageFrame = invContainerFrame:WaitForChild("LinkedList");
@@ -526,6 +547,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			if portableStorageInterfaces[storageId] == nil then
 				portableStorageInterfaces[storageId] = modStorageInterface.new(storageId, inventoryFrame, slotFrames);
 				portableStorageInterfaces[storageId]:AddContextOption(usableContextOption);
+				portableStorageInterfaces[storageId]:AddContextOption(tradeUpContextOption);
 
 			else
 				portableStorageInterfaces[storageId]:UpdateSlotFrames(slotFrames);
