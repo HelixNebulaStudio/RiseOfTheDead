@@ -90,6 +90,7 @@ local HUD_TASK_ID = "PinnedMissionHudTask";
 local interfacePackage = {
     Type = "Character";
 };
+interfacePackage.EventStoryFlagCache = {};
 --==
 
 function interfacePackage.onRequire()
@@ -3040,14 +3041,17 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 								storyButton.Size = UDim2.new(0, 40, 0, 40);
 								storyButton.ImageColor3 = Color3.fromRGB(255, 255, 255);
 
-								local newGlow = storyButton:FindFirstChild("ClaimGlow") or modItemInterface.newGlowEffect();
-								newGlow.Name = "ClaimGlow"
-								newGlow.ImageColor3 = Color3.fromRGB(255, 255, 255);
-								newGlow.ImageTransparency = 0.6;
-								newGlow:WaitForChild("Rays").ImageColor3 = Color3.fromRGB(255, 255, 255);
-								newGlow.Parent = storyButton;
-								lvlSlotInfo.GlowLabel = newGlow;
+								if interfacePackage.EventStoryFlagCache[lvl] == nil then
+									interfacePackage.EventStoryFlagCache[lvl] = true;
 
+									local newGlow = storyButton:FindFirstChild("ClaimGlow") or modItemInterface.newGlowEffect();
+									newGlow.Name = "ClaimGlow"
+									newGlow.ImageColor3 = Color3.fromRGB(255, 255, 255);
+									newGlow.ImageTransparency = 0.6;
+									newGlow:WaitForChild("Rays").ImageColor3 = Color3.fromRGB(255, 255, 255);
+									newGlow.Parent = storyButton;
+									lvlSlotInfo.GlowLabel = newGlow;
+								end
 
 							elseif buttonState == "Viewed" then
 								for _, obj in pairs(storyButton:GetChildren()) do
@@ -3131,10 +3135,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 											end
 											
 										else
-											local cardListing = cardsListFrame:FindFirstChild(cKey);
-											if cardListing then
-												local uiShadow = cardListing:WaitForChild("UIShadow");
-												uiShadow.Enabled = false;
+											for _, cardListing in pairs(cardsListFrame:GetChildren()) do
+												local uiShadow = cardListing:FindFirstChild("UIShadow");
+												if uiShadow then
+													uiShadow.Enabled = false;
+												end
 											end
 
 										end
