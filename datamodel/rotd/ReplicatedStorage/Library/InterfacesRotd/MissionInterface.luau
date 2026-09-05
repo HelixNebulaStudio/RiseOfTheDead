@@ -24,6 +24,7 @@ local modStoriesLibrary = shared.require(game.ReplicatedStorage.Library.StoriesL
 local modDropRateCalculator = shared.require(game.ReplicatedStorage.Library.DropRateCalculator);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 local modVector = shared.require(game.ReplicatedStorage.Library.Util.Vector);
+local modTables = shared.require(game.ReplicatedStorage.Library.Util.Tables);
 
 local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.Library.NpcProfileLibrary);
 local modHeadIcons = shared.require(game.ReplicatedStorage.Library.HeadIcons);
@@ -336,7 +337,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			pinnedTaskList.Visible = false;
 			
 			local incomplete = false;
-			for name, objective in pairs(missionLib.Objectives) do
+			for name, objective in pairs(missionLib.Objectives or {}) do
 				local newTask = pinnedTaskList:FindFirstChild(name);
 				if newTask == nil then
 					newTask = taskTemplate:Clone();
@@ -3071,7 +3072,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 							elseif buttonState == "Next" then
 								for _, obj in pairs(storyButton:GetChildren()) do
-									if not obj:IsA("GuiObject") and obj.Name ~= "UIPadding"then continue end;
+									if not obj:IsA("GuiObject") and obj.Name ~= "UIPadding" then continue end;
 									obj:Destroy();
 								end
 								
@@ -3086,6 +3087,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 									local c = modBattlePassLibrary.BpCardIdsList[cardRng:NextInteger(1, #modBattlePassLibrary.BpCardIdsList)];
 									table.insert(cardCost, c);
 								end
+								
 								
 								local uiPadding = Instance.new("UIPadding");
 								uiPadding.PaddingLeft = UDim.new(0, 30);
@@ -3102,69 +3104,92 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 									if r and r.Success then
 										newUnlockButton:Destroy();
 									end
-
 								end)
 
-								local cardCount = {};
-								for a=1, #cardCost do
-									local cKey = cardCost[a];
-									local cardLib = modBattlePassLibrary.BpCardsList[cKey];
+								local function loadRequiredCards()
+									for _, obj in pairs(newUnlockButton:GetChildren()) do
+										if not obj:IsA("GuiObject") then continue end;
+										obj:Destroy();
+									end
+									
+									local cardCount = {};
+									for a=1, #cardCost do
+										local cKey = cardCost[a];
+										local cardLib = modBattlePassLibrary.BpCardsList[cKey];
 
-									cardCount[cKey] = (cardCount[cKey] or 0) +1;
+										cardCount[cKey] = (cardCount[cKey] or 0) +1;
 
-									local newCard = Instance.new("ImageLabel");
-									newCard.Size = UDim2.new(0, 35, 0, 35);
-									newCard.LayoutOrder = cardLib.Order;
-									newCard.BackgroundTransparency = 1;
-									newCard.Image = cardLib.Image;
-									newCard.Parent = newUnlockButton;
+										local newCard = Instance.new("ImageLabel");
+										newCard.Size = UDim2.new(0, 35, 0, 35);
+										newCard.LayoutOrder = cardLib.Order;
+										newCard.BackgroundTransparency = 1;
+										newCard.Image = cardLib.Image;
+										newCard.Parent = newUnlockButton;
 
-									newCard:GetPropertyChangedSignal("GuiState"):Connect(function()
-										if newCard.GuiState == Enum.GuiState.Hover then
-											local cardListing = cardsListFrame:FindFirstChild(cKey);
-											if cardListing then
-												local uiShadow = cardListing:WaitForChild("UIShadow");
-												uiShadow.Enabled = true;
-												uiShadow.Transparency = 1;
+										newCard:GetPropertyChangedSignal("GuiState"):Connect(function()
+											if newCard.GuiState == Enum.GuiState.Hover then
+												local cardListing = cardsListFrame:FindFirstChild(cKey);
+												if cardListing then
+													local uiShadow = cardListing:WaitForChild("UIShadow");
+													uiShadow.Enabled = true;
+													uiShadow.Transparency = 1;
 
-												TweenService:Create(
-													uiShadow, 
-													TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.In, -1, true, 0), 
-													{Transparency = 0;}
-												):Play();
-											end
-											
-										else
-											for _, cardListing in pairs(cardsListFrame:GetChildren()) do
-												local uiShadow = cardListing:FindFirstChild("UIShadow");
-												if uiShadow then
-													uiShadow.Enabled = false;
+													TweenService:Create(
+														uiShadow, 
+														TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.In, -1, true, 0), 
+														{Transparency = 0;}
+													):Play();
 												end
+												
+											else
+												for _, cardListing in pairs(cardsListFrame:GetChildren()) do
+													local uiShadow = cardListing:FindFirstChild("UIShadow");
+													if uiShadow then
+														uiShadow.Enabled = false;
+													end
+												end
+
 											end
+										end)
+										
+										local uiGlow = Instance.new("UIShadow");
+										uiGlow.BlurRadius = UDim.new(0, 10);
+										uiGlow.Color = Color3.new(1, 1, 1);
+										uiGlow.Spread = UDim2.new(0, 4, 0, 4);
+										uiGlow.Transparency = 0;
+										uiGlow.Parent = newCard;
 
-										end
-									end)
-									
-									local uiGlow = Instance.new("UIShadow");
-									uiGlow.BlurRadius = UDim.new(0, 10);
-									uiGlow.Color = Color3.new(1, 1, 1);
-									uiGlow.Spread = UDim2.new(0, 4, 0, 4);
-									uiGlow.Transparency = 0;
-									uiGlow.Parent = newCard;
+										TweenService:Create(
+											uiGlow, 
+											TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, -1, true, 0), 
+											{Transparency = 1;}
+										):Play();
+														
+										local seasonCards = seasonData.Cards or {};
+										local hasCard = (seasonCards[cKey] or 0) >= cardCount[cKey];
+										
+										newCard.ImageColor3 = hasCard and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150);
+										uiGlow.Enabled = hasCard;
+										
+									end
 
-									TweenService:Create(
-										uiGlow, 
-										TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, -1, true, 0), 
-										{Transparency = 1;}
-									):Play();
-													
-									local seasonCards = seasonData.Cards or {};
-									local hasCard = (seasonCards[cKey] or 0) >= cardCount[cKey];
-									
-									newCard.ImageColor3 = hasCard and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(150, 150, 150);
-									uiGlow.Enabled = hasCard;
-									
 								end
+								loadRequiredCards();
+
+								task.spawn(function()
+									local r = remoteBattlepassRemote:InvokeServer("unlockwithcards", lvl, true);
+									if r and typeof(r.CardCostDict) == "table" then
+										table.clear(cardCost);
+										
+										for cardName, c in pairs(r.CardCostDict) do
+											for i=1, c do
+												table.insert(cardCost, cardName);
+											end
+										end
+
+										loadRequiredCards();
+									end
+								end)
 
 							else
 								for _, obj in pairs(storyButton:GetChildren()) do

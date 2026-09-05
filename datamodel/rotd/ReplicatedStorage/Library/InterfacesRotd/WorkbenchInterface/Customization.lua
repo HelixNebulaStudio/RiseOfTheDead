@@ -1050,7 +1050,8 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 					if activeGroupName then
 						for a=1, #itemViewport.PartDataList do
 							local partData = itemViewport.PartDataList[a];
-							if partData.Group == activeGroupName then
+							if activeGroupName == "[All]"
+							or (partData.Group == activeGroupName) then
 								table.insert(partDataList, partData);
 							end
 						end
@@ -1614,7 +1615,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						customPlan.Skin = baseCustomPlan.BaseSkin;
 					end
 					customPlan.SkinTint = selectColor;
-				end)
+				end);
 			end
 			skinTintButton.MouseButton1Click:Connect(function()
 				if skinTintButton.Darken.Visible then return end;
@@ -2815,6 +2816,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 
 					elseif customPlan then
 						OnColorSelect(customPlan.Color);
+						OnSkinTintSelect(customPlan.SkinTint);
 
 						local newSkin = customPlan.Skin;
 						local skinId, variantId = modCustomizationData.GetSkinIds(newSkin);
