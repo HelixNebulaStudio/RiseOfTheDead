@@ -507,6 +507,7 @@ local WORLDS = {
         PrivateWorld = true;
         OverWorldIndex = 0;
         UseCachedPathfinding = true;
+        LoadLeaderboard = true;
     };
     NekronsGambit = {
         DisplayName = "Nekron's Gambit";

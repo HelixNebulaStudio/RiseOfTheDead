@@ -1603,7 +1603,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				newList.LayoutOrder = typeOrder;
 
 				if typeKey == "Premium" then -- Premium missions;
-					titleLabel.TextColor3 = Color3.fromRGB(185, 139, 0);
+					titleLabel.TextColor3 = interface.Colors.Premium;
 					collapseSign.BackgroundColor3 = titleLabel.TextColor3;
 					expandSign.BackgroundColor3 = titleLabel.TextColor3;
 					semiCollapseSign.BackgroundColor3 = titleLabel.TextColor3;
@@ -2223,8 +2223,16 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				if missionData.Type == 1 or missionData.Type == 3 then continue end;
 				countRepeatableMissions = countRepeatableMissions +1;
 			end
-			local repeatableTab, repeatableList = newMissionList("Board", 0, {ForceExpand=true;}); -- 
-			repeatableTab:WaitForChild("titleLabel").Text = "Missions Board: "..countRepeatableMissions
+			local repeatableTab, repeatableList = newMissionList("Board", 0, {ForceExpand=true;});
+
+			local repeatableTabHeader = repeatableTab:WaitForChild("titleLabel");
+			local maxBoardMissions = 6;
+			local maxCountColor = Color3.fromRGB(255, 255, 255);
+			if modData.IsPremium then
+				maxBoardMissions = 9;
+				maxCountColor = interface.Colors.Premium;
+			end
+			repeatableTabHeader.Text = `Missions Board: (<font color="#{maxCountColor:ToHex()}">{countRepeatableMissions}/{maxBoardMissions}</font>)`;
 
 			local hourlyMissionListing = repeatableList:FindFirstChild("hourlyMission");
 			local titleLabel;
@@ -2254,7 +2262,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						if missionData.Type == 1 or missionData.Type == 3 then continue end;
 						countRepeatableMissions = countRepeatableMissions +1;
 					end
-					repeatableTab:WaitForChild("titleLabel").Text = "Missions Board: "..countRepeatableMissions
+					if modData.IsPremium then
+						maxBoardMissions = 9;
+						maxCountColor = interface.Colors.Premium;
+					end
+					repeatableTabHeader.Text = `Missions Board: (<font color="#{maxCountColor:ToHex()}">{countRepeatableMissions}/{maxBoardMissions}</font>)`;
 
 					RightFrame:ClearAllChildren();
 
@@ -3020,6 +3032,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 									refreshData();
 									interface:PlayButtonClick();
 
+									interfacePackage.EventStoryFlagCache[lvl] = true;
 									binds.PlayStoryPackage(storyInfo.Id, storyInfo.Index);
 
 									if storyButton:FindFirstChild("ClaimGlow") then
@@ -3043,8 +3056,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 								storyButton.ImageColor3 = Color3.fromRGB(255, 255, 255);
 
 								if interfacePackage.EventStoryFlagCache[lvl] == nil then
-									interfacePackage.EventStoryFlagCache[lvl] = true;
-
 									local newGlow = storyButton:FindFirstChild("ClaimGlow") or modItemInterface.newGlowEffect();
 									newGlow.Name = "ClaimGlow"
 									newGlow.ImageColor3 = Color3.fromRGB(255, 255, 255);
@@ -3112,6 +3123,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 										obj:Destroy();
 									end
 									
+									newUnlockButton.Size = UDim2.new(0, (#cardCost*35)+10, 0, 45);
+								
 									local cardCount = {};
 									for a=1, #cardCost do
 										local cKey = cardCost[a];

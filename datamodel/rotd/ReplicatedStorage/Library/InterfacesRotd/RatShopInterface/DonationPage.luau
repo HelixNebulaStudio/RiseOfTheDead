@@ -37,13 +37,13 @@ local donateOptions = {
 
 function PageInterface:Load(interface: Interface, window: InterfaceWindow)
 	local keyTable = {
-		StatName="Gold";
-		AllTimeTableKey="AllTimeGoldDonor";
-		YearlyTableKey="YearlyGoldDonor";
-		SeasonlyTableKey="SeasonlyGoldDonor";
-		MonthlyTableKey="MonthlyGoldDonor";
-		WeeklyTableKey="WeeklyGoldDonor";
-		DailyTableKey="DailyGoldDonor";
+		StatName = "Gold";
+		AllTimeTableKey = "AllTimeGoldDonor";
+		YearlyTableKey = "YearlyGoldDonor";
+		SeasonlyTableKey = "SeasonlyGoldDonor";
+		MonthlyTableKey = "MonthlyGoldDonor";
+		WeeklyTableKey = "WeeklyGoldDonor";
+		DailyTableKey = "DailyGoldDonor";
 	};
 	
 	modLeaderboardService.ClientSyncRequest();

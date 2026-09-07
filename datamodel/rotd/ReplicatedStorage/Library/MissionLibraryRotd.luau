@@ -3204,10 +3204,11 @@ MissionLibrary.New{
 	};
 	SaveData = {Kills=20;};
 	GuideText = "";
-	Tier = "Easy";
+	Tier = "Normal";
 	Rewards = {
-		{Type="Perks"; Amount=PerksReward.Easy};
+		{Type="Perks"; Amount=PerksReward.Normal};
 		{Type="EventFlag"; Id="SafePage5"};
+		{Type="Card"; Amount=NumberRange.new(2, 2); Types={"wolf"; "rabbit"; "bear"};};
 	};
 	AddRequirements = {
 		{Type="Level"; Value=150};

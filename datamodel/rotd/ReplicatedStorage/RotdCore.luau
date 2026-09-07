@@ -7,7 +7,7 @@ local RotdCore = {};
 local modGlobalVars = shared.require(game.ReplicatedStorage.GlobalVariables);
 modGlobalVars.DevVersion="3.0.x";
 modGlobalVars.GameVersion = "3.0";
-modGlobalVars.GameBuild = "144";
+modGlobalVars.GameBuild = "145";
 modGlobalVars.ModeVerLabel = `$Fps fps\t$UpTime\tRotd $GameVersion $BranchName $IsMobile`;
 
 --==
@@ -95,6 +95,12 @@ if RunService:IsServer() then
         Mission7_UnlockedBloxmartGate = 24;
         Mission7_Complete = 25;
     };
+
+    modShopSystem = shared.require(game.ServerScriptService.ServerLibrary.ShopSystem);
+    modShopSystem.RegisterActionHandler("shopopen", function(player, ...)
+		modStatusEffects.DirectCamera(player, nil);
+	end)
+
 end
 
 function RotdCore.OnPlayerAdded(player)

@@ -162,7 +162,7 @@ if RunService:IsServer() then
 
 								task.spawn(function()
 									task.wait(3);
-									modStatusEffects.DirectCamera(player, Vector3.new(11.464, 57.691, -37.268), 3.5);
+									modStatusEffects.DirectCamera(player, Vector3.new(11.464, 58.691, -37.268), 10.5);
 								end)
 							end)
 						end)
@@ -207,6 +207,8 @@ if RunService:IsServer() then
 					dialog:SetInitiateTag("whereAmI_refill");
 					
 					if checkpoint == 7 then
+						modStatusEffects.DirectCamera(player, nil);
+
 						local function taskOffer(dialog)
 							dialog:AddChoice("whereAmI_acceptTask", function(dialog)
 								modMission:SetData(player, MISSION_ID, "accept", 1);

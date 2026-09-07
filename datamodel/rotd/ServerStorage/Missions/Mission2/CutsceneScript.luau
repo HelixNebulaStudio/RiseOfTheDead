@@ -20,8 +20,8 @@ if RunService:IsServer() then
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 	modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
 	modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
-
-	if modBranchConfigurations.IsWorld("TheWarehouse") then
+	
+	if shared.WorldName == "TheWarehouse" then
 		local function onDoorEnter(eventPacket: EventPacket, interactable: InteractableInstance)
 			local player: Player? = eventPacket.Player;
 			if player == nil then return end;
@@ -140,6 +140,7 @@ return function(CutsceneSequence)
 		local mission = modMission:GetMission(player, MISSION_ID);
 		if mission == nil then return end;
 
+		local profile = shared.modProfile:Get(player);
 		local playerClass: PlayerClass = shared.modPlayers.get(player);
 		
 		local masonNpcClass: NpcClass = modNpcs.getPlayerNpc(player, "Mason");
@@ -201,18 +202,20 @@ return function(CutsceneSequence)
 					end)
 					
 					modAnalyticsService:LogOnBoarding{
-						Player=player;
-						OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission2_WakeUp;
+						Player = player;
+						OnBoardingStep = modAnalyticsService.OnBoardingSteps.Mission2_WakeUp;
 					};
 
 					CutsceneSequence:NextScene("wakeUp");
 					task.spawn(function()
 						task.wait(6.5);
 						if mission.ProgressionPoint ~= 1 then return end;
-						modStatusEffects.DirectCamera(player, masonNpcClass.Head.Position, 5);
+						modStatusEffects.DirectCamera(player, masonNpcClass.Head.Position -Vector3.yAxis, 60);
 					end)
 
 				elseif mission.ProgressionPoint == 2 then
+					modStatusEffects.DirectCamera(player, nil);
+
 					CutsceneSequence:NextScene("enableInterfaces");
 
 					masonNpcClass.StopAnimation("Lean");
@@ -254,6 +257,20 @@ return function(CutsceneSequence)
 					masonNpcClass.Chat(masonNpcClass.Player, "Talk to Dr. Deniski");
 					masonNpcClass:ToggleInteractable(true);
 
+					task.spawn(function()
+						task.wait(5);
+
+						local abExp_ForceDirectCam = profile:GetPlayerConfig("Exp_ForceDirectCamera");
+						if RunService:IsStudio() then
+							abExp_ForceDirectCam = true;
+						end
+						if abExp_ForceDirectCam then
+							task.spawn(function()
+								modStatusEffects.DirectCamera(player, Vector3.new(4.31, 57.6, 4.797), 60);
+							end)
+						end
+					end)
+
 				elseif mission.ProgressionPoint == 3 then
 					CutsceneSequence:NextScene("enableInterfaces");
 
@@ -265,7 +282,7 @@ return function(CutsceneSequence)
 						
 					task.spawn(function()
 						task.wait(1);
-						modStatusEffects.DirectCamera(player, masonNpcClass.Head.Position, 2.5);
+						modStatusEffects.DirectCamera(player, masonNpcClass.Head.Position -Vector3.yAxis, 2.5);
 					end)
 
 				elseif mission.ProgressionPoint == 5 then
@@ -282,10 +299,33 @@ return function(CutsceneSequence)
 					masonNpcClass.Properties.CutsceneActive = false;
 
 				elseif mission.ProgressionPoint == 6 then
+					
+					local abExp_ForceDirectCam = profile:GetPlayerConfig("Exp_ForceDirectCamera");
+					if RunService:IsStudio() then
+						abExp_ForceDirectCam = true;
+					end
+					if abExp_ForceDirectCam then
+						task.spawn(function()
+							modStatusEffects.DirectCamera(player, Vector3.new(-9.704, 59.172, 18.53), 60);
+						end)
+					end
+					
 					local p250StorageItem = modStorage.FindItemIdFromStorages("p250", player);
 					if p250StorageItem then
 						p250StorageItem:SetValues("A", 0);
 						p250StorageItem:Sync({"A"});
+					end
+
+				elseif mission.ProgressionPoint == 7 then
+
+					local abExp_ForceDirectCam = profile:GetPlayerConfig("Exp_ForceDirectCamera");
+					if RunService:IsStudio() then
+						abExp_ForceDirectCam = true;
+					end
+					if abExp_ForceDirectCam then
+						task.spawn(function()
+							modStatusEffects.DirectCamera(player, Vector3.new(11.464, 57.691, -37.268), 60);
+						end)
 					end
 
 				elseif mission.ProgressionPoint == 9 then

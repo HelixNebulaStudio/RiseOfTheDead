@@ -785,6 +785,8 @@ function library.onRequire()
 			});
 		};
 	};
+
+	library.init();
 end
 
 return library;

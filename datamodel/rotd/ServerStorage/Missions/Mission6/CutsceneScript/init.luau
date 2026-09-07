@@ -8,6 +8,7 @@ local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 local modDestructibles = shared.require(game.ReplicatedStorage.Entity.Destructibles);
 local modPlayerNpcs = shared.require(game.ReplicatedStorage.Library.PlayerNpcs);
+local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
 
 local modVector = shared.require(game.ReplicatedStorage.Library.Util.Vector);
 
@@ -63,6 +64,9 @@ return function(CutsceneSequence)
 		local player: Player = players[1];
 		local mission = modMission:GetMission(player, MISSION_ID);
 		if mission == nil then return end;
+
+		local profile = shared.modProfile:Get(player);
+		local playerClass: PlayerClass = shared.modPlayers.get(player);
 		
 		local robertPlayerNpc: PlayerNpc = modPlayerNpcs.getPlayerNpc(player, "Robert");
 		robertPlayerNpc:SetCFrame{
@@ -127,6 +131,7 @@ return function(CutsceneSequence)
 			end
 
 			if mission.Type == 2 then -- OnAvailable
+				robertPlayerNpc:SetCFrame();
 				robertNpcClass.StopAnimation("Sit");
 				robertNpcClass.RootPart.Anchored = true;
 				robertPlayerNpc:SetCFrame{
@@ -136,6 +141,25 @@ return function(CutsceneSequence)
 
 				robertNpcClass.SetAnimation("Holding", {script:WaitForChild("RobertHoldingAnim")});
 				robertNpcClass.PlayAnimation("Holding");
+
+			
+				local abExp_ForceDirectCam = profile:GetPlayerConfig("Exp_ForceDirectCamera");
+				if RunService:IsStudio() then
+					abExp_ForceDirectCam = true;
+				end
+				if abExp_ForceDirectCam then
+					task.spawn(function()
+						while mission.Type == 2 do
+							task.wait(2);
+							if not game.Players:IsAncestorOf(player) then return end;
+							if robertNpcClass.Properties.M6SpokeTo then return end;
+
+							if (playerClass:GetCFrame().Position - BLOCKMART_CF.Position).Magnitude <= 26 then
+								modStatusEffects.DirectCamera(player, robertNpcClass:GetCFrame().Position +Vector3.yAxis*2, 2.5);
+							end
+						end
+					end)
+				end
 				
 			elseif mission.Type == 1 then -- OnActive
 				Debugger:Warn("B GetReplicated ",barricade);

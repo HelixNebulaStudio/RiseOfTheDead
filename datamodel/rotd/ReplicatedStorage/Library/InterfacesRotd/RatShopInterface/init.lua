@@ -14,6 +14,7 @@ local modBlueprintLibrary = shared.require(game.ReplicatedStorage.Library.Bluepr
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumber);
 local modBattlePassLibrary = shared.require(game.ReplicatedStorage.Library.BattlePassLibrary);
+local modLeaderboardService = shared.require(game.ReplicatedStorage.Library.LeaderboardService);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 local interfacePackage = {
@@ -129,6 +130,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             interface:ToggleWindow("Inventory", true);
             
 			task.spawn(function()
+				remoteShopService:InvokeServer("shopopen");
+			end)
+			task.spawn(function()
 				modData:GetFlag("ItemCodex", true);
 			end)
 			task.spawn(function()
@@ -142,14 +146,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 window:Close();
 			end)
 
-			-- if reselectSlot and reselectSlot.Button then
-			-- 	binds.onItemSelect(nil, reselectSlot);
-	
-			-- else
-                window:Update();
-				binds.LoadPage("Money");
-	
-			-- end
+			window:Update();
+			binds.LoadPage("Money");
+			
+			modLeaderboardService.ClientSyncRequest();
 			
 		else
 			game.Debris:AddItem(shopFrame:FindFirstChild("ToolTip"), 0);

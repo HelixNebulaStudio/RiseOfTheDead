@@ -9,6 +9,7 @@ local modGuiHighlight = shared.require(game.ReplicatedStorage.Library.UI.GuiHigh
 if RunService:IsClient() then
 	local modWaypoint = shared.require(game.ReplicatedStorage.Library.Waypoint);
 	local modPlayers = shared.require(game.ReplicatedStorage.Library.Players);
+	local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 	MissionFunctions.activeWaypoint = nil;
 	local player = game.Players.LocalPlayer;
@@ -86,6 +87,7 @@ if RunService:IsClient() then
 		Debugger:Log("Checkpoint 7");
 		modGuiHighlight.Set("MainInterface");
 		SetWaypoint();
+        modClientGuis.toggleWindow("Inventory", false);
 	end
 
 	function MissionFunctions.Cancel()

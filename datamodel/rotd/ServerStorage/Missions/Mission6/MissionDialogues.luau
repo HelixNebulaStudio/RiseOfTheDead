@@ -29,12 +29,21 @@ Dialogues.Robert.DialogueStrings = {
 };
 
 if RunService:IsServer() then
+	local modPlayerNpcs = shared.require(game.ReplicatedStorage.Library.PlayerNpcs);
+
 	-- !outline: Robert Handler
 	Dialogues.Robert.DialogueHandler = function(player, dialog, data, mission)
 		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 		local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
 
 		if mission.Type == 2 then -- Available;
+			task.spawn(function()
+				local robertPlayerNpc: PlayerNpc = modPlayerNpcs.getPlayerNpc(player, "Robert");
+				if robertPlayerNpc then
+					robertPlayerNpc.NpcClass.Properties.M6SpokeTo = true;
+				end
+			end)
+			
 			dialog:SetInitiate("Help!! I'm trapped!");
 			dialog:AddChoice("firstRescue_how", function(dialog)
 				dialog:AddChoice("firstRescue_standback", function(dialog)
