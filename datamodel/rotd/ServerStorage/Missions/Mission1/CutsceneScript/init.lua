@@ -348,7 +348,7 @@ return function(CutsceneSequence)
 								
 					equipmentClass:AddBaseModifier("npcDmg", {
 						SetValues = {
-							Damage = 20;
+							Damage = 10;
 						};
 						Priority = 999;
 					});
@@ -582,7 +582,7 @@ return function(CutsceneSequence)
 						CFrame = pickSpawn();
 						BindSetup = loadZombies;
 					};
-					task.wait(4);
+					task.wait(8);
 				end;
 			end
 			for a=1, 12 do
@@ -594,11 +594,11 @@ return function(CutsceneSequence)
 						CFrame = pickSpawn();
 						BindSetup = loadZombies;
 					};
-					task.wait(2);
+					task.wait(4);
 				end;
 			end
 		end);
-		for a=1, 60 do
+		for a=1, 120 do
 			task.wait(1);
 			if endSpawnLoop then break; end;
 		end

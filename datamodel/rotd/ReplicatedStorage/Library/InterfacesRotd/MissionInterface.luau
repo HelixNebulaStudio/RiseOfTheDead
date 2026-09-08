@@ -301,7 +301,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				missionHudTask = nil;
 			end
 			if pinHudData.TaskList then
-				pinnedTaskList.Visible = false;
+				pinHudData.TaskList:Destroy();
+				pinHudData.TaskList = nil;
 			end
 			return;
 		end
@@ -1922,12 +1923,25 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 			--MARK: Pinned Mission Render
 			if missionData.Pinned ~= true then return end;
+
 			if missionHudTask == nil then
 				local taskHudWindow: InterfaceWindow = interface:GetWindow("TaskListHud");
 				missionHudTask = taskHudWindow and taskHudWindow.Binds.getOrNewTask(HUD_TASK_ID, true) or nil;
 			end;
 			if missionHudTask == nil then return end;
 			
+			local function destroyTaskList()
+				if pinHudData.TaskList then
+					pinHudData.TaskList:Destroy();
+					pinHudData.TaskList = nil;
+				end
+			end
+
+			if pinHudData.MissionData and pinHudData.MissionData.Id ~= missionData.Id then
+				Debugger:StudioWarn(`Pinned mission changed`);
+				destroyTaskList();
+			end
+
 			pinHudData.MissionData = missionData;
 			pinHudData.HeaderText = `{missionLib.Name}{missionData.Redo and " (Redo)" or ""}`;
 
@@ -1964,13 +1978,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			end
 			binds.UpdatePinnedHud();
 			if missionData == nil then return end;
-
-			local function destroyTaskList()
-				if pinHudData.TaskList then
-					pinHudData.TaskList:Destroy();
-					pinHudData.TaskList = nil;
-				end
-			end
 
 			local isDev = shared.gameConfig.BranchName == "Dev";
 			if missionData.Type == 1 then
@@ -2216,6 +2223,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		end
 		
 		-- MARK: Repeatable Missions;
+		local dailyBoardBonusFlag = {Percent=0; Time=0;};
+
 		do
 			local countRepeatableMissions = 0;
 			for a=1, #repeatableMissionList do
@@ -2271,6 +2280,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					RightFrame:ClearAllChildren();
 
 					local missionBoard = templateMissionBoard:Clone();
+					local descPanel = missionBoard:WaitForChild("Desc");
 					missionBoard.Parent = RightFrame;
 					
 					local closeButton = missionBoard:WaitForChild("closeButton");
@@ -2278,9 +2288,71 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						RightFrame:ClearAllChildren();
 						binds.RefreshMissionMap();
 					end)
-					
-					local listFrame = missionBoard:WaitForChild("list");
 
+					local dailyBonus = missionBoard:WaitForChild("DailyBonus");
+					local barFrame = dailyBonus:WaitForChild("Bar");
+					local barFill = barFrame:WaitForChild("BarFill");
+					local dailyLabel = dailyBonus:WaitForChild("dailyLabel");
+					local activeStroke = dailyBonus:WaitForChild("UIStroke");
+
+					local filRatio = math.clamp( dailyBoardBonusFlag.Percent/100 , 0, 1);
+					barFill.Size = UDim2.new(filRatio, 0, 1, 0);
+
+					dailyBonus:GetPropertyChangedSignal("GuiState"):Connect(function()
+						if dailyBonus.GuiState == Enum.GuiState.Hover then
+							descPanel.Visible = true;
+							descPanel.Text = `Bonus daily board mission perks! Do a board mission daily to build up your daily bonuses. Grace period of 2 days and then -15% per day.`;
+						else
+							descPanel.Visible = false;
+						end
+					end)
+					
+					local nextMission = missionBoard:WaitForChild("NextMission");
+					local nextMissionLabel = nextMission:WaitForChild("nextLabel");
+					local radialBar = nextMission:WaitForChild("radialBar");
+					nextMission:GetPropertyChangedSignal("GuiState"):Connect(function()
+						if nextMission.GuiState == Enum.GuiState.Hover then
+							descPanel.Visible = true;
+							descPanel.Text = `Time until next board mission. New missions will be added every hour.`;
+						else
+							descPanel.Visible = false;
+						end
+					end)
+					
+					local canStartForDailyBonus = false;
+					local nextDailyBonusTime = 0;
+
+					task.spawn(function()
+						local radialBar = modRadialImage.new(TIMER_RADIAL_CONFIG, radialBar);
+
+						while localPlayer:IsAncestorOf(missionBoard) do
+							if window.Visible == false then break; end;
+
+							local missionCycleData = modData:GetEvent("missionCycleData");
+							if missionCycleData and missionCycleData.LastAddUnixTime ~= 0 then
+								local nextTime = missionCycleData.LastAddUnixTime + shared.Const.Hour;
+								local timeUntilNext = nextTime - workspace:GetServerTimeNow();
+								nextMissionLabel.Text = modSyncTime.toString(timeUntilNext);
+								
+								radialBar:UpdateLabel(1-math.clamp(timeUntilNext/shared.Const.Hour, 0, 0.89));
+							end
+
+							nextDailyBonusTime = dailyBoardBonusFlag 
+												and (dailyBoardBonusFlag.Time + shared.Const.Hours20) or 0;
+							canStartForDailyBonus = workspace:GetServerTimeNow() > nextDailyBonusTime;
+
+							if canStartForDailyBonus then
+								activeStroke.Enabled = true;
+							else
+								activeStroke.Enabled = false;
+							end
+							
+							task.wait(0.1);
+						end
+					end)
+
+
+					local listFrame = missionBoard:WaitForChild("list");
 					local hasActiveRepeatableMission = false;
 
 					local function refreshActiveRepeatable()
@@ -2308,8 +2380,20 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 								newButton.BackgroundColor3 = color;
 
 							end
-
 						end
+
+						task.spawn(function()
+							local getDailyBoardFlag = modData:GetFlag("DailyBoardBonus");
+							if getDailyBoardFlag then
+								dailyBoardBonusFlag = getDailyBoardFlag;
+							end
+							
+							local dailyBonusPercent = dailyBoardBonusFlag.Percent or 0;
+							local filRatio = math.clamp( dailyBonusPercent/100 , 0, 1);
+							barFill.Size = UDim2.new(filRatio, 0, 1, 0);
+
+							dailyLabel.Text = `+{dailyBonusPercent}%`;
+						end)
 					end
 
 					local lastMissionBoardUpdate = tick();
@@ -2319,7 +2403,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 						refreshActiveRepeatable();
 					end)
-
 
 					-- MARK: Board Missions Rendering
 					for a=1, #repeatableMissionList do
@@ -2376,6 +2459,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						
 						local perksLabel = generalRewardsFrame:WaitForChild("PerksReward");
 						if perksReward ~= nil then
+							if canStartForDailyBonus and dailyBoardBonusFlag.Percent > 0 then
+								perksReward += math.ceil(perksReward * (dailyBoardBonusFlag.Percent/100));
+							end
 							perksLabel.Visible = true;
 							perksLabel.TextLabel.Text = `{perksReward}`;
 						else
@@ -2441,35 +2527,70 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 							interface:PlayButtonClick();
 
+							local promptButtons = {
+								{
+									Text="Start";
+									Style="Confirm";
+									OnPrimaryClick=function(dialogWindow)
+										local statusLabel = dialogWindow.Binds.StatusLabel;
+										statusLabel.Text = "Starting<...>";
+										
+										local r = remoteMissionRemote:InvokeServer("MissionBoardStart", missionData.Id);
+										r = r or {};
+
+										if r.FailMsg then
+											statusLabel.Text = `Fail to start: {r.FailMsg}`;
+											task.wait(1);
+										else
+											task.wait(0.5);
+											binds.Select(missionData.Id);
+										end
+
+									end;
+								};
+								{
+									Text="Cancel";
+									Style="Cancel";
+								};
+							};
+
+							local descStr = descLabel.Text;
+							if canStartForDailyBonus then
+								table.insert(promptButtons, 1, {
+									Text = `Start for Daily Bonus`;
+									Style = "Confirm";
+									OnPrimaryClick=function(dialogWindow)
+										local statusLabel = dialogWindow.Binds.StatusLabel;
+										statusLabel.Text = "Starting<...>";
+										
+										local r = remoteMissionRemote:InvokeServer(
+											"MissionBoardStart", 
+											missionData.Id, {
+												StartAsDailyBonus = true;
+											});
+										r = r or {};
+
+										if r.FailMsg then
+											statusLabel.Text = `Fail to start: {r.FailMsg}`;
+											task.wait(1);
+										else
+											task.wait(0.5);
+											binds.Select(missionData.Id);
+										end
+
+									end;
+								});
+
+							else
+								local timeToNextDay = modSyncTime.toString(nextDailyBonusTime-workspace:GetServerTimeNow());
+								descStr = descStr..`\n\nNext Daily Bonus: {timeToNextDay}`;
+
+							end
+
 							modClientGuis.promptDialogBox({
-								Title=`Start <b>{titleLabel.Text}</b>?`;
-								Desc=`{descLabel.Text}`;
-								Buttons={
-									{
-										Text="Start";
-										Style="Confirm";
-										OnPrimaryClick=function(dialogWindow)
-											local statusLabel = dialogWindow.Binds.StatusLabel;
-											statusLabel.Text = "Starting<...>";
-											
-											local r = remoteMissionRemote:InvokeServer("MissionBoardStart", missionData.Id);
-											r = r or {};
-
-											if r.FailMsg then
-												statusLabel.Text = `Fail to start: {r.FailMsg}`;
-												task.wait(1);
-											else
-												task.wait(0.5);
-												binds.Select(missionData.Id);
-											end
-
-										end;
-									};
-									{
-										Text="Cancel";
-										Style="Cancel";
-									};
-								}
+								Title = `Start <b>{titleLabel.Text}</b>?`;
+								Desc = descStr;
+								Buttons = promptButtons;
 							});
 						end);
 
@@ -2485,6 +2606,14 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 				hourlyMissionListing.MouseButton1Click:Connect(function()
 					interface:PlayButtonClick();
+
+					task.spawn(function()
+						local getDailyBonus = modData:GetFlag("DailyBoardBonus", true);
+						if getDailyBonus then
+							dailyBoardBonusFlag = getDailyBonus;
+							loadBoardMissions();
+						end
+					end)
 
 					loadBoardMissions();
 				end)
@@ -2987,6 +3116,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					
 					if leafLib.Empty == true then
 						lvlSlot.Size = UDim2.new(0, 20, 1, 0);
+
+						local anyMissionHint = lvlSlotInfo.AnyMissionHint;
+						if anyMissionHint == nil and pSeasonLevel == lvl then
+							anyMissionHint = script:WaitForChild("AnyMissionHint"):Clone();
+							anyMissionHint.Parent = lvlSlot;
+						end
 						
 					else
 						lvlSlot.Size = UDim2.new(0, 0, 1, 0);
@@ -3435,6 +3570,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					end
 					
 					if pSeasonLevel > lvl then
+						if lvlSlotInfo.AnyMissionHint then
+							lvlSlotInfo.AnyMissionHint:Destroy();
+							lvlSlotInfo.AnyMissionHint = nil;
+						end
 						-- passed
 						if rewardInfo == nil then
 							lvlSlot.ImageColor3 = BP_COLORS.Normal
@@ -4175,7 +4314,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     interface.Garbage:Tag(modData.OnDataEvent:Connect(function(action, hierarchyKey, data)
         if action ~= "sync" then return end;
         
-        if hierarchyKey == "BattlePassSave" then
+        if hierarchyKey:sub(1, 14) == "BattlePassSave" then
             binds.UpdateBattlePass();
         end
         

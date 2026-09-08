@@ -66,7 +66,6 @@ function library.onRequire()
 			ColorMap="rbxassetid://95196813614980";
 		};
 		SurfaceAppearanceParent=script;
-		Hidden=true;
 	};
 
 	library:Add{
@@ -1415,7 +1414,6 @@ function library.onRequire()
 			ColorMap="rbxassetid://129799567178229";
 		};
 		SurfaceAppearanceParent=script;
-		Hidden=true;
 	};
 	
 	library:Add{

@@ -36,7 +36,7 @@ function WorldCore.InitGameController()
 
     newGameController.Objective = {
         Id = "Objective";
-        EnemyCap = 45;
+        EnemyCap = 35;
 
         HordeCycle = 999999;
         HordeSpawnRate = 1;
@@ -288,7 +288,10 @@ function WorldCore.InitMapLogic(gameController)
             if not interactable.Values.IsActive then return end;
 
             local duration = 60;
-            trainPrefab.TrainConfig:SetAttribute("TrainOffline", workspace:GetServerTimeNow()+duration);
+            
+            if workspace:IsAncestorOf(trainPrefab) then
+                trainPrefab.TrainConfig:SetAttribute("TrainOffline", workspace:GetServerTimeNow()+duration);
+            end
 
             trainInteractable:Reset();
             trainInteractable:SetPermissions("CanInteract", false);
@@ -317,7 +320,9 @@ function WorldCore.InitMapLogic(gameController)
             task.delay(duration, function()
                 modAudio.Play("DustbinHorn", interactable.Part);
 
-                trainPrefab.TrainConfig:SetAttribute("TrainOffline", nil);
+                if workspace:IsAncestorOf(trainPrefab) then
+                    trainPrefab.TrainConfig:SetAttribute("TrainOffline", nil);
+                end
                 trainInteractable:SetPermissions("CanInteract", true);
                 sethud();
                 sndGateOpening:Stop();
@@ -332,7 +337,10 @@ function WorldCore.InitMapLogic(gameController)
             if not interactable.Values.IsActive then return end;
 
             local duration = 60;
-            trainPrefab.TrainConfig:SetAttribute("TrainOffline", workspace:GetServerTimeNow()+duration);
+
+            if workspace:IsAncestorOf(trainPrefab) then
+                trainPrefab.TrainConfig:SetAttribute("TrainOffline", workspace:GetServerTimeNow()+duration);
+            end
 
             trainInteractable:Reset();
             trainInteractable:SetPermissions("CanInteract", false);
@@ -372,7 +380,9 @@ function WorldCore.InitMapLogic(gameController)
             task.delay(duration, function()
                 modAudio.Play("DustbinHorn", interactable.Part);
 
-                trainPrefab.TrainConfig:SetAttribute("TrainOffline", nil);
+                if workspace:IsAncestorOf(trainPrefab) then
+                    trainPrefab.TrainConfig:SetAttribute("TrainOffline", nil);
+                end
                 trainInteractable:SetPermissions("CanInteract", true);
 
                 sndGateOpening:Stop();

@@ -9,12 +9,14 @@ local BOARD_TIME_LIMIT = 3600;
 local FACTION_MISSION_EXPIRE_TIME = 3600*20;
 
 local PerksReward = {
-	Core=5;
-	Side=20;
+	Core = 5;
+	Side = 20;
 	
-	Easy=5;
-	Normal=10;
-	Hard=25;
+	Easy = 5;
+	Normal = 10;
+	Hard = 25;
+	Extreme = 40;
+	Insane = 80;
 };
 MissionLibrary.PerksReward = PerksReward;
 
@@ -95,12 +97,13 @@ MissionLibrary.New{
 		{Text="Kill $Kills zombies"; Notify=true;};
 		{Text="Return to Nick"; Notify=true;};
 	};
-	SaveData = {Kills=10;};
+	SaveData = {Kills=5;};
 	GuideText = "";
 	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Mission"; Id=5};
+		{Type="Item"; ItemId="metal"; Quantity=50;};
 	};
 	Markers = {
 		[1]={World="TheWarehouse"; Label="Mason"; Target="Mason"; Type=modMarkers.MarkerTypes.Npc;};
@@ -3208,7 +3211,7 @@ MissionLibrary.New{
 	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Normal};
 		{Type="EventFlag"; Id="SafePage5"};
-		{Type="Card"; Amount=NumberRange.new(2, 2); Types={"wolf"; "rabbit"; "bear"};};
+		{Type="Card"; Amount=NumberRange.new(1, 2); Types={"wolf"; "rabbit"; "bear"};};
 	};
 	AddRequirements = {
 		{Type="Level"; Value=150};
@@ -3292,6 +3295,41 @@ MissionLibrary.New{
 	};
 	AddRequirements = {
 		{Type="Level"; Value=200};
+	};
+	
+};
+
+--MARK: 94 - Priority Raid
+MissionLibrary.New{
+	MissionId = 94;
+	MissionType = MissionLibrary.MissionTypes.Board;
+	Name = "Priority Raid";
+	Description = "A large horde has been spotted to be infesting a facility!";
+	Timer = BOARD_TIME_LIMIT;
+	Persistent = true;
+	Checkpoint = {
+		{Text="Complete Raid: $Raid";};
+	};
+	SaveData = {
+		Raid = function()
+			local list = {
+				"Office";
+				"BanditOutpost";
+				"Tombs";
+				"Railways";
+				"Abandoned Bunker";
+			};
+			return list[math.random(1, #list)];
+		end;
+	};
+	GuideText = "";
+	Tier = "Hard";
+	Rewards = {
+		{Type="Perks"; Amount=PerksReward.Hard};
+		{Type="Card"; Amount=NumberRange.new(2, 2); Types={"snake"; "lion"};};
+	};
+	AddRequirements = {
+		{Type="Level"; Value=20};
 	};
 	
 };

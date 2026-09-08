@@ -1726,7 +1726,7 @@ function BlueprintLibrary.onRequire()
 		Product="ammobox";
 		Duration=10;
 		Requirements={
-			{Type="Item"; ItemId="metal"; Amount=100};
+			{Type="Item"; ItemId="metal"; Amount=25};
 			{Type="Item"; ItemId="gunpowder"; Amount=25};
 		};
 		CanUnlock=true;

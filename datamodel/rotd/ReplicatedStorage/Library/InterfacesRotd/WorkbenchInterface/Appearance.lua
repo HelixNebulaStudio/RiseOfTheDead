@@ -140,7 +140,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						isUnlocked = true;
 					end
 					
-					if unlockItemLib.Hidden ~= true or shared.gameConfig.BranchName == "Dev" or localPlayer.UserId == 16170943 then
+					if unlockItemLib.Hidden ~= true then
 						-- MARK: New UnlockableButton 
 						local unlockButton = unlockButtonTemplate:Clone();
 						local txrLabel = unlockButton:WaitForChild("TextureLabel");

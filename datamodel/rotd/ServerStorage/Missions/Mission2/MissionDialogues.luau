@@ -70,7 +70,7 @@ Dialogues.Nick.DialogueStrings = {
 	};
 	["whereAmI_firstTask"]={
 		Say="Yes, I refilled the gun."; 
-		Reply="Alrighty, there are a couple of zombies outside the warehouse, perhaps you can take care of it?";
+		Reply="Alrighty, there are a couple of zombies outside the warehouse, take care of it, and I'll give you a reward for it.";
 	};
 
 	["whereAmI_refill"]={
@@ -104,7 +104,7 @@ Dialogues.Nick.DialogueStrings = {
 	["whereAmI_taskComplete"]={
 		Face="Confident"; 
 		Say="There were too many, but I killed enough to prevent more damage on the gates."; 
-		Reply="Hmmm, I guess that will do for now, thanks.\n\nTalk to Mason, he can teach you how to upgrade your weapons.";
+		Reply="Hmmm, I guess that will do for now, thanks. Here's 50 Metal Scraps for your effort.\n\nTalk to Mason, he can teach you how to upgrade your weapons.";
 	};
 };
 
