@@ -71,7 +71,12 @@ function presetPackage.BindInit(storage: Storage)
             ItemSKU = `Rental:RatStorage`;
         };
 
-        storage.Values.RentalUnlockTime = workspace:GetServerTimeNow() + shared.Const.OneDaySecs;
+        local rentalUnlockDuration = shared.Const.OneDaySecs;
+        if shared.gameConfig.BranchName == "Dev" then
+            rentalUnlockDuration = 60;
+        end
+
+        storage.Values.RentalUnlockTime = workspace:GetServerTimeNow() + rentalUnlockDuration;
         rPacket.Success = true;
         
         if rPacket.Storages == nil then
