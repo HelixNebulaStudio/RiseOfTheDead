@@ -5,6 +5,8 @@ local modItemModsLibrary = shared.require(game.ReplicatedStorage.Library.ItemMod
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 
 local modRichFormatter = shared.require(game.ReplicatedStorage.Library.UI.RichFormatter);
+
+local modTables = shared.require(game.ReplicatedStorage.Library.Util.Tables);
 --
 local BlueprintLibrary = {};
 BlueprintLibrary.Identifiers = {};

@@ -11,7 +11,7 @@ library:Add{
 		Percent={Base=50; Max=75};
 	};
 	
-	Level=40;
+	Level=21;
 	UpgradeCost=20;
 	MaxLevel=5;
 };
@@ -27,7 +27,7 @@ library:Add{
 		Percent={Base=60; Max=110};
 	};
 
-	Level=60;
+	Level=41;
 	UpgradeCost=20;
 	MaxLevel=5;
 };
@@ -43,7 +43,7 @@ library:Add{
 		Cooldown={Base=5; Max=1};
 	};
 
-	Level=60;
+	Level=61;
 	UpgradeCost=20;
 	MaxLevel=5;
 };

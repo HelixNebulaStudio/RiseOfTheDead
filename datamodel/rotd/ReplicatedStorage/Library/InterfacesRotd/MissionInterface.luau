@@ -1938,7 +1938,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			end
 
 			if pinHudData.MissionData and pinHudData.MissionData.Id ~= missionData.Id then
-				Debugger:StudioWarn(`Pinned mission changed`);
 				destroyTaskList();
 			end
 
@@ -3120,6 +3119,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						local anyMissionHint = lvlSlotInfo.AnyMissionHint;
 						if anyMissionHint == nil and pSeasonLevel == lvl then
 							anyMissionHint = script:WaitForChild("AnyMissionHint"):Clone();
+							lvlSlotInfo.AnyMissionHint = anyMissionHint;
 							anyMissionHint.Parent = lvlSlot;
 						end
 						
@@ -4313,7 +4313,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
     interface.Garbage:Tag(modData.OnDataEvent:Connect(function(action, hierarchyKey, data)
         if action ~= "sync" then return end;
-        
+        if hierarchyKey == nil then return end;
+		
         if hierarchyKey:sub(1, 14) == "BattlePassSave" then
             binds.UpdateBattlePass();
         end
@@ -4324,6 +4325,26 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         end
     end));
 
+    modClientGuis.bindGuiRemote("missionsunlocked", function(missionsUnlockedList)
+        local qbNotifications: InterfaceElement = interface:GetOrDefaultElement("QuickButtonsNotifications");
+        if qbNotifications == nil then return end;
+
+        local notifyItems = {};
+        for a=1, #missionsUnlockedList do
+            local mId = missionsUnlockedList[a];
+
+			local missionLib = modMissionsLibrary:Find(mId);
+			if missionLib == nil then Debugger:Warn(`Invalid QBNotify Mission={mId}`); continue end;
+			local npcLib = modNpcProfileLibrary:Find(missionLib.From);
+
+            table.insert(notifyItems, {
+                Icon = npcLib and npcLib.Avatar or `rbxassetid://15641359355`;
+                Desc = `Mission Unlocked\n{missionLib.Name}`;
+            })
+        end
+
+        qbNotifications.queueNotify("Missions", notifyItems);
+    end)
 end
 
 return interfacePackage;

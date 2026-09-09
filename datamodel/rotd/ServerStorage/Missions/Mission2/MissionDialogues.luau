@@ -195,7 +195,7 @@ if RunService:IsServer() then
 						end)
 						modMission:Progress(player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint < 6 then
-								mission.SaveData.Kills = 10;
+								mission.SaveData.Kills = 5;
 								mission.ProgressionPoint = 6
 							end;
 						end)

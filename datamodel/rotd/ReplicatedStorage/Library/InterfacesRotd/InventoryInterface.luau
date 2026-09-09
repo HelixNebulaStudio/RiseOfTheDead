@@ -925,6 +925,26 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		modStorageInterface.RefreshSiid(siid);
 	end))
 	
+    modClientGuis.bindGuiRemote("specialpickup", function(itemIds)
+        local qbNotifications: InterfaceElement = interface:GetOrDefaultElement("QuickButtonsNotifications");
+        if qbNotifications == nil then return end;
+
+        local notifyItems = {};
+        for a=1, #itemIds do
+            local itemId = itemIds[a];
+			local itemLib = modItemsLibrary:Find(itemId);
+			if itemLib == nil then Debugger:Warn(`Invalid QBNotify Item={itemId}`); continue end;
+			
+            table.insert(notifyItems, {
+                Icon = itemLib.Icon;
+                Desc = `Picked Up\n{itemLib.Name}`;
+            })
+        end
+
+        qbNotifications.queueNotify("Inventory", notifyItems);
+    end)
+
+
 end
 
 return interfacePackage;

@@ -31,7 +31,7 @@ library:Add{
 		Percent={Base=10; Max=60};
 	};
 	
-	Level=15;
+	Level=40;
 	UpgradeCost=10;
 	MaxLevel=5;
 	
@@ -57,7 +57,7 @@ library:Add{
 		Percent={Base=15; Max=40};
 	};
 	
-	Level=15;
+	Level=25;
 	UpgradeCost=5;
 	MaxLevel=5;
 
@@ -83,7 +83,7 @@ library:Add{
 		Percent={Base=15; Max=40};
 	};
 	
-	Level=20;
+	Level=55;
 	UpgradeCost=10;
 	MaxLevel=5;
 };
@@ -99,7 +99,7 @@ library:Add{
 		Percent={Base=10; Max=30};
 	};
 	
-	Level=20;
+	Level=50;
 	UpgradeCost=10;
 	MaxLevel=5;
 };
@@ -115,7 +115,7 @@ library:Add{
 		Amount = {Base=0.01; Max=0.05};
 	};
 
-	Level = 25;
+	Level = 60;
 	UpgradeCost = 20;
 	MaxLevel = 5;
 	
@@ -149,7 +149,7 @@ library:Add{
 		Percent={Base=10; Max=85};
 	};
 
-	Level=25;
+	Level=65;
 	UpgradeCost=20;
 	MaxLevel=5;
 };

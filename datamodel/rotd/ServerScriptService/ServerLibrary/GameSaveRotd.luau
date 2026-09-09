@@ -324,6 +324,16 @@ function modGameSave:CalculateLevel()
 		if self.Profile then
 			task.spawn(function()
 				self.Profile:GuiAction("glowquickbutton", "MasteryMenu");
+
+				local skillUnlockedList = {};
+				for a=1, #modSkillTreeLibrary.SkillsIndexList do
+					local skillLib = modSkillTreeLibrary.SkillsIndexList[a];
+					if skillLib.Level == totalLevels then
+						table.insert(skillUnlockedList, skillLib.Id);
+					end
+				end
+				
+				self.Profile:GuiAction("skillsunlocked", skillUnlockedList);
 			end)
 		end
 		remoteHudNotification:FireClient(player, "Levelup", {Level=totalLevels;});

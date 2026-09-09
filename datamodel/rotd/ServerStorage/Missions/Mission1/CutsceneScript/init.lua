@@ -534,6 +534,11 @@ return function(CutsceneSequence)
 			properties.CanForgetTargets = false;
 			properties.DropRewardId = nil;
 
+			local configurations: ConfigVariable = npcClass.Configurations;
+			local weakenedDmgModifier = npcClass.Configurations.newModifier("WeakenedDmg");
+			weakenedDmgModifier.SetValues.AttackDamage = 5;
+			configurations:AddModifier(weakenedDmgModifier, true); 
+
 			npcClass.Move:SetMoveSpeed("set", "forcespeed", 6, 9);
 
 			npcClass.HealthComp.OnIsDeadChanged:Connect(function(isDead)

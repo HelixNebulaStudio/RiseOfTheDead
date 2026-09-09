@@ -15,6 +15,7 @@ local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.Br
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modKeyBindsHandler = shared.require(game.ReplicatedStorage.Library.KeyBindsHandler);
+local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 local modRadialImage = shared.require(game.ReplicatedStorage.Library.UI.RadialImage);
 local modNodeGridUI = shared.require(game.ReplicatedStorage.Library.UI.NodeGridUI);
@@ -66,6 +67,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
     local window: InterfaceWindow = interface:NewWindow("MasteryMenu", masteryFrame);
     window.BoolStringWhenActive = {String="!HotbarsHud"; Priority=2;};
+    window.DisableInteractables = true;
 	window.CompactFullscreen = true;
     window.CloseWithInteract = true;
 	
@@ -863,6 +865,26 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
         window:Update();
 	end))
+
+
+    modClientGuis.bindGuiRemote("skillsunlocked", function(skillsUnlockedList)
+        local qbNotifications: InterfaceElement = interface:GetOrDefaultElement("QuickButtonsNotifications");
+        if qbNotifications == nil then return end;
+
+        local notifyItems = {};
+        for a=1, #skillsUnlockedList do
+            local skillId = skillsUnlockedList[a];
+            local skillLib = modSkillTreeLibrary:Find(skillId);
+            if skillLib == nil then Debugger:Warn(`Invalid QBNotify Skill={skillId}`); continue end;
+
+            table.insert(notifyItems, {
+                Icon = skillLib.Icon;
+                Desc = `Skill Unlocked\n{skillLib.Name}`;
+            })
+        end
+
+        qbNotifications.queueNotify("MasteryMenu", notifyItems);
+    end)
 
 end
 
