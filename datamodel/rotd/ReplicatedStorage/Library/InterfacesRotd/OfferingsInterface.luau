@@ -216,7 +216,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             newPrice.Position = UDim2.new(0.5, 0, 1, 40);
             newPrice.BackgroundTransparency = 1;
             local priceLabel = newPrice:WaitForChild("priceLabel");
-            priceLabel.Text = rewardInfo.Price and interface.beautifyNumber(rewardInfo.Price) or "?";
+            local priceStr = rewardInfo.Price and interface.beautifyNumber(rewardInfo.Price) or "?";
+            priceLabel.Text = priceStr == "0" and "Free!" or priceStr;
             binds.CurPriceLabel = {Siid=storageItem.ID, Label=priceLabel};
             
             priceLabel.TextTransparency = 1;
@@ -390,7 +391,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 if interface.IsDestroyed then return end;
                 if binds.CurPriceLabel == nil or binds.CurPriceLabel.Siid ~= storageItem.ID then return end;
                 if storageItem.Values.R == nil or storageItem.Values.R.Price == nil then return end;
-                binds.CurPriceLabel.Label.Text = interface.beautifyNumber(storageItem.Values.R.Price);
+                local priceStr = interface.beautifyNumber(storageItem.Values.R.Price);
+                binds.CurPriceLabel.Label.Text = priceStr == "0" and "Free!" or priceStr;
             end)
             binds.LastHookSyncId = storageItem.ID;
 

@@ -36,6 +36,7 @@ local modRichFormatter = shared.require(game.ReplicatedStorage.Library.UI.RichFo
 local modComponents = shared.require(game.ReplicatedStorage.Library.UI.Components);
 local modScrollingPageUI = shared.require(game.ReplicatedStorage.Library.UI.ScrollingPageUI);
 local modChatBoardUI = shared.require(game.ReplicatedStorage.Library.UI.ChatBoardUI);
+local modUIUtil = shared.require(game.ReplicatedStorage.Library.UI.UIUtil);
 
 local TIMER_RADIAL_CONFIG = '{"version":1,"size":128,"count":128,"columns":8,"rows":8,"images":["rbxassetid://10606346824","rbxassetid://10606347195"]}';
 local BAR_COLORS = {
@@ -2873,6 +2874,291 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				new.Parent = cardsListFrame;
 			end
 
+			local exchangeCardButton = Instance.new("TextButton");
+			exchangeCardButton.Name = "Exchange";
+			exchangeCardButton.Text = "Exchange";
+			exchangeCardButton.TextColor3 = Color3.fromRGB(255, 255, 255);
+			exchangeCardButton.BackgroundColor3 = interface.Colors.Branch;
+			exchangeCardButton.Font = Enum.Font.ArimoBold;
+			exchangeCardButton.TextSize = 16;
+			exchangeCardButton.LayoutOrder = 999;
+			exchangeCardButton.Size = UDim2.new(0, 0, 0, 20);
+			exchangeCardButton.AutomaticSize = Enum.AutomaticSize.X;
+
+			local uiPadding = Instance.new("UIPadding");
+			uiPadding.PaddingLeft = UDim.new(0, 10);
+			uiPadding.PaddingRight = UDim.new(0, 10);
+			uiPadding.PaddingTop = UDim.new(0, 5);
+			uiPadding.PaddingBottom = UDim.new(0, 5);
+			uiPadding.Parent = exchangeCardButton;
+
+			local uiCorner = Instance.new("UICorner");
+			uiCorner.CornerRadius = UDim.new(0, 5);
+			uiCorner.Parent = exchangeCardButton;
+
+			exchangeCardButton.Parent = cardsListFrame;
+
+			exchangeCardButton.MouseButton1Click:Connect(function()
+				interface:PlayButtonClick();
+
+				RightFrame:ClearAllChildren();
+
+				local newCardsExchange = script:WaitForChild("CardsExchange"):Clone();
+				newCardsExchange.Parent = RightFrame;
+
+				local closeButton = newCardsExchange:WaitForChild("closeButton");
+				closeButton.MouseButton1Click:Connect(function()
+					RightFrame:ClearAllChildren();
+					binds.RefreshMissionMap();
+				end)
+
+				local scrollFrame = newCardsExchange:WaitForChild("ScrollingFrame");
+				local same3Frame = scrollFrame:WaitForChild("same3Frame");
+				local any4Frame = scrollFrame:WaitForChild("any4Frame");
+
+				local templateCardPickerButton = script:WaitForChild("CardPickerButton");
+				local cardPicker = newCardsExchange:WaitForChild("CardPicker");
+
+				--== MARK: CardPicker
+				local function getSeasonCards()
+					local battlePassData = modData.Profile and modData.Profile.BattlePassSave or nil;
+					local seasonData = battlePassData and battlePassData.Passes and battlePassData.Passes[activeBpId] or {};
+					return seasonData.Cards or {};
+				end
+
+				local pickerTarget = nil;
+
+				local function closeCardPicker()
+					cardPicker.Visible = false;
+					pickerTarget = nil;
+				end
+
+				local same3Info, any4Info;
+
+				local function refreshCardPicker(targetButton)
+					local seasonCards = getSeasonCards();
+					local isOutputPicker = targetButton.Name ~= "InputOption";
+
+					local requiredAmount = 1;
+					if not isOutputPicker and targetButton.Parent == same3Frame then
+						requiredAmount = 3;
+					end
+
+					for _, obj in pairs(cardPicker:GetChildren()) do
+						if not obj:IsA("GuiObject") then continue end;
+						obj:Destroy();
+					end
+
+					for id, cardInfo in pairs(modBattlePassLibrary.BpCardsList) do
+						if isOutputPicker and id == "strange" then continue end;
+
+						local new = templateCardPickerButton:Clone();
+						new.Name = id;
+						new.LayoutOrder = cardInfo.Order;
+
+						local imageLabel = new:WaitForChild("ImageLabel");
+						imageLabel.Image = cardInfo.Image;
+
+						local usedCount = 0;
+						if not isOutputPicker and targetButton.Parent == any4Frame and any4Info then
+							local any4Selections = any4Info.GetSelections();
+							for _, selectedId in pairs(any4Selections.Inputs) do
+								if selectedId == id then
+									usedCount = usedCount +1;
+								end
+							end
+						end
+
+						local amount = (seasonCards[id] or 0) - usedCount;
+						new:WaitForChild("TextLabel").Text = `{amount}`;
+
+						local canSelect = isOutputPicker or amount >= requiredAmount;
+						if not canSelect or amount <= 0 then
+							imageLabel.ImageColor3 = Color3.new(0.5, 0.5, 0.5);
+						end
+
+						if canSelect then
+							local baseColor = imageLabel.ImageColor3;
+							new:GetPropertyChangedSignal("GuiState"):Connect(function()
+								if new.GuiState == Enum.GuiState.Hover then
+									imageLabel.ImageColor3 = Color3.new(baseColor.R*0.6, baseColor.G*0.6, baseColor.B*0.6);
+								else
+									imageLabel.ImageColor3 = baseColor;
+								end
+							end)
+
+							new.MouseButton1Click:Connect(function()
+								interface:PlayButtonClick();
+								if pickerTarget == nil then return end;
+
+								local frameInfo = pickerTarget.Parent == same3Frame and same3Info or any4Info;
+								frameInfo.ApplyCardSelection(pickerTarget, id);
+
+								closeCardPicker();
+							end)
+						end
+
+						new.Parent = cardPicker;
+					end
+				end
+
+				local function openCardPicker(button)
+					refreshCardPicker(button);
+
+					local relPos = button.AbsolutePosition - newCardsExchange.AbsolutePosition;
+					local pickerSize = cardPicker.AbsoluteSize;
+					local parentSize = newCardsExchange.AbsoluteSize;
+
+					local centerX = math.clamp(
+						relPos.X + (button.AbsoluteSize.X/2),
+						pickerSize.X/2,
+						math.max(parentSize.X-(pickerSize.X/2), pickerSize.X/2)
+					);
+
+					local gap = 5;
+					local anchorY = 1;
+					local posY = relPos.Y-gap;
+					if (button.AbsolutePosition.Y-gap-pickerSize.Y) < 0 then
+						anchorY = 0;
+						posY = relPos.Y + button.AbsoluteSize.Y + gap;
+					end
+
+					cardPicker.AnchorPoint = Vector2.new(0.5, anchorY);
+					cardPicker.Position = UDim2.new(0, centerX, 0, posY);
+					cardPicker.Visible = true;
+					pickerTarget = button;
+				end
+
+				--== MARK: Exchange Options
+				local function bindHoverDarken(button)
+					local baseColor = button.ImageColor3;
+					button:GetPropertyChangedSignal("GuiState"):Connect(function()
+						if button.GuiState == Enum.GuiState.Hover then
+							button.ImageColor3 = Color3.new(baseColor.R*0.6, baseColor.G*0.6, baseColor.B*0.6);
+						else
+							button.ImageColor3 = baseColor;
+						end
+					end)
+				end
+
+				local function setupExchangeFrame(frame, isSame3)
+					local outputOption = frame:WaitForChild("OutputOption");
+					local exchangeButton = frame:WaitForChild("Exchange");
+
+					local inputOptions = {};
+					for _, obj in pairs(frame:GetChildren()) do
+						if obj.Name ~= "InputOption" then continue end;
+						table.insert(inputOptions, obj);
+					end
+					table.sort(inputOptions, function(a, b)
+						return a.LayoutOrder < b.LayoutOrder;
+					end)
+
+					local selections = {Inputs={}; Output=nil;};
+
+					local function isSelectionValid()
+						for _, inputOption in pairs(inputOptions) do
+							if selections.Inputs[inputOption.LayoutOrder] == nil then return false; end
+						end
+						return selections.Output ~= nil;
+					end
+
+					local function updateExchangeButton()
+						exchangeButton.Visible = isSelectionValid();
+					end
+
+					local function applyCardSelection(targetButton, cardId)
+						local cardLib = modBattlePassLibrary.BpCardsList[cardId];
+						if cardLib == nil then return end;
+
+						if targetButton == outputOption then
+							outputOption.Image = cardLib.Image;
+							selections.Output = cardId;
+
+						elseif targetButton.Name == "InputOption" then
+							if isSame3 then
+								for _, inputOption in pairs(inputOptions) do
+									inputOption.Image = cardLib.Image;
+									selections.Inputs[inputOption.LayoutOrder] = cardId;
+								end
+
+							else
+								targetButton.Image = cardLib.Image;
+								selections.Inputs[targetButton.LayoutOrder] = cardId;
+							end
+						end
+
+						updateExchangeButton();
+					end
+
+					for _, inputOption in pairs(inputOptions) do
+						bindHoverDarken(inputOption);
+						inputOption.MouseButton1Click:Connect(function()
+							interface:PlayButtonClick();
+							if pickerTarget == inputOption and cardPicker.Visible then
+								closeCardPicker();
+							else
+								openCardPicker(inputOption);
+							end
+						end)
+					end
+
+					if outputOption then
+						bindHoverDarken(outputOption);
+						outputOption.MouseButton1Click:Connect(function()
+							interface:PlayButtonClick();
+							if pickerTarget == outputOption and cardPicker.Visible then
+								closeCardPicker();
+							else
+								openCardPicker(outputOption);
+							end
+						end)
+					end
+
+					exchangeButton.MouseButton1Click:Connect(function()
+						interface:PlayButtonClick();
+
+						local inputs = {};
+						for _, inputOption in pairs(inputOptions) do
+							table.insert(inputs, selections.Inputs[inputOption.LayoutOrder]);
+						end
+
+						local exchangePacket = {
+							Mode = isSame3 and "same3" or "any4";
+							Inputs = inputs;
+							Output = selections.Output;
+						};
+
+						task.spawn(function()
+							local rPacket = remoteBattlepassRemote:InvokeServer("exchangecards", exchangePacket);
+							if rPacket and rPacket.Success then
+								modAudio.Play("Collectible", window.Frame);
+							end
+						end)
+					end)
+
+					return {ApplyCardSelection=applyCardSelection; GetSelections=function() return selections; end;};
+				end
+
+				same3Info = setupExchangeFrame(same3Frame, true);
+				any4Info = setupExchangeFrame(any4Frame, false);
+
+				local onPrimaryClickDisconnect = interface.Properties.OnChanged:Connect(function(key, value)
+					if key ~= "PrimaryInputDown" or value ~= true then return end;
+					if cardPicker.Visible ~= true or pickerTarget == nil then return end;
+
+					if not modUIUtil.IsMouseOver(cardPicker) and not modUIUtil.IsMouseOver(pickerTarget) then
+						closeCardPicker();
+					end
+				end)
+
+				newCardsExchange.Destroying:Connect(function()
+					closeCardPicker();
+					onPrimaryClickDisconnect();
+				end)
+			end)
+
+
 			local bpButtonFunc;
 
 			--== MARK: Event Pass
@@ -4340,6 +4626,24 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             table.insert(notifyItems, {
                 Icon = npcLib and npcLib.Avatar or `rbxassetid://15641359355`;
                 Desc = `Mission Unlocked\n{missionLib.Name}`;
+            })
+        end
+
+        qbNotifications.queueNotify("Missions", notifyItems);
+    end)
+
+    modClientGuis.bindGuiRemote("cardsreceived", function(cardNames)
+        local qbNotifications: InterfaceElement = interface:GetOrDefaultElement("QuickButtonsNotifications");
+        if qbNotifications == nil then return end;
+
+        local notifyItems = {};
+        for a=1, #cardNames do
+            local cardLib = modBattlePassLibrary.BpCardsList[cardNames[a]];
+            if cardLib == nil then continue end;
+
+            table.insert(notifyItems, {
+                Icon = cardLib.Image;
+                Desc = `Event Card Received\n{cardLib.Name}`;
             })
         end
 

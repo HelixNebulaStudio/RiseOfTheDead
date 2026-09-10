@@ -219,6 +219,10 @@ if RunService:IsServer() then
 					Tier = rInfo.Tier;
 				});
 				if price then
+					if math.random(1, 100) == 1 then
+						price = 0;
+					end
+
 					rInfo.Price = price;
 					storageItem:SetValues("R", rInfo);
 					storageItem:Sync({"R"});
@@ -347,8 +351,10 @@ if RunService:IsServer() then
 			end
 		end);
 
-		traderProfile:AddGold(-price);
-		profile:AddPlayPoints(price/50, "Sink:Gold");
+		if price > 0 then
+			traderProfile:AddGold(-price);
+			profile:AddPlayPoints(price/50, "Sink:Gold");
+		end
 
 		modAnalyticsService:Sink{
 			Player = player;

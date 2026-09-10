@@ -1,11 +1,13 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local TweenService = game:GetService("TweenService");
+local UserInputService = game:GetService("UserInputService");
 
 local localPlayer = game.Players.LocalPlayer;
 
 local modGlobalVars = shared.require(game.ReplicatedStorage.GlobalVariables);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
+local modKeyBindsHandler = shared.require(game.ReplicatedStorage.Library.KeyBindsHandler);
 
 local modTables = shared.require(game.ReplicatedStorage.Library.Util.Tables);
 
@@ -122,6 +124,46 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
                     local descLabel = newListing:WaitForChild("descLabel");
                     descLabel.Text = itemInfo.Desc;
+                end
+
+                if (modData.Profile 
+                and modData.Profile.FirstJoined 
+                and os.time()-modData.Profile.FirstJoined <= shared.Const.OneDaySecs*2)
+                or shared.gameConfig.BranchName == "Dev" then
+                    local hintStr = nil;
+                    
+                    if UserInputService.KeyboardEnabled then
+                        local keyName, keyDisplay = modKeyBindsHandler:ToString(`KeyWindow{qbName}`);
+                        if keyName ~= nil and keyName ~= "None" then
+                            hintStr = `Press [{keyDisplay}] to open menu.`;
+                        end
+                    else
+                        hintStr = `Click the button above to open menu.`;
+                    end
+                  
+                    if hintStr then
+                        ySize += 30;
+
+                        local newPlayerHintLabel = Instance.new("TextLabel");
+                        newPlayerHintLabel.AnchorPoint = Vector2.new(0.5, 0.5);
+                        newPlayerHintLabel.Position = UDim2.new(0.5, 0, 0.5, 0);
+                        newPlayerHintLabel.AutomaticSize = Enum.AutomaticSize.X;
+                        newPlayerHintLabel.RichText = true;
+                        newPlayerHintLabel.TextSize = 14;
+                        newPlayerHintLabel.BackgroundTransparency = 1;
+                        newPlayerHintLabel.LayoutOrder = 99;
+                        newPlayerHintLabel.Size = UDim2.new(1, 0, 0, 20);
+                        newPlayerHintLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
+                        newPlayerHintLabel.Font = Enum.Font.ArimoBold;
+                        newPlayerHintLabel.Text = hintStr;
+
+                        local uiPadding = Instance.new("UIPadding");
+                        uiPadding.PaddingLeft = UDim.new(0, 10);
+                        uiPadding.PaddingRight = UDim.new(0, 10);
+                        uiPadding.Parent = newPlayerHintLabel;
+
+                        newPlayerHintLabel.Parent = listFrame;
+                    end
                 end
 
                 TweenService:Create(newFrame, tweenInfo, {
