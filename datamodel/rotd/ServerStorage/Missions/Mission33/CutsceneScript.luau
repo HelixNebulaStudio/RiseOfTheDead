@@ -115,7 +115,10 @@ return function(CutsceneSequence)
 
 			local function OnChanged(firstRun)
 				if mission.Type == 2 then -- OnAvailable
-					stanPlayerNpc:SetCFrame();
+					stanPlayerNpc:SetCFrame{
+						MissionId = MISSION_ID;
+						CFrame = STAN_MALL_SPAWNCF;
+					};
 
 				elseif mission.Type == 4 and firstRun then
 					stanPlayerNpc:SetCFrame{
