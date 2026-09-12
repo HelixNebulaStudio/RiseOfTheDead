@@ -197,6 +197,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 	local RightFrame = windowFrame:WaitForChild("RightBackground");
 
+	local isDev = shared.gameConfig.BranchName == "Dev";
+
 	local curBpLib;
 
 	for id, lib in pairs(modMissionsLibrary.List()) do
@@ -257,7 +259,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		local missionSaveData = mission.SaveData;
 		local itemId = missionSaveData.ItemId;
 		local itemlib = missionSaveData.ItemId and modItemsLibrary:Find(itemId);
-		local desc = obj.Description;
+		local desc = obj.Description or "";
 
 		local needCount = tonumber(mission.ObjectivesCompleted[objName]);
 		local objectiveAmount = obj.Amount or missionSaveData.Amount or 1;
@@ -320,6 +322,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		local missionLib = modMissionsLibrary.Get(missionData.Id);
 		if missionLib == nil then return end;
 
+		local missionStage = missionData.ProgressionPoint;
+
 		if missionData.SaveData.Timers then
 			for k, v in pairs(missionData.SaveData.Timers) do
 				missionHudTask.Properties.Timers[k] = v;
@@ -339,7 +343,24 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			pinnedTaskList.Visible = false;
 			
 			local incomplete = false;
-			for name, objective in pairs(missionLib.Objectives or {}) do
+			local objectivesList;
+
+			local checkpointInfo = missionLib.Checkpoint and missionLib.Checkpoint[missionStage];
+			if checkpointInfo and checkpointInfo.Objectives then
+				objectivesList = {};
+				for _, objId in pairs(checkpointInfo.Objectives) do
+					local objInfo = missionLib.Objectives[objId];
+					if objInfo == nil then Debugger:Warn(`Missing objective info. ({missionData.Id}: {objId})`); continue end;
+					
+					objectivesList[objId] = objInfo;
+				end
+
+			elseif missionLib.Objectives then
+				objectivesList = missionLib.Objectives;
+
+			end
+
+			for name, objective in pairs(objectivesList or {}) do
 				local newTask = pinnedTaskList:FindFirstChild(name);
 				if newTask == nil then
 					newTask = taskTemplate:Clone();
@@ -357,18 +378,22 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				end
 			end
 
+			if checkpointInfo and checkpointInfo.Text then
+				if not incomplete then
+					pinHudData.TaskText = `<s>{isDev and `[{missionStage}] ` or ``}{checkpointInfo.Text}</s>`;
+				else
+					pinHudData.TaskText = `{isDev and `[{missionStage}] ` or ``}{checkpointInfo.Text}`;
+				end
+
+			elseif missionLib.Objectives then
+				pinHudData.TaskText = `Complete the objectives`;
+				
+			end
+
 			if incomplete then
 				pinnedTaskList.Visible = true;
-				pinHudData.TaskText = "Complete the objectives";
-
 			else
 				pinnedTaskList.Visible = false;
-
-				if missionLib.ObjectivesCompleteText then
-					local itemlib = missionData.SaveData.ItemId and modItemsLibrary:Find(missionData.SaveData.ItemId);
-					pinHudData.TaskText = missionLib.ObjectivesCompleteText:gsub("$ItemName", itemlib and itemlib.Name or missionData.SaveData.ItemId or "");
-				end
-				
 			end
 		end
 
@@ -513,6 +538,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		modData:RequestData("GameSave/Missions");
 	end
 
+	--MARK: Mission Map
 	function binds.RefreshMissionMap()
 		
 		if not interface.ScreenGui:IsAncestorOf(highlightAnimGradiant) then
@@ -776,6 +802,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		
 		local pinRequestDebounce = false;
 		
+		if modConfigurations.CompactInterface then
+			mapEntryTemplate.Size = UDim2.new(0, 180, 0, 35);
+		end
 		local entryXSize, entryYSize = (mapEntryTemplate.Size.X.Offset+20), (mapEntryTemplate.Size.Y.Offset+20);
 		local order = 0;
 		local function renderNode(node, parentNode, depth)
@@ -1598,6 +1627,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				newTab.Parent = MissionListFrame;
 				newTab.LayoutOrder = typeOrder;
 
+				if modConfigurations.CompactInterface then
+					newTab.Size = UDim2.new(1, 0, 0, 10);
+				end
+
 				newList = listTemplate:Clone();
 				newList.Name = typeKey;
 
@@ -1842,6 +1875,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			titleTag.Text = missionLib.Name.. (shared.gameConfig.BranchName == "Dev" and dbSuffix or "");
 			fromTag.Text = missionLib.From or "";
 
+			if modConfigurations.CompactInterface then
+				fromTag.Visible = false;
+				newListing.Size = UDim2.new(1, 0, 0, 30);
+				newListing.SliceCenter = Rect.new(2, 0, 24, 0);
+			end
+
 			if missionData.Type == 1 then -- Active
 				taskTag.Text = "";
 
@@ -1979,9 +2018,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			binds.UpdatePinnedHud();
 			if missionData == nil then return end;
 
-			local isDev = shared.gameConfig.BranchName == "Dev";
 			if missionData.Type == 1 then
-
 				local missionStage = missionData.ProgressionPoint;
 				if missionLib.Checkpoint and missionStage and missionLib.Checkpoint[missionStage] then
 					local checkpointInfo = missionLib.Checkpoint[missionStage];
@@ -2634,6 +2671,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				createListing(repeatableMissionList[a], repeatableTab, repeatableList);
 			end
 			
+			if modConfigurations.CompactInterface then
+				hourlyMissionListing.Size = UDim2.new(1, 0, 0, 30);
+				hourlyMissionListing.SliceCenter = Rect.new(2, 0, 24, 0);
+			end
+
 			hourlyMissionListing:SetAttribute("OverrideVisible", countRepeatableMissions > 0);
 		end
 
@@ -2833,6 +2875,18 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		local rightFrameSizeXAnchor = 1-leftFrameSizeXAnchor;
 		
 		PinnedMissionFrame.Size = UDim2.new(leftFrameSizeXAnchor, 0, 0, 90);
+
+		if modConfigurations.CompactInterface then
+			passButton.Size = UDim2.new(0.25, 10, 0, 50);
+			passIconLabel.Size = UDim2.new(0, 60, 0, 60);
+			passIconLabel.Position = UDim2.new(0, 5, 0.5, 0);
+
+			titleLabel.Position = UDim2.new(1, -20,0, 5);
+			titleLabel.Size = UDim2.new(0.6, -10,0, 15);
+
+			lvlLabel.Position = UDim2.new(1, -10, 0, 30);
+			lvlLabel.Size = UDim2.new(0.6, 0,0, 15);
+		end
 		
 		local daysLeft = (dOYEnd+(yearEnd-yearToday)*365)-dOYToday-1;
 		if activeBpId == nil or daysLeft < 0 then
@@ -2847,8 +2901,16 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		else
 			curBpLib = battlepassLib;
 			BottomFrame.Visible = true;
-			LeftFrame.Size = UDim2.new(leftFrameSizeXAnchor, 0, 0.9, -150);
-			LeftFrame.Position = UDim2.new(0, 0, 1, -150);
+
+			if modConfigurations.CompactInterface then
+				LeftFrame.Size = UDim2.new(leftFrameSizeXAnchor, 0, 0.9, -110);
+				LeftFrame.Position = UDim2.new(0, 0, 1, -110);
+			else
+				LeftFrame.Size = UDim2.new(leftFrameSizeXAnchor, 0, 0.9, -150);
+				LeftFrame.Position = UDim2.new(0, 0, 1, -150);
+			end
+
+
 			RightFrame.Size = UDim2.new(rightFrameSizeXAnchor, 0, 0.9, battlepassLib.CardsActive == true and -90 or -60);
 			RightFrame.Position = UDim2.new(1, 0, 0.1, 0);
 			
@@ -2872,6 +2934,14 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				new:WaitForChild("ImageLabel").Image = cardInfo.Image;
 				new:WaitForChild("TextLabel").Text = ``;
 				new.Parent = cardsListFrame;
+
+				if modConfigurations.CompactInterface then
+					new.Size = UDim2.new(0, 40, 0, 20);
+				end
+			end
+			if modConfigurations.CompactInterface then
+				cardsListFrame.Position = UDim2.new(0.25, -10, 0, -5);
+				cardsListFrame.Size = UDim2.new(0.75, 10, 0, 0);
 			end
 
 			local exchangeCardButton = Instance.new("TextButton");
@@ -2918,6 +2988,27 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 				local templateCardPickerButton = script:WaitForChild("CardPickerButton");
 				local cardPicker = newCardsExchange:WaitForChild("CardPicker");
+
+				if modConfigurations.CompactInterface then
+					local uiPadding = scrollFrame:WaitForChild("UIPadding");
+					uiPadding.PaddingBottom = UDim.new(0, 50);
+
+					for _, obj in pairs(same3Frame:GetChildren()) do
+						if obj:IsA("TextButton") or obj:IsA("ImageButton") then 
+							obj.Size = UDim2.new(0, 50, 0, 50);
+						end;
+					end
+					same3Frame.Size = UDim2.new(1, 0, 0, 50);
+
+					for _, obj in pairs(any4Frame:GetChildren()) do
+						if obj:IsA("TextButton") or obj:IsA("ImageButton") then 
+							obj.Size = UDim2.new(0, 50, 0, 50);
+						end;
+					end
+					any4Frame.Size = UDim2.new(1, 0, 0, 50);
+
+				end
+
 
 				--== MARK: CardPicker
 				local function getSeasonCards()
@@ -3009,22 +3100,29 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					local pickerSize = cardPicker.AbsoluteSize;
 					local parentSize = newCardsExchange.AbsoluteSize;
 
-					local centerX = math.clamp(
-						relPos.X + (button.AbsoluteSize.X/2),
-						pickerSize.X/2,
-						math.max(parentSize.X-(pickerSize.X/2), pickerSize.X/2)
-					);
-
 					local gap = 5;
 					local anchorY = 1;
+					local posX = relPos.X + (button.AbsoluteSize.X/2);
 					local posY = relPos.Y-gap;
 					if (button.AbsolutePosition.Y-gap-pickerSize.Y) < 0 then
 						anchorY = 0;
 						posY = relPos.Y + button.AbsoluteSize.Y + gap;
 					end
 
+					posX = math.clamp(
+						posX,
+						pickerSize.X/2,
+						math.max(parentSize.X-(pickerSize.X/2), pickerSize.X/2)
+					);
+
+					if anchorY == 1 then
+						posY = math.min(posY, parentSize.Y);
+					else
+						posY = math.min(posY, math.max(parentSize.Y-pickerSize.Y, 0));
+					end
+
 					cardPicker.AnchorPoint = Vector2.new(0.5, anchorY);
-					cardPicker.Position = UDim2.new(0, centerX, 0, posY);
+					cardPicker.Position = UDim2.new(0, posX, 0, posY);
 					cardPicker.Visible = true;
 					pickerTarget = button;
 				end
@@ -3918,7 +4016,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					lvlSlot.Parent = battlePassContent;
 				end
 				
-				lvlLabel.Text = `Pass Level: {modFormatNumber.Beautify(pSeasonLevel or 0)}`;
+				if modConfigurations.CompactInterface then
+					lvlLabel.Text = `Level: {modFormatNumber.Beautify(pSeasonLevel or 0)}`;
+				else
+					lvlLabel.Text = `Pass Level: {modFormatNumber.Beautify(pSeasonLevel or 0)}`;
+				end
 				--== MARK: Post Rewards
 				local giftShopRewards = modBattlePassLibrary.GiftShop;
 

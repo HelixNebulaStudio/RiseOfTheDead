@@ -33,8 +33,10 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 		local createsFrame = buttonsMenu:WaitForChild("CreatesFrame");
 		local createsListFrame = createsFrame:WaitForChild("List");
 		
+		local productItemLib = modItemLibrary:Find(library.Product);
+
 		local blueprintTagLabel = buildFrame:WaitForChild("blueprintTag");
-		blueprintTagLabel.Text = library.Name;
+		blueprintTagLabel.Text = library.Name or `{productItemLib.Name} Blueprint`;
 		
 		buildFrame.Visible = true;
 		listMenu:Add(buildFrame, 0);
@@ -45,7 +47,6 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 			for _, c in pairs(requireListFrame:GetChildren()) do if c:IsA("GuiObject") then c:Destroy() end; end;
 			for _, c in pairs(createsListFrame:GetChildren()) do if c:IsA("GuiObject") then c:Destroy() end; end;
 			
-			local productItemLib = modItemLibrary:Find(library.Product);
 			local productLabel = itemListingTemplate:Clone();
 			productLabel.Text = "• "..`<b>{productItemLib.Name}</b>`..(library.Amount and " x "..library.Amount or "");
 			productLabel.Parent = createsListFrame;

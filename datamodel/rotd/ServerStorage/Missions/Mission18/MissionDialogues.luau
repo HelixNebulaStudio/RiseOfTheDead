@@ -76,6 +76,12 @@ Dialogues.Carlson.DialogueStrings = {
 		Reply="No idea, but they have weapons and a lot of people, fighting them would not be a good idea.";
 	};
 
+	["aNewCommunity_gift"]={
+		Say = "Sure, thanks!";
+		Face = "Happy";
+		Reply = "Anytime.";
+	};
+
 };
 
 -- !outline: Erik Dialogues
@@ -192,7 +198,21 @@ if RunService:IsServer() then
 
 			end
 			
+		elseif mission.Type == 3 then -- Complete
+			local profile = shared.modProfile:Get(player);
+			local giftFlag = profile.Flags:Get("carlsonGunpartGift");
+			local unlockTime = giftFlag and (giftFlag.Time + shared.Const.Hours20) or 0;
+
+			dialog:SetInitiate("Hey $PlayerName, you saved my life back then. Let me repay you.");
+			dialog:AddChoice("aNewCommunity_gift", function()
+				local inventory = profile:GetActiveSave().Inventory;
+				inventory:Add("basicgunpart", {Quantity=1});
+				shared.Notify(player, "You received 1 Basic Gun Component from Carlson.", "Reward");
+				profile.Flags:Add{Id="carlsonGunpartGift"; Time=os.time()};
+			end, {ChoiceUnlockTime=unlockTime});
+
 		end
+
 	end
 
 	-- !outline: Erik Handler

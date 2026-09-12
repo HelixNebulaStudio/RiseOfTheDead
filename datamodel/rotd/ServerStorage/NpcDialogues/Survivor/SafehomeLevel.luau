@@ -52,6 +52,14 @@ if RunService:IsServer() then
 				npcData:CalculateHappiness();
 				Debugger:WarnClient(player, npcData);
 			end);
+
+			dialog:AddDialog({
+				Face="Happy";
+				Say=`{(shared.gameConfig.BranchName == "Dev" and "[Dev Branch]" or "[Dev]")} Inspect`;
+				Reply="Woop!";
+				ToggleWindow="NpcWindow";
+			}, function(dialog)
+			end, npcName);
 		end
 
 		local npcLib = modNpcProfileLibrary:Find(npcName);

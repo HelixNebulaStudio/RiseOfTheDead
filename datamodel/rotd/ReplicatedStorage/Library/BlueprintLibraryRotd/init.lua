@@ -548,6 +548,58 @@ function BlueprintLibrary.onRequire()
 
 
 
+	--== MARK: Components
+	BlueprintLibrary.New{
+		Id = "basicgunpartbp";
+		Product = "basicgunpart";
+		Duration = 10;
+		SellPrice = 50;
+		Requirements = {
+			{Type="Item"; ItemId="metal"; Amount=10;};
+			{Type="Item"; ItemId="metalpipes"; Amount=1;};
+		};
+		Sources={"Dropped from <b>Zomborg</b>"; "Obtained from <b>Russell in Mission: Basic Gun Component</b>";};
+		Category = "Components";
+	};
+
+	BlueprintLibrary.New{
+		Id = "primegunpartbp";
+		Product = "primegunpart";
+		Duration = 10;
+		SellPrice = 100;
+		Requirements = {
+			{Type="Item"; ItemId="wood"; Amount=20;};
+			{Type="Item"; ItemId="rope"; Amount=2;};
+		};
+		Category = "Components";
+	};
+
+	BlueprintLibrary.New{
+		Id = "advgunpartbp";
+		Name = "Advance Gun Component Blueprint";
+		Product = "advgunpart";
+		Duration = 10;
+		SellPrice = 150;
+		Requirements = {
+			{Type="Item"; ItemId="metal"; Amount=30;};
+			{Type="Item"; ItemId="gears"; Amount=3;};
+		};
+		Category = "Components";
+	};
+
+	BlueprintLibrary.New{
+		Id = "elitepartbp";
+		Name = "Elite Gun Component Blueprint";
+		Product = "elitegunpart";
+		Duration = 10;
+		SellPrice = 200;
+		Requirements = {
+			{Type="Item"; ItemId="glass"; Amount=40;};
+			{Type="Item"; ItemId="battery"; Amount=4;};
+		};
+		Category = "Components";
+	};
+
 	--== MARK: Weapons
 
 	BlueprintLibrary.New{
@@ -695,98 +747,104 @@ function BlueprintLibrary.onRequire()
 	};
 
 	BlueprintLibrary.New{
-		Id="grenadelauncherbp";
-		Name="Grenade Launcher Blueprint";
-		Product="grenadelauncher";
-		Duration=400;
-		SellPrice=600;
-		Requirements={
-			{Type="Stat"; Name="Money"; Amount=3600;};
-			{Type="Stat"; Name="Perks"; Amount=10;};
-			{Type="Stat"; Name="Level"; Amount=70;};
-			{Type="Item"; ItemId="metal"; Amount=100;};
+		Id = "grenadelauncherbp";
+		Name = "Grenade Launcher Blueprint";
+		Product = "grenadelauncher";
+		Duration = 400;
+		SellPrice = 600;
+		Requirements = {
+			{Type="Stat"; Name="Money"; Amount=1800;};
+			{Type="Stat"; Name="Perks"; Amount=5;};
+			{Type="Item"; ItemId="metal"; Amount=50;};
 			{Type="Item"; ItemId="motor"; Amount=1;};
 			{Type="Item"; ItemId="metalpipes"; Amount=1;};
+
+			{Type="Item"; ItemId="basicgunpart"; Amount=1;};
 		};
-		Category="Weapons";
+		Category = "Weapons";
 	};
 
 	BlueprintLibrary.New{
-		Id="dualp250bp";
-		Name="Dual P250 Blueprint";
-		Product="dualp250";
-		Duration=800;
-		SellPrice=700;
-		Requirements={
-			{Type="Stat"; Name="Money"; Amount=12000;};
-			{Type="Stat"; Name="Perks"; Amount=10;};
-			{Type="Stat"; Name="Level"; Amount=40;};
-			{Type="Item"; ItemId="metal"; Amount=230;};
+		Id = "dualp250bp";
+		Name = "Dual P250 Blueprint";
+		Product = "dualp250";
+		Duration = 800;
+		SellPrice = 700;
+		Requirements = {
+			{Type="Stat"; Name="Money"; Amount=6000;};
+			{Type="Stat"; Name="Perks"; Amount=5;};
+			{Type="Item"; ItemId="metal"; Amount=115;};
+
+			{Type="Item"; ItemId="basicgunpart"; Amount=1;};
 		};
-		Category="Weapons";
+		Category = "Weapons";
 	};
 
 	BlueprintLibrary.New{
-		Id="mariner590bp";
-		Name="Mariner 590 Blueprint";
-		Product="mariner590";
-		Duration=800;
-		SellPrice=2880;
-		Requirements={
-			{Type="Stat"; Name="Money"; Amount=22000;};
-			{Type="Stat"; Name="Perks"; Amount=10;};
-			{Type="Stat"; Name="Level"; Amount=60;};
-			{Type="Item"; ItemId="metal"; Amount=100;};
+		Id = "mariner590bp";
+		Name = "Mariner 590 Blueprint";
+		Product = "mariner590";
+		Duration = 800;
+		SellPrice = 2880;
+		Requirements = {
+			{Type="Stat"; Name="Money"; Amount=11000;};
+			{Type="Stat"; Name="Perks"; Amount=5;};
+			{Type="Item"; ItemId="metal"; Amount=50;};
 			{Type="Item"; ItemId="metalpipes"; Amount=1;};
+
+			{Type="Item"; ItemId="basicgunpart"; Amount=1;};
 		};
-		Category="Weapons";
+		Category = "Weapons";
 	};
 
 	BlueprintLibrary.New{
-		Id="revolver454bp";
-		Name="Revolver 454 Blueprint";
-		Product="revolver454";
-		Duration=hourSec;
-		SellPrice=800;
-		Requirements={
-			{Type="Stat"; Name="Money"; Amount=33000;};
-			{Type="Stat"; Name="Perks"; Amount=10;};
-			{Type="Stat"; Name="Level"; Amount=80;};
+		Id = "revolver454bp";
+		Name = "Revolver 454 Blueprint";
+		Product = "revolver454";
+		Duration = hourSec;
+		SellPrice = 800;
+		Requirements = {
+			{Type="Stat"; Name="Money"; Amount=16500;};
+			{Type="Stat"; Name="Perks"; Amount=5;};
+			{Type="Item"; ItemId="metal"; Amount=30;};
+			{Type="Item"; ItemId="metalpipes"; Amount=1;};
+
+			{Type="Item"; ItemId="basicgunpart"; Amount=1;};
+		};
+		Category = "Weapons";
+	};
+
+	BlueprintLibrary.New{
+		Id = "czevo3bp";
+		Name = "CZ Scorpion Evo 3 Blueprint";
+		Product = "czevo3";
+		Duration = hourSec;
+		SellPrice = 800;
+		Requirements = {
+			{Type="Stat"; Name="Money"; Amount=13500;};
+			{Type="Stat"; Name="Perks"; Amount=5;};
 			{Type="Item"; ItemId="metal"; Amount=60;};
-			{Type="Item"; ItemId="metalpipes"; Amount=2;};
+			{Type="Item"; ItemId="metalpipes"; Amount=1;};
+
+			{Type="Item"; ItemId="basicgunpart"; Amount=1;};
 		};
-		Category="Weapons";
+		Category = "Weapons";
 	};
 
 	BlueprintLibrary.New{
-		Id="czevo3bp";
-		Name="CZ Scorpion Evo 3 Blueprint";
-		Product="czevo3";
-		Duration=hourSec;
-		SellPrice=800;
-		Requirements={
-			{Type="Stat"; Name="Money"; Amount=27000;};
-			{Type="Stat"; Name="Perks"; Amount=10;};
-			{Type="Stat"; Name="Level"; Amount=20;};
-			{Type="Item"; ItemId="metal"; Amount=120;};
+		Id = "fnfalbp";
+		Name = "FN FAL Blueprint";
+		Product = "fnfal";
+		Duration = hourSec;
+		SellPrice = 600;
+		Requirements = {
+			{Type="Stat"; Name="Money"; Amount=16500;};
+			{Type="Stat"; Name="Perks"; Amount=5;};
+			{Type="Item"; ItemId="metal"; Amount=50;};
+			{Type="Item"; ItemId="wood"; Amount=10;};
 			{Type="Item"; ItemId="metalpipes"; Amount=1;};
-		};
-		Category="Weapons";
-	};
 
-	BlueprintLibrary.New{
-		Id="fnfalbp";
-		Name="FN FAL Blueprint";
-		Product="fnfal";
-		Duration=hourSec;
-		SellPrice=600;
-		Requirements={
-			{Type="Stat"; Name="Money"; Amount=33000;};
-			{Type="Stat"; Name="Perks"; Amount=10;};
-			{Type="Stat"; Name="Level"; Amount=140;};
-			{Type="Item"; ItemId="metal"; Amount=100;};
-			{Type="Item"; ItemId="wood"; Amount=20;};
-			{Type="Item"; ItemId="metalpipes"; Amount=1;};
+			{Type="Item"; ItemId="basicgunpart"; Amount=1;};
 		};
 		Category="Weapons";
 	};
@@ -798,204 +856,216 @@ function BlueprintLibrary.onRequire()
 		Duration = daySec;
 		SellPrice = 1600;
 		Requirements = {
-			{Type="Stat"; Name="Money"; Amount=20000;};
-			{Type="Stat"; Name="Perks"; Amount=20;};
-			{Type="Stat"; Name="Level"; Amount=60;};
-			{Type="Item"; ItemId="metal"; Amount=80;};
+			{Type="Stat"; Name="Money"; Amount=10000;};
+			{Type="Stat"; Name="Perks"; Amount=10;};
+			{Type="Item"; ItemId="metal"; Amount=40;};
+
+			{Type="Item"; ItemId="basicgunpart"; Amount=3;};
 		};
 		Category = "Weapons";
 	};
 
 	BlueprintLibrary.New{
-		Id="tacticalbowbp";
-		Name="Tactical Bow Blueprint";
-		Product="tacticalbow";
-		Duration=daySec;
-		SellPrice=3000;
-		Requirements={
-			{Type="Stat"; Name="Money"; Amount=55000;};
-			{Type="Stat"; Name="Perks"; Amount=20;};
-			{Type="Stat"; Name="Level"; Amount=100;};
-			{Type="Item"; ItemId="metal"; Amount=50;};
+		Id = "tacticalbowbp";
+		Name = "Tactical Bow Blueprint";
+		Product = "tacticalbow";
+		Duration = daySec;
+		SellPrice = 3000;
+		Requirements = {
+			{Type="Stat"; Name="Money"; Amount=27500;};
+			{Type="Stat"; Name="Perks"; Amount=5;};
+			{Type="Item"; ItemId="metal"; Amount=25;};
 			{Type="Item"; ItemId="wood"; Amount=10;};
-			{Type="Item"; ItemId="tacticalbowparts"; Amount=6;};
+			{Type="Item"; ItemId="tacticalbowparts"; Amount=3;};
+
+			{Type="Item"; ItemId="primegunpart"; Amount=1;};
 		};
-		Category="Weapons";
-		Sources={"Obtainable from Mission: <b>Vindictive Treasure 3</b>"; "Obtainable from <b>Bandit's Market</b> Shop"};
+		Category = "Weapons";
+		Sources = {"Obtainable from Mission: <b>Vindictive Treasure 3</b>"; "Obtainable from <b>Bandit's Market</b> Shop"};
 	};
 
 	BlueprintLibrary.New{
-		Id="desolatorheavybp";
-		Name="Desolator Heavy Blueprint";
-		Product="desolatorheavy";
-		Duration=hourSec;
-		SellPrice=800;
-		Requirements={
-			{Type="Stat"; Name="Money"; Amount=35000;};
-			{Type="Stat"; Name="Perks"; Amount=10;};
-			{Type="Stat"; Name="Level"; Amount=100;};
+		Id = "desolatorheavybp";
+		Name = "Desolator Heavy Blueprint";
+		Product = "desolatorheavy";
+		Duration = hourSec;
+		SellPrice = 800;
+		Requirements = {
+			{Type="Stat"; Name="Money"; Amount=17500;};
+			{Type="Stat"; Name="Perks"; Amount=5;};
 
-			{Type="Item"; ItemId="metal"; Amount=100;};
+			{Type="Item"; ItemId="metal"; Amount=50;};
 			{Type="Item"; ItemId="motor"; Amount=1;};
 			{Type="Item"; ItemId="metalpipes"; Amount=1;};
+
+			{Type="Item"; ItemId="basicgunpart"; Amount=3;};
 		};
 		Category="Weapons";
 	};
 
 	BlueprintLibrary.New{
-		Id="rec21bp";
-		Name="Rec-21 Blueprint";
-		Product="rec21";
-		Duration=hourSec;
-		SellPrice=800;
-		Requirements={
-			{Type="Stat"; Name="Money"; Amount=45000;};
-			{Type="Stat"; Name="Perks"; Amount=10;};
-			{Type="Stat"; Name="Level"; Amount=400;};
+		Id = "rec21bp";
+		Name = "Rec-21 Blueprint";
+		Product = "rec21";
+		Duration = hourSec;
+		SellPrice = 800;
+		Requirements = {
+			{Type="Stat"; Name="Money"; Amount=22500;};
+			{Type="Stat"; Name="Perks"; Amount=5;};
 
-			{Type="Item"; ItemId="metal"; Amount=300;};
+			{Type="Item"; ItemId="metal"; Amount=150;};
 			{Type="Item"; ItemId="metalpipes"; Amount=1;};
 			{Type="Item"; ItemId="lens"; Amount=5;};
+
+			{Type="Item"; ItemId="basicgunpart"; Amount=3;};
 		};
-		Category="Weapons";
+		Category = "Weapons";
 	};
 
 	BlueprintLibrary.New{
-		Id="at4bp";
-		Name="AT4 Rocket Launcher Blueprint";
-		Product="at4";
-		Duration=daySec;
-		SellPrice=1000;
-		Requirements={
-			{Type="Stat"; Name="Money"; Amount=60000;};
-			{Type="Stat"; Name="Perks"; Amount=20;};
-			{Type="Stat"; Name="Level"; Amount=260;};
-			{Type="Item"; ItemId="metal"; Amount=400;};
-			{Type="Item"; ItemId="at4parts"; Amount=3;};
-		};
-		Category="Weapons";
-	};
-
-	BlueprintLibrary.New{
-		Id="sr308bp";
-		Name="SR-308 Blueprint";
-		Product="sr308";
-		Duration=daySec;
-		SellPrice=1000;
-		Requirements={
-			{Type="Stat"; Name="Money"; Amount=50000;};
-			{Type="Stat"; Name="Perks"; Amount=20;};
-			{Type="Stat"; Name="Level"; Amount=420;};
-			{Type="Item"; ItemId="metal"; Amount=100;};
-			{Type="Item"; ItemId="glass"; Amount=40;};
-			{Type="Item"; ItemId="sr308parts"; Amount=3;};
-		};
-		Category="Weapons";
-	};
-
-	BlueprintLibrary.New{
-		Id="deaglebp";
-		Name="Desert Eagle Blueprint";
-		Product="deagle";
-		Duration=daySec;
-		SellPrice=1000;
-		Requirements={
+		Id = "at4bp";
+		Name = "AT4 Rocket Launcher Blueprint";
+		Product = "at4";
+		Duration = daySec;
+		SellPrice = 1000;
+		Requirements = {
 			{Type="Stat"; Name="Money"; Amount=30000;};
-			{Type="Stat"; Name="Perks"; Amount=20;};
-			{Type="Item"; ItemId="metal"; Amount=80;};
-			{Type="Item"; ItemId="deagleparts"; Amount=3;};
+			{Type="Stat"; Name="Perks"; Amount=10;};
+			{Type="Item"; ItemId="metal"; Amount=200;};
+			{Type="Item"; ItemId="at4parts"; Amount=3;};
+
+			{Type="Item"; ItemId="primegunpart"; Amount=3;};
 		};
-		Category="Weapons";
+		Category = "Weapons";
 	};
 
 	BlueprintLibrary.New{
-		Id="vectorxbp";
-		Name="Vector X Blueprint";
-		Product="vectorx";
-		Duration=daySec;
-		SellPrice=28800;
-		Requirements={
-			{Type="Stat"; Name="Money"; Amount=20000;};
-			{Type="Stat"; Name="Perks"; Amount=20;};
-			{Type="Stat"; Name="Level"; Amount=350;};
+		Id = "sr308bp";
+		Name = "SR-308 Blueprint";
+		Product = "sr308";
+		Duration = daySec;
+		SellPrice = 1000;
+		Requirements = {
+			{Type="Stat"; Name="Money"; Amount=25000;};
+			{Type="Stat"; Name="Perks"; Amount=10;};
+			
+			{Type="Item"; ItemId="metal"; Amount=50;};
+			{Type="Item"; ItemId="glass"; Amount=20;};
+			{Type="Item"; ItemId="sr308parts"; Amount=3;};
 
-			{Type="Item"; ItemId="metal"; Amount=300;};
-			{Type="Item"; ItemId="glass"; Amount=200;};
-			{Type="Item"; ItemId="steelfragments"; Amount=20;};
+			{Type="Item"; ItemId="primegunpart"; Amount=1;};
+		};
+		Category = "Weapons";
+	};
+
+	BlueprintLibrary.New{
+		Id = "deaglebp";
+		Name = "Desert Eagle Blueprint";
+		Product = "deagle";
+		Duration = daySec;
+		SellPrice = 1000;
+		Requirements = {
+			{Type="Stat"; Name="Money"; Amount=15000;};
+			{Type="Stat"; Name="Perks"; Amount=10;};
+			{Type="Item"; ItemId="metal"; Amount=40;};
+			{Type="Item"; ItemId="deagleparts"; Amount=3;};
+
+			{Type="Item"; ItemId="primegunpart"; Amount=1;};
+		};
+		Category = "Weapons";
+	};
+
+	BlueprintLibrary.New{
+		Id = "vectorxbp";
+		Name = "Vector X Blueprint";
+		Product = "vectorx";
+		Duration = daySec;
+		SellPrice = 28800;
+		Requirements = {
+			{Type="Stat"; Name="Money"; Amount=10000;};
+			{Type="Stat"; Name="Perks"; Amount=10;};
+
+			{Type="Item"; ItemId="metal"; Amount=150;};
+			{Type="Item"; ItemId="glass"; Amount=100;};
+			{Type="Item"; ItemId="steelfragments"; Amount=10;};
 
 			{Type="Item"; ItemId="vectorxparts"; Amount=3;};
+
+			{Type="Item"; ItemId="advgunpart"; Amount=1;};
 		};
-		Category="Weapons";
+		Category = "Weapons";
 	};
 
 
 	BlueprintLibrary.New{
-		Id="rusty48bp";
-		Name="Rusty 48 Blueprint";
-		Product="rusty48";
-		Duration=daySec;
-		SellPrice=1200;
-		Requirements={
-			{Type="Stat"; Name="Money"; Amount=30000;};
-			{Type="Stat"; Name="Perks"; Amount=20;};
-			{Type="Stat"; Name="Level"; Amount=440;};
+		Id = "rusty48bp";
+		Name = "Rusty 48 Blueprint";
+		Product = "rusty48";
+		Duration = daySec;
+		SellPrice = 1200;
+		Requirements = {
+			{Type="Stat"; Name="Money"; Amount=15000;};
+			{Type="Stat"; Name="Perks"; Amount=10;};
 
-			{Type="Item"; ItemId="metal"; Amount=200;};
-			{Type="Item"; ItemId="wood"; Amount=50;};
+			{Type="Item"; ItemId="metal"; Amount=100;};
+			{Type="Item"; ItemId="wood"; Amount=25;};
 			{Type="Item"; ItemId="gears"; Amount=3;};
 
 			{Type="Item"; ItemId="rusty48parts"; Amount=3;};
+
+			{Type="Item"; ItemId="advgunpart"; Amount=1;};
 		};
-		Category="Weapons";
+		Category = "Weapons";
 	};
 
 
 	BlueprintLibrary.New{
-		Id="arelshiftcrossbp";
-		Name="Arelshift Cross Blueprint";
-		Product="arelshiftcross";
-		Duration=daySec;
-		SellPrice=1200;
-		Requirements={
-			{Type="Stat"; Name="Money"; Amount=30000;};
-			{Type="Stat"; Name="Perks"; Amount=100;};
-			{Type="Stat"; Name="Level"; Amount=460;};
+		Id = "arelshiftcrossbp";
+		Name = "Arelshift Cross Blueprint";
+		Product = "arelshiftcross";
+		Duration = daySec;
+		SellPrice = 1200;
+		Requirements = {
+			{Type="Stat"; Name="Money"; Amount=15000;};
+			{Type="Stat"; Name="Perks"; Amount=50;};
 			
-			{Type="Item"; ItemId="metal"; Amount=300;};
-			{Type="Item"; ItemId="glass"; Amount=100;};
+			{Type="Item"; ItemId="metal"; Amount=150;};
+			{Type="Item"; ItemId="glass"; Amount=50;};
 			
 			{Type="Item"; ItemId="gears"; Amount=2;};
 			{Type="Item"; ItemId="rope"; Amount=3;};
 			
-			
 			{Type="Item"; ItemId="arelshiftcrossparts"; Amount=3;};
+
+			{Type="Item"; ItemId="advgunpart"; Amount=1;};
 		};
-		Category="Weapons";
+		Category = "Weapons";
 	};
 
 
 	BlueprintLibrary.New{
-		Id="grandgarandbp";
-		Name="Grand Garand Blueprint";
-		Product="grandgarand";
-		Duration=daySec;
-		SellPrice=1500;
-		Requirements={
-			{Type="Stat"; Name="Level"; Amount=500;};
-			{Type="Stat"; Name="Money"; Amount=35000;};
-			{Type="Stat"; Name="Perks"; Amount=50;};
+		Id = "grandgarandbp";
+		Name = "Grand Garand Blueprint";
+		Product = "grandgarand";
+		Duration = daySec;
+		SellPrice = 1500;
+		Requirements = {
+			{Type="Stat"; Name="Money"; Amount=17000;};
+			{Type="Stat"; Name="Perks"; Amount=25;};
 			
-			{Type="Item"; ItemId="wood"; Amount=50;};
+			{Type="Item"; ItemId="wood"; Amount=25;};
 
-			{Type="Item"; ItemId="lens"; Amount=10;};
-			{Type="Item"; ItemId="steelfragments"; Amount=20;};
+			{Type="Item"; ItemId="lens"; Amount=5;};
+			{Type="Item"; ItemId="steelfragments"; Amount=10;};
 			{Type="Item"; ItemId="gears"; Amount=2;};
 			
 			{Type="Item"; ItemId="grandgarandparts1"; Amount=1;};
 			{Type="Item"; ItemId="grandgarandparts2"; Amount=1;};
 			{Type="Item"; ItemId="grandgarandparts3"; Amount=1;};
+
+			{Type="Item"; ItemId="elitegunpart"; Amount=1;};
 		};
-		Category="Weapons";
+		Category = "Weapons";
 	};
 
 	BlueprintLibrary.New{
@@ -1005,17 +1075,18 @@ function BlueprintLibrary.onRequire()
 		Duration = daySec;
 		SellPrice = 1500;
 		Requirements = {
-			{Type="Stat"; Name="Level"; Amount=500;};
-			{Type="Stat"; Name="Money"; Amount=35000;};
-			{Type="Stat"; Name="Perks"; Amount=50;};
+			{Type="Stat"; Name="Money"; Amount=17000;};
+			{Type="Stat"; Name="Perks"; Amount=25;};
 			
-			{Type="Item"; ItemId="screws"; Amount=50;};
-			{Type="Item"; ItemId="steelfragments"; Amount=25;};
+			{Type="Item"; ItemId="screws"; Amount=25;};
+			{Type="Item"; ItemId="steelfragments"; Amount=15;};
 			{Type="Item"; ItemId="gears"; Amount=3;};
 			
 			{Type="Item"; ItemId="rechamber1216parts1"; Amount=1;};
 			{Type="Item"; ItemId="rechamber1216parts2"; Amount=1;};
 			{Type="Item"; ItemId="rechamber1216parts3"; Amount=1;};
+
+			{Type="Item"; ItemId="elitegunpart"; Amount=1;};
 		};
 		Category = "Weapons";
 	};
@@ -1027,9 +1098,8 @@ function BlueprintLibrary.onRequire()
 		Duration = daySec;
 		SellPrice = 1500;
 		Requirements = {
-			{Type="Stat"; Name="Level"; Amount=500;};
-			{Type="Stat"; Name="Money"; Amount=35000;};
-			{Type="Stat"; Name="Perks"; Amount=50;};
+			{Type="Stat"; Name="Money"; Amount=17000;};
+			{Type="Stat"; Name="Perks"; Amount=25;};
 			
 			{Type="Item"; ItemId="lens"; Amount=4;};
 			{Type="Item"; ItemId="motor"; Amount=2;};
@@ -1037,6 +1107,8 @@ function BlueprintLibrary.onRequire()
 			{Type="Item"; ItemId="dualuziparts1"; Amount=1;};
 			{Type="Item"; ItemId="dualuziparts2"; Amount=1;};
 			{Type="Item"; ItemId="dualuziparts3"; Amount=1;};
+
+			{Type="Item"; ItemId="elitegunpart"; Amount=1;};
 		};
 		Category = "Weapons";
 	};
@@ -1748,8 +1820,9 @@ function BlueprintLibrary.New(data)
 	local colorStringText = modRichFormatter.ColorStringText;
 	local colorNumberText = modRichFormatter.ColorNumberText;
 	
+	local dataBpName = data.Name or "";
 	if library[data.Id] ~= nil then 
-		error("BlueprintLibrary>>  Blueprint ID ("..data.Id..") already exist for ("..data.Name..").");
+		error("BlueprintLibrary>>  Blueprint ID ("..data.Id..") already exist for ("..dataBpName..").");
 	end;
 
 	indexCount += 1;
@@ -1777,7 +1850,13 @@ function BlueprintLibrary.New(data)
 	if productLib == nil then
 		error("BlueprintLibrary>>  Blueprint ID ("..data.Id..") has a unknown product ("..productItemId..").");
 	end
-	BlueprintLibrary.Identifiers[data.Name] = data.Id;
+
+	if dataBpName == "" then
+		dataBpName = `{productLib.Name} Blueprint`;
+		data.Name = dataBpName;
+	end
+
+	BlueprintLibrary.Identifiers[dataBpName] = data.Id;
 	local desc = "Used to build "..productLib.Name..(data.Type == modItemsLibrary.Types.Mod and " Mod" or "").." from the workbench.";
 	
 	local requireDesc = "";
@@ -1809,7 +1888,7 @@ function BlueprintLibrary.New(data)
 
 	new(blueprintBase, {
 		Id = data.Id; 
-		Name = data.Name; 
+		Name = dataBpName; 
 		Icon = productLib.Icon; 
 		Description = desc;
 		Sources = data.Sources;

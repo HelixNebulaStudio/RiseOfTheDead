@@ -1889,6 +1889,7 @@ MissionLibrary.New{
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=MoneyReward.Core};
+		{Type="Mission"; Id=95};
 	};
 	Markers={
 		[1]={World="Safehome"; Label="Mason"; Target="Mason"; Type=modMarkers.MarkerTypes.Npc;};
@@ -3330,6 +3331,39 @@ MissionLibrary.New{
 	};
 	AddRequirements = {
 		{Type="Level"; Value=20};
+	};
+	
+};
+
+-- MARK: 95 - Basic Gun Component
+MissionLibrary.New{
+	MissionId = 95;
+	MissionType = MissionLibrary.MissionTypes.Side;
+	Name = "Basic Gun Component";
+	From = "Russell";
+	Description = "Mason says Russell knows how more advanced weapons work, go talk to him.";
+	Persistent = true;
+	World = {"TheWarehouse"; "TheMall";};
+	Checkpoint = {
+		{Text="Travel to W.D. Mall";};
+		{Text="Basic Gun Component Blueprint"; Objectives={"Blueprint"}; CompleteText="Build a Basic Gun Component";};
+		{Text="Basic Gun Component"; Objectives={"Component"}; CompleteText="Give Russell the Basic Gun Component";};
+		{Text="Give Russell the Basic Gun Component";};
+	};
+	Objectives = {
+		["Blueprint"]={Index=1; Description="Defeat Zomborg until you obtain a Basic Gun Component Blueprint"; Type="RequireItem"; RememberCompleted=true; ItemId="basicgunpartbp";};
+		["Component"]={Index=1; Description="Build a Basic Gun Component at the Workbench"; Type="RequireItem"; RememberCompleted=true; ItemId="basicgunpart";};
+	};
+	GuideText = "Talk to Russell";
+	Rewards = {
+		{Type="Perks"; Amount=PerksReward.Side};
+		{Type="Money"; Amount=MoneyReward.Side};
+		{Type="Item"; ItemId="metalpipes"; Quantity=3;};
+	};
+	Markers = {
+		[1]={World="TheMall"; Label="W.D. Mall"; Target=Vector3.new(690.355, 64.16, -859.45); Type=modMarkers.MarkerTypes.Waypoint;};
+		[2]={World="TheMall"; Label="W.D. Mall"; Target=Vector3.new(690.355, 64.16, -859.45); Type=modMarkers.MarkerTypes.Waypoint;};
+		[4]={World="TheWarehouse"; Label="Russell"; Target="Russell"; Type=modMarkers.MarkerTypes.Npc;};
 	};
 	
 };

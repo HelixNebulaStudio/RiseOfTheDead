@@ -82,15 +82,16 @@ return function(CutsceneSequence)
 				if mission.ProgressionPoint == 1 then
 
 				elseif mission.ProgressionPoint == 2 then
-					local playerClass: PlayerClass = shared.modPlayers.get(player);
-
 					local spawnCfs = {};
 					task.delay(5, function()
+						local playerClass: PlayerClass = shared.modPlayers.get(player);
 						checkLoop = true;
 
 						local lastSpawnTick;
 						while checkLoop do
 							if not game.Players:IsAncestorOf(player) then return; end;
+							if playerClass == nil then return end;
+							
 							if lastSpawnTick == nil or tick() > lastSpawnTick then
 								if lastSpawnTick == nil then
 									lastSpawnTick = tick()+math.random(3,4);
@@ -109,6 +110,9 @@ return function(CutsceneSequence)
 									local banditNpcClass: NpcClass = modNpcs.spawn2{
 										Name = "Bandit";
 										CFrame = lastDoorCf;
+										Properties = {
+											IsHostile = true;
+										};
 										BindSetup = function(npcClass: NpcClass)
 											npcClass.Properties.TargetableDistance = 4096;
 											Debugger.Expire(npcClass.Character, 60);
@@ -156,8 +160,6 @@ return function(CutsceneSequence)
 
 
 					elseif targetNpcName == "Frank" then
-						Debugger:Warn("Frank walk out");
-
 						local cutscenePlayersComp = frankNpcClass and frankNpcClass:GetComponent("CutscenePlayers");
 						if cutscenePlayersComp then
 							cutscenePlayersComp:AddPlayer(player, MISSION_ID);

@@ -26,10 +26,8 @@ function treePackage.DoCutsceneState(npcClass: NpcClass)
     local properties = npcClass.Properties;
     local cutscenePlayersComp = npcClass:GetComponent("CutscenePlayers");
 
-    if modBranchConfigurations.IsWorld("TheWarehouse") 
-    or modBranchConfigurations.IsWorld("BioXResearch") then
+    if shared.WorldName == "TheWarehouse" or shared.WorldName == "BioXResearch" then
         if cutscenePlayersComp:IsCutsceneActive("71") then
-            
             local isInsideShop = properties.IsInsideShop;
             if isInsideShop then
                 local shopExitInteractable: InteractableInstance = modInteractables.getById("sundaysShopExit");

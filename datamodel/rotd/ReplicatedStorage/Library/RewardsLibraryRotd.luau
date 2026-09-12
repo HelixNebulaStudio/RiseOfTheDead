@@ -736,10 +736,9 @@ function library.onRequire()
 	local componentChance = 1/3;
 	local commodityChance = 1/3;
 
-	-- MARK: prisoner : 1
+	-- MARK: prisoner
 	library:Add{
 		Id="prisoner";
-		Level=1;
 		Rewards={
 			{Index=1; ItemId="metal"; Quantity={Min=16; Max=25}; Chance=1;};
 			{Index=1; ItemId="metalpipes"; Quantity=1; Chance=1;};
@@ -757,10 +756,9 @@ function library.onRequire()
 		};
 	};
 
-	-- MARK: tanker : 10
+	-- MARK: tanker
 	library:Add{
 		Id="tanker";
-		Level=10;
 		Rewards={
 			{Index=1; ItemId="wood"; Quantity={Min=3; Max=8}; Chance=1;};
 			{Index=1; ItemId="igniter"; Quantity=1; Chance=1;};
@@ -776,10 +774,9 @@ function library.onRequire()
 		};
 	};
 
-	-- MARK: fumes : 20
+	-- MARK: fumes
 	library:Add{
 		Id="fumes";
-		Level=20;
 		Rewards={
 			{Index=1; ItemId="glass"; Quantity={Min=3; Max=5}; Chance=1;};
 			{Index=1; ItemId="gastank"; Quantity=1; Chance=1;};
@@ -796,10 +793,9 @@ function library.onRequire()
 		};
 	};
 
-	-- MARK: corrosive : 40
+	-- MARK: corrosive
 	library:Add{
 		Id="corrosive";
-		Level=40;
 		Rewards={
 			{Index=1; ItemId="glass"; Quantity={Min=4; Max=8}; Chance=1;};
 			{Index=1; ItemId="battery"; Quantity=1; Chance=1;};
@@ -812,10 +808,9 @@ function library.onRequire()
 		};
 	};
 
-	-- MARK: zpider : 60
+	-- MARK: zpider
 	library:Add{
 		Id="zpider";
-		Level=60;
 		Rewards={
 			{Index=1; ItemId="wood"; Quantity={Min=5; Max=12}; Chance=1;};
 			{Index=1; ItemId="wires"; Quantity=1; Chance=1;};
@@ -829,10 +824,9 @@ function library.onRequire()
 		};
 	};
 
-	-- MARK: shadow : 80
+	-- MARK: shadow
 	library:Add{
 		Id="shadow";
-		Level=80;
 		Rewards={
 			{Index=1; ItemId="glass"; Quantity={Min=7; Max=14}; Chance=1;};
 			{Index=1; ItemId="motor"; Quantity=1; Chance=1;};
@@ -847,30 +841,29 @@ function library.onRequire()
 		};
 	};
 
-	-- MARK: zomborg : 110
+	-- MARK: zomborg
 	library:Add{
 		Id="zomborg";
-		Level=110;
 		Rewards={
-			{Index=1; ItemId="wood"; Quantity={Min=18; Max=26}; Chance=1;};
+			{Index=1; ItemId="glass"; Quantity={Min=40; Max=50}; Chance=1;};
 			{Index=1; ItemId="circuitboards"; Quantity=1; Chance=1;};
 			{Index=1; ItemId="lightbulb"; Quantity=1; Chance=componentChance;};
 			
-			{Index=2; ItemId="walkietalkiebp";  Chance=commodityChance;};
-			{Index=2; ItemId="pistolammomagmod";  Chance=modBpChance;};
+			{Index=2; ItemId="walkietalkiebp"; Chance=commodityChance;};
+			{Index=2; ItemId="pistolammomagmod"; Chance=modBpChance;};
 			{Index=2; ItemId="flinchcushioning"; Chance=modBpChance;};
 			
-			{Index=3; ItemId="dualp250bp";  Chance=weaponBpChance;};
-			{Index=3; ItemId="pickaxe";  Chance=3/10;};
+			{Index=3; ItemId="basicgunpartbp"; Chance=1};
+			{Index=3; ItemId="dualp250bp"; Chance=weaponBpChance;};
+			{Index=3; ItemId="pickaxe"; Chance=3/10;};
 		};
 	};
 
-	-- MARK: billies : 160
+	-- MARK: billies
 	library:Add{
 		Id="billies";
-		Level=160;
 		Rewards={
-			{Index=1; ItemId="glass"; Quantity={Min=14; Max=20}; Chance=1;};
+			{Index=1; ItemId="wood"; Quantity={Min=50; Max=60}; Chance=1;};
 			{Index=1; ItemId="lightbulb"; Quantity=1; Chance=1;};
 			
 			{Index=2; ItemId="spotlightbp";  Chance=commodityChance;};
@@ -883,12 +876,11 @@ function library.onRequire()
 		};
 	};
 
-	-- MARK: hectorshot : 180
+	-- MARK: hectorshot
 	library:Add{
 		Id="hectorshot";
-		Level=180;
 		Rewards={
-			{Index=1; ItemId="lens"; Quantity={Min=1; Max=2}; Chance=1;};
+			{Index=1; ItemId="rope"; Quantity={Min=5; Max=8}; Chance=1;};
 			{Index=1; ItemId="tires"; Quantity=1; Chance=1;};
 			
 			{Index=2; ItemId="walkietalkiebp";  Chance=commodityChance;};
@@ -902,12 +894,11 @@ function library.onRequire()
 		};
 	};
 
-	-- MARK: zomborgprime : 280
+	-- MARK: zomborgprime
 	library:Add{
 		Id="zomborgprime";
-		Level=280;
 		Rewards={
-			{Index=1; ItemId="glass"; Quantity={Min=32; Max=45}; Chance=1;};
+			{Index=1; ItemId="lens"; Quantity={Min=6; Max=8}; Chance=1;};
 			{Index=1; ItemId="zricerahornbp"; Quantity=1; Chance=1;};
 			
 			{Index=2; ItemId="explosiveradiusmod"; Chance=modBpChance;};
@@ -928,10 +919,9 @@ function library.onRequire()
 
 	--==Extreme;
 
-	-- MARK: zricera : 50
+	-- MARK: zricera
 	library:Add{
 		Id="zricera";
-		Level=50;
 		Rewards={
 			{Index=1; Weekday="Monday"; ItemId="hmgdamagemod"; Quantity=1; Chance=1;};
 			{Index=1; Weekday="Tuesday"; ItemId="machete"; Quantity=1; Chance=1;};
@@ -946,10 +936,9 @@ function library.onRequire()
 		};
 	};
 
-	-- MARK: vexeron : 100
+	-- MARK: vexeron
 	library:Add{
 		Id="vexeron";
-		Level=100;
 		Rewards={
 			{Index=1; Weekday="Monday"; ItemId="riflehyperdamagemod"; Quantity=1; Chance=1;};
 			{Index=1; Weekday="Tuesday"; ItemId="shotgunautomod"; Quantity=1; Chance=1;};
@@ -971,10 +960,9 @@ function library.onRequire()
 		};
 	};
 
-	-- MARK: mothena : 150
+	-- MARK: mothena
 	library:Add{
 		Id="mothena";
-		Level=150;
 		Rewards={
 			{Index=1; Weekday="Monday"; ItemId="nekronparticulatecachebp"; Quantity=1; Chance=1;};
 			{Index=1; Weekday="Tuesday"; ItemId="pacifistamuletmod"; Quantity=1; Chance=1;};
@@ -988,10 +976,9 @@ function library.onRequire()
 		};
 	};
 
-	-- MARK: banditheli : 200
+	-- MARK: banditheli
 	library:Add{
 		Id="banditheli";
-		Level=200;
 		Rewards={
 			{Index=1; Weekday="Monday"; ItemId="bluntdamagebp"; Quantity=1; Chance=1;};
 			{Index=1; Weekday="Tuesday"; ItemId="bluntknockbackmod"; Quantity=1; Chance=1;};
@@ -1006,10 +993,9 @@ function library.onRequire()
 		};
 	};
 
-	-- MARK: : veinofnekron : 250
+	-- MARK: : veinofnekron
 	library:Add{
 		Id="veinofnekron";
-		Level=250;
 		Rewards={
 			{Index=1; Weekday="Monday"; ItemId="shovel"; Quantity=1; Chance=1;};
 			{Index=1; Weekday="Tuesday"; ItemId="ammorecyclermod"; Quantity=1; Chance=1;};
@@ -1023,10 +1009,9 @@ function library.onRequire()
 
 	--==Raid
 
-	-- MARK: : factorycrate : 5
+	-- MARK: : factorycrate
 	library:Add{
 		Id="factorycrate";
-		Level=5;
 		Rewards={
 			{Index=1; ItemId="cannedbeans"; Quantity={Min=1; Max=2}; Chance=1;};
 
@@ -1038,10 +1023,9 @@ function library.onRequire()
 	};
 
 
-	-- MARK: : officecrate : 30
+	-- MARK: : officecrate
 	library:Add{
 		Id="officecrate";
-		Level=30;
 		Rewards={
 			{Index=1; ItemId="metalpipes"; Quantity=1; Chance=1;};
 			{Index=1; ItemId="igniter"; Quantity=1; Chance=1;};
@@ -1054,10 +1038,9 @@ function library.onRequire()
 		};
 	};
 
-	-- MARK: : tombschest : 120
+	-- MARK: : tombschest
 	library:Add{
 		Id="tombschest";
-		Level=120;
 		Rewards={
 			{Index=1; ItemId="tacticalbowparts"; Quantity={Min=2; Max=3}; Chance=1;};
 			
@@ -1071,10 +1054,9 @@ function library.onRequire()
 		};
 	};
 
-	-- MARK: railwayscrate : 260
+	-- MARK: railwayscrate
 	library:Add{
 		Id="railwayscrate";
-		Level=80;
 		Rewards={
 			{Index=1; ItemId="coal"; Quantity={Min=30; Max=60}; Chance=1;};
 			
@@ -1086,10 +1068,9 @@ function library.onRequire()
 		};
 	};
 
-	-- MARK: banditcrate : 160
+	-- MARK: banditcrate
 	library:Add{
 		Id="banditcrate";
-		Level=160;
 		Rewards={
 			{Index=1; ItemId="pulleymechanicsbp";  Chance=commodityChance;};
 			
@@ -1102,10 +1083,9 @@ function library.onRequire()
 		};
 	};
 
-	-- MARK: hbanditcrate : 360
+	-- MARK: hbanditcrate
 	library:Add{
 		Id="hbanditcrate";
-		Level=300;
 		Rewards={
 			{Index=1; ItemId="scraparmorbp"; Recyclable=true; Chance=1;};
 
@@ -1118,10 +1098,9 @@ function library.onRequire()
 		};
 	};
 
-	-- MARK: abandonedbunkercrate : 460
+	-- MARK: abandonedbunkercrate
 	library:Add{
 		Id="abandonedbunkercrate";
-		Level=300;
 		Rewards={
 			{Index=1; ItemId="rope"; Quantity={Min=1; Max=2}; Chance=1;};
 			{Index=1; ItemId="abgreenkey"; Recyclable=true; Chance=1;};
@@ -1144,10 +1123,9 @@ function library.onRequire()
 
 	--== Survival;
 
-	-- MARK: sectorfcrate : 50
+	-- MARK: sectorfcrate
 	library:Add{
 		Id="sectorfcrate";
-		Level=50;
 		Rewards={
 			{Index=1; ItemId="advmedkit"; Level=0; Quantity=1; Chance=1;};
 			{Index=1; ItemId="metalpipes"; Level=0; Quantity=1; Chance=1;};
@@ -1165,7 +1143,6 @@ function library.onRequire()
 	-- MARK: ucsectorfcrate
 	library:Add{
 		Id="ucsectorfcrate";
-		Level=180;
 		Rewards={
 			{Index=1; ItemId="crowbar"; Level=0; Recyclable=true; Quantity=1; Chance=1;};
 			{Index=1; ItemId="subdmgcalibremod"; Level=30; Recyclable=true; Quantity=1; Chance=9/10;};
@@ -1181,7 +1158,6 @@ function library.onRequire()
 	library:Add{
 		Id = "corruptedsectorfcrate";
 		Name = "Corrupted Sector F Survival";
-		Level = 240;
 		Rewards = {
 			{Wave=4; ItemId="stickygrenade"; Quantity=1; Chance=1;};
 			{Wave=4; ItemId="advmedkit"; Quantity=1; Chance=1;};
@@ -1201,10 +1177,9 @@ function library.onRequire()
 		WaveBased=true;
 	};
 
-	-- MARK: prisoncrate : 140
+	-- MARK: prisoncrate
 	library:Add{
 		Id="prisoncrate";
-		Level=80;
 		Rewards={
 			{Index=1; ItemId="advmedkit"; Level=0; Quantity=1; Chance=1;};
 			{Index=1; ItemId="bloxycola"; Level=0; Quantity=1; Chance=9/10;};
@@ -1221,7 +1196,6 @@ function library.onRequire()
 	-- MARK: nprisoncrate
 	library:Add{
 		Id="nprisoncrate";
-		Level=240;
 		Rewards={
 			{Index=1; ItemId="motor"; Level=0; Quantity={Min=1; Max=2}; Chance=1;};
 			{Index=1; ItemId="tires"; Quantity={Min=1; Max=2}; Chance=1;};
@@ -1238,7 +1212,6 @@ function library.onRequire()
 	library:Add{
 		Id = "corruptedprisoncrate";
 		Name = "Corrupted Prison Survival";
-		Level = 300;
 		Rewards = {
 			{Wave=4; ItemId="stickygrenade"; Quantity=1; Chance=1;};
 			{Wave=4; ItemId="advmedkit"; Quantity={Min=1; Max=2}; Chance=1;};
@@ -1261,7 +1234,6 @@ function library.onRequire()
 	-- MARK: sectordcrate
 	library:Add{
 		Id="sectordcrate";
-		Level=80;
 		Rewards={
 			{Index=1; ItemId="cannedfish"; Level=0; Quantity={Min=1; Max=2}; Chance=1;};
 			{Index=1; ItemId="mk2grenade"; Level=0; Quantity=1; Chance=1;};
@@ -1279,7 +1251,6 @@ function library.onRequire()
 	-- MARK: ucsectordcrate
 	library:Add{
 		Id="ucsectordcrate";
-		Level=260;
 		Rewards={
 			{Index=1; ItemId="wires"; Level=0; Quantity={Min=1; Max=2}; Chance=1;};
 			{Index=1; ItemId="sandwich"; Level=0; Quantity=1; Chance=1;};
@@ -1296,7 +1267,6 @@ function library.onRequire()
 	library:Add{
 		Id = "corruptedsectordcrate";
 		Name = "Corrupted Sector D Survival";
-		Level = 300;
 		Rewards = {
 			{Wave=4; ItemId="stickygrenade"; Quantity={Min=1; Max=2}; Chance=1;};
 			{Wave=4; ItemId="advmedkit"; Quantity=1; Chance=1;};
@@ -1319,7 +1289,6 @@ function library.onRequire()
 	-- MARK: mangrovecrate
 	library:Add{
 		Id = "mangrovecrate";
-		Level = 100;
 		Rewards = {
 			{Index=1; ItemId="tires"; Level=0; Quantity={Min=1; Max=2}; Chance=1;};
 			{Index=1; ItemId="radiator"; Level=0; Quantity=1; Chance=1;};
@@ -1335,7 +1304,6 @@ function library.onRequire()
 	
 	library:Add{
 		Id = "dmangrovecrate";
-		Level = 260;
 		Rewards = {
 			{Index=1; ItemId="motor"; Level=0; Quantity={Min=1; Max=2}; Chance=1;};
 			{Index=1; ItemId="toxiccontainer"; Level=0; Quantity=1; Chance=1;};
@@ -1353,7 +1321,6 @@ function library.onRequire()
 	library:Add{
 		Id = "corruptedmangrovecrate";
 		Name = "Corrupted Swamplands Survival";
-		Level = 340;
 		Rewards = {
 			{Wave=4; ItemId="stickygrenade"; Quantity=1; Chance=1;};
 			{Wave=4; ItemId="advmedkit"; Quantity=1; Chance=1;};
@@ -1375,10 +1342,9 @@ function library.onRequire()
 
 
 	--== Coop;
-	-- MARK: genesiscrate : 220
+	-- MARK: genesiscrate
 	library:Add{
 		Id="genesiscrate";
-		Level=220;
 		Rewards={
 			{Index=1; ItemId="battery"; Quantity={Min=1; Max=3}; Chance=1;};
 
@@ -1389,10 +1355,9 @@ function library.onRequire()
 		};
 	};
 
-	-- MARK: ggenesiscrate : 440
+	-- MARK: ggenesiscrate
 	library:Add{
 		Id="ggenesiscrate";
-		Level=300;
 		Rewards={
 			{Index=1; ItemId="battery"; Quantity={Min=1; Max=3}; Chance=1;};
 
@@ -1404,10 +1369,9 @@ function library.onRequire()
 	};
 
 
-	-- MARK: sunkenchest : 300
+	-- MARK: sunkenchest
 	library:Add{
 		Id="sunkenchest";
-		Level=300;
 		Rewards={
 			{Index=1; ItemId="gears"; Quantity={Min=2; Max=3}; Chance=1;};
 			

@@ -653,6 +653,11 @@ function modItemsLibrary.onRequire()
         end;
     }
 
+    new(weaponCompBase, {Id="basicgunpart"; Name="Basic Gun Component"; Icon="rbxassetid://78720218939428"; Description="Used to build Basic tier guns.";});
+    new(weaponCompBase, {Id="primegunpart"; Name="Prime Gun Component"; Icon="rbxassetid://80129884654446"; Description="Used to build Prime tier guns.";});
+    new(weaponCompBase, {Id="advgunpart"; Name="Advance Gun Component"; Icon="rbxassetid://115196698769867"; Description="Used to build Advance tier guns.";});
+    new(weaponCompBase, {Id="elitegunpart"; Name="Elite Gun Component"; Icon="rbxassetid://138952688056052"; Description="Used to build Elite tier guns.";});
+
     new(weaponCompBase, {Id="tacticalbowparts"; CraftFor="tacticalbow";});
     new(weaponCompBase, {Id="at4parts"; CraftFor="at4";});
     new(weaponCompBase, {Id="sr308parts"; CraftFor="sr308";});
