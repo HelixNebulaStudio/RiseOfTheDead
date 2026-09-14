@@ -832,7 +832,7 @@ function library.onRequire()
 			{Index=1; ItemId="motor"; Quantity=1; Chance=1;};
 			{Index=1; ItemId="circuitboards"; Quantity=1; Chance=componentChance;};
 			
-			{Index=2; ItemId="handgeneratorbp";  Chance=commodityChance;};
+			{Index=2; ItemId="walkietalkiebp"; Chance=commodityChance;};
 			{Index=2; ItemId="hmgreloadspeedmod";  Chance=modBpChance;};
 			{Index=2; ItemId="hmgammocapmod";  Chance=modBpChance;};
 			{Index=2; ItemId="largemedkitbp";  Chance=modBpChance;};
@@ -849,7 +849,7 @@ function library.onRequire()
 			{Index=1; ItemId="circuitboards"; Quantity=1; Chance=1;};
 			{Index=1; ItemId="lightbulb"; Quantity=1; Chance=componentChance;};
 			
-			{Index=2; ItemId="walkietalkiebp"; Chance=commodityChance;};
+			{Index=2; ItemId="handgeneratorbp";  Chance=commodityChance;};
 			{Index=2; ItemId="pistolammomagmod"; Chance=modBpChance;};
 			{Index=2; ItemId="flinchcushioning"; Chance=modBpChance;};
 			

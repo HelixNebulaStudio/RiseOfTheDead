@@ -171,7 +171,7 @@ function library.onRequire()
 	library:Add{Id="Cooper"; Class="Rat"; World="TheHarbor";};
 	library:Add{Id="Lewis"; Class="Rat"; World="TheHarbor"; Avatar="rbxassetid://15944933279";};
 	library:Add{Id="Greg"; Class="Rat"; World="TheHarbor";};
-	library:Add{Id="Caitlin"; Class="Medic"; HeadIcon="Heal"; World="TheHarbor";};
+	library:Add{Id="Caitlin"; Class="Medic"; HeadIcon="Heal"; World="TheHarbor"; Avatar="rbxassetid://140686861083929";};
 
 	library:Add{Id="Zark"; Class="Bandit"; World="BanditCamp"; Avatar="rbxassetid://18932927518"; };
 	library:Add{Id="Loran"; Class="Bandit"; World="BanditCamp";};

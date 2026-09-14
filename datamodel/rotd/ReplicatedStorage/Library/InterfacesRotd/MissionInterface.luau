@@ -380,7 +380,16 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 			if checkpointInfo and checkpointInfo.Text then
 				if not incomplete then
-					pinHudData.TaskText = `<s>{isDev and `[{missionStage}] ` or ``}{checkpointInfo.Text}</s>`;
+					
+					local compText = checkpointInfo.CompleteText;
+					if compText then
+						local itemlib = missionData.SaveData.ItemId and modItemsLibrary:Find(missionData.SaveData.ItemId);
+						compText = string.gsub(compText, "$ItemName", itemlib and itemlib.Name or missionData.SaveData.ItemId or "");
+						pinHudData.TaskText = `{isDev and `[{missionStage}] ` or ``}{compText}`;
+
+					else
+						pinHudData.TaskText = `<s>{isDev and `[{missionStage}] ` or ``}{checkpointInfo.Text}</s>`;
+					end
 				else
 					pinHudData.TaskText = `{isDev and `[{missionStage}] ` or ``}{checkpointInfo.Text}`;
 				end
@@ -2059,29 +2068,26 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 							newTask.Text = `• {taskStr}`;
 						end
 
-						
-						if checkpointInfo.Text then
-							if not incomplete then
-								pinHudData.TaskText = `<s>{isDev and `[{missionStage}] ` or ``}{checkpointInfo.Text}</s>`;
-							else
-								pinHudData.TaskText = `{isDev and `[{missionStage}] ` or ``}{checkpointInfo.Text}`;
-							end
-						else
-							pinHudData.TaskText = ``;
-						end
-
 						pinnedTaskList.Visible = true;
 						
-						if not incomplete then
-							local newTask = taskTemplate:Clone();
+						if incomplete then
+							if checkpointInfo.Text then
+								if not incomplete then
+									pinHudData.TaskText = `<s>{isDev and `[{missionStage}] ` or ``}{checkpointInfo.Text}</s>`;
+								else
+									pinHudData.TaskText = `{isDev and `[{missionStage}] ` or ``}{checkpointInfo.Text}`;
+								end
+							else
+								pinHudData.TaskText = ``;
+							end
 
-							local itemlib = missionData.SaveData.ItemId and modItemsLibrary:Find(missionData.SaveData.ItemId);
+						else
 							local compText = checkpointInfo.CompleteText;
-							compText = string.gsub(compText, "$ItemName", itemlib and itemlib.Name or missionData.SaveData.ItemId or "");
-							
-							newTask.LayoutOrder = 99;
-							newTask.Text = `• {compText}`;
-							newTask.Parent = pinnedTaskList;
+							if compText then
+								local itemlib = missionData.SaveData.ItemId and modItemsLibrary:Find(missionData.SaveData.ItemId);
+								compText = string.gsub(compText, "$ItemName", itemlib and itemlib.Name or missionData.SaveData.ItemId or "");
+								pinHudData.TaskText = `{isDev and `[{missionStage}] ` or ``}{compText}`;
+							end
 						end
 						
 					else

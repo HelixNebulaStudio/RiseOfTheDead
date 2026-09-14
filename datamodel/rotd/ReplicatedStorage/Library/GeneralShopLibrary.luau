@@ -283,6 +283,8 @@ ShopLibrary.Pages = {
 
 			{Type="Product"; Id="pistolhappyautomod"};
 			{Type="Product"; Id="shotgunhappyautomod"};
+
+			{Type="Product"; Id="advgunpartbp"};
 		};
 		
 		BanditsSpecialPage = {
@@ -293,6 +295,7 @@ ShopLibrary.Pages = {
 			{Type="Product"; Id="gunpowderbp"};
 			{Type="Product"; Id="ammoboxbp"};
 			
+			{Type="Product"; Id="advgunpartbp"};
 		};
 		
 		WeaponsPage = {
@@ -351,6 +354,15 @@ ShopLibrary.Pages = {
 			};
 
 		};
+	};
+	
+	Locked = {
+		Hidden = true;
+		
+		Type="Page";
+		Id="Locked";
+		Title="Locked";
+		Desc="• Locked";
 	};
 };
 
@@ -444,6 +456,8 @@ ShopLibrary.Products:Add{Id="gunpowderbp"; Currency="Perks"; Price=25;};
 ShopLibrary.Products:Add{Id="ammoboxbp"; Currency="Perks"; Price=25;};
 
 ShopLibrary.Products:Add{Id="wantedposter"; Currency="Perks"; Price=25;};
+
+ShopLibrary.Products:Add{Id="advgunpartbp"; Currency="Money"; Price=6000;};
 
 --====================================
 

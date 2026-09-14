@@ -804,6 +804,7 @@ MissionLibrary.New{
 		{Type="Mission"; Id=29};
 		{Type="Mission"; Id=30};
 		{Type="Mission"; Id=20};
+		{Type="Mission"; Id=95};
 	};
 	LinkNextMission = 30;
 	StartRequirements = {
@@ -1889,7 +1890,7 @@ MissionLibrary.New{
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=MoneyReward.Core};
-		{Type="Mission"; Id=95};
+		{Type="Mission"; Id=96};
 	};
 	Markers={
 		[1]={World="Safehome"; Label="Mason"; Target="Mason"; Type=modMarkers.MarkerTypes.Npc;};
@@ -1957,6 +1958,7 @@ MissionLibrary.New{
 		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Mission"; Id=58};
 		{Type="Mission"; Id=77};
+		{Type="Mission"; Id=97};
 	};
 	LinkNextMission = 58;
 	StartRequirements = {
@@ -3123,13 +3125,14 @@ MissionLibrary.New{
 	GuideText = "Talk to Joseph";
 	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Core};
+		{Type="Mission"; Id=98};
+		{Type="Mission"; Id=100};
 	};
 	Markers = {
 		[2]={Label="Joseph"; Target="Joseph"; Type=modMarkers.MarkerTypes.Npc;};
 		[10]={World="TheResidentials"; Label="Caitlin"; Target="Caitlin"; Type=modMarkers.MarkerTypes.Npc;};
 	};
 	CanFastTravelWhenActive = {2;3;8;18;};
-	--WIP = true;
 };
 
 -- MARK: 88 - Shadows of Trust
@@ -3346,13 +3349,13 @@ MissionLibrary.New{
 	World = {"TheWarehouse"; "TheMall";};
 	Checkpoint = {
 		{Text="Travel to W.D. Mall";};
-		{Text="Basic Gun Component Blueprint"; Objectives={"Blueprint"}; CompleteText="Build a Basic Gun Component";};
-		{Text="Basic Gun Component"; Objectives={"Component"}; CompleteText="Give Russell the Basic Gun Component";};
+		{Text="Defeat Zomborg until you obtain a Basic Gun Component Blueprint"; Objectives={"Blueprint"}; CompleteText="Build a Basic Gun Component";};
+		{Text="Build a Basic Gun Component at the Workbench"; Objectives={"Component"}; CompleteText="Give Russell the Basic Gun Component";};
 		{Text="Give Russell the Basic Gun Component";};
 	};
 	Objectives = {
-		["Blueprint"]={Index=1; Description="Defeat Zomborg until you obtain a Basic Gun Component Blueprint"; Type="RequireItem"; RememberCompleted=true; ItemId="basicgunpartbp";};
-		["Component"]={Index=1; Description="Build a Basic Gun Component at the Workbench"; Type="RequireItem"; RememberCompleted=true; ItemId="basicgunpart";};
+		["Blueprint"]={Index=1; Description="Basic Gun Component Blueprint"; Type="RequireItem"; RememberCompleted=true; ItemId="basicgunpartbp";};
+		["Component"]={Index=1; Description="Basic Gun Component"; Type="RequireItem"; RememberCompleted=true; ItemId="basicgunpart";};
 	};
 	GuideText = "Talk to Russell";
 	Rewards = {
@@ -3365,7 +3368,151 @@ MissionLibrary.New{
 		[2]={World="TheMall"; Label="W.D. Mall"; Target=Vector3.new(690.355, 64.16, -859.45); Type=modMarkers.MarkerTypes.Waypoint;};
 		[4]={World="TheWarehouse"; Label="Russell"; Target="Russell"; Type=modMarkers.MarkerTypes.Npc;};
 	};
-	
+};
+
+-- MARK: 96 - Prime Gun Component
+MissionLibrary.New{
+	MissionId = 96;
+	MissionType = MissionLibrary.MissionTypes.Side;
+	Name = "Prime Gun Component";
+	From = "Wilson";
+	Description = "Wilson says his walkie talkie signal is too weak. Help him out.";
+	Persistent = true;
+	World = {"TheWarehouse";};
+	Checkpoint = {
+		{Text="Obtain a Walkie Talkie Blueprint"; Objectives={"Blueprint"}; CompleteText="Give Wilson the Walkie Talkie Blueprint"};
+	};
+	Objectives = {
+		["Blueprint"]={Index=1; Description="Walkie Talkie Blueprint"; Type="RequireItem"; ItemId="walkietalkiebp";};
+	};
+	GuideText = "Talk to Wilson";
+	AddRequirements = {
+		{Type="Mission"; Id=95};
+	};
+	Rewards = {
+		{Type="Perks"; Amount=PerksReward.Side};
+		{Type="Money"; Amount=MoneyReward.Side};
+	};
+	Markers = {
+		[1]={World="TheWarehouse"; Label="Wilson"; Target="Wilson"; Type=modMarkers.MarkerTypes.Npc;};
+	};
+};
+
+-- MARK: 97 - Advance Gun Component
+MissionLibrary.New{
+	MissionId = 97;
+	MissionType = MissionLibrary.MissionTypes.Side;
+	Name = "Advance Gun Component";
+	From = "Nate";
+	Description = "Nate wants to upgrade his weapon and he needs something he can't get on his own.";
+	Persistent = true;
+	World = {"TheResidentials";};
+	Checkpoint = {
+		{Text="Buy an Advance Gun Component Blueprint from the Rats or the Bandits"; Objectives={"Blueprint"}; CompleteText="Give Nate the Advance Gun Component Blueprint";};
+	};
+	Objectives = {
+		["Blueprint"]={Index=1; Description="Advance Gun Component Blueprint"; Type="RequireItem"; ItemId="advgunpartbp";};
+	};
+	GuideText = "Talk to Nate";
+	AddRequirements = {
+		{Type="Mission"; Id=96};
+	};
+	Rewards = {
+		{Type="Perks"; Amount=PerksReward.Side};
+		{Type="Money"; Amount=MoneyReward.Side+6000};
+	};
+	Markers = {
+		[1]={World="TheResidentials"; Label="Nate"; Target="Nate"; Type=modMarkers.MarkerTypes.Npc;};
+	};
+};
+
+-- MARK: 98 - Basic to Prime Gun Component
+MissionLibrary.New{
+	MissionId = 98;
+	MissionType = MissionLibrary.MissionTypes.Board;
+	Name = "Basic to Prime Gun Component";
+	From = "Russell";
+	Description = "Russell offers to upgrade your Basic Gun Components.";
+	Persistent = true;
+	World = {"TheWarehouse";};
+	Checkpoint = {
+		{Text="Bring Russell the 2 Basic Gun Components"; Objectives={"Components"}; CompleteText="Exchange 2 Basic Gun Components for a Prime Gun Component";};
+	};
+	Objectives = {
+		["Components"]={Index=1; Description="2 Basic Gun Components"; Type="RequireItem"; ItemId="basicgunpart"; Amount=2;};
+	};
+	GuideText = "Talk to Russell";
+	AddRequirements = {
+		{Type="Mission"; Id=96};
+	};
+	Rewards = {
+		{Type="Perks"; Amount=PerksReward.Easy};
+		{Type="Item"; ItemId="primegunpart"; Quantity=1;};
+		{Type="Card"; Amount=NumberRange.new(1, 1); Types={"boar"; "rabbit"};};
+	};
+	Markers = {
+		[1]={World="TheWarehouse"; Label="Russell"; Target="Russell"; Type=modMarkers.MarkerTypes.Npc;};
+	};
+};
+
+-- MARK: 99 - Prime To Advance
+MissionLibrary.New{
+	MissionId = 99;
+	MissionType = MissionLibrary.MissionTypes.Board;
+	Name = "Prime to Advance";
+	From = "Wilson";
+	Description = "Wilson's gear is damaged and he needs Prime Gun Components.";
+	Persistent = true;
+	World = {"TheWarehouse";};
+	Checkpoint = {
+		{Text="Bring Wilson the 2 Prime Gun Components"; Objectives={"Components"}; CompleteText="Exchange 2 Prime Gun Components for an Advance Gun Component";};
+	};
+	Objectives = {
+		["Components"]={Index=1; Description="2 Prime Gun Components"; Type="RequireItem"; ItemId="primegunpart"; Amount=2;};
+	};
+	GuideText = "Talk to Wilson";
+	AddRequirements = {
+		{Type="Mission"; Id=97};
+	};
+	Rewards = {
+		{Type="Perks"; Amount=PerksReward.Easy};
+		{Type="Item"; ItemId="advgunpart"; Quantity=1;};
+		{Type="Card"; Amount=NumberRange.new(1, 1); Types={"lion"; "wolf"};};
+	};
+	Markers = {
+		[1]={World="TheWarehouse"; Label="Wilson"; Target="Wilson"; Type=modMarkers.MarkerTypes.Npc;};
+	};
+};
+
+-- MARK: 100 - Advance to Elite
+-- temp, elitebp to be unlocked in later missions from military faction
+MissionLibrary.New{
+	MissionId = 100;
+	MissionType = MissionLibrary.MissionTypes.Side;
+	Name = "Advance to Elite";
+	From = "Caitlin";
+	Description = "Caitlin wants to help repair some things in the residentials. Help her out.";
+	Persistent = true;
+	World = {"TheResidentials";};
+	Checkpoint = {
+		{Text="Bring Caitlin the 3 Circuit Boards"; Objectives={"CircuitBoards"}; CompleteText="Give her the 3 Circuit Boards";};
+	};
+	Objectives = {
+		["CircuitBoards"]={Index=1; Description="3 Circuit Boards"; Type="RequireItem"; ItemId="circuitboards"; Amount=3;};
+	};
+	GuideText = "Talk to Caitlin";
+	AddRequirements = {
+		{Type="Mission"; Id=87};
+		{Type="Mission"; Id=97};
+	};
+	Rewards = {
+		{Type="Perks"; Amount=PerksReward.Easy};
+		{Type="Item"; ItemId="elitegunpart"; Quantity=1;};
+		{Type="Card"; Amount=NumberRange.new(1, 1); Types={"rat"; "lion"};};
+	};
+	Markers = {
+		[1]={World="TheResidentials"; Label="Caitlin"; Target="Caitlin"; Type=modMarkers.MarkerTypes.Npc;};
+	};
 };
 
 

@@ -20,20 +20,21 @@ Dialogues.Wilson.DialogueStrings = {
 	["crowdcontrol_yeah"]={
 		CheckMission=MISSION_ID;
 		Say="Yeah, I can."; 
-		Face="Joyful"; Reply="Great! This will really help me out in finding my partner. Kill about a hundred zombies will do.";
+		Reply="Great! This will really help me out in finding my partner. Kill about a hundred zombies will do.";
+		Face="Joyful";
 		FailResponses = {
 			{Reply="You're gonna need bigger weapons before you do this.."};
 		};
 	};
 	["crowdcontrol_stillWorking"]={
 		Say="Still working on it.."; 
-		Face="Smirk"; 
 		Reply="Alright, keep at it.";
+		Face="Smirk"; 
 	};
 	["crowdcontrol_return"]={
 		Say="I think I killed about a hundred zombies..."; 
-		Face="Happy"; 
 		Reply="That'll be good for now, thanks for your help.";
+		Face="Happy"; 
 	};
 	
 };

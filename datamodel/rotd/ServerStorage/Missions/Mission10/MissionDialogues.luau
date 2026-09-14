@@ -92,12 +92,8 @@ if RunService:IsServer() then
 	-- !outline: Wilson Handler
 	Dialogues.Wilson.DialogueHandler = function(player, dialog, data, mission)
 		if mission.Type == 3 then -- Complete
-			dialog:AddChoice("fallen_contact", function(dialog)
-				dialog:AddChoice("fallen_hurry", function(dialog)
-					dialog:AddChoice("fallen_disconnected", function(dialog)
-						dialog:AddChoice("fallen_mia");
-					end)
-				end)
+			dialog:AddChoice({"fallen_contact"; "fallen_hurry"; "fallen_disconnected"}, function(dialog)
+				dialog:AddChoice("fallen_mia");
 			end)
 		end
 	end

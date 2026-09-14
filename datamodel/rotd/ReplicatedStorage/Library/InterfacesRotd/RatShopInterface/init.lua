@@ -417,6 +417,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			end
 		end
 		for cataType, cataInfo in pairs(modShopLibrary.Pages) do
+			if cataInfo.Hidden == true then continue end;
+			
 			local newCataButton = typeOptionTemplate:Clone();
 			local cataButton = newCataButton:WaitForChild("Button");
 
@@ -483,6 +485,29 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 					cataButtonB.MouseButton1Click:Connect(function()
 						interface:PlayButtonClick();
+
+						local mission58Complete = false;
+						local missionData = modData:GetMission(58);
+						if missionData and (missionData.Type == 3 or missionData.Redo == true) then
+							mission58Complete = true;
+						end
+
+						if mission58Complete == false then
+							binds.ClearSelection();
+							binds.ClearPage();
+
+							local lockedLabel = Instance.new("TextLabel");
+							lockedLabel.BackgroundTransparency = 1;
+							lockedLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
+							lockedLabel.RichText = true;
+							lockedLabel.Font = Enum.Font.Arimo;
+							lockedLabel.Size = UDim2.new(1, 0, 0, 40);
+							lockedLabel.TextScaled = true;
+							lockedLabel.Text = `\n\n<b>{cataLabelB.Text}</b> Requires Mission: <b>Double Cross</b>`;
+							lockedLabel.Parent = pageFrame;
+
+							return;
+						end
 						binds.LoadPage(cataType, optInfo.Id);
 					end)
 				end

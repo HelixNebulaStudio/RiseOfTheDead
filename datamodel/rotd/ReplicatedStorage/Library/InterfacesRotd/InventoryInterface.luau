@@ -931,13 +931,15 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
         local notifyItems = {};
         for a=1, #itemIds do
-            local itemId = itemIds[a];
-			local itemLib = modItemsLibrary:Find(itemId);
-			if itemLib == nil then Debugger:Warn(`Invalid QBNotify Item={itemId}`); continue end;
-			
+            local rawItemId: string = itemIds[a];
+            local itemId, qtyStr = string.match(rawItemId, "^(.-):(%d+)$");
+            local qty = qtyStr and tonumber(qtyStr) or nil;
+            local itemLib = modItemsLibrary:Find(itemId or rawItemId);
+            if itemLib == nil then Debugger:Warn(`Invalid QBNotify Item={rawItemId}`); continue end;
+
             table.insert(notifyItems, {
                 Icon = itemLib.Icon;
-                Desc = `Picked Up\n{itemLib.Name}`;
+                Desc = `Picked Up\n{itemLib.Name}{qty and qty > 1 and " x"..qty or ""}`;
             })
         end
 

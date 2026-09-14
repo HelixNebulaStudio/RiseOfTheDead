@@ -12,27 +12,6 @@ local MISSION_ID = 19;
 
 -- MARK: Wilson Dialogues
 Dialogues.Wilson.DialogueStrings = {
-	["medbre_init"]={
-		Face="Worried"; 
-		Reply="Stan saved my life, I was trapped and he heard me cried for help. I miss him so much..";
-	};
-
-	["medbre_start"]={
-		CheckMission=MISSION_ID;
-		Say="Hey, it's okay. I have some news about Stan.";
-		Face="Worried"; 
-		Reply="News.. about Stan?";
-		FailResponses = {
-			{Reply="You're too new here, come back once you're more familiar with the place."};
-		};
-	};
-	["medbre_start2"]={
-		Say="Yes, so apparently Stan is still alive.";
-		Face="Disbelief"; 
-		Reply="...";
-	};
-
-
 	["tickhunting_sure"]={
 		Say="Sure."; 
 		Face="Ugh"; 

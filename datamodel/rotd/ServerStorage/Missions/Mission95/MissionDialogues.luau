@@ -39,7 +39,7 @@ Dialogues.Russell.DialogueStrings = {
 	};
 	["basicguncomponent_thanks"]={
 		Say="Here it is.";
-        Reply="Not bad for a first build. Stick around and I'll show you how to make more advanced gun components.";
+        Reply="Not bad for a first build. When I'm free, I could help you turn this into a more advanced gun component.";
 		Face="Confident"; 
 	};
 };

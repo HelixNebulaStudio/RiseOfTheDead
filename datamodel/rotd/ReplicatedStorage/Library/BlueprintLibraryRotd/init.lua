@@ -566,11 +566,12 @@ function BlueprintLibrary.onRequire()
 		Id = "primegunpartbp";
 		Product = "primegunpart";
 		Duration = 10;
-		SellPrice = 100;
+		SellPrice = 300;
 		Requirements = {
 			{Type="Item"; ItemId="wood"; Amount=20;};
 			{Type="Item"; ItemId="rope"; Amount=2;};
 		};
+		Sources={"Obtained from <b>Wilson in Mission: Prime Gun Component</b>";};
 		Category = "Components";
 	};
 
@@ -579,7 +580,7 @@ function BlueprintLibrary.onRequire()
 		Name = "Advance Gun Component Blueprint";
 		Product = "advgunpart";
 		Duration = 10;
-		SellPrice = 150;
+		SellPrice = 600;
 		Requirements = {
 			{Type="Item"; ItemId="metal"; Amount=30;};
 			{Type="Item"; ItemId="gears"; Amount=3;};
@@ -592,7 +593,7 @@ function BlueprintLibrary.onRequire()
 		Name = "Elite Gun Component Blueprint";
 		Product = "elitegunpart";
 		Duration = 10;
-		SellPrice = 200;
+		SellPrice = 1200;
 		Requirements = {
 			{Type="Item"; ItemId="glass"; Amount=40;};
 			{Type="Item"; ItemId="battery"; Amount=4;};
