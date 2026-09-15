@@ -83,6 +83,7 @@ if RunService:IsServer() then
 					shared.Notify(player, "You received 1 Prime Gun Component Blueprint from Wilson.", "Reward");
 					
                     modMission:CompleteMission(player, MISSION_ID);
+					profile:GuiAction("specialpickup", {"primegunpartbp";});
 				end)
 
 			else
@@ -91,7 +92,7 @@ if RunService:IsServer() then
 			end
 
 		elseif mission.Type == 3 then -- Complete
-			dialog:SetInitiate("I still got spare Walkie Talkie Blueprints if you need more.");
+			dialog:SetInitiate("I still got spare Prime Gun Component Blueprints if you need more.");
 			dialog:AddChoice("primeguncomponent_trade", function(dialog)
 				local storageItem = inventory:FindByItemId("walkietalkiebp");
 				if storageItem == nil then
@@ -102,6 +103,7 @@ if RunService:IsServer() then
 				inventory:Remove(storageItem.ID, 1);
 				inventory:Add("primegunpartbp", {Quantity=1});
 				shared.Notify(player, "You traded 1 Walkie Talkie Blueprint for 1 Prime Gun Component Blueprint.", "Reward");
+				profile:GuiAction("specialpickup", {"primegunpartbp";});
 			end)
 
 		elseif mission.Type == 4 then -- Failed

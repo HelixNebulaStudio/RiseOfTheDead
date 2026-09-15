@@ -34,7 +34,7 @@ Dialogues.Nate.DialogueStrings = {
 	};
 	["advguncomponent_give"]={
 		Say="I have the Advance Gun Component Blueprint.";
-		Reply="No waay, you actually got one? Hand it over, hand it over!";
+		Reply="No waay, you actually got one?";
 		Face="Surprise";
 	};
 	["advguncomponent_thanks"]={

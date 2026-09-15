@@ -900,6 +900,7 @@ function library.onRequire()
 		Rewards={
 			{Index=1; ItemId="lens"; Quantity={Min=6; Max=8}; Chance=1;};
 			{Index=1; ItemId="zricerahornbp"; Quantity=1; Chance=1;};
+			{Index=1; ItemId="metalpipes"; Quantity={Min=2; Max=4}; Chance=1;};
 			
 			{Index=2; ItemId="explosiveradiusmod"; Chance=modBpChance;};
 			{Index=2; ItemId="riflecritmultimod"; Chance=modBpChance;};

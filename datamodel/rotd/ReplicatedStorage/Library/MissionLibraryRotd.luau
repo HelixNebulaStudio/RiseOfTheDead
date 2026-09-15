@@ -3362,6 +3362,7 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Side};
 		{Type="Money"; Amount=MoneyReward.Side};
 		{Type="Item"; ItemId="metalpipes"; Quantity=3;};
+		{Type="Mission"; Id=96};
 	};
 	Markers = {
 		[1]={World="TheMall"; Label="W.D. Mall"; Target=Vector3.new(690.355, 64.16, -859.45); Type=modMarkers.MarkerTypes.Waypoint;};
@@ -3392,6 +3393,7 @@ MissionLibrary.New{
 	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Side};
 		{Type="Money"; Amount=MoneyReward.Side};
+		{Type="Mission"; Id=97};
 	};
 	Markers = {
 		[1]={World="TheWarehouse"; Label="Wilson"; Target="Wilson"; Type=modMarkers.MarkerTypes.Npc;};
@@ -3420,6 +3422,7 @@ MissionLibrary.New{
 	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Side};
 		{Type="Money"; Amount=MoneyReward.Side+6000};
+		{Type="Mission"; Id=100};
 	};
 	Markers = {
 		[1]={World="TheResidentials"; Label="Nate"; Target="Nate"; Type=modMarkers.MarkerTypes.Npc;};
