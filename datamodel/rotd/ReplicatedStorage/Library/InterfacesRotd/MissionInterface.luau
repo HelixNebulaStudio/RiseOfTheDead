@@ -2072,11 +2072,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						
 						if incomplete then
 							if checkpointInfo.Text then
-								if not incomplete then
-									pinHudData.TaskText = `<s>{isDev and `[{missionStage}] ` or ``}{checkpointInfo.Text}</s>`;
-								else
-									pinHudData.TaskText = `{isDev and `[{missionStage}] ` or ``}{checkpointInfo.Text}`;
-								end
+								pinHudData.TaskText = `{isDev and `[{missionStage}] ` or ``}{checkpointInfo.Text}`;
+								
 							else
 								pinHudData.TaskText = ``;
 							end

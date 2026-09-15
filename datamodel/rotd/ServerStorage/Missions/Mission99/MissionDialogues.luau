@@ -18,7 +18,7 @@ Dialogues.Wilson.DialogueStrings = {
 	};
 	["pgctoagc_give"]={
 		Say="I have 2 Prime Gun Components.";
-		Reply="Perfect! Advance Gun Components for your 2 Prine Gun Component?";
+		Reply="Perfect! Advance Gun Components for your 2 Prime Gun Component?";
 		Face="Happy";
 	};
 	["pgctoagc_thanks"]={

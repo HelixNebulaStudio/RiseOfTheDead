@@ -496,15 +496,18 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 							binds.ClearSelection();
 							binds.ClearPage();
 
-							local lockedLabel = Instance.new("TextLabel");
-							lockedLabel.BackgroundTransparency = 1;
-							lockedLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
-							lockedLabel.RichText = true;
-							lockedLabel.Font = Enum.Font.Arimo;
-							lockedLabel.Size = UDim2.new(1, 0, 0, 40);
-							lockedLabel.TextScaled = true;
-							lockedLabel.Text = `\n\n<b>{cataLabelB.Text}</b> Requires Mission: <b>Double Cross</b>`;
-							lockedLabel.Parent = pageFrame;
+							if pageFrame:FindFirstChild("LockedText") == nil then
+								local lockedLabel = Instance.new("TextLabel");
+								lockedLabel.Name = "LockedText";
+								lockedLabel.BackgroundTransparency = 1;
+								lockedLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
+								lockedLabel.RichText = true;
+								lockedLabel.Font = Enum.Font.Arimo;
+								lockedLabel.Size = UDim2.new(1, 0, 0, 40);
+								lockedLabel.TextScaled = true;
+								lockedLabel.Text = `\n\n<b>{cataLabelB.Text}</b> Requires Mission: <b>Double Cross</b>`;
+								lockedLabel.Parent = pageFrame;
+							end
 
 							return;
 						end

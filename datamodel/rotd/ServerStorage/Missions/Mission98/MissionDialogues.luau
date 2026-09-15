@@ -23,7 +23,7 @@ Dialogues.Russell.DialogueStrings = {
 	};
 	["bgctopgc_thanks"]={
 		Say="Here you go.";
-		Reply="Alright, give me a moment here... unscrew, re-seat, tighten... and boom. One Prime Gun Component, fresh off the workbench.";
+		Reply="Alright, give me a moment here.. unscrew, re-seat, tighten.. and boom. One Prime Gun Component, fresh off the workbench.";
 		Face="Confident";
 	};
 };

@@ -3495,7 +3495,7 @@ MissionLibrary.New{
 	Persistent = true;
 	World = {"TheResidentials";};
 	Checkpoint = {
-		{Text="Bring Caitlin the 3 Circuit Boards"; Objectives={"CircuitBoards"}; CompleteText="Give her the 3 Circuit Boards";};
+		{Text="Caitlin needs 3 Circuit Boards"; Objectives={"CircuitBoards"}; CompleteText="Give Caitlin the 3 Circuit Boards";};
 	};
 	Objectives = {
 		["CircuitBoards"]={Index=1; Description="3 Circuit Boards"; Type="RequireItem"; ItemId="circuitboards"; Amount=3;};
