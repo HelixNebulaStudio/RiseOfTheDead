@@ -94,6 +94,11 @@ Dialogues.Patrick.DialogueStrings = {
 		Face="Confident";
 		Reply="Alright.";
 	};
+	["tpwarehouse"]={
+		Say="Let's go back to the warehouse. (Travel to W.D. The Warehouse)"; 
+		Face="Confident";
+		Reply="Alright.";
+	};
 };
 
 

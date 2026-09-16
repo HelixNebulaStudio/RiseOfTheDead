@@ -5,7 +5,6 @@ local TweenService = game:GetService("TweenService");
 
 local localPlayer = game.Players.LocalPlayer;
 
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modReplicationManager = shared.require(game.ReplicatedStorage.Library.ReplicationManager);
 
 --==
@@ -15,8 +14,9 @@ if RunService:IsServer() then
 	modNpcs = shared.modNpcs;
 	modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
+	cutsceneAssets = script.Parent:WaitForChild("CutsceneAssets");
 	
-	if modBranchConfigurations.IsWorld("TheWarehouse") or RunService:IsStudio() then
+	if shared.WorldName == "TheWarehouse" or RunService:IsStudio() then
 		shared.modEventService:OnInvoked("Players_BindWieldEvent", function(event: EventPacket, ...) 
 			local action: string, toolHandler: ToolHandlerInstance = ...;
 
@@ -62,9 +62,11 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	if not modBranchConfigurations.IsWorld("TheWarehouse") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
+	if shared.WorldName ~= "TheWarehouse" then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
 	
 	CutsceneSequence:Initialize(function()
+		local triggerPrefab = cutsceneAssets:WaitForChild("summonTrigger");
+
 		local players = CutsceneSequence:GetPlayers();
 		local player: Player = players[1];
 		local mission = modMission:GetMission(player, MISSION_ID);
@@ -100,12 +102,12 @@ return function(CutsceneSequence)
 					if cargoScene == nil then
 						shared.modPlayers.cameraShakeAndZoom(player, 5, 0, 1, 2, false);
 						
-						cargoScene = script:WaitForChild("CargoScene"):Clone();
+						cargoScene = cutsceneAssets:WaitForChild("CargoScene"):Clone();
 						cargoScene.Parent = workspace;
 						modReplicationManager.ReplicateOut(player, cargoScene);
 
 						helicopterPrefab = cargoScene:WaitForChild("HelicopterRig");
-						local clientEffect = script.HelicopterEffect:Clone();
+						local clientEffect = cutsceneAssets:WaitForChild("HelicopterEffect"):Clone();
 						local prefabTag = clientEffect:WaitForChild("Prefab");
 						prefabTag.Value = helicopterPrefab;
 
@@ -163,7 +165,7 @@ return function(CutsceneSequence)
 
 				elseif mission.ProgressionPoint == 2 then
 
-					walterNpcClass.SetAnimation("TakeOffMask", {script:WaitForChild("TakeOffMask")});
+					walterNpcClass.SetAnimation("TakeOffMask", {cutsceneAssets:WaitForChild("TakeOffMask")});
 
 					TweenService:Create(heliCfTag, TweenInfo.new(1), {
 						Value=CFrame.new(665.327759, 122.156693, -65.71595, -0.949426413, 0.150374383, 0.275639594, 0.156434491, 0.987688363, -3.7252903e-09, -0.272246003, 0.0431195311, -0.961261153);
@@ -220,7 +222,7 @@ return function(CutsceneSequence)
 					task.wait(3);
 					walterNpcClass.PlayAnimation("TakeOffMask");
 					task.wait(0.5);
-					local weldSwap = script:WaitForChild("MaskWeld");
+					local weldSwap = cutsceneAssets:WaitForChild("MaskWeld");
 					local nWeld = weldSwap:Clone();
 					local oWeld = walterNpcClass.Character:WaitForChild("Gas Mask"):WaitForChild("Handle"):WaitForChild("AccessoryWeld");
 
@@ -244,7 +246,7 @@ return function(CutsceneSequence)
 				elseif mission.ProgressionPoint >= 3 then
 
 					if cargoScene == nil then
-						cargoScene = script:WaitForChild("CargoScene"):Clone();
+						cargoScene = cutsceneAssets:WaitForChild("CargoScene"):Clone();
 						cargoScene.Parent = workspace;
 						modReplicationManager.ReplicateOut(player, cargoScene);
 
@@ -255,7 +257,7 @@ return function(CutsceneSequence)
 						cargoDoorA:PivotTo(CFrame.new(654.471191, 97.3799973, -74.124527) * CFrame.Angles(0, math.rad(-125), 0));
 						cargoDoorB:PivotTo(CFrame.new(651.385498, 97.3799973, -63.7809982) * CFrame.Angles(0, math.rad(125), 0));
 
-						local weldSwap = script:WaitForChild("MaskWeld");
+						local weldSwap = cutsceneAssets:WaitForChild("MaskWeld");
 						local nWeld = weldSwap:Clone();
 						local oWeld = walterNpcClass.Character:WaitForChild("Gas Mask"):WaitForChild("Handle"):WaitForChild("AccessoryWeld");
 
@@ -278,7 +280,7 @@ return function(CutsceneSequence)
 			elseif mission.Type == 3 then -- OnComplete
 
 				if cargoScene == nil then
-					cargoScene = script:WaitForChild("CargoScene"):Clone();
+					cargoScene = cutsceneAssets:WaitForChild("CargoScene"):Clone();
 					cargoScene.Parent = workspace;
 					modReplicationManager.ReplicateOut(player, cargoScene);
 
@@ -289,7 +291,7 @@ return function(CutsceneSequence)
 					cargoDoorA:SetPrimaryPartCFrame(CFrame.new(654.471191, 97.3799973, -74.124527) * CFrame.Angles(0, math.rad(-125), 0));
 					cargoDoorB:SetPrimaryPartCFrame(CFrame.new(651.385498, 97.3799973, -63.7809982) * CFrame.Angles(0, math.rad(125), 0));
 
-					local weldSwap = script:WaitForChild("MaskWeld");
+					local weldSwap = cutsceneAssets:WaitForChild("MaskWeld");
 					local nWeld = weldSwap:Clone();
 					local oWeld = walterNpcClass.Character:WaitForChild("Gas Mask"):WaitForChild("Handle"):WaitForChild("AccessoryWeld");
 

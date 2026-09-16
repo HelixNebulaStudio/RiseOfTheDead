@@ -3436,6 +3436,7 @@ MissionLibrary.New{
 	Name = "Basic to Prime Gun Component";
 	From = "Russell";
 	Description = "Russell offers to upgrade your Basic Gun Components.";
+	Timer=BOARD_TIME_LIMIT;
 	Persistent = true;
 	World = {"TheWarehouse";};
 	Checkpoint = {
@@ -3465,6 +3466,7 @@ MissionLibrary.New{
 	Name = "Prime to Advance";
 	From = "Wilson";
 	Description = "Wilson's gear is damaged and he needs Prime Gun Components.";
+	Timer=BOARD_TIME_LIMIT;
 	Persistent = true;
 	World = {"TheWarehouse";};
 	Checkpoint = {

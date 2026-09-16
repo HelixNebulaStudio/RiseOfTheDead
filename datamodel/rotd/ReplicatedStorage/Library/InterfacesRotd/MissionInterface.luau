@@ -2368,13 +2368,19 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						while localPlayer:IsAncestorOf(missionBoard) do
 							if window.Visible == false then break; end;
 
+							local restockTimeDuration = modMissionsLibrary.BoardMissionStockTimer;
 							local missionCycleData = modData:GetEvent("missionCycleData");
 							if missionCycleData and missionCycleData.LastAddUnixTime ~= 0 then
-								local nextTime = missionCycleData.LastAddUnixTime + shared.Const.Hour;
+								local nextTime = missionCycleData.LastAddUnixTime + restockTimeDuration;
 								local timeUntilNext = nextTime - workspace:GetServerTimeNow();
-								nextMissionLabel.Text = modSyncTime.toString(timeUntilNext);
-								
-								radialBar:UpdateLabel(1-math.clamp(timeUntilNext/shared.Const.Hour, 0, 0.89));
+
+								if timeUntilNext <= 0 then
+									nextMissionLabel.Text = "Full";
+									radialBar:UpdateLabel(1);
+								else
+									nextMissionLabel.Text = modSyncTime.toString(timeUntilNext);
+									radialBar:UpdateLabel(1-math.clamp(timeUntilNext/restockTimeDuration, 0, 0.89));
+								end
 							end
 
 							nextDailyBonusTime = dailyBoardBonusFlag 

@@ -87,16 +87,21 @@ if RunService:IsServer() then
 		elseif mission.Type == 3 then -- Complete
 			dialog:SetInitiate("I still got some spare Elite Gun Components if you need more.");
 			dialog:AddChoice("advtoelite_done", function(dialog)
-				local storageItem = inventory:FindByItemId("circuitboards");
-				if storageItem <= 3 then
+				local totalCount, itemList = inventory:ListQuantity("circuitboards", 3);
+				
+				if totalCount < 3 then
 					shared.Notify(player, "You don't have enough Circuitboards in your inventory.", "Negative");
 					return;
-				end
 
-				inventory:Remove(storageItem.ID, 3);
-				inventory:Add("elitegunpart", {Quantity=1});
-				shared.Notify(player, "You traded 3 Circuitboards for 1 Elite Gun Component.", "Reward");
-				profile:GuiAction("specialpickup", {"eliteguncomponent";});
+				else
+					for a=1, #itemList do
+						inventory:Remove(itemList[a].ID, itemList[a].Quantity);
+					end
+
+					inventory:Add("elitegunpart", {Quantity=1});
+					shared.Notify(player, "You traded 3 Circuitboards for 1 Elite Gun Component.", "Reward");
+					profile:GuiAction("specialpickup", {"eliteguncomponent";});
+				end
 			end)
 
 		elseif mission.Type == 4 then -- Failed
