@@ -100,7 +100,7 @@ if RunService:IsServer() then
 
 					inventory:Add("elitegunpart", {Quantity=1});
 					shared.Notify(player, "You traded 3 Circuitboards for 1 Elite Gun Component.", "Reward");
-					profile:GuiAction("specialpickup", {"eliteguncomponent";});
+					profile:GuiAction("specialpickup", {"elitegunpart";});
 				end
 			end)
 

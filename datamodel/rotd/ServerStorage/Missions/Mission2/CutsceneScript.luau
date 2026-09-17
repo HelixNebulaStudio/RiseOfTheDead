@@ -93,8 +93,8 @@ if RunService:IsServer() then
 					if mission.ProgressionPoint < 7 then
 						mission.ProgressionPoint = 7;
 						modAnalyticsService:LogOnBoarding{
-							Player=player;
-							OnBoardingStep=modAnalyticsService.OnBoardingSteps.Mission2_PurchaseAmmo;
+							Player = player;
+							OnBoardingStep = modAnalyticsService.OnBoardingSteps.Mission2_PurchaseAmmo;
 						};
 
 					elseif m2restorepointEvent then
@@ -260,15 +260,9 @@ return function(CutsceneSequence)
 					task.spawn(function()
 						task.wait(5);
 
-						local abExp_ForceDirectCam = profile:GetPlayerConfig("Exp_ForceDirectCamera");
-						if RunService:IsStudio() then
-							abExp_ForceDirectCam = true;
-						end
-						if abExp_ForceDirectCam then
-							task.spawn(function()
-								modStatusEffects.DirectCamera(player, Vector3.new(4.31, 57.6, 4.797), 60);
-							end)
-						end
+						task.spawn(function()
+							modStatusEffects.DirectCamera(player, Vector3.new(4.31, 57.6, 4.797), 60);
+						end)
 					end)
 
 				elseif mission.ProgressionPoint == 3 then
@@ -299,16 +293,10 @@ return function(CutsceneSequence)
 					masonNpcClass.Properties.CutsceneActive = false;
 
 				elseif mission.ProgressionPoint == 6 then
-					
-					local abExp_ForceDirectCam = profile:GetPlayerConfig("Exp_ForceDirectCamera");
-					if RunService:IsStudio() then
-						abExp_ForceDirectCam = true;
-					end
-					if abExp_ForceDirectCam then
-						task.spawn(function()
-							modStatusEffects.DirectCamera(player, Vector3.new(-9.704, 59.172, 18.53), 60);
-						end)
-					end
+				
+					task.spawn(function()
+						modStatusEffects.DirectCamera(player, Vector3.new(-9.704, 59.172, 18.53), 60);
+					end)
 					
 					local p250StorageItem = modStorage.FindItemIdFromStorages("p250", player);
 					if p250StorageItem then
@@ -317,16 +305,9 @@ return function(CutsceneSequence)
 					end
 
 				elseif mission.ProgressionPoint == 7 then
-
-					local abExp_ForceDirectCam = profile:GetPlayerConfig("Exp_ForceDirectCamera");
-					if RunService:IsStudio() then
-						abExp_ForceDirectCam = true;
-					end
-					if abExp_ForceDirectCam then
-						task.spawn(function()
-							modStatusEffects.DirectCamera(player, Vector3.new(11.464, 57.691, -37.268), 60);
-						end)
-					end
+					task.spawn(function()
+						modStatusEffects.DirectCamera(player, Vector3.new(11.464, 57.691, -37.268), 60);
+					end)
 
 				elseif mission.ProgressionPoint == 9 then
 

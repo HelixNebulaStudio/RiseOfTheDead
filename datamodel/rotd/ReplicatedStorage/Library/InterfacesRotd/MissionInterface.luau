@@ -2411,6 +2411,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 						for _, obj in pairs(listFrame:GetChildren()) do
 							if not obj:IsA("GuiObject") then continue end;
+							if obj:IsA("TextLabel") then continue end;
 
 							local newButton = obj;
 
@@ -2451,6 +2452,21 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					end)
 
 					-- MARK: Board Missions Rendering
+					if #repeatableMissionList <= 0 then
+						local emptyLabel = Instance.new("TextLabel");
+						emptyLabel.Name = "EmptyLabel";
+						emptyLabel.BackgroundTransparency = 1;
+						emptyLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
+						emptyLabel.Size = UDim2.new(1, 0, 0, 40);
+						emptyLabel.Text = "No board missions at the moment.";
+						emptyLabel.Parent = listFrame;
+
+					else
+						if listFrame:FindFirstChild("EmptyLabel") then
+							listFrame.EmptyLabel:Destroy();
+						end
+
+					end
 					for a=1, #repeatableMissionList do
 						local missionData = repeatableMissionList[a].Data;
 						if missionData.Type == 1 or missionData.Type == 3 then continue end;
@@ -2685,7 +2701,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				hourlyMissionListing.SliceCenter = Rect.new(2, 0, 24, 0);
 			end
 
-			hourlyMissionListing:SetAttribute("OverrideVisible", countRepeatableMissions > 0);
+			local isVisible = countRepeatableMissions > 0;
+			local localplayerStats = modData.GetStats();
+			if localplayerStats and localplayerStats.Level and localplayerStats.Level >= 10 then
+				isVisible = true;
+			end
+			hourlyMissionListing:SetAttribute("OverrideVisible", isVisible);
 		end
 
 		-- General Missions;
@@ -4721,6 +4742,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             window:Update();
         end
     end));
+
+    modClientGuis.bindGuiRemote("missionsnotify", function(notifyItems)
+        local qbNotifications: InterfaceElement = interface:GetOrDefaultElement("QuickButtonsNotifications");
+        if qbNotifications == nil then return end;
+
+        qbNotifications.queueNotify("Missions", notifyItems);
+    end)
 
     modClientGuis.bindGuiRemote("missionsunlocked", function(missionsUnlockedList)
         local qbNotifications: InterfaceElement = interface:GetOrDefaultElement("QuickButtonsNotifications");

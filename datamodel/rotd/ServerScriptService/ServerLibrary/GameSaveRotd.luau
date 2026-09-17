@@ -335,6 +335,35 @@ function modGameSave:CalculateLevel()
 				
 				self.Profile:GuiAction("skillsunlocked", skillUnlockedList);
 			end)
+			task.spawn(function()
+				local missionProfile = shared.modMission.GetMissions(player.Name);
+				if missionProfile == nil then return end;
+
+				local newMissions = {};
+
+				local missionsList = missionProfile:GetTypes(2);
+				for a=1, #missionsList do
+					local mission: Mission = missionsList[a];
+					if mission.Library.StartRequirements and mission.Library.StartRequirements.Level == totalLevels then
+						local canStart = missionProfile:CanStart(mission.Id);
+						if not canStart then continue end
+						table.insert(newMissions, mission.Id);
+					end
+				end
+				
+				if totalLevels == 10 then
+					self.Profile:GuiAction("missionsnotify", {
+						{
+							Icon = `rbxassetid://1550983590`;
+							Desc = `Mission Board Unlocked!`;
+						}
+					});
+				end
+
+				if #newMissions > 0 then
+					self.Profile:GuiAction("missionsunlocked", newMissions);
+				end
+			end)
 		end
 		remoteHudNotification:FireClient(player, "Levelup", {Level=totalLevels;});
 		

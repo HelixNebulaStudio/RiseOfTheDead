@@ -158,7 +158,7 @@ function modProfile.onRequire()
 				Success = false;
 			};
 			
-			local profile = modProfile:Get(player);
+			local profile: ProfileRotd = modProfile:Get(player);
 			if profile == nil then
 				modServerManager:TeleportToPrivateServer("MainMenu", modServerManager:CreatePrivateServer("MainMenu"), {player});
 				return rPacket;
@@ -201,21 +201,31 @@ function modProfile.onRequire()
 			end
 
 			local beginningMission = saveData.Missions:Get(1);
+			
+			local exp_SkipMission1Test = profile:GetPlayerConfig("Exp_SkipMission1Test") == true;
+			if beginningMission == nil and exp_SkipMission1Test then
+				Debugger:Warn(`Exp_SkipMission1Test ({player}) = true;`);
+				shared.modMission:CompleteMission(player, 1);
+				beginningMission = saveData.Missions:Get(1);
+			end
+
 			if beginningMission and beginningMission.Type == 3 then
 				local spawnId = saveData.Spawn;
 				local worldId = modBranchConfigurations.GetWorldOfSpawn(spawnId);
 				
 				if worldId == nil then
-					shared.Notify(player, "Invalid SpawnId ("..spawnId.."), spawning in the warehouse.", "Negative");
+					Debugger:Warn(`Invalid SpawnId ({spawnId}), spawning in The Warehouse safehouse.`);
+					shared.Notify(player, `Invalid SpawnId ({spawnId}), spawning in The Warehouse safehouse.`, "Negative");
 					worldId = "TheWarehouse";
 				end
+
 				modServerManager:Travel(player, worldId);
 				rPacket.Index = 2;
 				
 			else
 				modAnalyticsService:LogOnBoarding{
-					Player=player;
-					OnBoardingStep=modAnalyticsService.OnBoardingSteps.ClickPlay;
+					Player = player;
+					OnBoardingStep = modAnalyticsService.OnBoardingSteps.ClickPlay;
 				};
 				saveData.Missions:Start(1);
 				

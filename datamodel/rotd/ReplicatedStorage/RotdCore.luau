@@ -7,7 +7,7 @@ local RotdCore = {};
 local modGlobalVars = shared.require(game.ReplicatedStorage.GlobalVariables);
 modGlobalVars.DevVersion="3.0.x";
 modGlobalVars.GameVersion = "3.0";
-modGlobalVars.GameBuild = "152";
+modGlobalVars.GameBuild = "153";
 modGlobalVars.ModeVerLabel = `$Fps fps\t$UpTime\tRotd $GameVersion $BranchName $IsMobile`;
 
 --==

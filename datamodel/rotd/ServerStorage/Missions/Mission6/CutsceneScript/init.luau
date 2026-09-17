@@ -142,24 +142,17 @@ return function(CutsceneSequence)
 				robertNpcClass.SetAnimation("Holding", {script:WaitForChild("RobertHoldingAnim")});
 				robertNpcClass.PlayAnimation("Holding");
 
-			
-				local abExp_ForceDirectCam = profile:GetPlayerConfig("Exp_ForceDirectCamera");
-				if RunService:IsStudio() then
-					abExp_ForceDirectCam = true;
-				end
-				if abExp_ForceDirectCam then
-					task.spawn(function()
-						while mission.Type == 2 do
-							task.wait(2);
-							if not game.Players:IsAncestorOf(player) then return end;
-							if robertNpcClass.Properties.M6SpokeTo then return end;
+				task.spawn(function()
+					while mission.Type == 2 do
+						task.wait(2);
+						if not game.Players:IsAncestorOf(player) then return end;
+						if robertNpcClass.Properties.M6SpokeTo then return end;
 
-							if (playerClass:GetCFrame().Position - BLOCKMART_CF.Position).Magnitude <= 26 then
-								modStatusEffects.DirectCamera(player, robertNpcClass:GetCFrame().Position +Vector3.yAxis*2, 2.5);
-							end
+						if (playerClass:GetCFrame().Position - BLOCKMART_CF.Position).Magnitude <= 26 then
+							modStatusEffects.DirectCamera(player, robertNpcClass:GetCFrame().Position +Vector3.yAxis*2, 2.5);
 						end
-					end)
-				end
+					end
+				end)
 				
 			elseif mission.Type == 1 then -- OnActive
 				Debugger:Warn("B GetReplicated ",barricade);

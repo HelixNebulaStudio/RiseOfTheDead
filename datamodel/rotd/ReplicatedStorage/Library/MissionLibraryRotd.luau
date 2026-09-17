@@ -139,7 +139,7 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Side};
 	};
 	StartRequirements={
-		Level=2;
+		Level = 3;
 	};
 	
 };
@@ -166,7 +166,7 @@ MissionLibrary.New{
 	};
 	LinkNextMission = 8;
 	StartRequirements = {
-		Level=2;
+		Level = 3;
 	};
 	
 };
@@ -205,7 +205,7 @@ MissionLibrary.New{
 	};
 	LinkNextMission = 6;
 	StartRequirements = {
-		Level=2;
+		Level = 3;
 	};
 	Markers = {
 		[1]={World="TheWarehouse"; Label="Workbench"; Target=Vector3.new(29.8, 60.5, -40.5); Type=modMarkers.MarkerTypes.Waypoint;};
@@ -241,7 +241,7 @@ MissionLibrary.New{
 	};
 	LinkNextMission = 7;
 	StartRequirements = {
-		Level=2;
+		Level = 2;
 	};
 	Markers = {
 		[1]={World="TheWarehouse"; Label="Destroy"; Target=Vector3.new(269.352, 62.881, 34.188); Type=modMarkers.MarkerTypes.Waypoint;};
@@ -277,12 +277,13 @@ MissionLibrary.New{
 		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Mission"; Id=9};
 		{Type="Mission"; Id=11};
+		{Type="Mission"; Id=16};
 		{Type="Mission"; Id=46;};
 		{Type="Mission"; Id=43;};
 	};
 	LinkNextMission = 11;
 	StartRequirements={
-		Level=2;
+		Level = 2;
 	};
 	Markers={
 		[1]={World="TheWarehouse"; Label="Robert"; Target="Robert"; Type=modMarkers.MarkerTypes.Npc;};
@@ -318,7 +319,7 @@ MissionLibrary.New{
 		{Type="MissionCompleted"; Value={4; 7}};
 	};
 	StartRequirements = {
-		Level=5;
+		Level = 4;
 	};
 	
 };
@@ -344,7 +345,7 @@ MissionLibrary.New{
 		{Type="MissionCompleted"; Value={3; 7}};
 	};
 	StartRequirements={
-		Level=5;
+		Level = 7;
 	};
 	
 };
@@ -395,7 +396,7 @@ MissionLibrary.New{
 	};
 	LinkNextMission = 4;
 	StartRequirements={
-		Level=4;
+		Level = 4;
 	};
 	Markers={
 		[1]={World="TheWarehouse"; Label="Satellite To Repair"; Target=Vector3.new(635.642, 95, -50.283); Type=modMarkers.MarkerTypes.Waypoint;};
@@ -433,7 +434,7 @@ MissionLibrary.New{
 	};
 	LinkNextMission = 4;
 	StartRequirements = {
-		Level = 7;
+		Level = 6;
 		MissionCompleted = {49};
 	};
 	Markers = {
@@ -470,7 +471,7 @@ MissionLibrary.New{
 		{Type="Mission"; Id=19};
 	};
 	StartRequirements={
-		Level=20;
+		Level = 11;
 	};
 	
 };
@@ -495,7 +496,7 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Side};
 	};
 	StartRequirements = {
-		Level=9;
+		Level = 11;
 	};
 	
 };
@@ -522,7 +523,7 @@ MissionLibrary.New{
 		{Type="MissionCompleted"; Value={3, 7, 9, 12};};
 	};
 	StartRequirements={
-		Level=20;
+		Level = 13;
 	};
 	
 };
@@ -547,7 +548,7 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Side};
 	};
 	StartRequirements={
-		Level=20;
+		Level = 9;
 	};
 	
 };
@@ -574,7 +575,7 @@ MissionLibrary.New{
 		{Type="Card"; Amount=NumberRange.new(1, 2); Types={"wolf"; "rat"};};
 	};
 	AddRequirements={
-		{Type="MissionCompleted"; Value={16}};
+		{Type="Mission"; Id=16};
 	};
 	
 };
@@ -650,7 +651,7 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Side};
 	};
 	StartRequirements={
-		Level=30;
+		Level = 17;
 	};
 	AddRequirements={
 		{Type="MissionCompleted"; Value={13}};
@@ -679,7 +680,7 @@ MissionLibrary.New{
 	};
 	StartRequirements={
 		Premium=true;
-		Level=30;
+		Level = 11;
 	};
 	
 };
@@ -708,7 +709,8 @@ MissionLibrary.New{
 		{Type="Card"; Amount=NumberRange.new(1, 1); Types={"wolf"; "zombie"};};
 	};
 	AddRequirements={
-		{Type="Level"; Value=30};
+		{Type="Level"; Value=10};
+		{Type="Mission"; Id=7};
 	};
 	
 };
@@ -735,7 +737,7 @@ MissionLibrary.New{
 		{Type="Mission"; Id=28};
 	};
 	StartRequirements = {
-		Level=35;
+		Level = 19;
 	};
 	Markers = {
 		[1]={World="TheUnderground"; Label="Search"; Target=Vector3.new(-220.035, 16.43, 128.225); Type=modMarkers.MarkerTypes.Waypoint;};
@@ -768,7 +770,7 @@ MissionLibrary.New{
 	};
 	StartRequirements={
 		Premium=true;
-		Level=25;
+		Level = 21;
 	};
 	Markers={
 		[1]={World="TheUnderground"; Label="Targets"; Target=Vector3.new(-278.695, 22.56, -1.19); Type=modMarkers.MarkerTypes.Waypoint;};
@@ -870,7 +872,8 @@ MissionLibrary.New{
 		{Type="Card"; Amount=NumberRange.new(1, 2); Types={"rat"; "zombie"};};
 	};
 	AddRequirements={
-		{Type="Level"; Value=40};
+		{Type="Level"; Value=10};
+		{Type="Mission"; Id=18};
 	};
 	
 };
@@ -920,7 +923,7 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Side};
 	};
 	StartRequirements={
-		Level=40;
+		Level = 31;
 	};
 	Markers={
 		["addDoorway"]={World="TheUnderground"; Label="Build Doorway"; Target=Vector3.new(-54.939, 27.972, 304.291); Type=modMarkers.MarkerTypes.Waypoint;};
@@ -951,7 +954,7 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Side};
 	};
 	StartRequirements={
-		Level=30;
+		Level = 31;
 	};
 	Markers={
 		[1]={World="TheUnderground"; Label="Lennon"; Target="Lennon"; Type=modMarkers.MarkerTypes.Npc;};
@@ -1144,7 +1147,8 @@ MissionLibrary.New{
 		{Type="Card"; Amount=NumberRange.new(2, 2); Types={"boar"; "rabbit"; "lion"};};
 	};
 	AddRequirements = {
-		{Type="Level"; Value=60};
+		{Type="Mission"; Id=7};
+		{Type="Level"; Value=10};
 	};
 	CanFastTravelWhenActive = {2};
 	BoardPickFreq = 5;
@@ -1234,7 +1238,7 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Side};
 	};
 	StartRequirements = {
-		Level=35;
+		Level = 33;
 	};
 	
 };
@@ -1264,7 +1268,7 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Side};
 	};
 	StartRequirements = {
-		Level=36;
+		Level = 41;
 	};
 	Markers = {
 		["wateringcan"]={World="TheResidentials"; Label="Make Watering Can"; Target=Vector3.new(1146.179, 57.015, -93.945); Type=modMarkers.MarkerTypes.Waypoint;};
@@ -1343,7 +1347,7 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Side};
 	};
 	StartRequirements={
-		Level=50;
+		Level = 37;
 	};
 	Markers={
 		["addWall1"]={World="TheMall"; Label="Build A Spiked Fence"; Target=Vector3.new(724.63, 95.551, -703.974); Type=modMarkers.MarkerTypes.Waypoint;};
@@ -1383,7 +1387,7 @@ MissionLibrary.New{
 	};
 	LinkNextMission=41;
 	StartRequirements={
-		Level=100;
+		Level = 43;
 	};
 	Markers={
 		[1]={World="TheWarehouse"; Label="Kill Zricera"; Target=Vector3.new(352.02, 60.4, 225.46); Type=modMarkers.MarkerTypes.Waypoint;};
@@ -1558,7 +1562,7 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Side};
 	};
 	StartRequirements={
-		Level=50;
+		Level = 27;
 	};
 	Markers={
 		[3]={World="Prison"; Label="Marker"; Target=Vector3.new(36.91, -9.045, 45.03); Type=modMarkers.MarkerTypes.Waypoint;};
@@ -1615,7 +1619,7 @@ MissionLibrary.New{
 	};
 	StartRequirements={
 		Premium=true;
-		Level=35;
+		Level = 37;
 	};
 	Markers={
 	};
@@ -1683,7 +1687,6 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=(MoneyReward.Core+1000)};
 		{Type="Mission"; Id=12};
-		{Type="Mission"; Id=16};
 	};
 	LinkNextMission = 12;
 	Markers={
@@ -1755,7 +1758,7 @@ MissionLibrary.New{
 		{Type="Mission"; Id=53};
 	};
 	StartRequirements={
-		Level=300;
+		Level = 61;
 	};
 	Markers={
 		[1]={World="TheUnderground"; Label="Radio"; Target=Vector3.new(-76.697, 15.002, 259.405); Type=modMarkers.MarkerTypes.Waypoint;};
@@ -1859,7 +1862,6 @@ MissionLibrary.New{
 	};
 	StartRequirements={
 		Premium=true;
-		Level=300;
 	};
 	Markers={};
 	
@@ -2324,7 +2326,7 @@ MissionLibrary.New{
 		{Text="Figure out how to build Joseph's Crossbow";};
 	};
 	StartRequirements = {
-		Level=500;
+		Level = 101;
 	};
 	GuideText = "Talk to Joseph";
 	RewardText = "Received a Arelshift Cross Antique Skin-Perm";
@@ -2751,6 +2753,9 @@ MissionLibrary.New{
 	GuideText = "Talk to Lydia";
 	Rewards = {
 		{Type = "Perks"; Amount = PerksReward.Side};
+	};
+	AddRequirements = {
+		{Type="Mission"; Id=54};
 	};
 	Markers = {};
 	
@@ -3436,7 +3441,7 @@ MissionLibrary.New{
 	Name = "Basic to Prime Gun Component";
 	From = "Russell";
 	Description = "Russell offers to upgrade your Basic Gun Components.";
-	Timer=BOARD_TIME_LIMIT;
+	Timer = BOARD_TIME_LIMIT;
 	Persistent = true;
 	World = {"TheWarehouse";};
 	Checkpoint = {
@@ -3466,7 +3471,7 @@ MissionLibrary.New{
 	Name = "Prime to Advance";
 	From = "Wilson";
 	Description = "Wilson's gear is damaged and he needs Prime Gun Components.";
-	Timer=BOARD_TIME_LIMIT;
+	Timer = BOARD_TIME_LIMIT;
 	Persistent = true;
 	World = {"TheWarehouse";};
 	Checkpoint = {
