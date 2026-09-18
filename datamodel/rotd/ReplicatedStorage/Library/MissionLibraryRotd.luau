@@ -3130,7 +3130,6 @@ MissionLibrary.New{
 	GuideText = "Talk to Joseph";
 	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Core};
-		{Type="Mission"; Id=98};
 		{Type="Mission"; Id=100};
 	};
 	Markers = {
@@ -3398,7 +3397,6 @@ MissionLibrary.New{
 	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Side};
 		{Type="Money"; Amount=MoneyReward.Side};
-		{Type="Mission"; Id=97};
 	};
 	Markers = {
 		[1]={World="TheWarehouse"; Label="Wilson"; Target="Wilson"; Type=modMarkers.MarkerTypes.Npc;};

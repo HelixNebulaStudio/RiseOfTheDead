@@ -42,6 +42,8 @@ function interactablePackage.init(super) -- Server/Client
             if info.Action == "Client" then 
                 if info.Player == nil then return end;
 
+                local characterVars = shared.modPlayers.get(localPlayer).CharacterVars;
+
                 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
                 local interface: Interface = modClientGuis.ActiveInterface;
 
@@ -55,17 +57,29 @@ function interactablePackage.init(super) -- Server/Client
                             OnPrimaryClick=function(dialogWindow)
                                 interface:ToggleGameBlinds(false, 3);
                                 
-                                local characterVars = shared.modPlayers.get(localPlayer).CharacterVars;
                                 characterVars.CharacterProperties.CanMove = false;
                                 characterVars.CharacterProperties.CanInteract = false;
 
-                                interactable:InteractServer("interact", info.Values);
                                 SoundService:SetListener(Enum.ListenerType.CFrame, CFrame.new(0, 1000, 0));
+
+                                local newValues = interactable:InteractServer("interact", info.Values);
+
+                                if typeof(newValues) ~= "table" or newValues.Success ~= true then
+                                    characterVars.CharacterProperties.CanMove = true;
+                                    characterVars.CharacterProperties.CanInteract = true;
+                                    interface:ToggleGameBlinds(true, 1);
+                                end
                             end;
                         };
                         {
                             Text="Cancel";
                             Style="Cancel";
+                            OnPrimaryClick=function()
+                                Debugger:Warn(`Cancel`);
+                                characterVars.CharacterProperties.CanMove = true;
+                                characterVars.CharacterProperties.CanInteract = true;
+                                interface:ToggleGameBlinds(true, 1);
+                            end;
                         };
                     }
                 });
@@ -73,6 +87,7 @@ function interactablePackage.init(super) -- Server/Client
             end
             return;
         end;
+        
         --MARK: Server
         if not interactable:IsDebounced(`server`, 0.5) then
             Debugger:Warn(`Pickupable server is on cooldown.`, interactable);
@@ -104,6 +119,8 @@ function interactablePackage.init(super) -- Server/Client
         end
 
         modServerManager:Travel(player, worldName);
+
+        info.Values.Success = true;
     end
     
     -- When interactable pops up on screen.

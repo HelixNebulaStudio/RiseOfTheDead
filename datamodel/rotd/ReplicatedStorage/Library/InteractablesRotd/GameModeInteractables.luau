@@ -232,7 +232,10 @@ function interactablePackage.init(super) -- Server/Client
 
         if info.Action == "Client" then 
             if info.Player == nil then return end;
-            interactable:InteractServer("interact", info.Values);
+
+			task.spawn(function()
+           		interactable:InteractServer("interact", info.Values);
+			end)
             return;
         end 
         if RunService:IsClient() then return end;
