@@ -9,3 +9,26 @@ __pycache__/
 
 # Revive Engine source
 src/
+
+# Project place file
+/Rojo.rbxlx
+
+# Roblox Studio lock files
+/*.rbxlx.lock
+/*.rbxl.lock
+sourcemap.json
+
+# Editor configurations 
+.vscode
+settings.json
+aftman.toml
+default.project.json
+sourcemap.project.json
+
+# Ignore meta files
+*.meta.json
+*.rbxmx
+
+# RotD Base Local Library
+*./
+!src
