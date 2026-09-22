@@ -202,13 +202,6 @@ function modProfile.onRequire()
 
 			local beginningMission = saveData.Missions:Get(1);
 			
-			local exp_SkipMission1Test = profile:GetPlayerConfig("Exp_SkipMission1Test") == true;
-			if beginningMission == nil and exp_SkipMission1Test then
-				Debugger:Warn(`Exp_SkipMission1Test ({player}) = true;`);
-				shared.modMission:CompleteMission(player, 1);
-				beginningMission = saveData.Missions:Get(1);
-			end
-
 			if beginningMission and beginningMission.Type == 3 then
 				local spawnId = saveData.Spawn;
 				local worldId = modBranchConfigurations.GetWorldOfSpawn(spawnId);

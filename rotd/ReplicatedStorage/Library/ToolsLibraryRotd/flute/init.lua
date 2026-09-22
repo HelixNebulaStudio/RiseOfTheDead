@@ -36,6 +36,7 @@ local toolPackage = {
 
 toolPackage.ClientPrimaryFire = modGuitarTool.ClientPrimaryFire;
 toolPackage.ActionEvent = modGuitarTool.ActionEvent;
+toolPackage.OnToolEquip = modGuitarTool.OnToolEquip;
 
 function toolPackage.newClass()
 	return modEquipmentClass.new(toolPackage);

@@ -49,7 +49,9 @@ Please activate power levers to re-enabled BioX monorail.]];
         local clientData = info.ClientData;
         if clientData == nil then return end;
 
-        if interactable.Values.Uses <= 0 then
+        local usesLeft = interactable.Config:GetAttribute("_Uses");
+        if usesLeft ~= nil and usesLeft <= 0 then
+            interactable.Values.Uses = usesLeft;
             interactable.CanInteract = false;
             interactable.Label = "Monorail is in motion..";
             return;

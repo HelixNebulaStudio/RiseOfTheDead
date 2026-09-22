@@ -75,7 +75,6 @@ function interactablePackage.init(super) -- Server/Client
                             Text="Cancel";
                             Style="Cancel";
                             OnPrimaryClick=function()
-                                Debugger:Warn(`Cancel`);
                                 characterVars.CharacterProperties.CanMove = true;
                                 characterVars.CharacterProperties.CanInteract = true;
                                 interface:ToggleGameBlinds(true, 1);

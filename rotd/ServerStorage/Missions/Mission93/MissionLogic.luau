@@ -12,30 +12,36 @@ local MISSION_ID = 93;
 local MISSION_MARKER_COLOR = Color3.fromRGB(251, 255, 0);
 local AREAS_TO_SECURE = {
 	["BioXResearch"] = {
+		WorldName = "BioXResearch";
 		BarricadePileSpawnCFrame = CFrame.new(55.335, -18.85, 18.39);
 		RegionCFrame = CFrame.new(44.141, -14.517, 32.463);
 		RegionSize = Vector3.new(27.774, 8.867, 24.354);
 	};
 	["outside Sector F near Sewer Exit to W.D. Warehouse"] = {
+		WorldName = "TheWarehouse";
 		RegionCFrame = CFrame.new(12.869, 14.516, -54.53);
 		RegionSize = Vector3.new(69.266, 18.368, 31.173);
 	};
 	["inside the Train Station near W.D. Mall entrance"] = {
+		WorldName = "TheUnderground";
 		BarricadePileSpawnCFrame = CFrame.new(286.334, 23.9, -191.594) * CFrame.Angles(0, math.rad(180), 0);
 		RegionCFrame = CFrame.new(253.374, 47.225, -218.759);
 		RegionSize = Vector3.new(71.149, 46.85, 87.121);
 	};
 	["outside Radio Station near W.D. Mall"] = {
+		WorldName = "TheMall";
 		BarricadePileSpawnCFrame = CFrame.new(1072.629, 94.465, -654.818);
 		RegionCFrame = CFrame.new(1129.433, 98.828, -655.214);
 		RegionSize = Vector3.new(118.619, 11.074, 166.618);
 	};
 	["in Bunker Inc. near Residentials Safehouse"] = {
+		WorldName = "TheResidentials";
 		BarricadePileSpawnCFrame = CFrame.new(910.012, 55.4, -80.148);
 		RegionCFrame = CFrame.new(928.75, 56.301, -116.637);
 		RegionSize = Vector3.new(42.681, 32.152, 97.751);
 	};
 	["outside the Harbor Substation near the Golden Bridge"] = {
+		WorldName = "TheHarbor";
 		BarricadePileSpawnCFrame = CFrame.new(-630.45, 60.695, 211.009) * CFrame.Angles(0, math.rad(90), 0);
 		RegionCFrame = CFrame.new(-680.381, 66.979, 158.116);
 		RegionSize = Vector3.new(128.853, 13.082, 109.842);
@@ -68,7 +74,7 @@ function MissionLogic.onRequire()
 				if #playerMissions <= 0 then return end;
 
 				local shouldSpawn = false;
-				local targetMission = nil;
+				local targetMission: Mission = nil;
 
 				modTables.shuffle(playerMissions);
 				for a=1, #playerMissions do
@@ -98,6 +104,8 @@ function MissionLogic.onRequire()
 						Size = areaInfo.RegionSize;
 					};
 				end
+
+				if areaInfo.WorldName ~= shared.WorldName then return end;
 
 				shared.modNpcs.spawn2{
 					Name = ({"Zombie"; "Ticks"; "Heavy"})[math.random(1, 3)];
@@ -141,10 +149,20 @@ function MissionLogic.Init(missionProfile: MissionsProfile, mission: Mission)
 	end
 
 	local function OnChanged(firstRun)
-		if mission.Type ~= 1 then return; end
+		if mission.Type ~= 1 then
+			if mission.Type == 3 then
+				task.delay(0.5, function()
+					mission.Garbage:Destruct();
+				end)
+			end
+			
+			return;
+		end
 
 		local activeParametersKey = mission.SaveData.Area or DEFAULT_AREA;
 		local areaInfo = AREAS_TO_SECURE[activeParametersKey] or AREAS_TO_SECURE[DEFAULT_AREA];
+
+		if areaInfo.WorldName ~= shared.WorldName then return end;
 
 		if RunService:IsServer() then
 			-- MARK: IsServer
@@ -304,10 +322,12 @@ function MissionLogic.Init(missionProfile: MissionsProfile, mission: Mission)
 			if regionHighlight == nil then
 				regionHighlight = modAoeHighlight.highlightRegion(areaInfo.RegionCFrame, areaInfo.RegionSize);
 				regionHighlight.Color = MISSION_MARKER_COLOR;
+
 				mission.Garbage:Tag(function()
 					Debugger.Expire(regionHighlight);
 					regionHighlight = nil;
 				end);
+
 			end
 
 		end

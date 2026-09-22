@@ -1,6 +1,8 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local CollectionService = game:GetService("CollectionService");
+local RunService = game:GetService("RunService");
+
 local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
@@ -126,6 +128,25 @@ function toolPackage.ActionEvent(handler: ToolHandlerInstance, packet)
 
 	if handle:FindFirstChild("musicParticle") then
 		handle.musicParticle.Enabled = true;
+	end
+end
+
+
+function toolPackage.OnToolEquip(handler: ToolHandlerInstance)
+	if RunService:IsServer() then return end;
+
+	local toolModel = handler.MainToolModel;
+	local toolHandle = toolModel.PrimaryPart;
+	
+	if toolHandle then
+		local musicParticle: ParticleEmitter = toolHandle:FindFirstChild("musicParticle");
+		handler.Garbage:Tag(toolHandle.ChildAdded:Connect(function(c)
+			if not c:IsA("Sound") then return end;
+
+			if musicParticle then
+				musicParticle:Emit();
+			end
+		end))
 	end
 end
 
