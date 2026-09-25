@@ -1,15 +1,30 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
-local MissionLogic = {};
 local RunService = game:GetService("RunService");
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+
+local MissionLogic = {};
+
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 
 local MISSION_ID = 15;
 if RunService:IsServer() then
-	if not modBranchConfigurations.IsWorld("TheWarehouse") then return {}; end;
-
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
+	
+	shared.modEventService:OnInvoked("WorkbenchService_BindClaimBuild", function(eventPacket: EventPacket, ...)
+		local player = eventPacket.Player;
+		if player == nil then return end;
+
+		local bpLib = ...;
+		task.spawn(function()
+			if bpLib.Product ~= "electricmod" then return end;
+			if not modMission:Progress(player, MISSION_ID) then return end;
+			modMission:CompleteMission(player, MISSION_ID);
+		end)
+	end)
+
+
+	if shared.WorldName ~= "TheWarehouse" then return {}; end;
+
 	local modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
 	local modItemDrops = shared.require(game.ServerScriptService.ServerLibrary.ItemDrops);
 
@@ -34,18 +49,6 @@ if RunService:IsServer() then
 				end
 
 			end
-		end)
-	end)
-
-	shared.modEventService:OnInvoked("WorkbenchService_BindClaimBuild", function(eventPacket: EventPacket, ...)
-		local player = eventPacket.Player;
-		if player == nil then return end;
-
-		local bpLib = ...;
-		task.spawn(function()
-			if bpLib.Product ~= "electricmod" then return end;
-			if not modMission:Progress(player, MISSION_ID) then return end;
-			modMission:CompleteMission(player, MISSION_ID);
 		end)
 	end)
 

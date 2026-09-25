@@ -222,9 +222,9 @@ return function(CutsceneSequence)
 					task.wait(3);
 					walterNpcClass.PlayAnimation("TakeOffMask");
 					task.wait(0.5);
-					local weldSwap = cutsceneAssets:WaitForChild("MaskWeld");
+					local weldSwap = walterNpcClass.Character:WaitForChild("MaskWeld");
 					local nWeld = weldSwap:Clone();
-					local oWeld = walterNpcClass.Character:WaitForChild("Gas Mask"):WaitForChild("Handle"):WaitForChild("AccessoryWeld");
+					local oWeld = walterNpcClass.Character:WaitForChild("Gas Mask"):WaitForChild("Handle"):WaitForChild("AccessoryRigidConstraint");
 
 					oWeld.Enabled = false;
 					nWeld.Parent = oWeld.Parent;
@@ -259,7 +259,7 @@ return function(CutsceneSequence)
 
 						local weldSwap = cutsceneAssets:WaitForChild("MaskWeld");
 						local nWeld = weldSwap:Clone();
-						local oWeld = walterNpcClass.Character:WaitForChild("Gas Mask"):WaitForChild("Handle"):WaitForChild("AccessoryWeld");
+						local oWeld = walterNpcClass.Character:WaitForChild("Gas Mask"):WaitForChild("Handle"):WaitForChild("AccessoryRigidConstraint");
 
 						oWeld.Enabled = false;
 						nWeld.Parent = oWeld.Parent;
@@ -293,7 +293,7 @@ return function(CutsceneSequence)
 
 					local weldSwap = cutsceneAssets:WaitForChild("MaskWeld");
 					local nWeld = weldSwap:Clone();
-					local oWeld = walterNpcClass.Character:WaitForChild("Gas Mask"):WaitForChild("Handle"):WaitForChild("AccessoryWeld");
+					local oWeld = walterNpcClass.Character:WaitForChild("Gas Mask"):WaitForChild("Handle"):WaitForChild("AccessoryRigidConstraint");
 
 					oWeld.Enabled = false;
 					nWeld.Parent = oWeld.Parent;

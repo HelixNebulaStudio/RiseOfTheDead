@@ -692,6 +692,7 @@ MissionLibrary.New{
 	MissionType = MissionLibrary.MissionTypes.Board;
 	Name="Spring Killing";
 	Description="Jane wants you to clear out all the bosses in W.D. Warehouse.";
+	From = "Jane";
 	Timer=BOARD_TIME_LIMIT;
 	Persistent=true;
 	World="TheWarehouse";
@@ -3131,6 +3132,7 @@ MissionLibrary.New{
 	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Mission"; Id=100};
+		{Type="Mission"; Id=88; TestOnly=true;};
 	};
 	Markers = {
 		[2]={Label="Joseph"; Target="Joseph"; Type=modMarkers.MarkerTypes.Npc;};
@@ -3140,29 +3142,37 @@ MissionLibrary.New{
 };
 
 -- MARK: 88 - Shadows of Trust
--- MissionLibrary.New{
--- 	MissionId = 88;
--- 	MissionType = MissionLibrary.MissionTypes.Core;
--- 	Name = "Shadows of Trust";
--- 	From = "Joseph";
--- 	Description = "Caitlin urgently needs Joseph's help, but he doesn't trusts her.";
--- 	Persistent = true;
--- 	Checkpoint = {
--- 		{Text="WIP";};
--- 	};
--- 	LogEntry = {
--- 	};
--- 	StartRequirements = {
--- 		MissionCompleted={87};
--- 	};
--- 	SaveData = {};
--- 	GuideText = "Talk to Joseph";
--- 	Rewards = {
--- 		{Type="Perks"; Amount=PerksReward.Core};
--- 	};
--- 	Markers = {
--- 	};
--- };
+MissionLibrary.New{
+	MissionId = 88;
+	MissionType = MissionLibrary.MissionTypes.Core;
+	Name = "Shadows of Trust";
+	From = "Joseph";
+	Description = "Caitlin urgently needs Joseph's help, but he doesn't trusts her.";
+	Persistent = true;
+	Checkpoint = {
+		{Text="Talk to Caitlin";};
+		{Text="Wait for Caitlin";};
+		{Text="Talk to Caitlin when you are ready to go";};
+		{Text="Talk to Caitlin";};
+		{Text="Enter the door";};
+		
+		{Text="WIP";};
+	};
+	LogEntry = {
+	};
+	StartRequirements = {
+		MissionCompleted={87};
+	};
+	SaveData = {};
+	GuideText = "Talk to Joseph";
+	Rewards = {
+		{Type="Perks"; Amount=PerksReward.Core};
+	};
+	Markers = {
+		[1]={World="TheResidentials"; Label="Caitlin"; Target="Caitlin"; Type=modMarkers.MarkerTypes.Npc;};
+	};
+	WIP=true;
+};
 
 -- MARK: 89 - AB: Shadow Basement
 MissionLibrary.New{

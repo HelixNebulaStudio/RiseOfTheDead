@@ -18,7 +18,7 @@ local AREAS_TO_SECURE = {
 		RegionSize = Vector3.new(27.774, 8.867, 24.354);
 	};
 	["outside Sector F near Sewer Exit to W.D. Warehouse"] = {
-		WorldName = "TheWarehouse";
+		WorldName = "TheUnderground";
 		RegionCFrame = CFrame.new(12.869, 14.516, -54.53);
 		RegionSize = Vector3.new(69.266, 18.368, 31.173);
 	};

@@ -395,7 +395,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				end
 
 			elseif missionLib.Objectives then
-				pinHudData.TaskText = `Complete the objectives`;
+				if incomplete then
+					pinHudData.TaskText = `Complete the objectives`;
+				else
+					pinHudData.TaskText = missionLib.ObjectivesCompleteText or `Return to {missionLib.From or "Giver"}`;
+				end
 				
 			end
 

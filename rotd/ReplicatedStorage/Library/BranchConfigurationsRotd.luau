@@ -62,6 +62,16 @@ local WORLDS = {
         WorldType = WORLD_TYPES.General;
         TimeCycleEnabled = false;
     };
+    RadioStation = {
+        DisplayName = "Radio Station";
+        PlaceIds = {
+            [LIVE_GAME_ID] = 0;
+            [DEV_GAME_ID] = 119804165146838;
+        };
+        
+        WorldType = WORLD_TYPES.General;
+        TimeCycleEnabled = true;
+    };
 
 
 
