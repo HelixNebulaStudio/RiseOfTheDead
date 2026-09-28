@@ -180,7 +180,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
     local function UpdateApplicableFriends()
         local friends = {};
-        local s,e = pcall(function() friends = localPlayer.UserId > 0 and localPlayer:GetFriendsOnline() or {}; end)
+        local s,e = pcall(function() 
+            friends = localPlayer.UserId > 0 and localPlayer:GetFriendsOnlineAsync() or {};
+        end)
         if not s then warn(e) end;
         
         binds.FriendsList = {};
@@ -200,17 +202,17 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         local IdList = {};
         for a=1, #friends do
             local inUniverse = false;
-            if friends[a].LocationType == 1 or friends[a].LocationType == 4 then
+            if friends[a].PlaceId then
                 inUniverse = modBranchConfigurations.IsPlaceIdThisGame(friends[a].PlaceId);
-
             end
             
             local thumbnail = shared.modPlayers.getAvatar(friends[a].VisitorId);
-            if binds.FriendsList == nil then return end;
+            if binds.FriendsList == nil then continue end;
 
             friends[a].Avatar = thumbnail;
             friends[a].InUniverse = inUniverse;
             table.insert(IdList, friends[a].VisitorId);
+
             binds.FriendsList[friends[a].UserName] = friends[a];
         end
         
@@ -687,16 +689,21 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         local squadTeam = modTeamsManager.getTeamByPlayer(localPlayer, "Squad");
         if squadTeam and squadTeam.Members[playerName] then
             selectionWorldName = (squadTeam.Members[playerName].Values.WorldName or "Unknown");
+
         elseif binds.FriendsList and binds.FriendsList[playerName] and binds.FriendsList[playerName].InUniverse then
             selectionWorldName = (modBranchConfigurations.GetWorldName(binds.FriendsList[playerName].PlaceId) or "Unknown");
+
         end
+
+
         profileLocationLabel.Text = (selectionWorldName and modBranchConfigurations.GetWorldDisplayName(selectionWorldName) or "Unknown");
         
     end
 
 
-    local function UpdateListing(data)
-        local curPlayerName = data.Name;
+    local function UpdateListing(playerData)
+        local curPlayerName = playerData.Name;
+
         local listing = binds.ActivePlayerListing[curPlayerName];
         if listing == nil then
             listing = playerListingTemplate:Clone();
@@ -837,6 +844,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                     local travelDisabled;
                     if selectionWorldName ~= shared.WorldName or game.Players:FindFirstChild(curPlayerName) == nil then
                         local worldInfo = modBranchConfigurations.Worlds[selectionWorldName];
+                        
                         if worldInfo and worldInfo.CanTravelTo and binds.FriendsList[curPlayerName] then
                             if binds.FriendsList[curPlayerName].SearchedPlayer then
                                 newOptionButton(
@@ -961,7 +969,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             local playerData = modData.Players[curPlayerName];
             
             nameLabel.Text = curPlayerName;
-            avatarLabel.Image = data.Avatar or "";
+            avatarLabel.Image = playerData.Avatar or "";
             
             local thatPlayer = game.Players:FindFirstChild(curPlayerName);
             if thatPlayer then
@@ -990,13 +998,18 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 else
                     titleLabel.Text = "No Title"
                 end
+
             else
+                -- not ingame
+
                 --healthBarFrame.Visible = false;
                 locationLabel.Visible = true;
                 titleLabel.Visible = false;
-                local worldName = data.PlaceId and modBranchConfigurations.GetWorldName(data.PlaceId) or data.WorldName;
-                locationLabel.Text = modBranchConfigurations.GetWorldDisplayName(worldName) or "Unknown";
+
+                local worldName = playerData.PlaceId and modBranchConfigurations.GetWorldName(playerData.PlaceId) or playerData.WorldName;
+                locationLabel.Text = `{modBranchConfigurations.GetWorldDisplayName(worldName)}`;
             end
+
             if modData.Players[curPlayerName] then
                 if playerData.Role then
                     if playerData.Role == "Founder" then
@@ -1009,7 +1022,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 else
                     nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
                 end
-                modData.Players[curPlayerName].Avatar = data.Avatar;
+                modData.Players[curPlayerName].Avatar = playerData.Avatar;
                 
                 if playerData.Stats and playerData.Stats.Level then
                     levelIcon.Visible = true;
@@ -1023,6 +1036,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 levelIcon.Visible = false;
             end
         end
+
         update();
         
         return listing;
@@ -1035,7 +1049,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         debounce = true;
         if list.Parent == nil then return end;
         
-        local players = game.Players:GetPlayers();
+        local serverPlayers = game.Players:GetPlayers();
         local totalFriends = 0;
         local onlineFriends = 0;
         
@@ -1043,7 +1057,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         
         for userName, friendData in pairs(binds.FriendsList) do
             totalFriends = totalFriends+1;
-            if friendData.InUniverse then onlineFriends = onlineFriends +1; end
+            if friendData.InUniverse then 
+                onlineFriends = onlineFriends +1; 
+            end
         end
         
         local serverTab = list:FindFirstChild("ServerTab");
@@ -1058,7 +1074,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         
         --== Players;
         local playersOrder = onlineFriends+3;
-        for _,player in pairs(players) do
+        for _, player in pairs(serverPlayers) do
             if binds.FriendsList[player.Name] == nil or not binds.FriendsList[player.Name].InUniverse then
                 playersOrder = playersOrder +1;
                 
@@ -1074,7 +1090,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 updated[player.Name] = true;
             end
         end
-        serverTabLabel.Text = "Players Online ("..#players.."/".. game.Players.MaxPlayers ..")";
+        serverTabLabel.Text = "Players Online ("..#serverPlayers.."/".. game.Players.MaxPlayers ..")";
         
         --== Friends;
         local friendsTab = list:FindFirstChild("FriendsTab");
@@ -1084,19 +1100,23 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             new.Parent = list;
             friendsTab = new;
         end
+
         local friendIndex = 2;
         for userName, friendData in pairs(binds.FriendsList) do
-            if friendData.InUniverse then 
-                friendIndex = friendIndex +1;
-                local listing = UpdateListing{
-                    Name=userName;
-                    Avatar=CacheAvatar(userName, friendData.Avatar);
-                    PlaceId=friendData.PlaceId;
-                };
-                listing.LayoutOrder = friendIndex;
-                updated[userName] = true;
-            end
+            if not friendData.InUniverse then continue end;
+
+            friendIndex = friendIndex +1;
+
+            local listing = UpdateListing{
+                Name=userName;
+                Avatar=CacheAvatar(userName, friendData.Avatar);
+                PlaceId=friendData.PlaceId;
+            };
+            listing.LayoutOrder = friendIndex;
+
+            updated[userName] = true;
         end
+
         serverTab.LayoutOrder = friendIndex+1;
         local friendsTabLabel = friendsTab.Labeltag; -- inf yield
         friendsTabLabel.Text = "Friends Online ("..onlineFriends.."/"..totalFriends..")";

@@ -7,7 +7,7 @@ local RotdCore = {};
 local modGlobalVars = shared.require(game.ReplicatedStorage.GlobalVariables);
 modGlobalVars.DevVersion="3.0.x";
 modGlobalVars.GameVersion = "3.0";
-modGlobalVars.GameBuild = "156";
+modGlobalVars.GameBuild = "157";
 modGlobalVars.ModeVerLabel = `$Fps fps\t$UpTime\tRotd $GameVersion $BranchName $IsMobile`;
 
 --==
@@ -43,6 +43,7 @@ local modEmotesCommsLibrary = shared.require(game.ReplicatedStorage.Library.Emot
 local modSkillTreeLibrary = shared.require(game.ReplicatedStorage.Library.SkillTreeLibraryRotd);
 local modGpsLibrary = shared.require(game.ReplicatedStorage.Library.GpsLibrary);
 local modFactionsLibrary = shared.require(game.ReplicatedStorage.Library.FactionsLibraryRotd);
+local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.Library.NpcProfileLibraryRotd);
 local modFarmingSystem = shared.require(game.ReplicatedStorage.Library.FarmingSystem);
 
 if RunService:IsServer() then

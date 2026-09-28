@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local PathfindingService = game:GetService("PathfindingService");
 
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modDoors = shared.require(game.ReplicatedStorage.Entity.Doors);
 
 local treePackage = {
     LogicString = {
@@ -26,36 +26,19 @@ function treePackage.DoCutsceneState(npcClass: NpcClass)
     local properties = npcClass.Properties;
     local cutscenePlayersComp = npcClass:GetComponent("CutscenePlayers");
 
-    if modBranchConfigurations.IsWorld("TheWarehouse") or modBranchConfigurations.IsWorld("BioXResearch") then
+    if shared.WorldName == "TheWarehouse" or shared.WorldName == "BioXResearch" then
         if cutscenePlayersComp:IsCutsceneActive("16")
         or cutscenePlayersComp:IsCutsceneActive("17") then
             
-            local isInsideShop = properties.IsInsideShop;
-            if isInsideShop then
-                local shopExitInteractable: InteractableInstance = modInteractables.getById("warehouseShopExit");
-                shopExitInteractable:SetUserPermissions(npcClass.Name, "CanInteract", true);
-                local shopExitPoint = shopExitInteractable.Part:WaitForChild("PathToInteract");
+            local shopDoorInteractable = modInteractables.getById("warehouseShopDoor");
+            if shopDoorInteractable then
+                shopDoorInteractable:SetUserPermissions(npcClass.Name, "CanInteract", true);
+            end
 
-                if not npcClass.Move:IsAtPosition(shopExitPoint.WorldPosition) then
-                    local pathToShopExit: Path = PathfindingService:FindPathAsync(
-                        npcClass.RootPart.Position, 
-                        shopExitPoint.WorldPosition
-                    );
-                    if pathToShopExit.Status ~= Enum.PathStatus.Success then
-                        npcClass:UseInteractable(shopExitInteractable.Id);
-                    else
-                        npcClass.Move:MoveTo(shopExitPoint.WorldPosition);
-                        return;
-                    end
-                    return;
-                end
-
-                properties.IsInsideShop = false;
-                npcClass:UseInteractable(shopExitInteractable.Id);
-
-            else
-                npcClass.Move:MoveTo(Vector3.new(7.18, 57.6, 30.76));
-
+            local outsideShopPos = Vector3.new(7.18, 57.6, 30.76);
+            if not npcClass.Move:IsAtPosition(outsideShopPos) then
+                npcClass.Move:MoveTo(outsideShopPos);
+                return;
             end
 
         end
@@ -65,40 +48,21 @@ end
 function treePackage.Idle(npcClass: NpcClass)
     local properties = npcClass.Properties;
 
-    local isInsideShop = properties.IsInsideShop;
+    local insideShopPos = treePackage.ShopStandCFrame.Position;
+    local isInsideShop = npcClass.Move:IsAtPosition(insideShopPos);
     if isInsideShop == false then
-        local shopInteractable: InteractableInstance = modInteractables.getById("warehouseShopEntrance");
-        shopInteractable:SetUserPermissions(npcClass.Name, "CanInteract", true);
-        local shopPoint = shopInteractable.Part:WaitForChild("PathToInteract");
-
-        if not npcClass.Move:IsAtPosition(shopPoint.WorldPosition) then
-            local pathToShopEntrance: Path = PathfindingService:FindPathAsync(
-                npcClass.RootPart.Position, 
-                shopPoint.WorldPosition
-            );
-            if pathToShopEntrance.Status ~= Enum.PathStatus.Success then
-                npcClass:UseInteractable("warehouseShopEntrance");
-                properties.IsInsideShop = true;
-            end
-            npcClass.Move:MoveTo(shopPoint.WorldPosition);
-            return;
-        end
-
-        properties.IsInsideShop = true;
-        npcClass:UseInteractable("warehouseShopEntrance");
+        npcClass.Move:MoveTo(insideShopPos);
+        return;
 
     else
-        if not npcClass.Move:IsAtPosition(treePackage.ShopStandCFrame.Position) then
-            local pathToShopEntrance: Path = PathfindingService:FindPathAsync(
-                npcClass.RootPart.Position, 
-                treePackage.ShopStandCFrame.Position
-            );
-            if pathToShopEntrance.Status ~= Enum.PathStatus.Success then
-                npcClass:UseInteractable("warehouseShopEntrance");
-                properties.IsInsideShop = true;
+        if shared.WorldName == "TheWarehouse" or shared.WorldName == "BioXResearch" then
+            local shopDoorInteractable = modInteractables.getById("warehouseShopDoor");
+            if shopDoorInteractable then
+                local door: DoorInstance = modDoors.getOrNew(shopDoorInteractable.Values.DoorConfig);
+                if door then
+                    door:Toggle(false);
+                end
             end
-            npcClass.Move:MoveTo(treePackage.ShopStandCFrame.Position);
-            return;
         end
 
         npcClass.Move:Face(treePackage.ShopStandCFrame.Position + treePackage.ShopStandCFrame.LookVector*10);

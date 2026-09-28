@@ -37,7 +37,7 @@ function Component:__call(pathFindingLink: PathfindingLink, position: Vector3)
 
 	if humanoidType ~= "Zombie" then
 		-- Human use door
-		self.NpcClass:UseInteractable(interactConfig);
+		self.NpcClass:UseInteractable(interactConfig, {AutoClose=3;});
 		return;	
 	end
 

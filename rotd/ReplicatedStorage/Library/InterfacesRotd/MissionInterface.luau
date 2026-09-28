@@ -398,7 +398,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				if incomplete then
 					pinHudData.TaskText = `Complete the objectives`;
 				else
-					pinHudData.TaskText = missionLib.ObjectivesCompleteText or `Return to {missionLib.From or "Giver"}`;
+					local compTxtStr = missionLib.ObjectivesCompleteText;
+					if compTxtStr then
+						local itemlib = missionData.SaveData.ItemId and modItemsLibrary:Find(missionData.SaveData.ItemId);
+						compTxtStr = compTxtStr:gsub("$ItemName", itemlib and itemlib.Name or missionData.SaveData.ItemId or "");
+					end
+					pinHudData.TaskText = compTxtStr or `Return to {missionLib.From or "Giver"}`;
 				end
 				
 			end

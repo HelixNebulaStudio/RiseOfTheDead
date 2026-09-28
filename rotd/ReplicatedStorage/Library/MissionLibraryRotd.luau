@@ -2860,102 +2860,102 @@ MissionLibrary.New{
 
 
 -- MARK: 82 - Candy Hoarder
-MissionLibrary.New{
-	MissionId=82;
-	MissionType = MissionLibrary.MissionTypes.Board;
-	Name="Candy Hoarder";
-	Description="Complete a Slaughterfest round with at least 500 candies.";
-	Timer=BOARD_TIME_LIMIT;
-	Persistent=true;
-	Checkpoint={
-		{Text="Complete a Slaughterfest round with at least 500 candies";};
-		{Text="Click Complete on mission menu";};
-	};
-	SaveData={};
-	GuideText="";
-	Tier="Halloween";
-	Rewards={
-		{Type="Perks"; Amount=PerksReward.Normal};
-		{Type="Item"; ItemId="slaughterfestcandybag"; Quantity=1;};
-	};
-	AddRequirements={
-		{Type="SpecialEvent"; Value="Halloween"};
-		{Type="Level"; Value=30};
-	};
-};
+-- MissionLibrary.New{
+-- 	MissionId=82;
+-- 	MissionType = MissionLibrary.MissionTypes.Board;
+-- 	Name="Candy Hoarder";
+-- 	Description="Complete a Slaughterfest round with at least 500 candies.";
+-- 	Timer=BOARD_TIME_LIMIT;
+-- 	Persistent=true;
+-- 	Checkpoint={
+-- 		{Text="Complete a Slaughterfest round with at least 500 candies";};
+-- 		{Text="Click Complete on mission menu";};
+-- 	};
+-- 	SaveData={};
+-- 	GuideText="";
+-- 	Tier="Halloween";
+-- 	Rewards={
+-- 		{Type="Perks"; Amount=PerksReward.Normal};
+-- 		{Type="Item"; ItemId="slaughterfestcandybag"; Quantity=1;};
+-- 	};
+-- 	AddRequirements={
+-- 		{Type="SpecialEvent"; Value="Halloween"};
+-- 		{Type="Level"; Value=30};
+-- 	};
+-- };
 
 
 -- MARK: 83 - Mass Slaughterer
-MissionLibrary.New{
-	MissionId=83;
-	MissionType = MissionLibrary.MissionTypes.Board;
-	Name="Mass Slaughterer";
-	Description="Complete a Slaughterfest round and get 10 player kills.";
-	Timer=BOARD_TIME_LIMIT;
-	Persistent=true;
-	Checkpoint={
-		{Text="Objectives"; CompleteText="Complete a Slaughterfest round"; Objectives={"Objective1";};};
-	};
-	Objectives={
-		["Objective1"]={Index=1; Description="Get $Kills kills in Slaughterfest"; Type="SaveData"; Key="Kills"; CheckFunc=function(m, k, v)
-			return (k == "Kills" and v <= 0);
-		end};
-	};
-	SaveData={Kills=10;};
-	GuideText="";
-	Tier="Halloween";
-	Rewards={
-		{Type="Perks"; Amount=PerksReward.Normal};
-		{Type="Item"; ItemId="slaughterfestcandybag"; Quantity=1;};
-	};
-	AddRequirements={
-		{Type="SpecialEvent"; Value="Halloween"};
-		{Type="Level"; Value=30};
-	};
-};
+-- MissionLibrary.New{
+-- 	MissionId=83;
+-- 	MissionType = MissionLibrary.MissionTypes.Board;
+-- 	Name="Mass Slaughterer";
+-- 	Description="Complete a Slaughterfest round and get 10 player kills.";
+-- 	Timer=BOARD_TIME_LIMIT;
+-- 	Persistent=true;
+-- 	Checkpoint={
+-- 		{Text="Objectives"; CompleteText="Complete a Slaughterfest round"; Objectives={"Objective1";};};
+-- 	};
+-- 	Objectives={
+-- 		["Objective1"]={Index=1; Description="Get $Kills kills in Slaughterfest"; Type="SaveData"; Key="Kills"; CheckFunc=function(m, k, v)
+-- 			return (k == "Kills" and v <= 0);
+-- 		end};
+-- 	};
+-- 	SaveData={Kills=10;};
+-- 	GuideText="";
+-- 	Tier="Halloween";
+-- 	Rewards={
+-- 		{Type="Perks"; Amount=PerksReward.Normal};
+-- 		{Type="Item"; ItemId="slaughterfestcandybag"; Quantity=1;};
+-- 	};
+-- 	AddRequirements={
+-- 		{Type="SpecialEvent"; Value="Halloween"};
+-- 		{Type="Level"; Value=30};
+-- 	};
+-- };
 
 
 -- MARK: 84 - Jack of all Slaughter
-MissionLibrary.New{
-	MissionId=84;
-	MissionType = MissionLibrary.MissionTypes.Board;
-	Name="Jack of all Slaughter";
-	Description="Complete a Slaughterfest round with different weapon kills.";
-	Timer=BOARD_TIME_LIMIT;
-	Persistent=true;
-	Checkpoint={
-		{Text="Objectives"; CompleteText="Complete a Slaughterfest round"; Objectives={"ItemA"; "ItemB"; "ItemC";};};
-	};
-	Objectives={
-		["ItemA"]={Index=1; Description="Get a kill with a $ItemA";};
-		["ItemB"]={Index=1; Description="Get a kill with a $ItemB";};
-		["ItemC"]={Index=1; Description="Get a kill with a $ItemC";};
-	};
-	SaveData={
-		ItemA=(function()
-			local list = {"minigun"; "p250"; "tacticalbow"};
-			return list[math.fmod(math.random(1, 999), #list) +1];
-		end);
-		ItemB=(function()
-			local list = {"survivalknife"; "machete"; "spikedbat";};
-			return list[math.fmod(math.random(1, 999), #list) +1];
-		end);
-		ItemC=(function()
-			local list = {"sledgehammer"; "shovel"; "broomspear";};
-			return list[math.fmod(math.random(1, 999), #list) +1];
-		end);
-	};
-	GuideText="";
-	Tier="Halloween";
-	Rewards={
-		{Type="Perks"; Amount=PerksReward.Normal};
-		{Type="Item"; ItemId="slaughterfestcandybag"; Quantity=1;};
-	};
-	AddRequirements={
-		{Type="SpecialEvent"; Value="Halloween"};
-		{Type="Level"; Value=30};
-	};
-};
+-- MissionLibrary.New{
+-- 	MissionId=84;
+-- 	MissionType = MissionLibrary.MissionTypes.Board;
+-- 	Name="Jack of all Slaughter";
+-- 	Description="Complete a Slaughterfest round with different weapon kills.";
+-- 	Timer=BOARD_TIME_LIMIT;
+-- 	Persistent=true;
+-- 	Checkpoint={
+-- 		{Text="Objectives"; CompleteText="Complete a Slaughterfest round"; Objectives={"ItemA"; "ItemB"; "ItemC";};};
+-- 	};
+-- 	Objectives={
+-- 		["ItemA"]={Index=1; Description="Get a kill with a $ItemA";};
+-- 		["ItemB"]={Index=1; Description="Get a kill with a $ItemB";};
+-- 		["ItemC"]={Index=1; Description="Get a kill with a $ItemC";};
+-- 	};
+-- 	SaveData={
+-- 		ItemA=(function()
+-- 			local list = {"minigun"; "p250"; "tacticalbow"};
+-- 			return list[math.fmod(math.random(1, 999), #list) +1];
+-- 		end);
+-- 		ItemB=(function()
+-- 			local list = {"survivalknife"; "machete"; "spikedbat";};
+-- 			return list[math.fmod(math.random(1, 999), #list) +1];
+-- 		end);
+-- 		ItemC=(function()
+-- 			local list = {"sledgehammer"; "shovel"; "broomspear";};
+-- 			return list[math.fmod(math.random(1, 999), #list) +1];
+-- 		end);
+-- 	};
+-- 	GuideText="";
+-- 	Tier="Halloween";
+-- 	Rewards={
+-- 		{Type="Perks"; Amount=PerksReward.Normal};
+-- 		{Type="Item"; ItemId="slaughterfestcandybag"; Quantity=1;};
+-- 	};
+-- 	AddRequirements={
+-- 		{Type="SpecialEvent"; Value="Halloween"};
+-- 		{Type="Level"; Value=30};
+-- 	};
+-- };
 
 
 -- MARK: 85 - Whos that Survivor
@@ -3042,43 +3042,43 @@ MissionLibrary.New{
 
 
 -- MARK: 86 - Candy Devourer
-MissionLibrary.New{
-	MissionId=86;
-	MissionType = MissionLibrary.MissionTypes.Board;
-	Name="Candy Devourer";
-	Description="Complete a Slaughterfest round after eating different candies.";
-	Timer=BOARD_TIME_LIMIT;
-	Persistent=true;
-	Checkpoint={
-		{Text="Objectives"; CompleteText="Complete a Slaughterfest round"; Objectives={"ItemA"; "ItemB"; "ItemC";};};
-	};
-	Objectives={
-		["ItemA"]={Index=1; Description="Find and eat a $ItemA";};
-		["ItemB"]={Index=1; Description="Find and eat a $ItemB";};
-		["ItemC"]={Index=1; Description="Find and eat a $ItemC";};
-	};
-	SaveData={
-		List=(function(mission)
-			local candyTypes = {"wickedtaffy"; "cherrybloodbar"; "spookmallow"; "eyeballgummies"; "zombiejello"};
+-- MissionLibrary.New{
+-- 	MissionId=86;
+-- 	MissionType = MissionLibrary.MissionTypes.Board;
+-- 	Name="Candy Devourer";
+-- 	Description="Complete a Slaughterfest round after eating different candies.";
+-- 	Timer=BOARD_TIME_LIMIT;
+-- 	Persistent=true;
+-- 	Checkpoint={
+-- 		{Text="Objectives"; CompleteText="Complete a Slaughterfest round"; Objectives={"ItemA"; "ItemB"; "ItemC";};};
+-- 	};
+-- 	Objectives={
+-- 		["ItemA"]={Index=1; Description="Find and eat a $ItemA";};
+-- 		["ItemB"]={Index=1; Description="Find and eat a $ItemB";};
+-- 		["ItemC"]={Index=1; Description="Find and eat a $ItemC";};
+-- 	};
+-- 	SaveData={
+-- 		List=(function(mission)
+-- 			local candyTypes = {"wickedtaffy"; "cherrybloodbar"; "spookmallow"; "eyeballgummies"; "zombiejello"};
 
-			mission.SaveData.ItemA = table.remove(candyTypes, math.random(1, #candyTypes));
-			mission.SaveData.ItemB = table.remove(candyTypes, math.random(1, #candyTypes));
-			mission.SaveData.ItemC = table.remove(candyTypes, math.random(1, #candyTypes));
+-- 			mission.SaveData.ItemA = table.remove(candyTypes, math.random(1, #candyTypes));
+-- 			mission.SaveData.ItemB = table.remove(candyTypes, math.random(1, #candyTypes));
+-- 			mission.SaveData.ItemC = table.remove(candyTypes, math.random(1, #candyTypes));
 
-			return {mission.SaveData.ItemA; mission.SaveData.ItemB; mission.SaveData.ItemC};
-		end)
-	};
-	GuideText="";
-	Tier="Halloween";
-	Rewards={
-		{Type="Perks"; Amount=PerksReward.Normal};
-		{Type="Item"; ItemId="slaughterfestcandybag"; Quantity=1;};
-	};
-	AddRequirements={
-		{Type="SpecialEvent"; Value="Halloween"};
-		{Type="Level"; Value=30};
-	};
-};
+-- 			return {mission.SaveData.ItemA; mission.SaveData.ItemB; mission.SaveData.ItemC};
+-- 		end)
+-- 	};
+-- 	GuideText="";
+-- 	Tier="Halloween";
+-- 	Rewards={
+-- 		{Type="Perks"; Amount=PerksReward.Normal};
+-- 		{Type="Item"; ItemId="slaughterfestcandybag"; Quantity=1;};
+-- 	};
+-- 	AddRequirements={
+-- 		{Type="SpecialEvent"; Value="Halloween"};
+-- 		{Type="Level"; Value=30};
+-- 	};
+-- };
 
 -- MARK: 87 - Buyer's Remorse
 MissionLibrary.New{

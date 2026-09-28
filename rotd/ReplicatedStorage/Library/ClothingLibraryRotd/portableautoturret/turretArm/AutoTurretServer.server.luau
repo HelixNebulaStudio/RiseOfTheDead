@@ -349,7 +349,7 @@ function TurretRuntime(weaponStorageItem)
 			for a=1, math.min(#sortedTargets, 3) do
 				local selectTargetInfo = sortedTargets[a];
 
-				local hitList = modRaycastUtil.GetHittable(handlePoint.WorldPosition, 64, selectTargetInfo.Target);
+				local hitList = modRaycastUtil.getHittable(handlePoint.WorldPosition, 64, selectTargetInfo.Target);
 				if #hitList <= 0 then continue end;
 
 				targetNpcClass = selectTargetInfo.NpcClass;
@@ -585,7 +585,7 @@ function TurretRuntime(weaponStorageItem)
 		if properties.Ammo and properties.Ammo <= 0 then break; end;
 		if npcClass.HealthComp.IsDead then break; end;
 		
-		local hitList = modRaycastUtil.GetHittable(handlePoint.WorldPosition, 64, targetPart);
+		local hitList = modRaycastUtil.getHittable(handlePoint.WorldPosition, 64, targetPart);
 		if #hitList <= 0 then break end;
 	end
 	

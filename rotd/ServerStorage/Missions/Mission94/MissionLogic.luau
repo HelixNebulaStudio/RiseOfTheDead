@@ -2,8 +2,6 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local RunService = game:GetService("RunService");
 
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
-
 local MISSION_ID = 94;
 
 local MissionLogic = {};
@@ -20,16 +18,16 @@ function MissionLogic.onRequire()
 			local room = packet.Room;
 			if room.Type ~= "Raid" then return end;
 
-			if event.Player == nil then return end;
-			local player = event.Player;
-
-			local mission = modMission:GetMission(player, MISSION_ID);
-			if mission == nil or mission.Type ~= 1 or mission.ProgressionPoint ~= 1 then Debugger:Warn(`Mission 94 inactive`); return end;
-
-			local raidId = mission.SaveData.Raid;
-			if room.Stage ~= raidId then Debugger:Warn(`Wrong raid for mission 94`); return end;
-
-			modMission:CompleteMission(player, MISSION_ID);
+			for _, player in pairs(game.Players:GetPlayers()) do
+				local mission = modMission:GetMission(player, MISSION_ID);
+				if mission == nil then continue end;
+				if mission.Type ~= 1 or mission.ProgressionPoint ~= 1 then continue end;
+					
+				local raidId = mission.SaveData.Raid;
+				if room.Stage ~= raidId then continue end;
+					
+				modMission:CompleteMission(player, MISSION_ID);
+			end
 		end)
 	end
 end

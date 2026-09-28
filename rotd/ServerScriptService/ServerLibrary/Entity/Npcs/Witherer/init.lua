@@ -105,7 +105,7 @@ function npcPackage.Spawned(npcClass: NpcClass)
             local pointCf = CFrame.lookAt(point, point + normal) * CFrame.Angles(math.rad(-90), 0, 0);
             local origin = point + (normal*0.1);
 
-            local rayResultList = modRaycastUtil.ConeCast{
+            local rayResultList = modRaycastUtil.coneCast{
                 Origin=origin;
                 Dir=-normal;
                 Points=scanPoints;
