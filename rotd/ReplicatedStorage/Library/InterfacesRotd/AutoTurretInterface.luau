@@ -140,7 +140,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		
 		local patProperties = patStorage.Properties;
 
-		local isOnline = patProperties.Online == true;
+		local isOnline = patProperties.IsOnline == true;
 		activateButton.Text = isOnline and "Online" or "Offline";
 		activateButton.BackgroundColor3 = isOnline and Color3.fromRGB(50, 100, 50) or Color3.fromRGB(100, 50, 50);
 		
@@ -312,11 +312,16 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		
 		if returnPacket and returnPacket.Success then
 			updateStorageProperties(returnPacket.StorageProperties);
-			binds.Refresh();
 		end
 		
+		binds.Refresh();
 		debounce = tick()-1;
 	end)
+	
+	--MARK: OnInterfaceEvent
+	interface:BindEvent("UpdatePatWindow", function()
+		binds.Refresh();
+	end);
 	
 	function remoteAutoTurret.OnClientInvoke(action, packet)
 		if action == "refresh" then

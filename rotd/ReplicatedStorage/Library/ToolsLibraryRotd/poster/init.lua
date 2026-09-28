@@ -93,6 +93,26 @@ if RunService:IsServer() then
 		elseif action == "fetchhistory" then
 			return modEvents:GetEvent(player, "PosterHistory");
 			
+		elseif action == "remove" then
+			local decalId = paramPacket and paramPacket.DecalId;
+			if decalId == nil then return end;
+			
+			local posterHistory = modEvents:GetEvent(player, "PosterHistory");
+			if posterHistory == nil then
+				return {Success=false; Reason="No history found.";};
+			end
+			
+			for a=#posterHistory.List, 1, -1 do
+				if posterHistory.List[a].ImageId == decalId then
+					table.remove(posterHistory.List, a);
+				end
+			end
+			
+			modEvents:NewEvent(player, posterHistory);
+			Debugger:Log("Removed Poster id ", decalId);
+			
+			return {Success=true;};
+			
 		end
 
 		return;
@@ -116,7 +136,7 @@ local toolPackage = {
 	Properties={};
 };
 
-function toolPackage.InputEvent(toolHandler: ToolHandlerInstance, inputData: ToolInputData)
+function toolPackage.InputEvent(toolHandler: ToolHandlerInstance, inputData: ToolInputData & anydict)
 	if inputData.InputState ~= "Begin" then return end;
 	
 	local posterPrefab = modPoster.Script:WaitForChild("PosterModel");

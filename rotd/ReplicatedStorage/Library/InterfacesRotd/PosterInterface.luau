@@ -7,6 +7,7 @@ local localPlayer = game.Players.LocalPlayer;
 
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
 local modStrings = shared.require(game.ReplicatedStorage.Library.Util.Strings);
+local modComponents = shared.require(game.ReplicatedStorage.Library.UI.Components);
 
 local TEMPLATE_DECALS = {
     {Title="Poster"; ImageId="9242720986"};
@@ -69,9 +70,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		end
 	end)
 
+	local savedListingButtons = {};
+
 	function binds.reloadHistory()
 		task.spawn(function()
 			local rPacket = remoteSetPoster:InvokeServer("fetchhistory");
+
+			table.clear(savedDecals);
 			if rPacket and rPacket.List then
 				for a=1, #rPacket.List do
 					local item = rPacket.List[a];
@@ -85,36 +90,68 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				end
 			end
 
-			for _, obj in pairs(rightScrollFrame:GetChildren()) do
-				if obj.Name == "new" then
+			for _, obj in pairs(savedListingButtons) do
+				if obj and obj.Parent then
 					game.Debris:AddItem(obj, 0);
 				end
 			end
+			table.clear(savedListingButtons);
 
 			for a=1, #savedDecals do
-				if rightScrollFrame:FindFirstChild(savedDecals[a].ImageId) then continue end;
-				
+				local decalEntry = savedDecals[a];
+
+				local isTemplate = false;
+				for b=1, #TEMPLATE_DECALS do
+					if TEMPLATE_DECALS[b].ImageId == decalEntry.ImageId then
+						isTemplate = true;
+						break;
+					end
+				end
+				if isTemplate then continue end;
+
 				local new = templateListingButton:Clone();
-				new.Name = savedDecals[a].ImageId;
-				new.Text = (savedDecals[a].Title or "").." (".. savedDecals[a].ImageId ..")";
+				new.Name = decalEntry.ImageId;
+				new.Text = (decalEntry.Title or "").." (".. decalEntry.ImageId ..")";
 
 				new.MouseMoved:Connect(function()
-					decalLabel.Image = "rbxassetid://".. savedDecals[a].ImageId;
+					decalLabel.Image = "rbxassetid://".. decalEntry.ImageId;
 				end)
 				new.MouseButton1Click:Connect(function()
-                    if binds.Interactable == nil then return end;
-                    
-                    interface:PlayButtonClick();
-                    local _rPacket = remoteSetPoster:InvokeServer("set", {
-                        Poster = binds.Interactable.Part.Parent;
-                        DecalId = savedDecals[a].ImageId;
-                    });
-                    binds.reloadHistory();
+	                   if binds.Interactable == nil then return end;
+	                   
+	                   interface:PlayButtonClick();
+	                   local _rPacket = remoteSetPoster:InvokeServer("set", {
+	                       Poster = binds.Interactable.Part.Parent;
+	                       DecalId = decalEntry.ImageId;
+	                   });
+	                   binds.reloadHistory();
 				end)
-				
+
+				local removeHoldDownObj = modComponents.CreateHoldDownButton(interface, {
+					Text="";
+				});
+				local removeHoldButton = removeHoldDownObj.Button;
+				removeHoldButton.AnchorPoint = Vector2.new(1, 0);
+				removeHoldButton.BackgroundColor3 = Color3.fromRGB(120, 57, 57);
+				removeHoldButton.Position = UDim2.new(1, -5, 0, 5);
+				removeHoldButton.Size = UDim2.new(0, 15, 0, 15);
+				removeHoldButton.Parent = new;
+
+				removeHoldDownObj.OnHoldDownConfirm = function()
+					local _removePacket = remoteSetPoster:InvokeServer("remove", {
+						DecalId = decalEntry.ImageId;
+					});
+
+					if _removePacket and _removePacket.Success then
+						binds.reloadHistory();
+					end
+				end;
+
 				new.LayoutOrder = #TEMPLATE_DECALS + 10 + a;
 
 				new.Parent = rightScrollFrame;
+
+				table.insert(savedListingButtons, new);
 			end
 		end)
 	end

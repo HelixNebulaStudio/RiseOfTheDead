@@ -115,6 +115,11 @@ function itemPackage.Init(itemLib)
 
 		local accessories = playerSave.AppearanceData:GetAccessoriesByItemId("portableautoturret");
 		local accessory = accessories[1];
+		if accessory == nil then
+			shared.Notify(player, "Equip the Portable Auto Turret before using it.", "Negative");
+			return rPacket;
+		end
+
 		local turretArm = accessory:WaitForChild("turretArm");
 
 		local accessorySiid = accessory:GetAttribute("StorageItemId");
@@ -144,9 +149,9 @@ function itemPackage.Init(itemLib)
 			patStorage.Properties.IsOnline = not onlineBool;
 			patStorage:SyncProperties();
 			if patStorage.Properties.IsOnline then
-				modAudio.Play("TurretOnline", turretArm.PrimaryPart); 
+				modAudio.Play("TurretOnline", turretArm.PrimaryPart);
 			else
-				modAudio.Play("TurretOffline", turretArm.PrimaryPart); 
+				modAudio.Play("TurretOffline", turretArm.PrimaryPart);
 			end
 			
 			rPacket.StorageProperties = patStorage.Properties;

@@ -3,7 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local RunService = game:GetService("RunService");
 local TextService = game:GetService("TextService");
 local BadgeService = game:GetService("BadgeService");
-local TweenService = game:GetService("TweenService");
+local GroupService = game:GetService("GroupService");
 
 
 local localPlayer = game.Players.LocalPlayer;
@@ -28,9 +28,44 @@ local HIGHLIGHT_COLORS = {
 	Silver = Color3.fromRGB(116, 116, 116);
 	Gold = Color3.fromRGB(116, 96, 24);
 	Diamond = Color3.fromRGB(77, 142, 143);
-}
-local THUMBNAIL_TYPE = Enum.ThumbnailType.HeadShot;
-local THUMBNAIL_SIZE = Enum.ThumbnailSize.Size420x420;
+};
+
+local FOCUS_LEVEL_COLORS = {
+	Color3.fromRGB(89, 89, 89);
+	Color3.fromRGB(51, 102, 204);
+	Color3.fromRGB(101, 59, 169);
+	Color3.fromRGB(165, 59, 168);
+};
+
+local STAT_SORT = {
+	Level={Name="Mastery Level"; Index=1; MaxKey="MaxLevels";};
+	Kills={Name="Kills"; Index=3;};
+	ZombieKills={Name="Zombie Kills"; Index=31;};
+	HumanKills={Name="Human Kills"; Index=32;};
+	Death={Name="Death"; Index=40;};
+	TweakPoints={Name="Tweak Points"; Index=49;};
+	Perks={Name="Perks"; Index=50;};
+	Money={Name="Money"; Index=60;};
+	MissionsCompleted={Name="Missions Completed"; Index=70;};
+	FotlStats={Name="Fall of the Living"; Index=75;};
+	ColorPacks={Name="Color Packs"; Index=80;};
+	SkinsPacks={Name="Skin Packs"; Index=90;};
+	--TraderRep={Name="Trader Reputation"; Index=100;};
+};
+
+local function getHighlightColor(tier)
+	if tier == modAchievementLibrary.Tiers.Bronze then
+		return HIGHLIGHT_COLORS.Bronze;
+	elseif tier == modAchievementLibrary.Tiers.Silver then
+		return HIGHLIGHT_COLORS.Silver;
+	elseif tier == modAchievementLibrary.Tiers.Gold then
+		return HIGHLIGHT_COLORS.Gold;
+	elseif tier == modAchievementLibrary.Tiers.Diamond then
+		return HIGHLIGHT_COLORS.Diamond;
+	end
+
+	return HIGHLIGHT_COLORS.Black;
+end
 
 local interfacePackage = {
     Type = "Player";
@@ -42,8 +77,7 @@ function interfacePackage.onRequire()
 end
 
 function interfacePackage.newInstance(interface: InterfaceInstance)
-    local remotes = game.ReplicatedStorage.Remotes;
-    local remoteWorldTravelRequest = remotes.Interactable.WorldTravelRequest;
+    local remoteWorldTravelRequest = game.ReplicatedStorage.Remotes.Interactable.WorldTravelRequest;
     local remoteRequestPublicProfile = modRemotesManager:Get("RequestPublicProfile");
     local remoteProgressMission = modRemotesManager:Get("ProgressMission");
     local remoteSetPlayerTitle = modRemotesManager:Get("SetPlayerTitle");
@@ -53,7 +87,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     local remoteTeamsManager = modRemotesManager:Get("TeamsManager");
     
     local modData = shared.require(localPlayer:WaitForChild("DataModule"));
-    local branchColor = modBranchConfigurations.BranchColor
 
     local friendsTabTemplate = script:WaitForChild("FriendsTab");
     local playerListingTemplate = script:WaitForChild("PlayerListing");
@@ -76,7 +109,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
     local searchBar = menuFrame:WaitForChild("SearchBar"):WaitForChild("nameInput");
 
-    local invitationsList = {};
     local inviteDebounce = {};
 
 
@@ -89,7 +121,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     local searchedPlayer = {};
 
     local barTemplate = script:WaitForChild("barTemplate");
-    local templatebadgeButton = script:WaitForChild("badgeButton");
+    local templateBadgeButton = script:WaitForChild("badgeButton");
     local templatePinIcon = script:WaitForChild("PinIcon");
 
     local templateOptionFrame = script:WaitForChild("Options");
@@ -105,11 +137,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	window.CompactFullscreen = true;
     window.CloseWithInteract = true;
 
-	if modConfigurations.CompactInterface then
-		window:SetClosePosition(UDim2.new(0.5, 0, -1, 0), UDim2.new(0.5, 0, 0.5, 0));
-	else
-		window:SetClosePosition(UDim2.new(0.5, 0, -1, 0), UDim2.new(0.5, 0, 0.5, 0));
-	end
+	window:SetClosePosition(UDim2.new(0.5, 0, -1, 0), UDim2.new(0.5, 0, 0.5, 0));
     
 	local quickButton = interface:NewQuickButton("SocialMenu", "Social", "rbxassetid://3256270238");
 	quickButton.LayoutOrder = 100;
@@ -129,6 +157,14 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
     
     local mission1Data;
+    local function hasCompletedFirstMission()
+        if mission1Data ~= nil and mission1Data.Type == 3 then
+            return true;
+        end
+
+        modClientGuis.promptWarning("Please complete the first mission.");
+        return false;
+    end
 
     --MARK: OnToggle
 	window.OnToggle:Connect(function(visible)
@@ -159,79 +195,69 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			highlightText.Visible = false;
 		end
 	end)
-	
 
+	   if modConfigurations.CompactInterface then
+	       menuFrame.Position = UDim2.new(0.5, 0, 0.5, 0);
+	       menuFrame.Size = UDim2.new(1, 0, 1, 0);
+	       menuFrame:WaitForChild("UICorner"):Destroy();
 
-
-
-
-    if modConfigurations.CompactInterface then
-        menuFrame.Position = UDim2.new(0.5, 0, 0.5, 0);
-        menuFrame.Size = UDim2.new(1, 0, 1, 0);
-        menuFrame:WaitForChild("UICorner"):Destroy();
-        
-        menuFrame:WaitForChild("touchCloseButton").Visible = true;
-        menuFrame:WaitForChild("touchCloseButton"):WaitForChild("closeButton").MouseButton1Click:Connect(function()
-            interface:PlayButtonClick();
-            window:Close();
-        end)
-    end
+	       local touchCloseButton = menuFrame:WaitForChild("touchCloseButton");
+	       touchCloseButton.Visible = true;
+	       touchCloseButton:WaitForChild("closeButton").MouseButton1Click:Connect(function()
+	           interface:PlayButtonClick();
+	           window:Close();
+	       end)
+	   end
 
     local function UpdateApplicableFriends()
         local friends = {};
-        local s,e = pcall(function() 
+        local s,e = pcall(function()
             friends = localPlayer.UserId > 0 and localPlayer:GetFriendsOnlineAsync() or {};
         end)
         if not s then warn(e) end;
-        
+
         binds.FriendsList = {};
-        
+
         for a=1, #searchedPlayer do
             searchedPlayer[a].LocationType = 1;
             searchedPlayer[a].SearchedPlayer = true;
             table.insert(friends, searchedPlayer[a]);
         end
-        
+
         for a=1, #modData.TravelRequests do
             modData.TravelRequests[a].LocationType = 1;
             modData.TravelRequests[a].TravelRequest = true;
             table.insert(friends, modData.TravelRequests[a]);
         end
-        
-        local IdList = {};
+
         for a=1, #friends do
             local inUniverse = false;
             if friends[a].PlaceId or friends[a].LocationType == 1 or friends[a].LocationType == 4 then
                 inUniverse = modBranchConfigurations.IsPlaceIdThisGame(friends[a].PlaceId);
             end
-            
-            local thumbnail = shared.modPlayers.getAvatar(friends[a].VisitorId);
-            if binds.FriendsList == nil then continue end;
 
-            friends[a].Avatar = thumbnail;
+            friends[a].Avatar = shared.modPlayers.getAvatar(friends[a].VisitorId);
             friends[a].InUniverse = inUniverse;
-            table.insert(IdList, friends[a].VisitorId);
 
             binds.FriendsList[friends[a].UserName] = friends[a];
         end
-        
-        
+
         if localPlayer.UserId == -1 then
-            local friend = {};
-            friend.VisitorId = modGlobalVars.UseRandomId();
-            local _thumbnail;
-            friend.UserName = "Random1";
-            friend.Avatar = "";
-            friend.InUniverse = true;
-            binds.FriendsList[friend.UserName] = friend;
-            
-            local friend2 = {};
-            friend2.VisitorId = modGlobalVars.UseRandomId();
-            local thumbnail2 = shared.modPlayers.getAvatar(friend2.VisitorId);
-            friend2.UserName = "Random2";
-            friend2.Avatar = thumbnail2;
-            friend2.InUniverse = true;
-            binds.FriendsList[friend2.UserName] = friend2;
+            local random1Id = modGlobalVars.UseRandomId();
+            binds.FriendsList.Random1 = {
+                VisitorId = random1Id;
+                UserName = "Random1";
+                Avatar = shared.modPlayers.getAvatar(random1Id);
+                InUniverse = true;
+            };
+
+            local random2Id = modGlobalVars.UseRandomId();
+            binds.FriendsList.Random2 = {
+                VisitorId = random2Id;
+                UserName = "Random2";
+                Avatar = shared.modPlayers.getAvatar(random2Id);
+                InUniverse = true;
+            };
         end
     end
 
@@ -275,15 +301,29 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     end
 
 
+    local function getPlayerWorldName(playerName, fallbackWorldName)
+        local squadTeam = modTeamsManager.getTeamByPlayer(localPlayer, "Squad");
+        if squadTeam and squadTeam.Members[playerName] then
+            return squadTeam.Members[playerName].Values.WorldName or "Unknown";
+        end
+
+        local friendData = binds.FriendsList and binds.FriendsList[playerName];
+        if friendData and friendData.InUniverse then
+            return modBranchConfigurations.GetWorldName(friendData.PlaceId) or "Unknown";
+        end
+
+        return fallbackWorldName;
+    end
+
     --MARK: Render social profile;
     function binds.SelectPlayer(playerName, refresh)
         playerSelection = playerName;
         profileNameTag.Text = playerName;
         profileAvatarLabel.Image = CacheAvatar(playerName) or "";
         
-        if modData.Players[playerName] == nil or refresh then 
+        if modData.Players[playerName] == nil or refresh then
             modData.Players[playerName] = remoteRequestPublicProfile:InvokeServer(playerName);
-        end;
+        end
         if modData.Players[playerName] then
             local playerData = modData.Players[playerName];
             
@@ -311,57 +351,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             end
             
             if playerData.Stats then
-                if playerData.Stats.Level then
-                    modLevelBadge:Update(profileLevelLabel, playerData.Stats.Level);
-                else
-                    modLevelBadge:Update(profileLevelLabel, 0);
-                end
-                
-                local statSort = {
-                    Level={Name="Mastery Level"; Index=1; MaxKey="MaxLevels"};
-                    Kills={Name="Kills"; Index=3};
-                    ZombieKills={Name="Zombie Kills"; Index=31};
-                    HumanKills={Name="Human Kills"; Index=32};
-                    Death={Name="Death"; Index=40};
-                    TweakPoints={Name="Tweak Points"; Index=49};
-                    Perks={Name="Perks"; Index=50};
-                    Money={Name="Money"; Index=60};
-                    MissionsCompleted={Name="Missions Completed"; Index=70};
-                    FotlStats={Name="Fall of the Living"; Index=75;};
-                    ColorPacks={Name="Color Packs"; Index=80};
-                    SkinsPacks={Name="Skin Packs"; Index=90};
-                    --TraderRep={Name="Trader Reputation"; Index=100};
-                };
-                local _enemySort = {
-                    ["Zombie"]=1;
-                    ["Leaper Zombie"]=2;
-                    ["Leaper"]=2;
-                    ["Ticks Zombie"]=3;
-                    ["Ticks"]=3;
-                    ["Heavy Zombie"]=4;
-                    ["Heavy"]=4;
-                    
-                    ["Bandit"]=1;
-                    
-                    ["The Prisoner"]=10;
-                    ["Tanker"]=11;
-                    ["Fumes"]=12;
-                    ["Corrosive"]=13;
-                    ["Zpider"]=14;
-                    ["Shadow"]=15;
-                    ["Zomborg"]=16;
-                    ["Karl"]=18;
-                    ["Kylde"]=19;
-                    ["Hector Shot"]=20;
-                    ["Zricera"]=21;
-                    ["Vexeron"]=22;
-                }
-                
-                local statStringTable = {};
+                modLevelBadge:Update(profileLevelLabel, playerData.Stats.Level or 0);
+
                 local statCache = {};
                 
                 if RunService:IsStudio() then
-                    local playPoints = interface.beautifyNumber(playerData.PlayPoints);
+                    local playPoints = interface.beautifyNumber(playerData.PlayPoints or 0);
                     table.insert(statCache, {Index=99; String=`<b>Gameplay Points</b>: <font size="12">{playPoints}</font>`});
                 end
 
@@ -370,15 +365,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 end
                 
                 for k, v in pairs(playerData.Stats) do
-                    local lib = statSort[k];
-                    
-                    local statKey = tostring(lib and lib.Name or k) or "";
-                    local statValue = tostring(v) or "";
+                    local lib = STAT_SORT[k];
 
+                    local statKey = lib and lib.Name or k;
+                    local statValue = tostring(v);
 
-                    if k == "FotlStats" then
-                        Debugger:StudioLog(`FotlStats`, v);
-                    end
                     if typeof(v) == "number" then
                         statValue = interface.beautifyNumber(v);
 
@@ -387,16 +378,16 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                             statValue = `{statValue} <font size="9"><b>(Maxed)</b></font>`;
                         end
                     end
-                    
-                    local s = `<b>{statKey}</b>: <font size="12">{statValue}</font>`;
 
                     if lib then
-                        table.insert(statCache, {Index=(lib and lib.Index or 999); String=s});
+                        table.insert(statCache, {Index=lib.Index; String=`<b>{statKey}</b>: <font size="12">{statValue}</font>`});
                     end
                 end
                 table.sort(statCache, function(A, B) return A.Index < B.Index; end)
+
+                local statStringTable = table.create(#statCache);
                 for a=1, #statCache do
-                    table.insert(statStringTable, statCache[a].String);
+                    statStringTable[a] = statCache[a].String;
                 end
                 
                 profileDisplayList.statsProfile.label.Text = table.concat(statStringTable, "\n");
@@ -411,7 +402,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             profileDisplayList.statsProfile.Visible = true;
             profileLevelLabel.Visible = true;
             
-            if playerData.Stats.FocusLevel and playerData.Stats.Level then
+            if playerData.Stats and playerData.Stats.FocusLevel and playerData.Stats.Level then
                 profileDisplayList.focusLevels.Visible = true;
                 local focusLevelFrame = profileDisplayList.focusLevels.Frame;
                 local playerLevel = playerData.Stats.Level;
@@ -429,45 +420,34 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 for lvl=math.clamp(focusLevel-3, 1, math.huge), focusLevel do
                     local levelKills = (playerData.Stats["LevelKills-"..lvl] or 0);
                     local focusAmount = modGlobalVars.GetFocusLevel(playerLevel, lvl);
-                
+
                     local barFrame = barTemplate:Clone();
                     local label = barFrame:WaitForChild("amountLabel");
                     barFrame.Parent = focusLevelFrame;
-                    
+
                     local sizeConstraint = Instance.new("UISizeConstraint");
                     sizeConstraint.MinSize = Vector2.new(40, 0);
                     sizeConstraint.Parent = barFrame;
 
                     local killsNeeded = focusAmount-math.fmod(levelKills, focusAmount);
-                    totalKills = totalKills + killsNeeded;
-                    label.Text = ("L$focusLevel: $killsNeeded"):gsub("$focusLevel",tostring(lvl)):gsub("$killsNeeded", killsNeeded);
-                    
-                    table.insert(barFrames, {Bar=barFrame; Amount=killsNeeded});
+                    totalKills += killsNeeded;
+                    label.Text = `L{lvl}: {killsNeeded}`;
+
+                    table.insert(barFrames, {Bar=barFrame; Amount=killsNeeded;});
                     table.insert(levelSort, {Bar=barFrame; Level=lvl;});
                 end
-                table.sort(barFrames, function(A, B) return A.Amount < B.Amount end)
-                table.sort(levelSort, function(A, B) return A.Level > B.Level end)
+                table.sort(barFrames, function(A, B) return A.Amount < B.Amount end);
+                table.sort(levelSort, function(A, B) return A.Level > B.Level end);
 
-                
                 for a=1, #barFrames do
                     local barFrame = barFrames[a].Bar;
-                    
+
                     barFrame.LayoutOrder = a;
-                    barFrame.Size = UDim2.new(math.clamp(barFrames[a].Amount/totalKills, 0, 1) , 0, 1, 0);
-                    
+                    barFrame.Size = UDim2.new(math.clamp(barFrames[a].Amount/totalKills, 0, 1), 0, 1, 0);
                     barFrame.Visible = true;
                 end
                 for a=1, #levelSort do
-                    local barFrame = barFrames[a].Bar;
-                    if a == 1 then
-                        barFrame.BackgroundColor3 = Color3.fromRGB(89, 89, 89);
-                    elseif a == 2 then
-                        barFrame.BackgroundColor3 = Color3.fromRGB(51, 102, 204);
-                    elseif a == 3 then
-                        barFrame.BackgroundColor3 = Color3.fromRGB(101, 59, 169);
-                    elseif a == 4 then
-                        barFrame.BackgroundColor3 = Color3.fromRGB(165, 59, 168);
-                    end
+                    levelSort[a].Bar.BackgroundColor3 = FOCUS_LEVEL_COLORS[a] or FOCUS_LEVEL_COLORS[#FOCUS_LEVEL_COLORS];
                 end
             else
                 profileDisplayList.focusLevels.Visible = false;
@@ -488,18 +468,18 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 local total = #found+#notFound;
                 local noOfFound = #found;
                 profileDisplayList.collectionProfile.Frame.Bar.Size = UDim2.new(math.clamp(#found/total, 0, 1), 0, 1, 0);
-                profileDisplayList.collectionProfile.label.Text = ("Collectibles doesn't have any affect on gameplay. ($f/$t)"):gsub("$f", noOfFound):gsub("$t", total);
+                profileDisplayList.collectionProfile.label.Text = `Collectibles doesn't have any affect on gameplay. ({noOfFound}/{total})`;
                 profileDisplayList.collectionProfile.foundLabel.Text = "Found:\n".. table.concat(found, "\n");
                 profileDisplayList.collectionProfile.notfoundLabel.Text = ":Not Found\n".. table.concat(notFound, "\n");
                 local txtBoundFound = TextService:GetTextSize(profileDisplayList.collectionProfile.foundLabel.Text,
                                                                 profileDisplayList.collectionProfile.foundLabel.TextSize,
                                                                 profileDisplayList.collectionProfile.foundLabel.Font,
-                                                                Vector2.new(250, 1000))
+                                                                Vector2.new(250, 1000));
                 local txtBoundUnfound = TextService:GetTextSize(profileDisplayList.collectionProfile.notfoundLabel.Text,
                                                                 profileDisplayList.collectionProfile.notfoundLabel.TextSize,
                                                                 profileDisplayList.collectionProfile.notfoundLabel.Font,
-                                                                Vector2.new(250, 1000))
-                local ySize = txtBoundFound.Y > txtBoundUnfound.Y and txtBoundFound.Y or txtBoundUnfound.Y;
+                                                                Vector2.new(250, 1000));
+                local ySize = math.max(txtBoundFound.Y, txtBoundUnfound.Y);
                 profileDisplayList.collectionProfile.Size = UDim2.new(1, 0, 0, ySize+130);
             else
                 profileDisplayList.collectionProfile.Visible = false;
@@ -507,64 +487,54 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             
             if playerData.Achievements then
                 profileDisplayList.achievements.Visible = true;
-                
+
                 local equipTitleDebounce = false;
                 local order = 1000;
                 for a=1, #achievementIndexList do
                     local lib = achievementIndexList[a];
                     local owned = playerData.Achievements[lib.Id];
-                    
-                    local new = badgeButtons[lib.Id] or templatebadgeButton:Clone();
-                    
+
+                    local new = badgeButtons[lib.Id] or templateBadgeButton:Clone();
+
                     if lib.Id == playerData.TitleId then
                         if titlePinIcon == nil or titlePinIcon.Parent == nil then
                             titlePinIcon = templatePinIcon:Clone();
                         end
-                        
+
                         titlePinIcon.Parent = new;
                         titlePinIcon.Visible = true;
                     end
-                    
-                    if badgeButtons[lib.Id] == nil and new then
+
+                    if badgeButtons[lib.Id] == nil then
                         new.MouseMoved:Connect(function()
                             if lib.BadgeInfo == nil then return end;
-                            
+
                             local position = new.AbsolutePosition-menuFrame.AbsolutePosition;
                             highlightText.Position = UDim2.new(0, position.X+40, 0, position.Y+65);
-                            
-                            if lib.Tier == modAchievementLibrary.Tiers.Bronze then
-                                highlightText.ImageColor3 = HIGHLIGHT_COLORS.Bronze;
-                            elseif lib.Tier == modAchievementLibrary.Tiers.Silver then
-                                highlightText.ImageColor3 = HIGHLIGHT_COLORS.Silver;
-                            elseif lib.Tier == modAchievementLibrary.Tiers.Gold then
-                                highlightText.ImageColor3 = HIGHLIGHT_COLORS.Gold;
-                            elseif lib.Tier == modAchievementLibrary.Tiers.Diamond then
-                                highlightText.ImageColor3 = HIGHLIGHT_COLORS.Diamond;
-                            else
-                                highlightText.ImageColor3 = HIGHLIGHT_COLORS.Black;
-                            end
-                            
+
+                            highlightText.ImageColor3 = getHighlightColor(lib.Tier);
+
                             highlightText.titleTag.Text = lib.BadgeInfo.Name;
-                            highlightText.descTag.Text = lib.BadgeInfo.Description
-                            
+                            highlightText.descTag.Text = lib.BadgeInfo.Description;
+
                             if lib.Tier and lib.Tier.Perks then
-                                highlightText.descTag.Text = highlightText.descTag.Text.."\nReward: +"..lib.Tier.Perks.." Perks";
+                                highlightText.descTag.Text ..= `\nReward: +{lib.Tier.Perks} Perks`;
                             end
-                            
+
                             local textBounds = TextService:GetTextSize(
-                                highlightText.descTag.Text, 
+                                highlightText.descTag.Text,
                                 highlightText.descTag.TextSize,
                                 highlightText.descTag.Font,
                                 Vector2.new(340, 1000));
-                            
+
                             highlightText.Size = UDim2.new(0, 350, 0, 40+math.clamp(textBounds.Y, 0, 1000));
-                            
+
                             highlightText.Visible = true;
                         end)
                         new.MouseLeave:Connect(function()
                             highlightText.Visible = false;
                         end)
-                        
+
                         local function setTitleClick()
                             interface:PlayButtonClick();
 
@@ -583,28 +553,27 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                         new.MouseButton1Click:Connect(function()
                             if playerName ~= localPlayer.Name then return end;
                             if playerData.Achievements[lib.Id] == nil then
-
                                 if lib.Id == "gromem" then
-                                    game:GetService("GroupService"):PromptJoinAsync(4573862);
+                                    GroupService:PromptJoinAsync(4573862);
                                 end
 
                                 return
                             end;
-                            
+
                             if equipTitleDebounce then return end
                             equipTitleDebounce = true;
                             setTitleClick();
                             equipTitleDebounce = false;
                         end)
-                        
-                        if (RunService:IsStudio()) then
+
+                        if RunService:IsStudio() then
                             new.MouseButton2Click:Connect(setTitleClick);
                         end
                     end
-                    
+
                     badgeButtons[lib.Id] = new;
                     new.LayoutOrder = owned or order+a;
-                    
+
                     task.spawn(function()
                         if lib.BadgeInfo == nil then
                             pcall(function()
@@ -615,33 +584,25 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                             new.Image = lib.BadgeInfo.IconImageId and "rbxassetid://"..lib.BadgeInfo.IconImageId or "rbxasset://textures/ui/GuiImagePlaceholder.png";
                         end
                     end)
-                    new.ImageColor3 = owned and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(25, 25, 25);
-                    
+                    new.ImageColor3 = owned and Color3.fromRGB(255, 255, 255) or HIGHLIGHT_COLORS.Black;
+                    new.Visible = not (lib.Hidden and owned == nil);
 
-                    if lib.Hidden and owned == nil then
-                        new.Visible = false;
-                    else
-                        new.Visible = true;
-                    end
-
-                    
                     new.Parent = profileDisplayList.achievements.ScrollingFrame;
                 end
-                pcall(function()
-                    task.spawn(function()
-                        profileDisplayList.achievements.Size = UDim2.new(
-                            1, 
-                            0, 
-                            0, 
-                            profileDisplayList.achievements.ScrollingFrame.UIGridLayout.AbsoluteContentSize.Y+130
-                        );
-                    end)
+
+                task.spawn(function()
+                    profileDisplayList.achievements.Size = UDim2.new(
+                        1,
+                        0,
+                        0,
+                        profileDisplayList.achievements.ScrollingFrame.UIGridLayout.AbsoluteContentSize.Y+130
+                    );
                 end)
             else
                 profileDisplayList.achievements.Visible = false;
             end
             
-            if playerData.Statistics and next(playerData.Statistics) ~= nil then
+            if playerData.Statistics and next(playerData.Statistics) then
                 profileDisplayList.gameStatistics.Visible = true;
                 
                 local strTable = {
@@ -674,24 +635,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             profileDisplayList.focusLevels.Visible = false;
         end
         
-        selectionWorldName = shared.WorldName;
-
-        local squadTeam = modTeamsManager.getTeamByPlayer(localPlayer, "Squad");
-        if squadTeam and squadTeam.Members[playerName] then
-            selectionWorldName = (squadTeam.Members[playerName].Values.WorldName or "Unknown");
-
-        elseif binds.FriendsList and binds.FriendsList[playerName] and binds.FriendsList[playerName].InUniverse then
-            selectionWorldName = (modBranchConfigurations.GetWorldName(binds.FriendsList[playerName].PlaceId) or "Unknown");
-
-        end
-
-        profileLocationLabel.Text = (selectionWorldName and modBranchConfigurations.GetWorldDisplayName(selectionWorldName) or "Unknown");
-        
+        selectionWorldName = getPlayerWorldName(playerName, shared.WorldName);
+        profileLocationLabel.Text = selectionWorldName and modBranchConfigurations.GetWorldDisplayName(selectionWorldName) or "Unknown";
     end
 
 
-    local function UpdateListing(playerData)
-        local curPlayerName = playerData.Name;
+    local function UpdateListing(listingData)
+        local curPlayerName = listingData.Name;
 
         local listing = binds.ActivePlayerListing[curPlayerName];
         if listing == nil then
@@ -751,8 +701,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                             remoteTradeRequest:FireServer("request", curPlayerName);
                     end)
                     newOptionButton(
-                        curPlayerName ~= localPlayer.Name and isInGame 
-                        and getInvitationFrom("TradeInvite", curPlayerName),
+                        curPlayerName ~= localPlayer.Name and isInGame
+                        and getInvitationFrom("TradeInvite", curPlayerName) ~= nil,
                         "Accept Trade Request",
                         function()
                             local tradeInvitePacket = getInvitationFrom("TradeInvite", curPlayerName);
@@ -786,14 +736,14 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                             if inviteDebounce[curPlayerName] then return end;
                             inviteDebounce[curPlayerName] = true;
                             task.delay(5, function() inviteDebounce[curPlayerName] = nil; end);
-                            
-                            local rPacket = remoteTeamsManager:InvokeServer("invitetosquad", curPlayerName);
+
+                            remoteTeamsManager:InvokeServer("invitetosquad", curPlayerName);
                     end)
                     newOptionButton(
                         curPlayerName == localPlayer.Name and squadTeam,
                         "Leave Squad",
-                        function(button)
-                            local rPacket = remoteTeamsManager:InvokeServer("leavesquad");
+                        function()
+                            remoteTeamsManager:InvokeServer("leavesquad");
                     end)
                     newOptionButton(
                         getInvitationFrom("SquadInvite", curPlayerName) ~= nil,
@@ -802,11 +752,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                             local squadInvitePacket = getInvitationFrom("SquadInvite", curPlayerName);
                             if squadInvitePacket then
                                 squadInvitePacket._hide = squadInvitePacket.AddTime;
-                                local teamGuid = squadInvitePacket.Id;
-                                local rPacket = remoteTeamsManager:InvokeServer("joinsquadguid", teamGuid);
+                                remoteTeamsManager:InvokeServer("joinsquadguid", squadInvitePacket.Id);
                             end
                         end)
-
 
                     newOptionButton(
                         curPlayerName ~= localPlayer.Name and modData.MutePlayerNoise[curPlayerName] == nil,
@@ -822,14 +770,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                             modData.MutePlayerNoise[curPlayerName] = nil;
                             modData.RefreshPlayerNoise(curPlayerName);
                         end)
-                    
-                    
-                    if squadTeam and squadTeam.Members[curPlayerName] then
-                        selectionWorldName = (squadTeam.Members[curPlayerName].Values.WorldName or "Unknown");
-                    elseif binds.FriendsList and binds.FriendsList[curPlayerName] and binds.FriendsList[curPlayerName].InUniverse then
-                        selectionWorldName = (modBranchConfigurations.GetWorldName(binds.FriendsList[curPlayerName].PlaceId) or "Unknown");
-                    end
-                    
+
+                    selectionWorldName = getPlayerWorldName(curPlayerName, selectionWorldName);
+
                     local travelDisabled;
                     if selectionWorldName ~= shared.WorldName or game.Players:FindFirstChild(curPlayerName) == nil then
                         local worldInfo = modBranchConfigurations.Worlds[selectionWorldName];
@@ -840,11 +783,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                                     curPlayerName ~= localPlayer.Name,
                                     "Request to Travel",
                                     function()
-                                        if mission1Data == nil or mission1Data.Type ~= 3 then
-                                            modClientGuis.promptWarning("Please complete the first mission.");
-                                            return;
-                                        end
-                                        remoteWorldTravelRequest:InvokeServer("TravelRequest", curPlayerName)
+                                        if not hasCompletedFirstMission() then return end;
+                                        remoteWorldTravelRequest:InvokeServer("TravelRequest", curPlayerName);
                                     end
                                 )
                             end
@@ -854,11 +794,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                                     curPlayerName ~= localPlayer.Name,
                                     "Accept Travel Request",
                                     function()
-                                        if mission1Data == nil or mission1Data.Type ~= 3 then
-                                            modClientGuis.promptWarning("Please complete the first mission.");
-                                            return;
-                                        end
-                                        remoteWorldTravelRequest:InvokeServer("AcceptTravel", curPlayerName)
+                                        if not hasCompletedFirstMission() then return end;
+                                        remoteWorldTravelRequest:InvokeServer("AcceptTravel", curPlayerName);
                                         binds.FriendsList[curPlayerName] = nil;
                                 end)
                                 newOptionButton(
@@ -882,11 +819,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                                         if travelDisabled and tick()-travelDisabled <= 10 then return end;
                                         interface:PlayButtonClick();
 
-                                        if mission1Data == nil or mission1Data.Type ~= 3 then
-                                            modClientGuis.promptWarning("Please complete the first mission.");
-                                            return;
-                                        end
-                                        
+                                        if not hasCompletedFirstMission() then return end;
+
                                         local promptWindow = modClientGuis.promptQuestion(
                                             "You are about to leave this world",
                                             `Are you sure you want to travel to {modBranchConfigurations.GetWorldDisplayName(selectionWorldName)}?`
@@ -928,32 +862,17 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         local levelIcon = listing:WaitForChild("LevelIcon");
         local locationLabel = listing:WaitForChild("LocationTag");
         local titleLabel = listing:WaitForChild("TitleTag");
-        local healthBarFrame = listing:WaitForChild("HealthBar");
-        local healthBar = healthBarFrame:WaitForChild("Bar");
-        
+        local healthBar = listing:WaitForChild("HealthBar"):WaitForChild("Bar");
+
         local alertsFrame = avatarLabel:WaitForChild("playerAlerts");
         local tradeRequestIcon = alertsFrame:WaitForChild("tradeRequestIcon");
         local squadRequestIcon = alertsFrame:WaitForChild("squadRequestIcon");
         local duelRequestIcon = alertsFrame:WaitForChild("duelRequestIcon");
-        
-        if getInvitationFrom("TradeInvite", curPlayerName) then
-            tradeRequestIcon.Visible = true;
-        else
-            tradeRequestIcon.Visible = false;
-        end
-        
-        if getInvitationFrom("SquadInvite", curPlayerName) then
-            squadRequestIcon.Visible = true;
-        else
-            squadRequestIcon.Visible = false;
-        end
-        
-        if getInvitationFrom("DuelInvite", curPlayerName) then
-            duelRequestIcon.Visible = true;
-        else
-            duelRequestIcon.Visible = false;
-        end
-        
+
+        tradeRequestIcon.Visible = getInvitationFrom("TradeInvite", curPlayerName) ~= nil;
+        squadRequestIcon.Visible = getInvitationFrom("SquadInvite", curPlayerName) ~= nil;
+        duelRequestIcon.Visible = getInvitationFrom("DuelInvite", curPlayerName) ~= nil;
+
         local function update()
             local playerData = modData.Players[curPlayerName];
             
@@ -962,64 +881,59 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             
             local thatPlayer = game.Players:FindFirstChild(curPlayerName);
             if thatPlayer then
-                --healthBarFrame.Visible = true;
                 locationLabel.Visible = false;
                 titleLabel.Visible = true;
-                
+
                 local playerTitleTag = thatPlayer:FindFirstChild("PlayerTitleTag");
                 if playerTitleTag and playerData then
                     playerData.TitleId = playerTitleTag.Value;
                 end
-                
+
                 local titleLib = modPlayerTitlesLibrary:Find(playerData and playerData.TitleId or "");
-                
                 if titleLib then
                     titleLabel.Text = titleLib.Title;
-                    
+
                     if titleLib.TitleStyle then
-                        if titleLib.TitleStyle.TextColor3 then
-                            titleLabel.TextColor3 = titleLib.TitleStyle.TextColor3;
-                        end
-                        if titleLib.TitleStyle.TextStrokeColor3 then
-                            titleLabel.TextStrokeColor3 = titleLib.TitleStyle.TextStrokeColor3;
-                        end
+                        titleLabel.TextColor3 = titleLib.TitleStyle.TextColor3 or titleLabel.TextColor3;
+                        titleLabel.TextStrokeColor3 = titleLib.TitleStyle.TextStrokeColor3 or titleLabel.TextStrokeColor3;
                     end
                 else
-                    titleLabel.Text = "No Title"
+                    titleLabel.Text = "No Title";
                 end
-
             else
                 -- not ingame
-
-                --healthBarFrame.Visible = false;
                 locationLabel.Visible = true;
                 titleLabel.Visible = false;
 
-                local worldName = playerData.PlaceId and modBranchConfigurations.GetWorldName(playerData.PlaceId) or playerData.WorldName;
-                locationLabel.Text = `{modBranchConfigurations.GetWorldDisplayName(worldName)}`;
+                local worldName = listingData.WorldId
+                    or (listingData.PlaceId and modBranchConfigurations.GetWorldName(listingData.PlaceId))
+                    or (playerData and (playerData.PlaceId and modBranchConfigurations.GetWorldName(playerData.PlaceId)
+                                        or playerData.WorldName));
+
+                local worldDisplayName = modBranchConfigurations.GetWorldDisplayName(worldName);
+                if worldDisplayName == "Unknown World" then
+                    binds.ActivePlayerListing[curPlayerName] = nil;
+                    game.Debris:AddItem(listing, 0);
+                else
+                    locationLabel.Text = worldDisplayName;
+                end
             end
 
-            if modData.Players[curPlayerName] then
-                if playerData.Role then
-                    if playerData.Role == "Founder" then
-                        nameLabel.TextColor3 = Color3.fromRGB(231,186,115);
-                        
-                    elseif playerData.GroupRank >= 200 then
-                        nameLabel.TextColor3 = Color3.fromRGB(206,107,225);
-                        
-                    end
+            if playerData then
+                if playerData.Role == "Founder" then
+                    nameLabel.TextColor3 = Color3.fromRGB(231,186,115);
+                elseif playerData.GroupRank and playerData.GroupRank >= 200 then
+                    nameLabel.TextColor3 = Color3.fromRGB(206,107,225);
                 else
                     nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
                 end
-                modData.Players[curPlayerName].Avatar = playerData.Avatar;
-                
+
                 if playerData.Stats and playerData.Stats.Level then
                     levelIcon.Visible = true;
                     modLevelBadge:Update(levelIcon, playerData.Stats.Level);
                 end
                 if playerData.Health and playerData.MaxHealth then
                     healthBar.Size = UDim2.new(1, 0, math.clamp(playerData.Health/playerData.MaxHealth, 0, 1), 0);
-                    
                 end
             else
                 levelIcon.Visible = false;
@@ -1027,27 +941,26 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         end
 
         update();
-        
+
         return listing;
     end
 
     local debounce = false;
     -- MARK: OnUpdate
     window.OnUpdate:Connect(function()
-        if debounce then return end;
+        if debounce or list.Parent == nil then return end;
         debounce = true;
-        if list.Parent == nil then return end;
-        
+
         local serverPlayers = game.Players:GetPlayers();
         local totalFriends = 0;
         local onlineFriends = 0;
         
         local updated = {};
         
-        for userName, friendData in pairs(binds.FriendsList) do
-            totalFriends = totalFriends+1;
-            if friendData.InUniverse then 
-                onlineFriends = onlineFriends +1; 
+        for _, friendData in pairs(binds.FriendsList) do
+            totalFriends += 1;
+            if friendData.InUniverse then
+                onlineFriends += 1;
             end
         end
         
@@ -1055,7 +968,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         if serverTab == nil then
             local new = friendsTabTemplate:Clone();
             new.Name = "ServerTab";
-            new.LayoutOrder = onlineFriends+3;
             new.Parent = list;
             serverTab = new;
         end
@@ -1080,7 +992,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 updated[player.Name] = true;
             end
         end
-        serverTabLabel.Text = "Players Online ("..#serverPlayers.."/".. game.Players.MaxPlayers ..")";
+        serverTabLabel.Text = `Players Online ({#serverPlayers}/{game.Players.MaxPlayers})`;
         
         --== Friends;
         local friendsTab = list:FindFirstChild("FriendsTab");
@@ -1095,7 +1007,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         for userName, friendData in pairs(binds.FriendsList) do
             if not friendData.InUniverse then continue end;
 
-            friendIndex = friendIndex +1;
+            friendIndex += 1;
 
             local listing = UpdateListing{
                 Name = userName;
@@ -1109,12 +1021,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
         serverTab.LayoutOrder = friendIndex+1;
         local friendsTabLabel = friendsTab.Labeltag; -- inf yield
-        friendsTabLabel.Text = "Friends Online ("..onlineFriends.."/"..totalFriends..")";
-        if onlineFriends > 0 then
-            friendsTab.Visible = true;
-        else
-            friendsTab.Visible = false;
-        end
+        friendsTabLabel.Text = `Friends Online ({onlineFriends}/{totalFriends})`;
+        friendsTab.Visible = onlineFriends > 0;
         
         --== Squads;
         local squadTeam = modTeamsManager.getTeamByPlayer(localPlayer, "Squad");
@@ -1127,7 +1035,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 new.Parent = list;
                 squadTab = new;
             end
-            local socialTabLabel = squadTab.Labeltag;
+            local squadTabLabel = squadTab.Labeltag;
             local mCount = 0;
             for mName, mData in pairs(squadTeam.Members) do
                 mCount += 1;
@@ -1146,7 +1054,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 updated[mName] = true;
             end
             
-            socialTabLabel.Text = `Squad ({mCount}/6)`;
+            squadTabLabel.Text = `Squad ({mCount}/6)`;
         else
             for _, obj in pairs(list:GetChildren()) do
                 if obj:IsA("GuiObject") and obj.Name == "SquadTab" then
@@ -1157,15 +1065,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         
         local showServerTab = false;
         for _, obj in pairs(list:GetChildren()) do
-            if obj:IsA("GuiObject") then
-                if obj.LayoutOrder > serverTab.LayoutOrder then
-                    serverTab.Visible = true;
-                    showServerTab = true;
-                end
+            if obj:IsA("GuiObject") and obj.LayoutOrder > serverTab.LayoutOrder then
+                showServerTab = true;
+                break;
             end
         end
-        if not showServerTab then serverTab.Visible = false; end;
-        
+        serverTab.Visible = showServerTab;
+
         for name, listing in pairs(binds.ActivePlayerListing) do
             if updated[name] == nil then
                 binds.ActivePlayerListing[name] = nil;
@@ -1179,44 +1085,30 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         task.spawn(function() binds.SelectPlayer(playerSelection, false); end);
     end)
 
+    local function showScrollBars()
+        return modData.Settings ~= nil and modData.Settings.ShowScrollbars == 1;
+    end
 
     listUIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-        local showScrollBars = modData.Settings and modData.Settings.ShowScrollbars == 1 or false;
-        
-        if showScrollBars then
-            list.ScrollBarThickness = 5;
-        else
-            list.ScrollBarThickness = 0;
-        end
+        list.ScrollBarThickness = showScrollBars() and 5 or 0;
         list.CanvasSize = UDim2.new(0, 0, 0, listUIListLayout.AbsoluteContentSize.Y+5);
     end)
 
     profileDisplayLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-        local showScrollBars = modData.Settings and modData.Settings.ShowScrollbars == 1 or false;
-        
-        if showScrollBars then
-            profileDisplayList.UIPadding.PaddingRight = profileDisplayLayout.AbsoluteContentSize.Y >= profileDisplayList.AbsoluteSize.Y and UDim.new(0, 15) or UDim.new(0, 0);
-            profileDisplayList.ScrollBarThickness = 5;
-        else
-            profileDisplayList.UIPadding.PaddingRight = UDim.new(0, 0);
-            profileDisplayList.ScrollBarThickness = 0;
-        end
+        local contentOverflows = profileDisplayLayout.AbsoluteContentSize.Y >= profileDisplayList.AbsoluteSize.Y;
+        profileDisplayList.UIPadding.PaddingRight = (showScrollBars() and contentOverflows) and UDim.new(0, 15) or UDim.new(0, 0);
+        profileDisplayList.ScrollBarThickness = showScrollBars() and 5 or 0;
         profileDisplayList.CanvasSize = UDim2.new(0, 0, 0, profileDisplayLayout.AbsoluteContentSize.Y);
     end)
 
     profileFrame.BottomBorder:GetPropertyChangedSignal("Visible"):Connect(function()
-        profileDisplayList.Size = UDim2.new(1, -10, 1, profileFrame.BottomBorder.Visible and -125 or -55)
+        profileDisplayList.Size = UDim2.new(1, -10, 1, profileFrame.BottomBorder.Visible and -125 or -55);
     end)
 
     searchBar:GetPropertyChangedSignal("Text"):Connect(function()
-        if #searchBar.Text > 0 then
-            for name, listing in pairs(binds.ActivePlayerListing) do
-                listing.Visible = name:lower():match(searchBar.Text:lower()) ~= nil;
-            end
-        else
-            for name, listing in pairs(binds.ActivePlayerListing) do
-                listing.Visible = true;
-            end
+        local filter = searchBar.Text:lower();
+        for name, listing in pairs(binds.ActivePlayerListing) do
+            listing.Visible = filter == "" or name:lower():match(filter) ~= nil;
         end
     end)
 
@@ -1232,7 +1124,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     end)
 
     local amtFrame = quickButton:WaitForChild("AmtFrame");
-	local amtLabel = amtFrame:WaitForChild("AmtLabel");
+    local amtLabel = amtFrame:WaitForChild("AmtLabel");
     interface.Scheduler.OnStepped:Connect(function(tickData: TickData)
         if tickData.ms1000 ~= true then return end;
 
@@ -1245,29 +1137,27 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         amtLabel.Text = invCount;
         amtFrame.Visible = invCount > 0;
     end)
-	task.spawn(UpdateApplicableFriends);
+
+    task.spawn(UpdateApplicableFriends);
 
     interface:BindEvent("UpdateSocialMenu", function()
         if not window.Visible then return end;
         window:Update();
     end)
 
-
     --MARK: Mailbox
-    local navBar = menuFrame:WaitForChild("Nav");
-    
-    local mailBoxButton = navBar:WaitForChild("Mailbox");
+    local mailBoxButton = menuFrame:WaitForChild("Nav"):WaitForChild("Mailbox");
     mailBoxButton.MouseButton1Click:Connect(function()
         interface:ToggleWindow("Mailbox", true);
     end)
-    window.OnToggle:Connect(function()
-        local amtFrame = mailBoxButton:WaitForChild("AmtFrame");
-        local amtLabel = amtFrame:WaitForChild("AmtLabel");
-        amtLabel.Text = #modData.GameSave.Mailbox > 0 and #modData.GameSave.Mailbox or "";
-        amtFrame.Visible = #modData.GameSave.Mailbox > 0;
-    end)
 
+    local mailBoxAmtFrame = mailBoxButton:WaitForChild("AmtFrame");
+    local mailBoxAmtLabel = mailBoxAmtFrame:WaitForChild("AmtLabel");
+    window.OnToggle:Connect(function()
+        local mailCount = #modData.GameSave.Mailbox;
+        mailBoxAmtLabel.Text = mailCount > 0 and mailCount or "";
+        mailBoxAmtFrame.Visible = mailCount > 0;
+    end)
 end
 
 return interfacePackage;
-

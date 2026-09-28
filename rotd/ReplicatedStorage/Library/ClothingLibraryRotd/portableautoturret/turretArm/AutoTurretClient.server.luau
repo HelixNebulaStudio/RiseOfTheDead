@@ -120,17 +120,34 @@ if isOwner then
 
 	local modData = shared.require(localPlayer:WaitForChild("DataModule") :: ModuleScript);
 	
-	if modData.ControlInputsBindable then
+	task.spawn(function()
+		while true do
+			local bindable = modData.ControlInputsBindable;
+
+			if bindable ~= nil and bindable:IsDescendantOf(character) then break end;
+			task.wait(0.1);
+		end
+
 		modData.ControlInputsBindable.Event:Connect(function(keyId, inputState)
 			if keyId ~= "KeyTogglePat" or inputState ~= "Begin" then return end;
 			if turretArm.Parent == nil or turretArm.Parent.Parent ~= character then return end;
 
 			if tick()-debounce <= 1 then return end;
 			debounce = tick();
-					
-			local _returnPacket = remoteAutoTurret:InvokeServer("toggleonline");
+			
+			local returnPacket = remoteAutoTurret:InvokeServer("toggleonline");
+			if returnPacket and returnPacket.Success and returnPacket.StorageProperties then
+				local patStorage = modData.GetStorage("portableautoturret");
+				if patStorage then
+					for k, v in pairs(returnPacket.StorageProperties) do
+						patStorage.Properties[k] = v;
+					end
+				end
+			end
 
+			local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
+			modClientGuis.fireEvent("UpdatePatWindow");
 			debounce = tick()-0.5;
 		end)
-	end
+	end)
 end
