@@ -148,7 +148,7 @@ MissionLibrary.New{
 -- MARK: 4 - Lend A Hand
 MissionLibrary.New{
 	MissionId = 4;
-	MissionType = MissionLibrary.MissionTypes.Core;
+	MissionType = MissionLibrary.MissionTypes.Side;
 	Name = "Lend A Hand";
 	From = "Dr. Deniski";
 	Description = "Dr. Deniski wants you to find a zombie arm for his experiments.";
@@ -160,9 +160,8 @@ MissionLibrary.New{
 	ObjectivesCompleteText = "Return the zombie arm to Dr. Deniski";
 	GuideText = "Talk to Dr. Deniski to start";
 	Rewards = {
-		{Type="Perks"; Amount=PerksReward.Core};
+		{Type="Perks"; Amount=PerksReward.Side};
 		{Type="Mission"; Id=8;};
-		{Type="Mission"; Id=15;};
 	};
 	LinkNextMission = 8;
 	StartRequirements = {
@@ -237,6 +236,7 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=MoneyReward.Core};
 		{Type="Mission"; Id=3};
+		{Type="Mission"; Id=4};
 		{Type="Mission"; Id=7};
 	};
 	LinkNextMission = 7;
@@ -300,7 +300,7 @@ MissionLibrary.New{
 -- MARK: 8 - Bandage Up
 MissionLibrary.New{
 	MissionId = 8;
-	MissionType = MissionLibrary.MissionTypes.Core;
+	MissionType = MissionLibrary.MissionTypes.Side;
 	Name = "Bandage Up";
 	From = "Dr. Deniski";
 	Description = "Dr. Deniski has something for you to heal yourself while you're outside. He teaches you how to make medkits.";
@@ -311,12 +311,10 @@ MissionLibrary.New{
 	};
 	GuideText = "Talk to Dr. Deniski to start";
 	Rewards = {
-		{Type="Perks"; Amount=PerksReward.Core};
-		{Type="Mission"; Id=49};
+		{Type="Perks"; Amount=PerksReward.Side};
 	};
-	LinkNextMission = 49;
 	AddRequirements = {
-		{Type="MissionCompleted"; Value={4; 7}};
+		{Type="MissionCompleted"; Value={4}};
 	};
 	StartRequirements = {
 		Level = 4;
@@ -340,9 +338,10 @@ MissionLibrary.New{
 	GuideText="Talk to Stephanie to start";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Side};
+		{Type="Mission"; Id=15;};
 	};
 	AddRequirements={
-		{Type="MissionCompleted"; Value={3; 7}};
+		{Type="MissionCompleted"; Value={3}};
 	};
 	StartRequirements={
 		Level = 7;
@@ -391,10 +390,11 @@ MissionLibrary.New{
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=MoneyReward.Core};
+		{Type="Mission"; Id=12};
 		{Type="Mission"; Id=14};
-		{Type="Mission"; Id=4};
+		{Type="Mission"; Id=49};
 	};
-	LinkNextMission = 4;
+	LinkNextMission = 12;
 	StartRequirements={
 		Level = 4;
 	};
@@ -429,13 +429,12 @@ MissionLibrary.New{
 	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=MoneyReward.Core};
-		{Type="Mission"; Id=27};
 		{Type="Mission"; Id=18};
+		{Type="Mission"; Id=27};
 	};
-	LinkNextMission = 4;
+	LinkNextMission = 18;
 	StartRequirements = {
 		Level = 6;
-		MissionCompleted = {49};
 	};
 	Markers = {
 		[1] = {World="TheWarehouse"; Label="Mason"; Target="Mason"; Type=modMarkers.MarkerTypes.Npc;};
@@ -520,7 +519,7 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Side};
 	};
 	AddRequirements={
-		{Type="MissionCompleted"; Value={3, 7, 9, 12};};
+		{Type="MissionCompleted"; Value={9};};
 	};
 	StartRequirements={
 		Level = 13;
@@ -614,7 +613,6 @@ MissionLibrary.New{
 	};
 	StartRequirements = {
 		Level = 10;
-		MissionCompleted = {8, 4};
 	};
 	Markers = {
 		[1]={World="TheWarehouse"; Label="Robert"; Target="Robert"; Type=modMarkers.MarkerTypes.Npc;};
@@ -1388,7 +1386,7 @@ MissionLibrary.New{
 	};
 	LinkNextMission=41;
 	StartRequirements={
-		Level = 43;
+		Level = 23;
 	};
 	Markers={
 		[1]={World="TheWarehouse"; Label="Kill Zricera"; Target=Vector3.new(352.02, 60.4, 225.46); Type=modMarkers.MarkerTypes.Waypoint;};
@@ -1670,7 +1668,7 @@ MissionLibrary.New{
 -- MARK: 49 - Navigation
 MissionLibrary.New{
 	MissionId=49;
-	MissionType = MissionLibrary.MissionTypes.Core;
+	MissionType = MissionLibrary.MissionTypes.Side;
 	Name="Navigation";
 	From="Mason";
 	Description="Mason needs help searching for a book.";
@@ -1685,11 +1683,9 @@ MissionLibrary.New{
 	};
 	GuideText="Talk to Mason";
 	Rewards={
-		{Type="Perks"; Amount=PerksReward.Core};
-		{Type="Money"; Amount=(MoneyReward.Core+1000)};
-		{Type="Mission"; Id=12};
+		{Type="Perks"; Amount=PerksReward.Side};
+		{Type="Money"; Amount=(MoneyReward.Side+1000)};
 	};
-	LinkNextMission = 12;
 	Markers={
 		[4]={World="TheWarehouse"; Label="Book"; Target=Vector3.new(641.77, 61.36, 243.15); Type=modMarkers.MarkerTypes.Waypoint;};
 		[5]={World="TheWarehouse"; Label="Mason"; Target="Mason"; Type=modMarkers.MarkerTypes.Npc;};

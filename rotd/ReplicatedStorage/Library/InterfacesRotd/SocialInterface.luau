@@ -82,7 +82,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
     local playerSelection = localPlayer.Name;
     local selectionWorldName = "TheWarehouse";
-    modGlobalVars.AvatarCache = {};
 
     local titlePinIcon = nil;
     local achievementIndexList = modAchievementLibrary:GetIndexList();
@@ -202,7 +201,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         local IdList = {};
         for a=1, #friends do
             local inUniverse = false;
-            if friends[a].PlaceId then
+            if friends[a].PlaceId or friends[a].LocationType == 1 or friends[a].LocationType == 4 then
                 inUniverse = modBranchConfigurations.IsPlaceIdThisGame(friends[a].PlaceId);
             end
             
@@ -267,21 +266,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         Debugger:StudioWarn("OnUpdateToast", toastPackets);
     end)
 
-    local function CacheAvatar(name, userId)
-        if modGlobalVars.AvatarCache[name] then return modGlobalVars.AvatarCache[name]; end;
-        if userId then
-            if type(userId) == "number" then
-                task.spawn(function()
-                    pcall(function()
-                        modGlobalVars.AvatarCache[name] = game.Players:GetUserThumbnailAsync(userId > 0 
-                            and userId or modGlobalVars.UseRandomId(), THUMBNAIL_TYPE, THUMBNAIL_SIZE);
-                    end)	
-                end)
-            else
-                modGlobalVars.AvatarCache[name] = userId;
-            end
+    local function CacheAvatar(playerName, userId)
+        if userId == nil then
+            userId = shared.modPlayers.getUserId(playerName);
         end
-        return modGlobalVars.AvatarCache[name]
+        if userId == nil then return "" end;
+        return shared.modPlayers.getAvatar(userId);
     end
 
 
@@ -695,7 +685,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
         end
 
-
         profileLocationLabel.Text = (selectionWorldName and modBranchConfigurations.GetWorldDisplayName(selectionWorldName) or "Unknown");
         
     end
@@ -969,7 +958,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             local playerData = modData.Players[curPlayerName];
             
             nameLabel.Text = curPlayerName;
-            avatarLabel.Image = playerData.Avatar or "";
+            avatarLabel.Image = playerData and playerData.Avatar or "";
             
             local thatPlayer = game.Players:FindFirstChild(curPlayerName);
             if thatPlayer then
@@ -1079,8 +1068,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 playersOrder = playersOrder +1;
                 
                 local listing = UpdateListing{
-                    Name=player.Name;
-                    Avatar=CacheAvatar(player.Name, player.UserId);
+                    Name = player.Name;
+                    UserId = player.UserId;
+                    Avatar = CacheAvatar(player.Name, player.UserId);
                 };
                 if player.Name == localPlayer.Name then
                     listing.LayoutOrder = 1;
@@ -1108,9 +1098,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             friendIndex = friendIndex +1;
 
             local listing = UpdateListing{
-                Name=userName;
-                Avatar=CacheAvatar(userName, friendData.Avatar);
-                PlaceId=friendData.PlaceId;
+                Name = userName;
+                Avatar = friendData.Avatar or CacheAvatar(userName);
+                PlaceId = friendData.PlaceId;
             };
             listing.LayoutOrder = friendIndex;
 
@@ -1144,6 +1134,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 
                 local listing = UpdateListing{
                     Name = mName;
+                    UserId = mData.UserId;
                     Avatar = CacheAvatar(mName, mData.UserId);
                     WorldId = mData.Values.WorldName;
                 };

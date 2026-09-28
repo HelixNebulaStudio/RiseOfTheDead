@@ -24,7 +24,6 @@ if RunService:IsServer() then
 	modGameModeManager = shared.require(game.ServerScriptService.ServerLibrary.GameModeManager);
 
 	statuePrefab = script.Parent:WaitForChild("statue");
-	tombsInteractable = script.Parent:WaitForChild("Raid_Tombs");
 	tombRaidPickup = script.Parent:WaitForChild("TombRaidPickup");
 
 	if modBranchConfigurations.IsWorld("TheWarehouse") then
@@ -203,20 +202,7 @@ return function(CutsceneSequence)
 			local mission = modMission:GetMission(player, MISSION_ID);
 			if mission == nil then return end;
 				
-			local function spawnTombRaidInteractable()
-				if mission.Cache.TombsInteractable then return end;
-				
-				local newTombsInteractable = tombsInteractable:Clone();
-				local interactConfig = modInteractables.createInteractable("GameModeEnter");
-				interactConfig:SetAttribute("Mode", "Raid");
-				interactConfig:SetAttribute("Stage", "Tombs");
-				interactConfig.Parent = newTombsInteractable;
-				modReplicationManager.ReplicateIn(player, newTombsInteractable, workspace.Interactables);
-				mission.Cache.TombsInteractable = newTombsInteractable;
-			end
-
 			if modMission:IsComplete(player, 42) then
-				spawnTombRaidInteractable();
 				return;
 			end
 			
@@ -246,9 +232,6 @@ return function(CutsceneSequence)
 				if mission.Type == 2 then -- OnAvailable
 					
 				elseif mission.Type == 1 then -- OnActive
-					if mission.ProgressionPoint >= 5 then
-						spawnTombRaidInteractable();
-					end
 					if mission.ProgressionPoint >= 5 and modEvents:GetEvent(player, "takeNekronMask") then
 						modMission:Progress(player, MISSION_ID, function(mission)
 							if mission.ProgressionPoint <= 7 then mission.ProgressionPoint = 7; end;

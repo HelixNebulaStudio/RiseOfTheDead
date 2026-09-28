@@ -601,7 +601,7 @@ function modItemsLibrary.onRequire()
         TradingTax = 20;
         Tags = {"Offerings"};
         SigilType = "Greek";
-        Description = "Use this to get special skins for a calibrated gold offer. This offering will be not tradable and expires in 3 days after use.";
+        Description = "Use this to get special skins for FREE or a calibrated gold offer. This offering will be not tradable and expires in 3 days after use.";
         Sources = {"Obtained as a random drop from doing anything. Drop cooldown depends on account statistics.";};
     };
     new(offerings, {

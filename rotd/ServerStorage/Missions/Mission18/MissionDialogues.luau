@@ -24,12 +24,17 @@ Dialogues.Jane.DialogueStrings = {
 		CheckMission=MISSION_ID;
 		Say="Oh no, they need help.";
 		Face="Disbelief"; 
-		Reply="Sounds like they're deep inside the sewers. They could be in danger, you need to find them. Oh, and ask Robert to go along with you, he can help..";
+		Reply="Sounds like they're deep inside the sewers. Ask Robert to go along with you, he can help.. and here's some medkits just in case..";
 		FailResponses = {
 			{Reply="Prepare yourself before we go further out there.."};
 		};	
 	};
-
+	["aNewCommunity_noinvspace"]={
+		CheckMission=MISSION_ID;
+		Say="Oh no, they need help.";
+		Face="Disbelief"; 
+		Reply="Sounds like they're deep inside the sewers..\nMake some space in your inventory, so I can give you these medkits.";
+	};
 };
 
 -- !outline: Robert Dialogues
@@ -108,9 +113,19 @@ if RunService:IsServer() then
 		if mission.Type == 2 then -- Available;
 			dialog:SetInitiate("Hey $PlayerName, I found something. Listen to this..");
 			dialog:AddChoice("aNewCommunity_okay", function(dialog)
-				dialog:AddChoice("aNewCommunity_help", function(dialog)
-					modMission:StartMission(player, MISSION_ID);
-				end)
+
+				local profile = shared.modProfile:Get(player);
+				local inventory = profile.ActiveInventory;
+				if inventory:SpaceCheck{{ItemId="medkit"; Data={Quantity=2;};}} then
+					dialog:AddChoice("aNewCommunity_help", function(dialog)
+						inventory:Add("medkit", {Quantity=2});
+						modMission:StartMission(player, MISSION_ID);
+					end)
+
+				else
+					dialog:AddChoice("aNewCommunity_noinvspace");
+					
+				end
 			end)
 			
 		end
