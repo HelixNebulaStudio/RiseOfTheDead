@@ -15,6 +15,8 @@ else
 	
 end
 
+local cutscenePackage = {};
+--==
 local MISSION_ID = 92;
 
 local DEFAULTSPAWN = "outside W.D. Warehouse: Office";
@@ -74,7 +76,8 @@ local PATHOROTH_SPAWNS = {
 };
 --==
 
-return function(CutsceneSequence)
+--MARK: run
+function cutscenePackage.run(CutsceneSequence)
 	CutsceneSequence:Initialize(function()
 		local players = CutsceneSequence:GetPlayers();
 		local player: Player = players[1];
@@ -93,6 +96,12 @@ return function(CutsceneSequence)
 				area = "bioxresearch";
 			end
 			
+			local spawnInfo = PATHOROTH_SPAWNS[area];
+			if shared.WorldName ~= spawnInfo.WorldName then 
+				Debugger:StudioWarn(`Wrong world for Pathoroth search.`);
+				return;
+			end;
+
 			if mission.Type == 2 then -- OnAvailable
 				
 			elseif mission.Type == 1 then -- OnActive
@@ -104,12 +113,6 @@ return function(CutsceneSequence)
 					loopActive = true;
 
 					task.spawn(function()
-						local spawnInfo = PATHOROTH_SPAWNS[area];
-						if shared.WorldName ~= spawnInfo.WorldName then 
-							Debugger:StudioWarn(`Wrong world for Pathoroth search.`);
-							return
-						end;
-
 						while loopActive do
 							if not game.Players:IsAncestorOf(player) then break; end;
 							if mission.Type ~= 1 then break; end;
@@ -147,11 +150,6 @@ return function(CutsceneSequence)
 					local gameSave = profile:GetActiveSave();
 					local playerLevel = gameSave:GetStat("Level") or 0;
 
-					local spawnInfo = PATHOROTH_SPAWNS[area];
-					if shared.WorldName ~= spawnInfo.WorldName then
-							Debugger:StudioWarn(`Wrong world for Pathoroth spawn.`);
-						return;
-					end
 					local spawnPos = spawnInfo.Position;
 					
 					shared.modNpcs.spawn2{
@@ -193,3 +191,5 @@ return function(CutsceneSequence)
 	
 	return CutsceneSequence;
 end;
+
+return cutscenePackage;

@@ -534,7 +534,7 @@ function remoteModHandler.OnServerInvoke(player, interactPart, action, modifierS
 		end
 		
 		if storageItem and modifierStorageItem and storageOfModifier.Id ~= siid then
-			local emptyIndex = storageForMod:FindEmpty();
+			local emptyIndex = storageForMod:FindEmptyFor();
 			if emptyIndex then
 				shared.modEventService:ServerInvoke("WorkbenchService_BindModEquip", {ReplicateTo={player}}, modifierStorageItem, storageItem);
 
@@ -570,7 +570,7 @@ function remoteModHandler.OnServerInvoke(player, interactPart, action, modifierS
 	elseif action == 2 then --== Unequip;
 
 		if modifierStorageItem then
-			local emptyIndex = inventory:FindEmpty();
+			local emptyIndex = inventory:FindEmptyFor();
 			if emptyIndex then
 				local refreshStorages = storageOfModifier:SetIndex(player, modifierSiid, {Id=inventory.Id; Index=emptyIndex;});
 				if storageOfModifier:Loop() <= 0 then

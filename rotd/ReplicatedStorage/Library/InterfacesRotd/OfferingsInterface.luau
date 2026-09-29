@@ -161,6 +161,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     end
     local function animateReward(storageItem)
         if storageItem.Values.R == nil then return end;
+
         local rewardInfo = storageItem.Values.R;
         Debugger:Warn("Reward Info", rewardInfo);
 
@@ -295,10 +296,12 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         if optionInfo == nil or optionInfo.Activated then return end;
         optionInfo.Activated = true;
 
-        local rPacket = binds.RemoteInvoke("offeringsactivate", storageItem, storageItem.ID, offerIndex);
-        if rPacket == nil or rPacket.Fail then
-            Debugger:Warn("Failed to activate offering", rPacket);
-            return;
+		if storageItem.Values.OO == nil or table.find(storageItem.Values.OO, offerIndex) == nil then
+            local rPacket = binds.RemoteInvoke("offeringsactivate", storageItem, storageItem.ID, offerIndex);
+            if rPacket == nil or rPacket.Fail then
+                Debugger:Warn("Failed to activate offering", rPacket);
+                return;
+            end
         end
 
         animateOpen(offerIndex);
@@ -507,15 +510,16 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 };
             end
 
+            local lastOptionOpened = 1;
             if itemValues.OO then
                 for _, oi in ipairs(itemValues.OO) do
                     animateOpen(oi);
+                    lastOptionOpened = oi;
                 end
             end
             if itemValues.R then
                 openSnd:Play();
-                animateFlash();
-                animateReward(storageItem);
+                binds.ActivateOffer(storageItem, lastOptionOpened);
             end
 
         else

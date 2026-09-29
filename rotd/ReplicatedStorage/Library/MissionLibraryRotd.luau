@@ -338,7 +338,6 @@ MissionLibrary.New{
 	GuideText="Talk to Stephanie to start";
 	Rewards={
 		{Type="Perks"; Amount=PerksReward.Side};
-		{Type="Mission"; Id=15;};
 	};
 	AddRequirements={
 		{Type="MissionCompleted"; Value={3}};
@@ -429,6 +428,7 @@ MissionLibrary.New{
 	Rewards = {
 		{Type="Perks"; Amount=PerksReward.Core};
 		{Type="Money"; Amount=MoneyReward.Core};
+		{Type="Mission"; Id=15;};
 		{Type="Mission"; Id=18};
 		{Type="Mission"; Id=27};
 	};
