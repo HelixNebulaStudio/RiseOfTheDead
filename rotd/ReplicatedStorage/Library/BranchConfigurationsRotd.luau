@@ -303,10 +303,19 @@ local WORLDS = {
     EighthStreet = {
         DisplayName = "Eighth Street";
         PlaceIds = {
-            [LEGACY_GAME_ID] = 0;
             [LIVE_GAME_ID] = 0;
-            [LEGACY_DEV_GAME_ID] = 0;
             [DEV_GAME_ID] = 131876661413681;
+        };
+        
+        WorldType = WORLD_TYPES.General;
+        LoadLeaderboard = false;
+        MaxPlayers = 6;
+    };
+    NorthStarEmbassy = {
+        DisplayName = "North Star Embassy";
+        PlaceIds = {
+            [LIVE_GAME_ID] = 0;
+            [DEV_GAME_ID] = 70992181085951;
         };
         
         WorldType = WORLD_TYPES.General;
@@ -593,7 +602,8 @@ local LINKED_WORLDS = {
 	TheMall = {"TheUnderground"; "TheResidentials";};
 	TheResidentials = {"TheWarehouse"; "TheUnderground"; "TheMall"; "TheHarbor";};
 	TheHarbor = {"TheWarehouse"; "TheUnderground"; "TheResidentials";};
-	SectorE = {"TheUnderground"}
+	SectorE = {"TheUnderground"};
+    RadioStation = {"TheResidentials"};
 };
 
 
@@ -630,6 +640,7 @@ local SPAWN_LIBRARY = {
 		unToMallKin = {};
 		radioStationExit = {};
 		patrick = {};
+        nsEmbassyExit = {};
 	};
 	TheResidentials={
 		communitySh = {};
@@ -639,6 +650,7 @@ local SPAWN_LIBRARY = {
 		witherweenbasement = {};
 		sectorDToRes = {};
 		ratTunnelHarbor = {};
+        radioStationNS = {};
 	};
 	TheHarbor={
 		harborSh = {};

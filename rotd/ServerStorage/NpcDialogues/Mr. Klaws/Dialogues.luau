@@ -107,7 +107,9 @@ if RunService:IsServer() then
 					profile.Flags:Add({Id=flagId});
 		
 					inventory:Add(yearlyPresentId, nil, function(queueEvent, storageItem)
-						modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
+						task.spawn(function()
+							modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
+						end)
 					end);
 					shared.Notify(player, "You recieved a ".. yearlyPresentItemLib.Name ..".", "Reward");
 					
@@ -215,7 +217,9 @@ if RunService:IsServer() then
 					local itemInfo = modItemsLibrary:Find(rewardId);
 					
 					inventory:Add(rewardId, nil, function(queueEvent, storageItem)
-						modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
+						task.spawn(function()
+							modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
+						end)
 					end);
 					shared.Notify(player, "You recieved a ".. itemInfo.Name ..".", "Reward");
 					shared.Notify(player, "Removed ".. coalAmount .." Coal from your inventory.", "Negative");

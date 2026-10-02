@@ -12,6 +12,7 @@ local MISSION_ID = 88;
 if RunService:IsServer() then
 	modNpcs = shared.modNpcs;
 	modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
+	modDialogueService = shared.require(game.ReplicatedStorage.Library.DialogueService);
 
 	if shared.WorldName == "RadioStation" then
 		shared.modEventService:OnInvoked("Interactables_BindDoorInteract", function(eventPacket: EventPacket, ...)
@@ -239,18 +240,71 @@ return function(CutsceneSequence)
 						walterNpcClass:ToggleInteractable(false);
 
 						walterNpcClass.Move:Face(leoNpcClass:GetCFrame().Position);
-						shawNpcClass.Move:Face(walterNpcClass:GetCFrame().Position);
+						shawNpcClass.PlayAnimation("crossedarm");
+
 
 					elseif mission.ProgressionPoint == 6 then
-
+						shawNpcClass.Move:Face(walterNpcClass:GetCFrame().Position);
 						mission.Cache.LowTension = modAudio.Play("Soundtrack:LowTension", workspace)
 						mission.Cache.LowTension.Volume = 0.4;
 
 						task.wait(3);
 						walterNpcClass.Chat(player, "That's not possible. Moving that many bodies..");
 						
-						task.wait(5);
+						task.wait(4.5);
 						leoNpcClass.Chat(player, "Just get it done!");
+
+						task.wait(3.5);
+						shawNpcClass.Move:Face(playerClass.RootPart);
+						task.wait(0.3);
+						walterNpcClass.Move:Face(playerClass.RootPart);
+						task.wait(0.1);
+						leoNpcClass.Move:Face(playerClass.RootPart);
+
+						task.wait(2.5);
+						shawNpcClass.Chat(player, "So this is who he sent?..");
+
+						task.wait(3.5);
+						leoNpcClass.Chat(player, "What's your name, lad?");
+
+						task.wait(4);
+
+						leoNpcClass:ToggleInteractable(true);
+						modDialogueService:InvokeDialogue(player, "talk", {
+							NpcModel = leoNpcClass.Character;
+						});
+
+
+					elseif mission.ProgressionPoint == 7 then
+						leoNpcClass:ToggleInteractable(false);
+
+						task.wait(2.5);
+						shawNpcClass.Chat(player, "It sure is an honour to meet Joseph's.. messenger.");
+
+						task.wait(1);
+
+						shawNpcClass:ToggleInteractable(true);
+						modDialogueService:InvokeDialogue(player, "talk", {
+							NpcModel = shawNpcClass.Character;
+						});
+
+
+					elseif mission.ProgressionPoint == 8 then
+						shawNpcClass:ToggleInteractable(false);
+
+						task.wait(2);
+						shawNpcClass.Move:LookAt(leoNpcClass.RootPart);
+						leoNpcClass.Chat(player, "A miracle, then. You look like you've been through hell and back yourself..");
+
+						task.wait(5.5);
+						leoNpcClass.Chat(player, "You ex-military mate?");
+
+						task.wait(3.3);
+						leoNpcClass:ToggleInteractable(true);
+						modDialogueService:InvokeDialogue(player, "talk", {
+							NpcModel = leoNpcClass.Character;
+						});
+
 
 					end
 				end

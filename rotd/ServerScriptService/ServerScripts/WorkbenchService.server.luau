@@ -357,8 +357,10 @@ function remoteBlueprintHandler.OnServerInvoke(player, action, packet)
 			local item = itemsRefund[a];
 			local itemLib = modItemsLibrary:Find(item.ItemId);
 			inventory:Add(item.ItemId, {Quantity=(item.Data and item.Data.Quantity or 1);}, function(event, storageItem)
-				modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
-				shared.Notify(player, (item.CostAmount or 1) > 1 and itemLib.Name.." ("..item.CostAmount..")" or itemLib.Name, "PickUp");
+				task.spawn(function()
+					modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
+					shared.Notify(player, (item.CostAmount or 1) > 1 and itemLib.Name.." ("..item.CostAmount..")" or itemLib.Name, "PickUp");
+				end)
 			end);
 		end
 		userWorkbench:RemoveProcess(buildIndex);
@@ -386,8 +388,10 @@ function remoteBlueprintHandler.OnServerInvoke(player, action, packet)
 		
 		local itemLib = modItemsLibrary:Find(bpLib.Product);
 		inventory:Add(bpLib.Product, {Quantity=(bpLib.Amount or 1);}, function(event, storageItem)
-			shared.Notify(player, string.gsub("You recieved a $Item.", "$Item", itemLib.Name), "Reward");
-			modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
+			task.spawn(function()
+				shared.Notify(player, string.gsub("You recieved a $Item.", "$Item", itemLib.Name), "Reward");
+				modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
+			end)
 		end);
 
 		shared.modEventService:ServerInvoke("WorkbenchService_BindClaimBuild", {ReplicateTo={player}}, bpLib);
@@ -1304,11 +1308,13 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 			values.IsEquipped = nil;
 			
 			inventory:Add(itemId, {Values=values}, function(event, newStorageItem)
-				shared.Notify(player, "Your "..itemName.." has completed deconstructing.", "Reward");
-				
-				newStorageItem.CustomName = customName;
-				inventory:Filter(newStorageItem.ID);
-				newStorageItem:Sync();
+				task.spawn(function()
+					shared.Notify(player, "Your "..itemName.." has completed deconstructing.", "Reward");
+					
+					newStorageItem.CustomName = customName;
+					inventory:Filter(newStorageItem.ID);
+					newStorageItem:Sync();
+				end)
 			end);
 			
 			if rewardTiers >= 4 then
@@ -1410,10 +1416,12 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 			if inventory:SpaceCheck{{ItemId=processData.ItemId; Data={Quantity=1;};}} then
 				local productLib = modItemsLibrary:Find(processData.ItemId);
 				inventory:Add(processData.ItemId, {Quantity=1; Values=processData.Values}, function(event, insert)
-					if processData.ItemName then
-						insert.Name = processData.ItemName;
-					end
-					shared.Notify(player, ("You recieved a $Item."):gsub("$Item", productLib.Name), "Reward");
+					task.spawn(function()
+						if processData.ItemName then
+							insert.Name = processData.ItemName;
+						end
+						shared.Notify(player, ("You recieved a $Item."):gsub("$Item", productLib.Name), "Reward");
+					end)
 				end);
 				userWorkbench:RemoveProcess(index);
 				
@@ -1538,19 +1546,21 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 			values.SkinWearId = processData.NewSeed;
 			
 			inventory:Add(itemId, {Values=values}, function(event, newStorageItem)
-				if polishSuccessful then
-					local percent = math.round(math.abs(processData.ChangeFloat) * 1000)/10;
-					shared.Notify(player, "Your "..itemName.." has been polished by ".. percent .."%.", "Reward");
-					
-				else
-					shared.Notify(player, "Polishing "..itemName.." has been unsuccessful.\nYou recieved a Liquid Metal Polish.", "Reward");
-					inventory:Add("liquidmetalpolish");
-					
-				end
+				task.spawn(function()
+					if polishSuccessful then
+						local percent = math.round(math.abs(processData.ChangeFloat) * 1000)/10;
+						shared.Notify(player, "Your "..itemName.." has been polished by ".. percent .."%.", "Reward");
+						
+					else
+						shared.Notify(player, "Polishing "..itemName.." has been unsuccessful.\nYou recieved a Liquid Metal Polish.", "Reward");
+						inventory:Add("liquidmetalpolish");
+						
+					end
 
-				newStorageItem.CustomName = customName;
-				inventory:Filter(newStorageItem.ID);
-				newStorageItem:Sync();
+					newStorageItem.CustomName = customName;
+					inventory:Filter(newStorageItem.ID);
+					newStorageItem:Sync();
+				end)
 			end);
 
 			userWorkbench:RemoveProcess(index);
@@ -1568,13 +1578,17 @@ function remotePolishTool.OnServerInvoke(player, interactPart, action, arg)
 					local customName = processData.ItemName;
 					local productLib = modItemsLibrary:Find(processData.ItemId);
 					inventory:Add(processData.ItemId, {Quantity=1; Values=processData.Values}, function(event, newStorageItem)
-						newStorageItem.CustomName = customName;
-						inventory:Filter(newStorageItem.ID);
-						shared.Notify(player, ("You recieved a $Item."):gsub("$Item", productLib.Name), "Reward");
+						task.spawn(function()
+							newStorageItem.CustomName = customName;
+							inventory:Filter(newStorageItem.ID);
+							shared.Notify(player, ("You recieved a $Item."):gsub("$Item", productLib.Name), "Reward");
+						end)
 					end);
 
 					inventory:Add("liquidmetalpolish", {Quantity=1;}, function(event, insert)
-						shared.Notify(player, "You recieved a Liquid Metal Polish.", "Reward");
+						task.spawn(function()
+							shared.Notify(player, "You recieved a Liquid Metal Polish.", "Reward");
+						end)
 					end);
 					
 					userWorkbench:RemoveProcess(index);

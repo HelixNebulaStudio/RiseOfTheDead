@@ -530,6 +530,20 @@ GameModeLibrary.GameModes={
 				TitleImage = "rbxassetid://13496701772";
 				-- RewardsId = "abandonedbunkercrate";
 				Soundtrack = "Soundtrack:Into The Abyss";
+				Description = "Echoes of constant growling and gun fire..";
+
+				WIP = `Suspicious Looking Door`;
+			};
+
+			["North Star Embassy"] = {
+				Index=2008;
+				WorldId = "NorthStarEmbassy";
+				ExitSpawn = "nsEmbassyExit";
+				MaxPlayers = 6;
+				TitleImage = "rbxassetid://13496701772";
+				-- RewardsId = "abandonedbunkercrate";
+				Soundtrack = "Soundtrack:Into The Abyss";
+				Description = "Echoes of constant growling and gun fire..";
 
 				WIP = `Suspicious Looking Door`;
 			};

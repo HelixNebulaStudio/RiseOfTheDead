@@ -4,8 +4,10 @@ local RunService = game:GetService("RunService");
 
 --=
 local Dialogues = {
-	Joseph={};
-	Caitlin={};
+	Joseph = {};
+	Caitlin = {};
+	Leo = {};
+	Shaw = {};
 };
 
 local MISSION_ID = 88;
@@ -113,7 +115,68 @@ Dialogues.Caitlin.DialogueStrings = {
 		Say = "Alright, how do I look?";
 		Reply = "Ha! Don't worry about it.";
 	};
+
+	-- o10;
+	["sot_arentrats1"] = {
+		Face = "Confident";
+		Say = "These people aren't the Rats..";
+		Reply = ".. They are not..";
+	};
+	["sot_arentrats2"] = {
+		Face = "Confident";
+		Say = "So who are they?";
+		Reply = ".. I'm not authorized to say. Sorry.\nYou should get going, you wouldn't want to keep Leo waiting.";
+	};
 };
+
+-- MARK: Leo DialogueStrings
+Dialogues.Leo.DialogueStrings = {
+	["sot_introduce"] = { -- o6;
+		Face = "Skeptical";
+		Say = "Uhm, I'm $PlayerName. Nice to meet you all?";
+		Reply = "...";
+	};
+	["sot_exmil1"] = { -- o8;
+		Face = "Skeptical";
+		Say = "Uhm, I don't think so...";
+		Reply = "Hm. Does our dear Joseph needs proof that we're the real deal?";
+	};
+	["sot_exmil2"] = {
+		Face = "Skeptical";
+		Say = "Kind of...";
+		Reply = "Straight to  business. Just how I like it. We've got proof, but words are cheap in this world. There's something <i>you</i> need to do for us first. You up for it?";
+	};
+	["sot_exmil3"] = {
+		Face = "Smirk";
+		Say = "Uhm..";
+		Reply = "There's a embassy building nearby, crawling with those nasty zombies. Clear it out so we can set up shop. Breach and clear, like the old days. Do that, and we'll give you what Joseph needs to verify us.";
+	};
+	["sot_exmil4"] = {
+		Face = "Smirk";
+		Say = "Why me? Can't you handle it?";
+		Reply = "We could, but this proves you're legit too. Our little <b>Soldier</b> needs to earn our trust as well.";
+	};
+	["sot_exmil5"] = {
+		Face = "Smirk";
+		Say = "Err.. Alright..";
+		Reply = "It's to the North of the W.D. Mall. Move out when you're ready. We'll talk real proof after.";
+	};
+};
+
+-- MARK: Shaw DialogueStrings
+Dialogues.Shaw.DialogueStrings = {
+	["sot_workedwithjoseph"] = { -- o7;
+		Face = "Skeptical";
+		Say = "So you guys worked with Joseph on some project before the apocalypse?";
+		Reply = "Only me and a few fellow researchers. For so long have we believed Joseph to have perished in this disaster...";
+	};
+	["sot_workedwithjoseph2"] = {
+		Face = "Skeptical";
+		Say = "Well I can assure you he is safe and in one piece.. sort of..";
+		Reply = "...";
+	};
+};
+
 
 if RunService:IsServer() then
 	local modPlayerNpcs = shared.require(game.ReplicatedStorage.Library.PlayerNpcs);
@@ -194,9 +257,69 @@ if RunService:IsServer() then
 					end
 				end)
 
+			elseif mission.ProgressionPoint == 9 then
+				dialog:SetInitiate("How'd it go?", "Surprise");
+
+				dialog:AddChoice({"sot_arentrats1"; "sot_arentrats2";}, function(dialog)
+					modMission:Progress(player, MISSION_ID, function(mission)
+						if mission.ProgressionPoint <= 10 then
+							mission.ProgressionPoint = 10;
+						end
+					end)
+				end)
+
 			end
 		end
 	end
+
+	-- MARK: Leo Handler
+	Dialogues.Leo.DialogueHandler = function(player, dialog, data, mission)
+		if mission.ProgressionPoint == 6 then
+			dialog:SetInitiate("What's your name, lad?", "Skeptical");
+
+			dialog:AddChoice({"sot_introduce";}, function(dialog)
+				modMission:Progress(player, MISSION_ID, function(mission)
+					if mission.ProgressionPoint <= 7 then
+						mission.ProgressionPoint = 7;
+					end
+				end)
+				dialog:SetExpireTime(workspace:GetServerTimeNow()+1);
+			end)
+
+		elseif mission.ProgressionPoint == 8 then
+			dialog:SetInitiate("You ex-military mate?", "Skeptical");
+
+			dialog:AddChoice({"sot_exmil1"; "sot_exmil2"; "sot_exmil3"; "sot_exmil4"; "sot_exmil5";}, function(dialog)
+				modMission:Progress(player, MISSION_ID, function(mission)
+					if mission.ProgressionPoint <= 9 then
+						mission.ProgressionPoint = 9;
+					end
+				end)
+			end)
+
+
+		end
+	end
+
+
+	-- MARK: Shaw Handler
+	Dialogues.Shaw.DialogueHandler = function(player, dialog, data, mission)
+		if mission.ProgressionPoint == 7 then
+			dialog:SetInitiate("It sure is an honour to meet Joseph's.. messenger.", "Suspicious");
+
+			dialog:AddChoice({"sot_workedwithjoseph"; "sot_workedwithjoseph2"}, function(dialog)
+				modMission:Progress(player, MISSION_ID, function(mission)
+					if mission.ProgressionPoint <= 8 then
+						mission.ProgressionPoint = 8;
+					end
+				end)
+				dialog:SetExpireTime(workspace:GetServerTimeNow()+1);
+			end)
+
+		end
+	end
+
+
 end
 
 

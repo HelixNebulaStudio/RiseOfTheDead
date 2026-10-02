@@ -54,8 +54,8 @@ MissionLibrary.New{
 	Checkpoint = {
 		{Text="Wake up"; Notify=false;};
 		{Text="Follow Mason"; Notify=true;};
-		{Text="Take the pistol by pressing [E] while pointing at it with your mouse"; Notify=true;};
-		{Text="Equip the P250 by clicking the pistol OR pressing [1]"; Notify=true;};
+		{Text="Take the gun by pressing [E] while pointing at it with your mouse"; Notify=true;};
+		{Text="Equip the gun by pressing [1] OR clicking it on screen."; Notify=true;};
 		{Text="Defend off the zombies"; Notify=true;};
 	};
 	GuideText = "";
@@ -3152,7 +3152,14 @@ MissionLibrary.New{
 		{Text="Talk to Caitlin";};
 		{Text="Enter the door";};
 		
-		{Text="WIP";};
+		{Text="Talk to Leo";};
+		{Text="Talk to Shaw";};
+		{Text="Talk to Leo";};
+		{Text="Talk to Caitlin";};
+		{Text="Head to the embassy north of the W.D. Mall";};
+
+		{Text="Complete the Raid: North Star Embassy";};
+		{Text="Return to Leo";};
 	};
 	LogEntry = {
 	};
@@ -3166,6 +3173,10 @@ MissionLibrary.New{
 	};
 	Markers = {
 		[1]={World="TheResidentials"; Label="Caitlin"; Target="Caitlin"; Type=modMarkers.MarkerTypes.Npc;};
+		[9]={World="TheResidentials"; Label="Caitlin"; Target="Caitlin"; Type=modMarkers.MarkerTypes.Npc;};
+		[10]={World="TheMall"; Label="Embassy"; Target=Vector3.new(1319.616, 98.465, -620.718); Type=modMarkers.MarkerTypes.Waypoint;};
+		[11]={World="TheMall"; Label="Embassy"; Target=Vector3.new(1319.616, 98.465, -620.718); Type=modMarkers.MarkerTypes.Waypoint;};
+		[12]={World="RadioStation"; Label="Leo"; Target="Leo"; Type=modMarkers.MarkerTypes.Npc;};
 	};
 	WIP=true;
 };

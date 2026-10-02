@@ -195,9 +195,18 @@ function library.onRequire()
 	library:Add{Id="Icarus"; Class="Trader"; Avatar="rbxassetid://13192700114"};
 	library:Add{Id="Valeria"; Class="Unknown"; Avatar="rbxassetid://127592506524326"};
 
-	--== Cutscene
+	
+	-- Cutscene
+	--== Sector F
 	library:Add{Id="Revas"; Class="Rat"; World="TheHarbor"; Avatar="rbxassetid://18932917905"; };
 	library:Add{Id="Eugene"; Class="BioX"; World="SectorE"; };
+
+	--== RadioStation
+	library:Add{Id="Leo"; Class="Military"; World="RadioStation"; };
+	library:Add{Id="Rex"; Class="Military"; World="RadioStation"; };
+	library:Add{Id="Skinner"; Class="Military"; World="RadioStation"; };
+	library:Add{Id="Shaw"; Class="BioX"; World="RadioStation"; };
+	
 
 end
 

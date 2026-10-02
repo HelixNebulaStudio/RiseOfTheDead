@@ -6,7 +6,6 @@ local TweenService = game:GetService("TweenService");
 
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 
@@ -52,7 +51,7 @@ if RunService:IsServer() then
 		if interactable == nil then return end;
 		
 		task.spawn(function()
-			if interactable.Values.ItemId ~= "p250" then return end;
+			if interactable.Values.ItemId ~= "p250" and interactable.Values.ItemId ~= "m4a4" then return end;
 			
 			modMission:Progress(player, MISSION_ID, function(mission)
 				if mission.ProgressionPoint >= 4 then return end;
@@ -77,7 +76,7 @@ and {
 	{Speaker="Mason"; Reply="Ski-ba-bop-ba-dop-bop.. Oh hey!"};
 	{Speaker="Mason"; Reply="Ey yo, you alive bruh?"};
 	{Speaker="Mason"; Reply="We have to skidaddle, the zombies are coming!"};
-	{Speaker="Mason"; Reply="I don't know why there's a pistol here but take it and use it.";};
+	{Speaker="Mason"; Reply="A gun magically appeared on my hand, take it and use it.";};
 	{Speaker="Mason"; Reply="Here they come!!!!!!";};
 
 	{Speaker="Mason"; Reply="Aight, I'mma head out.."};
@@ -86,8 +85,8 @@ and {
 } or {
 	{Speaker="Mason"; Reply="Oh ####... Hey! Hey, wake up."};
 	{Speaker="Mason"; Reply="Oh god, you're alive. Hurry, get up."};
-	{Speaker="Mason"; Reply="We have to get out of here, zombies are coming."};
-	{Speaker="Mason"; Reply="Here, take this pistol and help me fight them.";};
+	{Speaker="Mason"; Reply="Are you good? We have to get out of here."};
+	{Speaker="Mason"; Reply="Oh no, a horde is coming. Here, take my gun.";};
 	{Speaker="Mason"; Reply="Here they come! Point your gun at them and pull the trigger.";};
 
 	{Speaker="Mason"; Reply="Keep shooting, I will get the car ready."};
@@ -144,7 +143,7 @@ return function(CutsceneSequence)
 		
 		local players = CutsceneSequence:GetPlayers();
 		local player: Player = players[1];
-		
+
 		local item, storage = modStorage.FindItemIdFromStorages("p250", player);
 		if item ~= nil then
 			storage:DeleteValues(item.ID, {"A"; "MA"});
@@ -433,10 +432,14 @@ return function(CutsceneSequence)
 		local players = CutsceneSequence:GetPlayers();
 		local player: Player = players[1];
 		local playerClass = shared.modPlayers.get(player);
+		local profile = shared.modProfile:Get(player);
 
 		task.delay(3, function()
 			masonNpcClass.Chat(player, sceneDialogues[1].Reply);
 		end)
+
+		profile.Cache.InfAmmo = 1;
+		player:SetAttribute("InfAmmo", 1);
 
 		local masonCutsceneActions = masonNpcClass.Properties.CutsceneActions;
 		
@@ -470,8 +473,19 @@ return function(CutsceneSequence)
 		CutsceneSequence:Pause(18);
 		CutsceneSequence:NextScene("playerAllowMove");
 		
+		local explosionSoundPart = workspace.Environment:WaitForChild("ExplosionSoundPart");
+		modAudio.Play("HordeGrowl", explosionSoundPart);
+
+		task.wait(1);
 		
-		local item, _storage = modStorage.FindItemIdFromStorages("p250", player);
+		local exp_ExtendedTheBeginnings = profile:GetPlayerConfig("Exp_ExtendedTheBeginnings");
+		if shared.gameConfig.BranchName == "Dev" then
+			exp_ExtendedTheBeginnings = true;
+		end
+
+
+		local gunId = exp_ExtendedTheBeginnings and "m4a4" or "p250";
+		local item, _storage = modStorage.FindItemIdFromStorages(gunId, player);
 		if item == nil then
 			masonNpcClass.Chat(player, sceneDialogues[4].Reply);
 			masonCutsceneActions.NextAction();
@@ -485,9 +499,22 @@ return function(CutsceneSequence)
 			local rightHandAtt = masonPrefab:FindFirstChild("RightHandAttachment", true);
 			local newPickup: BasePart = script:WaitForChild("Mission1Pickup"):Clone();
 
+			if exp_ExtendedTheBeginnings then
+				game.Debris:AddItem(newPickup:FindFirstChild("p250"), 0);
+			else
+				game.Debris:AddItem(newPickup:FindFirstChild("m4a4"), 0);
+			end
+			
 			local pickupableConfig = modInteractables.createInteractable("Pickupable");
-			pickupableConfig:SetAttribute("ItemId", "p250");
+			pickupableConfig:SetAttribute("ItemId", gunId);
 			pickupableConfig.Parent = newPickup;
+
+			local pickupInteractable: InteractableInstance = modInteractables.getOrNew(pickupableConfig);
+			if pickupInteractable then
+				pickupInteractable.Values.ItemValues = {
+					M1TempGun=true;
+				};
+			end
 
 			local ridgidConst = newPickup:WaitForChild("RigidConstraint");
 			local dropGlow = newPickup:WaitForChild("DropGui");
@@ -510,9 +537,7 @@ return function(CutsceneSequence)
 			end)
 
 		end
-		
-		local explosionSoundPart = workspace.Environment:WaitForChild("ExplosionSoundPart");
-		modAudio.Play("HordeGrowl", explosionSoundPart);
+
 		masonCutsceneActions.NextAction();
 
 		masonNpcClass.Chat(players, sceneDialogues[5].Reply);
@@ -528,7 +553,7 @@ return function(CutsceneSequence)
 			local npcChar = npcClass.Character;
 			local properties = npcClass.Properties;
 
-			properties.Level = 0;
+			properties.Level = zombieKilled >= 15 and 2 or zombieKilled >= 10 and 1 or 0;
 			properties.HordeAggression = true;
 			properties.TargetableDistance = 1024;
 			properties.CanForgetTargets = false;
@@ -536,10 +561,12 @@ return function(CutsceneSequence)
 
 			local configurations: ConfigVariable = npcClass.Configurations;
 			local weakenedDmgModifier = npcClass.Configurations.newModifier("WeakenedDmg");
-			weakenedDmgModifier.SetValues.AttackDamage = 5;
+			weakenedDmgModifier.SetValues.AttackDamage = math.random(1, 3);
 			configurations:AddModifier(weakenedDmgModifier, true); 
 
-			npcClass.Move:SetMoveSpeed("set", "forcespeed", 6, 9);
+			if zombieKilled <= 5 then
+				npcClass.Move:SetMoveSpeed("set", "forcespeed", 6, 9);
+			end
 
 			npcClass.HealthComp.OnIsDeadChanged:Connect(function(isDead)
 				if not isDead then return end;
@@ -550,7 +577,7 @@ return function(CutsceneSequence)
 						table.remove(zombieNpcClasses, a);
 					end
 				end
-				if zombieKilled >= 5 then
+				if zombieKilled >= (exp_ExtendedTheBeginnings and 20 or 5) then
 					endSpawnLoop = true;
 				end
 			end)
@@ -587,7 +614,20 @@ return function(CutsceneSequence)
 						CFrame = pickSpawn();
 						BindSetup = loadZombies;
 					};
-					task.wait(8);
+
+					if exp_ExtendedTheBeginnings then
+						if zombieKilled > 9 then
+							task.wait(1);
+						elseif zombieKilled > 6 then
+							task.wait(2);
+						elseif zombieKilled > 3 then
+							task.wait(4);
+						else
+							task.wait(8);
+						end
+					else
+						task.wait(8);
+					end
 				end;
 			end
 			for a=1, 12 do

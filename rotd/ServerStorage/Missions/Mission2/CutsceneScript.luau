@@ -160,7 +160,19 @@ return function(CutsceneSequence)
 			modMission:StartMission(player, 2);
 		end
 		
+		local removedTempM4 = false;
 		pcall(function()
+			local m4List = modStorage.listItemIdFromStorages("m4a4", player);
+			for a=1, #m4List do
+				local storageItem = m4List[a].Item;
+				local storage = m4List[a].Storage;
+
+				if storageItem.Values.M1TempGun then
+					storage:Remove(storageItem.ID);
+					removedTempM4 = true;
+				end
+			end
+
 			local item = modStorage.FindItemIdFromStorages("p250", player);
 			if item == nil and modEvents:GetEvent(player, "hasBeginnerP250") == nil then
 				local profile = shared.modProfile:Get(player);
@@ -226,6 +238,11 @@ return function(CutsceneSequence)
 					task.wait(2);
 
 					if mission.ProgressionPoint >= 4 then return end;
+					
+					if removedTempM4 then
+						masonNpcClass.Chat(masonNpcClass.Player, "Oh, I'll have my rifle back and you can have my pistol for the effort.");
+						task.wait(4);
+					end
 					
 					masonNpcClass.Chat(masonNpcClass.Player, "Follow me...");
 					masonNpcClass.Move:Face(Vector3.new(-0.619997144, 57.6597404, -25.171896));

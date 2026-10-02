@@ -477,7 +477,7 @@ function SpecialEventPackage.onRequire()
         local player = storageItem.Player;
         if player == nil then return end;
         
-        local _, itemCount = modStorage.ListItemIdFromStorages(candyBagItemId, player);
+        local _, itemCount = modStorage.listItemIdFromStorages(candyBagItemId, player);
         modAnalyticsService:Source{
             Player=player;
             Currency="CandyBags";

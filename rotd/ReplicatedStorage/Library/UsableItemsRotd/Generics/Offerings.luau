@@ -339,16 +339,18 @@ if RunService:IsServer() then
 
 		storage:Remove(siid);
 		inventory:Add(itemId, {Quantity=quantity; Values=values;}, function(eventStatus, newStorageItem)
-			shared.Notify(player, `Thank you for purchasing {itemLib.Name}.`, "Reward");
-						
-			if profile.PolicyData.IsPaidItemTradingAllowed == false then
-				newStorageItem:SetNonTradeable(1);
-				newStorageItem:Sync();
-				
-			else
-				shared.modStorage.OnItemSourced:Fire(nil, newStorageItem, newStorageItem.Quantity);
-				
-			end
+			task.spawn(function()
+				shared.Notify(player, `Thank you for purchasing {itemLib.Name}.`, "Reward");
+							
+				if profile.PolicyData.IsPaidItemTradingAllowed == false then
+					newStorageItem:SetNonTradeable(1);
+					newStorageItem:Sync();
+					
+				else
+					shared.modStorage.OnItemSourced:Fire(nil, newStorageItem, newStorageItem.Quantity);
+					
+				end
+			end)
 		end);
 
 		if price > 0 then
@@ -490,7 +492,9 @@ if RunService:IsServer() then
 		local rewardItemLib = modItemsLibrary:Find(rewardItemId);
 
 		inventory:Add(rewardItemId, nil, function()
-			shared.Notify(player, `You received a {rewardItemLib.Name}.`, "Reward");
+			task.spawn(function()
+				shared.Notify(player, `You received a {rewardItemLib.Name}.`, "Reward");
+			end)
 		end);
 
 		rPacket.OutputItemId = pickRewardInfo.ItemId;

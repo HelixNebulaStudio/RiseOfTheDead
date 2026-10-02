@@ -157,7 +157,7 @@ if RunService:IsServer() then
 			end);
 		end
 	
-		local list = modStorage.ListItemIdFromStorages("wantedposter", player);
+		local list = modStorage.listItemIdFromStorages("wantedposter", player);
 	
 		local safehomeClass = shared.WorldCore.SafehomeClass;
 		if #list > 0 and safehomeClass and safehomeClass.FactionTag == nil then

@@ -157,10 +157,12 @@ function ShopSystem.onRequire()
 
                 gameSave:AddStat(currency, -price);
                 inventory:Add(itemLib.Id, {Quantity=(productInfo.Amount or 1);}, function(queueEvent, storageItem)
-                    shared.Notify(player, "You purchased ".. ((productInfo.Amount or 1) > 1 and productInfo.Amount or "a").." ".. itemLib.Name, "Reward");
-                    Debugger:Log("Player (",player.Name,") purchased a",itemLib.Name);
-                    
-                    modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
+                    task.spawn(function()
+                        shared.Notify(player, "You purchased ".. ((productInfo.Amount or 1) > 1 and productInfo.Amount or "a").." ".. itemLib.Name, "Reward");
+                        Debugger:Log("Player (",player.Name,") purchased a",itemLib.Name);
+                        
+                        modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
+                    end)
                 end);
             else
                 return modShopLibrary.PurchaseReplies.InventoryFull;

@@ -26,11 +26,11 @@ if RunService:IsClient() then
 
 		local highlight = modGuiHighlight.Set("MainInterface", "Hotbar", "1");
 
-		local hintText = "Press 1 to equip pistol";
+		local hintText = "Press 1 to equip gun";
 		if UserInputService.PreferredInput == Enum.PreferredInput.Gamepad then
 			hintText = `Press <font family="rbxasset://LuaPackages/Packages/_Index/BuilderIcons/BuilderIcons/BuilderIcons.json">Left Bumper</font> to equip pistol`;
 		elseif UserInputService.PreferredInput == Enum.PreferredInput.Touch then
-			hintText = `Tap here to equip pistol`;
+			hintText = `Tap here to equip gun`;
 		end
 
 		highlight.ContainerTextInfo = {

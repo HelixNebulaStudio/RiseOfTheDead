@@ -71,8 +71,10 @@ function CommunityItemPackages.ProcessReceipt(player: Player, receiptInfo: {
     end
 
     inventory:Add(itemId, {Quantity=quantity;}, function(eventStatus, newStorageItem)
-        shared.Notify(player, `You have purchased a {itemLib.Name}!`, "Reward");
-        shared.modStorage.OnItemSourced:Fire(nil, newStorageItem, newStorageItem.Quantity);
+        task.spawn(function()
+            shared.Notify(player, `You have purchased a {itemLib.Name}!`, "Reward");
+            shared.modStorage.OnItemSourced:Fire(nil, newStorageItem, newStorageItem.Quantity);
+        end)
     end);
 
     modContributorShareService:RecordPurchase(player, receiptInfo);

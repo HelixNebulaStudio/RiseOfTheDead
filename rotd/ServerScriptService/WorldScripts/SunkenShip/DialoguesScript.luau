@@ -159,7 +159,9 @@ if RunService:IsServer() then
 
 						local rewardItemLib = modItemsLibrary:Find(giveItemId);
 						inventory:Add(giveItemId, nil, function(queueEvent, storageItem)
-							modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
+							task.spawn(function()
+								modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
+							end)
 						end);
 						shared.Notify(player, "You recieved a ".. rewardItemLib.Name ..".", "Reward");
 						
@@ -189,7 +191,9 @@ if RunService:IsServer() then
 
 								local rewardItemLib = modItemsLibrary:Find(giveItemId);
 								inventory:Add(giveItemId, nil, function(queueEvent, storageItem)
-									modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
+									task.spawn(function()
+										modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
+									end)
 								end);
 								shared.Notify(player, "You recieved a ".. rewardItemLib.Name ..".", "Reward");
 

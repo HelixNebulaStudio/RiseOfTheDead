@@ -164,7 +164,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     --== Credits Window
 
     --MARK: Main Menu;
-    if not (modBranchConfigurations.IsWorld("MainMenu") or modBranchConfigurations.IsWorld("BioXResearch")) then return end;
+    if shared.WorldName ~= "MainMenu" and shared.WorldName ~= "BioXResearch" then return end;
 
     local frame = script:WaitForChild("MainMenu"):Clone();
     frame.Parent = interface.ScreenGui;
@@ -189,6 +189,28 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     menuWindow.BoolStringWhenActive = {String="!CharacterHud"; Priority=6;};
 
     local mainTheme;
+
+    
+    local mission1;
+    task.spawn(function()
+        while true do
+            task.wait(1);
+            mission1 = modData:GetMission(1);
+
+            local isM1Complete = mission1 and mission1.Type == 3;
+            local isLiveBranch = shared.gameConfig.BranchName == "Live";
+
+            playTestButton.Visible = isM1Complete and isLiveBranch;
+
+            for _, imageButton in pairs(frontPageFrame.ButtonList:GetChildren()) do
+                if not imageButton:IsA("ImageButton") then continue end;
+                if imageButton.Name == "MainUpdates" or imageButton.Name == "MainFriends" then
+                    imageButton.Visible = isM1Complete;
+                end
+            end
+        end
+    end)
+
     --MARK: OnToggle
     menuWindow.OnToggle:Connect(function(visible)
         if visible then
@@ -317,7 +339,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         if shared.gameConfig.BranchName == "Dev" then
             Debugger:Warn(`Showing PlayTestButton in studio only. ({shared.gameConfig.BranchName})`);
         end
-        playTestButton.Visible = true;
+        
         local function updatePlayTestButtonPos()
             local viewport = workspace.CurrentCamera.ViewportSize;
             local ratio = viewport.X/viewport.Y;

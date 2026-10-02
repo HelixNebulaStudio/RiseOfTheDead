@@ -102,9 +102,11 @@ function interactablePackage.init(super) -- Server/Client
         if hasSpace then
             local itemLib = modItemsLibrary:Find(itemId);
             inventory:Add(itemId, nil, function(queueEvent, storageItem)
-                if storageItem and storageItem.Quantity > 0 then
-                    shared.modStorage.OnItemSourced:Fire(nil, storageItem, storageItem.Quantity);
-                end
+                task.spawn(function()
+                    if storageItem and storageItem.Quantity > 0 then
+                        shared.modStorage.OnItemSourced:Fire(nil, storageItem, storageItem.Quantity);
+                    end
+                end)
             end);
             shared.Notify(player, "You have recieved a "..itemLib.Name..".", "Reward");
         else

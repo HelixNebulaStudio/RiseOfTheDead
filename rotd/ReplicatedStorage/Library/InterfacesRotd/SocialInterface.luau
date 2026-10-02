@@ -239,7 +239,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             friends[a].Avatar = shared.modPlayers.getAvatar(friends[a].VisitorId);
             friends[a].InUniverse = inUniverse;
 
-            binds.FriendsList[friends[a].UserName] = friends[a];
+            if binds.FriendsList then
+                binds.FriendsList[friends[a].UserName] = friends[a];
+            end
         end
 
         if localPlayer.UserId == -1 then

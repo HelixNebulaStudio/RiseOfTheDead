@@ -220,8 +220,10 @@ function Handler.onRequire(factions)
             local inventory = playerSave.Inventory;
 
             inventory:Add(itemId, {Quantity=1;}, function(queueEvent, storageItem)
-                shared.modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
-                shared.Notify(player, `You received {disName}.`, "Reward");
+                task.spawn(function()
+                    shared.modStorage.OnItemSourced:Fire(nil, storageItem,  storageItem.Quantity);
+                    shared.Notify(player, `You received {disName}.`, "Reward");
+                end)
             end);
         end
 

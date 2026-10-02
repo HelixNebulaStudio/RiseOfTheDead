@@ -85,7 +85,7 @@ if RunService:IsServer() then
 						shared.Notify(player, "Inventory is full!", "Negative");
 						
 					else
-						local list = modStorage.ListItemIdFromStorages("jacksscythe", player);
+						local list = modStorage.listItemIdFromStorages("jacksscythe", player);
 						if #list > 0 then
 							shared.Notify(player, "You already have Jack's Scythe.", "Inform");
 

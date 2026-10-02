@@ -48,7 +48,7 @@ if RunService:IsServer() then
 
 			if found then
 				dialog:AddChoice("lendAHand_complete", function(dialog)
-					local list = modStorage.ListItemIdFromStorages("zombiearm", player);
+					local list = modStorage.listItemIdFromStorages("zombiearm", player);
 					for a=1, #list do
 						list[a].Storage:Remove(list[a].Item.ID);
 					end
