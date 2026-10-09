@@ -13,6 +13,7 @@ local npcPackage = {
         IsHostile = false;
         DropRewardId = "rat";
         ThornResist = 0.7;
+        SmartPath = true;
     };
 
     Chatter = {

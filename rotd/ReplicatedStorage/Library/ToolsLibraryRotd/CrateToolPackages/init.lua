@@ -187,6 +187,9 @@ function toolPackage.init(super)
 		ItemId = "dmangrovecrate";
 	});
 	
+	toolPackage.inherit{
+		ItemId = "northstarcrate";
+	}
 	
 	-- MARK: Resource Crate
 	local ResourceCrate = {

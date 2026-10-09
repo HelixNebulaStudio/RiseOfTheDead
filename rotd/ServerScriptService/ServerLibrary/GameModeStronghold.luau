@@ -13,7 +13,10 @@ local modTeamsManager = shared.require(game.ReplicatedStorage.Library.TeamsManag
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
 local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
+local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modVector = shared.require(game.ReplicatedStorage.Library.Util.Vector);
+local modOctree = shared.require(game.ReplicatedStorage.Library.Util.Octree);
+local modRaycastUtil = shared.require(game.ReplicatedStorage.Library.Util.RaycastUtil);
 
 local modItemDrops = shared.require(game.ServerScriptService.ServerLibrary.ItemDrops);
 
@@ -27,6 +30,7 @@ local Config = {
 
 local Stronghold = {
     Active = nil;
+	OnAlertShoutConn = nil;
 };
 Stronghold.__index = Stronghold;
 
@@ -57,6 +61,8 @@ function Stronghold.new()
             Enabled: boolean;
         }});
 		BackupSpawnAttList = {};
+		SpawnFrames = {};
+		HordeSpawns = modOctree.new();
 
         Players = {};
         AlivePlayers = ({} :: {PlayerClass});
@@ -107,7 +113,7 @@ function Stronghold:Load()
 				for _, child in pairs(object:GetChildren()) do
 
 					if child:IsA("Folder") then
-						for _, plat in pairs(child:GetChildren()) do
+						for _, plat: BasePart in pairs(child:GetChildren()) do
 							spCount = spCount +1;
 							self.SpawnPlatforms[plat] = {
 								Name = "SpawnPlatform"..spCount;
@@ -131,6 +137,22 @@ function Stronghold:Load()
 						};
 
 					end
+
+				end
+
+			elseif object.Name == "SpawnFrames" then
+				for _, spawnFrame in pairs(object:GetChildren()) do
+					game.Debris:AddItem(spawnFrame:FindFirstChild("FrontDecal"));
+					spawnFrame.Transparency = 1;
+					table.insert(self.SpawnFrames, spawnFrame);
+
+				end
+
+			elseif object.Name == "HordeSpawns" then
+				for _, hordeSpawn in pairs(object:GetChildren()) do
+					game.Debris:AddItem(hordeSpawn:FindFirstChild("FrontDecal"));
+					hordeSpawn.Transparency = 1;
+					self.HordeSpawns:CreateNode(hordeSpawn.Position, hordeSpawn);
 
 				end
 
@@ -269,7 +291,8 @@ function Stronghold:Initialize(roomData)
                                         * CFrame.Angles(0, math.rad(math.random(0, 360)), 0);
 						
 						if #self.EnemyClasses <= Config.EnemyCap then
-							self:SpawnEnemy(self:PickEnemy(), {
+							local enemyName = spawnPlatformPart:GetAttribute("EnemyName") or self:PickEnemy();
+							self:SpawnEnemy(enemyName, {
 								SpawnCFrame = spawnCf;
 							});
 							continue;
@@ -468,13 +491,30 @@ end
 
 --MARK: SpawnEnemy
 function Stronghold:SpawnEnemy(npcName, paramPacket)
-	if self.EliminateCount >= self.EliminateGoal then return end;
+	if self.Status ~= EnumStatus.InProgress then return end;
 	paramPacket = paramPacket or {};
 
 	local spawnCf = paramPacket.SpawnCFrame;
 
 	local rngLevel = (self.Difficulty + (self.Wave-1)) + math.random(-2, 0);
 	local level = math.max(rngLevel, 1);
+
+	local patrolPosList = nil;
+
+	if paramPacket.SpawnFrame then
+		local sFrame = paramPacket.SpawnFrame;
+
+		for _, c in pairs(sFrame:GetChildren()) do
+			if c.Name:sub(1,10) == "PatrolPath" then
+				if patrolPosList == nil then 
+					patrolPosList = {
+						sFrame.Position + Vector3.new(0, -2.5, 0);
+					};
+				end;
+				table.insert(patrolPosList, c.WorldPosition);
+			end
+		end
+	end
 
 	return modNpcs.spawn2{
 		Name = npcName;
@@ -485,6 +525,12 @@ function Stronghold:SpawnEnemy(npcName, paramPacket)
 			CanForgetTargets = false;
 			IsHostile = true;
 			OpponentsThreshold = self.IsHard == true and math.random(1, 3) or 1;
+			PatrolPositions = patrolPosList;
+			PatrolFrequency = patrolPosList and 5 or nil;
+			EquippedByDefault = math.random(1, 4) > 1;
+
+			HordeAggression = paramPacket.HordeAggression == true;
+			NpcPercentHealthDamage = 0;
 		};
 		BindSetup = function(npcClass: NpcClass)
 			self.EnemiesSpawned = self.EnemiesSpawned + 1;
@@ -538,6 +584,56 @@ function Stronghold:SpawnEnemy(npcName, paramPacket)
 						targetHandlerComp:AddTarget(self.Players[a].Character);
 					end
 				end
+			end
+
+			task.delay(1, function()
+				self.StatusText = `Eliminate {self.EliminateGoal} enemies`;
+				self:Hud({
+					StatusText = self.StatusText;
+				})
+			end)
+
+			if npcClass.BehaviorTree.RootTree and npcClass.BehaviorTree.RootTree.OnAlertShout and Stronghold.OnAlertShoutConn == nil then
+
+				Stronghold.OnAlertShoutConn = npcClass.BehaviorTree.RootTree.OnAlertShout:Connect(function(shoutNpcClass: NpcClass, enemyEntityClass: EntityClass)
+					if self.LastHordeCryTick and tick()-self.LastHordeCryTick <= 60 then
+						return; 
+					end;
+					self.LastHordeCryTick = tick();
+
+					Debugger:Warn(`Bandit Alert Shout`);
+
+					task.wait(math.random(5, 10));
+	
+					modAudio.Play("HordeGrowl", workspace);
+
+					for a=1, math.random(6, 12) do
+						local spawnsInRange = self.HordeSpawns:RadiusSearch(shoutNpcClass:GetCFrame().Position, 128);
+						if #spawnsInRange <= 0 then 
+							task.wait(1); 
+							continue;
+						end;
+						local pickSpawn = spawnsInRange[math.random(1, #spawnsInRange)];
+
+						local zombieNpcClass: NpcClass = self:SpawnEnemy("Zombie", {
+							SpawnCFrame = pickSpawn.CFrame;
+							HordeAggression = math.random(1, 4) == 1;
+						});
+
+						if zombieNpcClass then
+							self.EliminateGoal += 1;
+
+							local targetHandlerComp = zombieNpcClass:GetComponent("TargetHandler");
+							if targetHandlerComp then
+								local priorityTargetData = targetHandlerComp:AddTarget(npcClass.Character);
+								zombieNpcClass.Properties.PriorityTargetData = priorityTargetData;
+							end
+						end
+
+						task.wait(math.random(10, 35)/10);
+						if self.Status ~= EnumStatus.InProgress then break; end;
+					end
+				end)
 			end
 		end
 	};
@@ -735,6 +831,9 @@ function Stronghold:Start()
 		self:LoadSpawnPlatform(spawnPart);
         self.EliminateGoal = self.EliminateGoal + spawnInfo.SpawnAmount;
 	end
+    for _, spawnFrame in pairs(self.SpawnFrames) do
+        self.EliminateGoal = self.EliminateGoal + 1;
+	end
 	self.EliminateGoal += math.random(3, 5);
     
 	for a=5, 1, -1 do
@@ -763,6 +862,57 @@ function Stronghold:Start()
 		StatusText = self.StatusText;
 	})
     Debugger:StudioLog(`Stronghold:Start self=`, self);
+
+	task.spawn(function()
+		while self.Status == EnumStatus.InProgress do
+			task.wait(1);
+
+			for _, spawnFrame: BasePart in pairs(self.SpawnFrames) do
+				local framePos = spawnFrame.Position;
+
+				if spawnFrame:GetAttribute("Enabled") or spawnFrame:GetAttribute("DefaultEnabled") then
+					if spawnFrame:GetAttribute("Spawned") == true then continue end;
+					spawnFrame:SetAttribute("Spawned", true);
+
+					local enemyName = spawnFrame:GetAttribute("EnemyName") or self:PickEnemy();
+					self:SpawnEnemy(enemyName, {
+						SpawnCFrame = spawnFrame.CFrame;
+						SpawnFrame = spawnFrame;
+					});
+
+					continue;
+				end
+
+				local playerTooClose = shared.modPlayers.listInRange(framePos, 100);
+				if #playerTooClose > 0 then
+					spawnFrame:SetAttribute("Enabled", true);
+					continue;
+				end
+
+				local playerInRange = shared.modPlayers.listInRange(framePos, 200);
+				for a=1, #playerInRange do
+					local playerClass: PlayerClass = playerInRange[a];
+
+					local eyeCFrame = playerClass.CameraCFrame;
+                    local eyeFov = playerClass.CameraFov;
+                    local eyeSize = playerClass.ViewportSize;
+
+                    local isInVision = modRaycastUtil.isInVision(
+                        eyeCFrame, eyeFov, eyeSize,
+                        spawnFrame.CFrame, spawnFrame.Size, 
+                        spawnFrame
+                    );
+					if isInVision then
+						spawnFrame:SetAttribute("Enabled", true);
+						break;
+					end
+				end
+
+			end
+		end
+		
+
+	end)
 end
 
 function Stronghold:RespawnDead()
@@ -789,7 +939,13 @@ function Stronghold:Restart()
     for spawnPart, spawnInfo in pairs(self.SpawnPlatforms) do
         spawnInfo.SpawnedAmbientEntity = nil;
     end
+	for _, spawnFrame: BasePart in pairs(self.SpawnFrames) do
+		spawnFrame:SetAttribute("Enabled", false);
+		spawnFrame:SetAttribute("Spawned", false);
+	end
 	
+	self.LastHordeCryTick = nil;
+
 	shared.Notify(game.Players:GetPlayers(), "Raid failed!", "Negative");
 	
 	for a=5, 1, -1 do
@@ -937,6 +1093,9 @@ function Stronghold:LoadSpawnPlatform(spawnPart: BasePart)
         math.random(Config.MinSpawnCount, Config.MaxSpawnCount), 
         #spawnPlatformInfo.SpawnCFrames
     );
+	if spawnPart:GetAttribute("SpawnAmount") then
+		numToSpawn = math.min(spawnPart:GetAttribute("SpawnAmount") :: number, #spawnPlatformInfo.SpawnCFrames);
+	end
     spawnPlatformInfo.SpawnAmount = numToSpawn;
 
     spawnPart:SetAttribute("MaxSpawns", maxSpawns);

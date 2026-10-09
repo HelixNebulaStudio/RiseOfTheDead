@@ -7,6 +7,7 @@ local modTeamsManager = shared.require(game.ReplicatedStorage.Library.TeamsManag
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modEntity = shared.require(game.ReplicatedStorage.Entity);
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
+local modRaycastUtil = shared.require(game.ReplicatedStorage.Library.Util.RaycastUtil);
 
 if RunService:IsServer() then
     modRegionMission = shared.require(game.ServerScriptService.ServerLibrary.RegionMission);
@@ -38,6 +39,29 @@ function WorldCore.onRequire()
 
             player.CharacterAdded:Once(function()
 			    game.Players:SetAttribute("AutoRespawn", true);
+            end)
+
+            task.spawn(function()
+                local viewPart = workspace.Terrain:WaitForChild("ViewPart");
+                local playerClass: PlayerClass = shared.modPlayers.get(player);
+
+                while task.wait(1) do
+                    local eyeCFrame = playerClass.CameraCFrame;
+                    local eyeFov = playerClass.CameraFov;
+                    local eyeSize = playerClass.ViewportSize;
+
+                    local isInVision = modRaycastUtil.isInVision(
+                        eyeCFrame, eyeFov, eyeSize,
+                        viewPart.CFrame, viewPart.Size, 
+                        viewPart
+                    );
+                    if isInVision then
+                        viewPart.Color = Color3.fromRGB(0, 100, 0);
+                    else
+                        viewPart.Color = Color3.fromRGB(100, 0, 0);
+                    end
+                end
+            
             end)
 
         end, 999);

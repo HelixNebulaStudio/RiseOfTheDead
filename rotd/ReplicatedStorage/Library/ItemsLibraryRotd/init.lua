@@ -304,6 +304,7 @@ function modItemsLibrary.onRequire()
     new(crateBase, {Id="abandonedbunkercrate"; Icon="rbxassetid://13495111655"; GameMode={Mode="Raid"; Stage="Abandoned Bunker"}});
     new(crateBase, {Id="mangrovecrate"; Icon="rbxassetid://89583678864591"; GameMode={Mode="Survival"; Stage="Swamplands"}});
     new(crateBase, {Id="dmangrovecrate"; Icon="rbxassetid://71675901045992"; GameMode={Mode="Survival"; Stage="Swamplands"; HardPrefix="Deadly"}});
+    new(crateBase, {Id="northstarcrate"; Icon="rbxassetid://82042790727715"; GameMode={Mode="Raid"; Stage="North Star Embassy"}});
 
     -- Corrupted
     local corruptedCrateBase = table.clone(crateBase);

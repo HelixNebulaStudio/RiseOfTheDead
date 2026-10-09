@@ -47,7 +47,7 @@ function Component:__call()
 	if enemyTargetData == nil then return end;
 
 	local playerClass: PlayerClass = enemyTargetData.HealthComp.CompOwner;
-	if playerClass.ClassName ~= "PlayerClass" then return end;
+	if playerClass == nil or playerClass.ClassName ~= "PlayerClass" then return end;
 	if not playerClass.HealthComp:CanTakeDamageFrom(npcClass) then return end;
 
 	local player = playerClass:GetInstance();

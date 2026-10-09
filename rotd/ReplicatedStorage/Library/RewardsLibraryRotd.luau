@@ -1115,6 +1115,17 @@ function library.onRequire()
 		};
 	};
 
+	-- MARK: northstarcrate
+	library:Add{
+		Id="northstarcrate";
+		Rewards={
+			{Index=1; ItemId="metalpipes"; Quantity={Min=4; Max=5}; Chance=1;};
+			{Index=1; ItemId="stickygrenade"; Recyclable=true; Chance=1;};
+
+			{Index=2; ItemId="militarygloves"; Recyclable=true; Chance=weaponBpChance;};
+		};
+	};
+
 	library:Add{
 		Id="world1crates";
 		Rewards={

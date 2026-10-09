@@ -669,7 +669,7 @@ function Raid:SpawnEnemy(npcName, paramPacket)
 		local function filterFunc(npcClass: NpcClass)
 			local reRespawnThreshold = #self.EnemyClassInstances > 100 and 1 or #self.EnemyClassInstances > 50 and 3 or 6;
 			if npcClass.LastRespawnTick and (tick() - npcClass.LastRespawnTick) < reRespawnThreshold then return false; end;
-			if modVector.DistanceSqrdXZ(npcClass:GetCFrame().Position, spawnCf.Position) <= 4096 then return false; end;
+			if modVector.distanceSqrdXZ(npcClass:GetCFrame().Position, spawnCf.Position) <= 4096 then return false; end;
 			return npcClass.Name == npcName;
 		end
 		local npcClass: NpcClass = shared.modNpcs.Octree:GetFurthestNodeFromPoints(playerPositions, filterFunc) :: NpcClass;
@@ -1137,7 +1137,7 @@ function Raid:Initialize(roomData)
 					chunk.LastTouched = tick();
 					if chunk.Position == nil then continue end;
 					
-					local dist = modVector.DistanceSqrdXZ(playerPosition, chunk.Position);
+					local dist = modVector.distanceSqrdXZ(playerPosition, chunk.Position);
 					local floor = math.abs(playerPosition.Y-chunk.Position.Y)^2 *3;
 
 					table.insert(sortedChunks, {
@@ -1319,7 +1319,7 @@ function Raid:Initialize(roomData)
 				for a=1, #spawnAttsInRange do
 					local spawnAtt = spawnAttsInRange[a];
 					if spawnAtt:GetAttribute("Enabled") then
-						local dist2 = modVector.DistanceSqrdXZ(spawnAtt.WorldCFrame.Position, characterPosition);
+						local dist2 = modVector.distanceSqrdXZ(spawnAtt.WorldCFrame.Position, characterPosition);
 						local floor = math.floor(math.abs(spawnAtt.WorldCFrame.Position.Y-characterPosition.Y)/8)^2 *3;
 						table.insert(validSpawnAtts, {
 							Att = spawnAtt;

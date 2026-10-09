@@ -101,6 +101,7 @@ function treePackage.HasEnemy(npcClass: NpcClass)
         if targetEntityClass.ClassName ~= "Destructible" then
             local isInVision = targetData.Model.PrimaryPart and npcClass:IsInVision(targetData.Model.PrimaryPart, 75) or false;
             targetData.IsInVision = isInVision;
+            targetData.LastAlertedTick = tick();
             if not isInVision then return false end;
         end
 
@@ -151,6 +152,15 @@ function treePackage.HasEnemy(npcClass: NpcClass)
         
     end
 
+    local enemyPriorityTargetData = properties.PriorityTargetData;
+    if enemyPriorityTargetData then
+        if enemyPriorityTargetData ~= nil 
+        and enemyPriorityTargetData.HealthComp
+        and not enemyPriorityTargetData.HealthComp.IsDead then
+            properties.EnemyTargetData = enemyPriorityTargetData;
+        end
+    end
+
     local hasEnemy = properties.EnemyTargetData ~= nil;
     if not hasEnemy then
         npcClass.Properties.AttacksMissed = 0;
@@ -187,6 +197,8 @@ function treePackage.LookAtEnemy(npcClass: NpcClass)
     local targetData = npcClass.Properties.EnemyTargetData;
 
     local enemyCharClass: CharacterClass = targetData.HealthComp.CompOwner;
+    if enemyCharClass == nil then return false end;
+
     if enemyCharClass.ClassName == "NpcClass" or enemyCharClass.ClassName == "PlayerClass" then
         local curTick = tick();
         if properties.LookAtEnemyTick == nil then
@@ -221,6 +233,8 @@ function treePackage.Attack(npcClass: NpcClass)
     local targetData = npcClass.Properties.EnemyTargetData;
 
     local targetHealthComp: HealthComp = targetData.HealthComp;
+    if targetHealthComp.IsDead then return end;
+    
     local targetEntityClass: EntityClass = targetHealthComp.CompOwner;
 
     local targetPosition = targetEntityClass:GetCFrame().Position;

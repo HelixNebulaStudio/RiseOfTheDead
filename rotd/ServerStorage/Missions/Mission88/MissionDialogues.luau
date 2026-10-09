@@ -161,6 +161,37 @@ Dialogues.Leo.DialogueStrings = {
 		Say = "Err.. Alright..";
 		Reply = "It's to the North of the W.D. Mall. Move out when you're ready. We'll talk real proof after.";
 	};
+
+	["sot_done1"] = { -- o12;
+		Face = "Suspicious";
+		Say = "I cleared out the embassy, apparently it was overrun with Bandits and Zombies.";
+		Reply = "Impressive. Did the Bandits breach the basement?";
+	};
+	["sot_done2"] = {
+		Face = "Confident";
+		Say = "There was a basement..? I don't think they breached it.";
+		Reply = "What we need is in the basement. We'll head out to breach it later.";
+	};
+	["sot_done3"] = {
+		Face = "Suspicious";
+		Say = "It also says North Star Embassy.. I'm guessing you guys are North Star militants..";
+		Reply = "Good observations, solider! We were North Star.. Carrying out rescue operations, but top government officials had other strategies.";
+	};
+	["sot_done4"] = {
+		Face = "Skeptical";
+		Say = "Other strategies?..";
+		Reply = "Notice how we're all stuck in Wrighton Dale, aye? Barricaded off? The outside military shoots on sight at whoever reaches the border. The outside world hasn't a clue what's going on here.";
+	};
+	["sot_done5"] = {
+		Face = "Skeptical";
+		Say = "I thought you guys work for the government..";
+		Reply = "Not anymore, the corruption runs too deep, so it does. No one gets in or out without paying. I'd take it you already know who's got deep pockets in this world, aye?";
+	};
+	["sot_done6"] = {
+		Face = "Suspicious";
+		Say = "Hmm.. The Rats..";
+		Reply = "That's right.. Anyways, we'll have another assignment for you once we're ready.";
+	};
 };
 
 -- MARK: Shaw DialogueStrings
@@ -297,7 +328,12 @@ if RunService:IsServer() then
 				end)
 			end)
 
-
+		elseif mission.ProgressionPoint == 12 then
+			dialog:SetInitiate("Hmm.. Back so soon?", "Skeptical");
+			
+			dialog:AddChoice({"sot_done1"; "sot_done2"; "sot_done3"; "sot_done4"; "sot_done5"; "sot_done6"}, function(dialog)
+				modMission:CompleteMission(player, MISSION_ID);
+			end)
 		end
 	end
 

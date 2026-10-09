@@ -27,6 +27,7 @@ function attirePackage.onRequire()
 
 			for _, player in pairs(game.Players:GetPlayers()) do
 				local playerClass: PlayerClass = shared.modPlayers.get(player);
+				if playerClass == nil then continue end;
 				if playerClass.Configurations.NekronMask then
 					table.insert(playersHasNekronMask, playerClass);
 				end

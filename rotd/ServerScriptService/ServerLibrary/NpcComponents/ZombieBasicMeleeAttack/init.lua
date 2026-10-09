@@ -46,7 +46,9 @@ function NpcComponent.new(npcClass: NpcClass)
 			return;
 		end
 
-		local enemyTargetData: NpcTargetData = npcClass.Properties.EnemyTargetData;
+		local properties = npcClass.Properties;
+
+		local enemyTargetData: NpcTargetData = properties.EnemyTargetData;
 		if enemyTargetData == nil then return end;
 
 		local enemyHealthComp: HealthComp = enemyTargetData.HealthComp;
@@ -135,7 +137,7 @@ function NpcComponent.new(npcClass: NpcClass)
 		npcClass.PlayAnimation("Attack", 0.05, nil, 1);
 
 		local attackRange = configurations.AttackRange;
-		attackRange += math.min(npcClass.Properties.AttacksMissed/10, 2);
+		attackRange += math.min(properties.AttacksMissed/10, 2);
 
 		local meleeBoxSize = Vector3.new(extentsSize.X + (attackRange/10), extentsSize.Y, attackRange + extentsSize.Z);
 		local meleeBoxCf = charCf * CFrame.new(0, -humanoid.HipHeight-rootPart.Size.Y/2 + (extentsSize.Y/2), -(meleeBoxSize.Z/2));
@@ -192,10 +194,10 @@ function NpcComponent.new(npcClass: NpcClass)
 			Debugger.Expire(box, 0.1);
 		end
 		if tarIsPlayerClass and (not isInMeleeHitboxClient or not isInMeleeHitboxServer) then
-			npcClass.Properties.AttacksMissed += 1;
+			properties.AttacksMissed += 1;
 			return 
 		end;
-		npcClass.Properties.AttacksMissed = 0;
+		properties.AttacksMissed = 0;
 
 		local distance = enemyTargetData.Distance or 999;
 		local dmgMulti = 1;
@@ -203,7 +205,8 @@ function NpcComponent.new(npcClass: NpcClass)
 		local attackDamage = configurations.AttackDamage;
 
 		if targetEntityClass.ClassName == "NpcClass" then
-			attackDamage = math.min(attackDamage + (enemyHealthComp.MaxHealth * 0.1), npcClass.HealthComp.MaxHealth);
+			local npcPercentHealthDamage = properties.NpcPercentHealthDamage or 0.1;
+			attackDamage = math.min(attackDamage + (enemyHealthComp.MaxHealth * npcPercentHealthDamage), npcClass.HealthComp.MaxHealth);
 			
 		elseif targetEntityClass.ClassName == "Destructible" then
 			dmgMulti = 1+math.abs(modMath.GaussianRandom());

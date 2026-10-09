@@ -483,6 +483,8 @@ function treePackage.Patrol(npcClass: NpcClass)
     and npcClass.Properties.SpokeByMeData == nil
     and #patrolPositions > 0 then
         -- Walk to random spot;
+        
+        if properties.PatrolIndex == nil then properties.PatrolIndex = 1; end;
         local patrolPos = patrolPositions[properties.PatrolIndex];
         if not npcClass.Move:IsAtPosition(patrolPos) then
             npcClass.Move:MoveTo(patrolPos);

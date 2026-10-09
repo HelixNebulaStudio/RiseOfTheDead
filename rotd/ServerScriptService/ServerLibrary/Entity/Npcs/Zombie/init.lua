@@ -56,8 +56,6 @@ function npcPackage.Spawning(npcClass: NpcClass)
 end
 
 function npcPackage.onRequire()
-    Debugger:StudioWarn(`Zombie OnRequire`);
-
     task.spawn(function()
         while true do
             task.wait(math.random(5, 10));

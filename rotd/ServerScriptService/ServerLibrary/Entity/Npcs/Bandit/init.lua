@@ -13,6 +13,7 @@ local npcPackage = {
         IsHostile = false;
         DropRewardId = "bandit";
         ThornResist = 0.7;
+        SmartPath = true;
     };
 
     Chatter = {
@@ -247,7 +248,7 @@ function npcPackage.Spawning(npcClass: NpcClass)
         if equipmentClass.Class == "Gun" then
             equipmentClass:AddBaseModifier("BanditGun", {
                 SetValues = {
-                    Damage = math.random(3, 5);
+                    Damage = math.random(5, 7);
                     MaxAmmoLimit = math.random(60, 120);
                     NpcPercentHealthDamage = 0.1;
                 };
@@ -314,6 +315,15 @@ function npcPackage.Spawned(npcClass: NpcClass)
             end
         end
     end)
+
+    local targetHandler = npcClass:GetComponent("TargetHandler");
+    if targetHandler then
+        targetHandler.SortLogic[2] = {Func=targetHandler.SortingFunctions.Distance; Weight=3.1}; -- Closest enemy higher priority
+    end
+
+    if properties.EquippedByDefault then
+        npcClass.BehaviorTree:RunTreeLeaf("BanditDefaultTree", "EquipWeapon");
+    end
 end
 
 function npcPackage.Despawning(npcClass: NpcClass)

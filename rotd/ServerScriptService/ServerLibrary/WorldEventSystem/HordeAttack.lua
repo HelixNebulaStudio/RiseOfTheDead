@@ -110,7 +110,7 @@ function WorldEvent.Start()
 			math.random(randomRegion.Min.Z, randomRegion.Max.Z)
 		);
 
-		if modVector.DistanceSqrdXZ(npcClass.SpawnCFrame.Position, randomPoint) > math.pow(250, 2) then return end;
+		if modVector.distanceSqrdXZ(npcClass.SpawnCFrame.Position, randomPoint) > math.pow(250, 2) then return end;
 		
 		local groundRay = Ray.new(randomPoint, Vector3.new(0, -20, 0));
 		local groundHit, groundPoint = workspace:FindPartOnRayWithWhitelist(groundRay, {workspace.Environment; workspace.Terrain}, true);

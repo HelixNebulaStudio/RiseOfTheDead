@@ -8,36 +8,24 @@ local modHealthComponents = shared.require(game.ReplicatedStorage.Components.Hea
 local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 
 if RunService:IsServer() then
-    modGameModeRaid = shared.require(game.ServerScriptService.ServerLibrary.GameModeRaid);
+    modGameModeStronghold = shared.require(game.ServerScriptService.ServerLibrary.GameModeStronghold);
     modGameModeManager = shared.require(game.ServerScriptService.ServerLibrary.GameModeManager);
     modGameModeManager.GameWorld = true;
 end
 
 local WorldCore = shared.require(game.ReplicatedStorage.Library.WorldCoreClassRotd).new(script);
 
-local GAME_MODE, GAME_STAGE = "Raid", "NorthStarEmbassy";
+local GAME_MODE, GAME_STAGE = "Raid", "North Star Embassy";
 --=
 
 function WorldCore.InitGameController()
-    local newGameController = modGameModeRaid.new();
+    local newGameController = modGameModeStronghold.new();
 
     newGameController.ModeType = GAME_MODE;
     newGameController.ModeStage = GAME_STAGE;
 
-    newGameController.Objective = {
-        Id = "Eliminate";
-
-        --EliminateGoal = 100;
-        EnemyCap = 35;
-
-        HordeWhenEnemiesDropsBelow = 4;
-        HordeCycle = 300;
-        HordeSpawnRate = 0.5;
-        HordeTimerDeduction = NumberRange.new(25, 35);
-    };
-
     newGameController.EnemiesList = {
-        {Name="Zombie"; Chance=100;};
+        {Name="Bandit"; Chance=100;};
     };
 
     task.spawn(function()
