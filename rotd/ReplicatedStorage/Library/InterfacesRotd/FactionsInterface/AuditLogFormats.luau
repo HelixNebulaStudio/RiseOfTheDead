@@ -1,4 +1,4 @@
-local modMissionsLibrary = shared.require(game.ReplicatedStorage.Library.MissionLibrary);
+local modMissionLibrary = shared.require(game.ReplicatedStorage.Library.MissionLibrary);
 local modFactionsLibrary = shared.require(game.ReplicatedStorage.Library.FactionsLibrary);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibraryRotd);
 
@@ -223,7 +223,7 @@ return {
 		
 		if reason:sub(1, 7) == "mission" then
 			local missionId = extractNumber(reason, "mission");
-			local missionLib = missionId and modMissionsLibrary.Get(missionId);
+			local missionLib = missionId and modMissionLibrary.Get(missionId);
 			if missionLib then
 				reason = reason:gsub(`mission{missionId}`,`Mission: {missionLib.Name}`);
 			end

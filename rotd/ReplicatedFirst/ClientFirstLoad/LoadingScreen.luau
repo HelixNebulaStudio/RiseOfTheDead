@@ -137,6 +137,12 @@ local WORLDS_INFO_LIBRARY = {
 		TitleTexts = "Raid: Abandoned Bunker";
 		DescTexts = "I'm pretty sure this place didn't looked like this yesterday..";
 	};
+	["NorthStarEmbassy"] = {
+		Images = {"rbxassetid://96402623956565"};
+		HeaderTexts = WD_HEADER;
+		TitleTexts = "Raid: North Star Embassy";
+		DescTexts = "Even the rescuers have fallen..";
+	};
 
 
 	--MARK: Coop

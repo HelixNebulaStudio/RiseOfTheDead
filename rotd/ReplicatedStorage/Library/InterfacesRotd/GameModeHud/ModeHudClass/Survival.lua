@@ -112,7 +112,7 @@ return function(interface, window, frame)
 			end
 
 			
-			if data.WaveObjective ~= false and #data.WaveObjective >0 then
+			if data.WaveObjective ~= false and typeof(data.WaveObjective) == "string" and #data.WaveObjective >0 then
 				objectiveLabel.Text = `Objective {data.WaveObjective}: {data.ObjectiveDesc}` or "";
 			else
 				objectiveLabel.Text = "";

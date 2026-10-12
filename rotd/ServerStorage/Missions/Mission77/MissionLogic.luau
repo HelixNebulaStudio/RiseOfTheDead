@@ -15,8 +15,42 @@ if RunService:IsServer() then
 	local modCrates = shared.require(game.ReplicatedStorage.Library.Crates);
 	local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
-	if shared.WorldName == "SunkenShip" or shared.WorldName == "BioXResearch" then
 
+    shared.modEventService:OnInvoked("Crates_BindSpawn", function(eventPacket: EventPacket, ...)
+        local players = eventPacket.Players;
+        local newPrefab, interactable: InteractableInstance = ...;
+
+		task.spawn(function()
+			local storageId = interactable.Values.StorageId;
+			if storageId == nil then
+				Debugger:Warn("Missing storageId.");
+				return;
+			end
+			if storageId:sub(1,11) ~= "sunkenchest" then return end;
+		
+			for a=1, #players do
+				local player = players[a];
+
+				local crateStorage: Storage? = shared.modStorage.Get(storageId, player);
+				if crateStorage == nil then continue end;
+
+				local mission = modMission:GetMission(player, MISSION_ID);
+				if mission == nil then continue end;
+				if mission.Type ~= 2 then continue end;
+
+				crateStorage:Add("blueprintpiece", {
+					CustomName = shared.modStorage.RegisterItemName("Turret Blueprint Piece");
+					Values = {
+						DescExtend = modRichFormatter.H3Text("\nMission: ").."Ask the Mysterious Engineer about this.";
+					};
+				});
+			end
+
+		end)
+    end)
+
+
+	if shared.WorldName == "SunkenShip" or shared.WorldName == "BioXResearch" then
 		shared.modEventService:OnInvoked("Generic_BindTrigger", function(event: EventPacket, ...)
 			local player: Player? = event.Player;
 			if player == nil then return end;

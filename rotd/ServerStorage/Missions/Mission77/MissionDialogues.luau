@@ -19,7 +19,8 @@ Dialogues["Mysterious Engineer"].DialogueStrings = {
 
 	["bofb_start"]={
 		Say="So I found this piece of blueprint form the SunkenShip Chests. It says something about a turret, any clue about this?";
-		Face="Surprise"; Reply="Oh wow! You found a piece?! I have a piece too and I've been searching for weeks for the rest but couldn't find them.";
+		Face="Surprise"; 
+		Reply="Oh wow! You found a piece?! I have a piece too and I've been searching for weeks for the rest but couldn't find them.";
 	};
 	["bofb_start2"]={
 		Say="I could try to find the rest.";
@@ -116,7 +117,6 @@ if RunService:IsServer() then
 	Dialogues["Mysterious Engineer"].DialogueHandler = function(player, dialog, data, mission)
 		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
 
-
 		local profile = shared.modProfile:Get(player);
 		local inventory = profile.ActiveInventory;
 		
@@ -138,9 +138,9 @@ if RunService:IsServer() then
 		end);
 		
 		if mission.Type == 2 then -- Available;
+			dialog:SetInitiateTag("bofb_init");
+
 			if #itemsList > 0 then
-				dialog:SetInitiateTag("bofb_init");
-				
 				dialog:AddChoice("bofb_start", function(dialog)
 					dialog:AddChoice("bofb_start2", function(dialog)
 						dialog:AddChoice("bofb_start3", function(dialog)

@@ -14,7 +14,18 @@ local attirePackage = {
 };
 
 function attirePackage.newClass()
-	return modEquipmentClass.new(attirePackage);
+	local equipmentClass = modEquipmentClass.new(attirePackage);
+
+	equipmentClass:AddBaseModifier("LockedIn", {
+		SetValues = {
+			DamageDropoff = false;
+		};
+		ArrayValues = {
+			PassiveModifiers = "Gunslinger Lock-In";
+		};
+	});
+
+	return equipmentClass;
 end
 
 return attirePackage;

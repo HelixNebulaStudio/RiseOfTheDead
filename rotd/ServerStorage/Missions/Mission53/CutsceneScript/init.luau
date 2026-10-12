@@ -65,8 +65,6 @@ return function(CutsceneSequence)
 	if shared.WorldName ~= "TheWarehouse" then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
 	
 	CutsceneSequence:Initialize(function()
-		local triggerPrefab = cutsceneAssets:WaitForChild("summonTrigger");
-
 		local players = CutsceneSequence:GetPlayers();
 		local player: Player = players[1];
 		local mission = modMission:GetMission(player, MISSION_ID);

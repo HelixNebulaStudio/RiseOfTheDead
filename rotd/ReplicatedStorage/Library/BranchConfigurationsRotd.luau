@@ -314,7 +314,7 @@ local WORLDS = {
     NorthStarEmbassy = {
         DisplayName = "North Star Embassy";
         PlaceIds = {
-            [LIVE_GAME_ID] = 0;
+            [LIVE_GAME_ID] = 118624416986208;
             [DEV_GAME_ID] = 70992181085951;
         };
         

@@ -190,7 +190,7 @@ function modItemsLibrary.onRequire()
     }
 
     -- Head
-    new(clothingBase, {Id="cowboyhat"; Name="Cowboy Hat"; Icon="rbxassetid://4994923375"; Tags={"Head"}; Description="I will be the one yeeee-haw-ing around here.";});
+    new(clothingBase, {Id="cowboyhat"; Name="Cowboy Hat"; Icon="rbxassetid://4994923375"; Tags={"Head"}; Description="I will be the one yeeee-haw-ing around here.\n\n<b>[Passive] Gunslinger Lock-In:</b> Removes damage distance fall off for equipped pistol.";});
     new(clothingBase, {Id="gasmask"; Name="Gas Mask"; Icon="rbxassetid://6971981402"; Tags={"Head"}; Description="Hudda hudda huuh! Reduce effects and damage from gas clouds and toxic damages.";});
     new(clothingBase, {Id="nekronmask"; Name="Nekron Mask"; Icon="rbxassetid://5419783427"; Tags={"Head"}; DestroyOnExpire=true; Description="Once you put it on, the mask will start consuming itself and some zombies will start looking like you.. (It will continue to consume even if you take the mask off.)"; Sources={"Obtained in <b>Mission: Vindictive Treasure</b>";};  });
     new(clothingBase, {Id="cultisthood"; Name="Cultist Hood"; Icon="rbxassetid://5550425398"; Tags={"Head"}; Description="Live in the shadows and pull the strings..\n\n<b>[Passive] Hoods Pact:</b> When damaged by a zombie, a Cultist will spawn to help you kill the zombie. (Cooldown: 15s)"; Sources={"Obtained in <b>Mission: Vindictive Treasure</b>";};  });
@@ -836,7 +836,7 @@ function modItemsLibrary.onRequire()
     new(skinPermBase, {Id="clownmaskmissjoyful"; Icon="rbxassetid://11269655306"; SkinPerm="Miss Joyful"; TargetItemId="clownmask"; Tags={"Slaughterfest";};});
 
     -- cowboyhat
-    new(skinPermBase, {Id="cowboyhattreasures"; Icon="rbxassetid://94599465285510"; SkinPerm="Treasures"; TargetItemId="cowboyhat"; Tags={"Unobtainable"}; });
+    new(skinPermBase, {Id="cowboyhattreasures"; Icon="rbxassetid://94599465285510"; SkinPerm="Treasures"; TargetItemId="cowboyhat";});
 
     -- cultisthood
     new(skinPermBase, {Id="cultisthoodnekros"; Icon="rbxassetid://14970995011"; SkinPerm="Nekros"; TargetItemId="cultisthood"; });

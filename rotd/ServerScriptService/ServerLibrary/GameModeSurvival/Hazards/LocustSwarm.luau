@@ -52,11 +52,10 @@ function Hazard:Begin()
             new:PivotTo(cfValue.Value - Vector3.yAxis*3);
         end)
 
-        local fliesSnd: Sound = modAudio.Play("Flies");
+        local fliesSnd: Sound = modAudio.Play("Flies", new.PrimaryPart);
         fliesSnd.Volume = 1;
         fliesSnd.RollOffMaxDistance = 64;
         fliesSnd.RollOffMinDistance = 17;
-        fliesSnd.Parent = new.PrimaryPart;
 
         new.Parent = workspace.Debris;
 

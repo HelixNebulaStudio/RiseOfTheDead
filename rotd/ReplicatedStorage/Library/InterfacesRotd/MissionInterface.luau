@@ -13,7 +13,7 @@ local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configur
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modKeyBindsHandler = shared.require(game.ReplicatedStorage.Library.KeyBindsHandler);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
-local modMissionsLibrary = shared.require(game.ReplicatedStorage.Library.MissionLibrary);
+local modMissionLibrary = shared.require(game.ReplicatedStorage.Library.MissionLibrary);
 local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
 local modMarkers = shared.require(game.ReplicatedStorage.Library.Markers);
 local modTableManager = shared.require(game.ReplicatedStorage.Library.TableManager);
@@ -201,7 +201,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 	local curBpLib;
 
-	for id, lib in pairs(modMissionsLibrary.List()) do
+	for id, lib in pairs(modMissionLibrary.List()) do
 		if lib.Rewards and lib.RewardText == nil then
 			local text = "Rewarded: ";
 			for a=1, #lib.Rewards do
@@ -210,7 +210,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				local preset = REWARDS_PRESETS[rewardType];
 				if preset then
 					if rewardType == "Mission" then
-						local rewardMission = modMissionsLibrary.Get(reward.Id);
+						local rewardMission = modMissionLibrary.Get(reward.Id);
 						text = text..preset.Text:gsub("$value", rewardMission and rewardMission.Name or "MissionId("..reward.Id..")");
 
 					elseif rewardType == "Perks" then
@@ -319,7 +319,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		local missionData = pinHudData.MissionData;
 		if missionData == nil then return; end
 
-		local missionLib = modMissionsLibrary.Get(missionData.Id);
+		local missionLib = modMissionLibrary.Get(missionData.Id);
 		if missionLib == nil then return end;
 
 		local missionStage = missionData.ProgressionPoint;
@@ -570,9 +570,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		end
 
 		local mapTypes = {
-			[modMissionsLibrary.MissionTypes.Core] = 0;
-			[modMissionsLibrary.MissionTypes.Side] = 1;
-			[modMissionsLibrary.MissionTypes.Premium] = 2;
+			[modMissionLibrary.MissionTypes.Core] = 0;
+			[modMissionLibrary.MissionTypes.Side] = 1;
+			[modMissionLibrary.MissionTypes.Premium] = 2;
 		};
 
 		local function validMissionType(missionLib)
@@ -588,7 +588,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		for a=1, #missionsProfile do
 			local rawMission = missionsProfile[a];
 			local mId = rawMission.Id;
-			local lib = modMissionsLibrary.Get(mId);
+			local lib = modMissionLibrary.Get(mId);
 
 			if rawMission.Pinned then
 				pinnedMission = modData:GetMission(mId);
@@ -712,10 +712,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		local missionChecked = {};
 
 		local function mapOutMission(id, parentNode, packet)
-			local lib = modMissionsLibrary.Get(id);
+			local lib = modMissionLibrary.Get(id);
 			if lib == nil then return end;
 
-			if modMissionsLibrary.StoryLineEnum[currentStoryline] then
+			if modMissionLibrary.StoryLineEnum[currentStoryline] then
 				if lib.Storyline ~= currentStoryline and parentNode then return end;
 			else
 				if lib.Storyline then 
@@ -779,9 +779,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			return newNode;
 		end
 		
-		if modMissionsLibrary.StoryLineEnum[currentStoryline] then
+		if modMissionLibrary.StoryLineEnum[currentStoryline] then
 			-- MARK: Custom Storyline
-			local storylineSplitInfo = modMissionsLibrary.StoryLines[currentStoryline];
+			local storylineSplitInfo = modMissionLibrary.StoryLines[currentStoryline];
 			if storylineSplitInfo then
 				local node = mapOutMission(storylineSplitInfo.Id, nil);
 				mapOutMission(storylineSplitInfo.NextId, node);
@@ -828,7 +828,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		local function renderNode(node, parentNode, depth)
 			depth = depth or 0;
 			local id = node.Id;
-			local lib = modMissionsLibrary.Get(id);
+			local lib = modMissionLibrary.Get(id);
 			
 			local missionData = missionsData[id];
 
@@ -944,7 +944,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					storylineButton.Parent = scrollFrame;
 				end
 
-				if lib.MissionType == modMissionsLibrary.MissionTypes.Premium then
+				if lib.MissionType == modMissionLibrary.MissionTypes.Premium then
 					local premStroke = Instance.new("UIStroke");
 					premStroke.Name = `PremStroke`;
 					premStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
@@ -1109,7 +1109,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		
 		if id == nil then return end
 		local data = getMissionData(id);
-		local book = modMissionsLibrary.Get(id);
+		local book = modMissionLibrary.Get(id);
 		if data == nil then Debugger:Warn("Missing mission data. Id:",id); return end;
 		if book == nil then Debugger:Warn("Missing mission library. Id:",id); return end;
 		if data.Type == 1 or data.Type == 3 then
@@ -1164,7 +1164,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				newRedoButton.Parent = RightFrame;
 			end
 
-			if book.MissionType == modMissionsLibrary.MissionTypes.Board then
+			if book.MissionType == modMissionLibrary.MissionTypes.Board then
 				if data.AddTime and book.ExpireTime then
 					local timeLapsed = book.ExpireTime-math.clamp(os.time()-data.AddTime, 0, book.ExpireTime);
 					descTag.Text = descTag.Text.."\n".."Refreshes: "..(modSyncTime.ToString(timeLapsed));
@@ -1227,7 +1227,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					end
 				end)
 				
-			elseif book.MissionType == modMissionsLibrary.MissionTypes.Secret then
+			elseif book.MissionType == modMissionLibrary.MissionTypes.Secret then
 				titleTag.Text = titleTag.Text.." (Secret Mission)";
 			end
 
@@ -1433,7 +1433,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						local newLabel = logListingTemplate:Clone();
 						newLabel.Font = Enum.Font.Arial;
 						if rewardType == "Mission" then
-							local rewardMission = modMissionsLibrary.Get(reward.Id);
+							local rewardMission = modMissionLibrary.Get(reward.Id);
 							newLabel.Text = preset.Text:gsub("$value", rewardMission and rewardMission.Name or "MissionId("..reward.Id..")");
 
 						elseif rewardType == "Perks" then
@@ -1474,13 +1474,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				binds.RefreshMissionMap();
 			end)
 			
-			if book.MissionType == modMissionsLibrary.MissionTypes.Board then
+			if book.MissionType == modMissionLibrary.MissionTypes.Board then
 				if data.AddTime and book.ExpireTime then
 					local timeLapsed = book.ExpireTime-math.clamp(os.time()-data.AddTime, 0, book.ExpireTime);
 					descTag.Text = descTag.Text.."\n".."Refreshes: "..(modSyncTime.ToString(timeLapsed));
 				end
 				titleTag.Text = titleTag.Text.." (Board Mission)";
-			elseif book.MissionType == modMissionsLibrary.MissionTypes.Secret then
+			elseif book.MissionType == modMissionLibrary.MissionTypes.Secret then
 				titleTag.Text = titleTag.Text.." (Secret Mission)";
 			end
 
@@ -1513,7 +1513,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				if book.StartRequirements.MissionCompleted then
 					for a=1, #book.StartRequirements.MissionCompleted do
 						local reqMissionId = book.StartRequirements.MissionCompleted[a];
-						local reqMissionLib = modMissionsLibrary.Get(reqMissionId);
+						local reqMissionLib = modMissionLibrary.Get(reqMissionId);
 						
 						local newLabel = logListingTemplate:Clone();
 						newLabel.Font = Enum.Font.Arial;
@@ -1542,7 +1542,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						local newLabel = logListingTemplate:Clone();
 						newLabel.Font = Enum.Font.Arial;
 						if rewardType == "Mission" then
-							local rewardMission = modMissionsLibrary.Get(reward.Id);
+							local rewardMission = modMissionLibrary.Get(reward.Id);
 							newLabel.Text = preset.Text:gsub("$value", rewardMission and rewardMission.Name or "MissionId("..reward.Id..")");
 
 						elseif rewardType == "Perks" then
@@ -1599,7 +1599,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		for a=1, #missionsList do
 			local rawMission = missionsList[a];
 			local mId = rawMission.Id;
-			local book = modMissionsLibrary.Get(mId);
+			local book = modMissionLibrary.Get(mId);
 
 			if rawMission.Pinned then
 				pinnedMissionLib = book;
@@ -1609,7 +1609,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				end
 			end
 
-			local typeKey = modMissionsLibrary.getTypeKey(book.MissionType);
+			local typeKey = modMissionLibrary.getTypeKey(book.MissionType);
 			
 			if missionTypesList[typeKey] then
 				table.insert(missionTypesList[typeKey], {
@@ -1791,11 +1791,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 				local missionTypeIcon = newListing:WaitForChild("MissionType");
 
-				if missionInfo.Lib.MissionType == modMissionsLibrary.MissionTypes.Board then
+				if missionInfo.Lib.MissionType == modMissionLibrary.MissionTypes.Board then
 					missionTypeIcon.Image = "rbxassetid://13870681338";
 					missionTypeIcon.Visible = true;
 
-				elseif missionInfo.Lib.MissionType == modMissionsLibrary.MissionTypes.Faction then
+				elseif missionInfo.Lib.MissionType == modMissionLibrary.MissionTypes.Faction then
 					missionTypeIcon.Image = "rbxassetid://9890634236";
 					missionTypeIcon.Visible = true;
 				end
@@ -2010,7 +2010,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			end
 
 			local missionTypeTitle = ""
-			for mType, id in pairs(modMissionsLibrary.MissionTypes) do
+			for mType, id in pairs(modMissionLibrary.MissionTypes) do
 				if missionLib.MissionType == id then
 					missionTypeTitle = mType;
 					break;
@@ -2377,7 +2377,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						while localPlayer:IsAncestorOf(missionBoard) do
 							if window.Visible == false then break; end;
 
-							local restockTimeDuration = modMissionsLibrary.BoardMissionStockTimer;
+							local restockTimeDuration = modMissionLibrary.BoardMissionStockTimer;
 							local missionCycleData = modData:GetEvent("missionCycleData");
 							if missionCycleData and missionCycleData.LastAddUnixTime ~= 0 then
 								local nextTime = missionCycleData.LastAddUnixTime + restockTimeDuration;
@@ -2720,13 +2720,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 		-- General Missions;
 		for typeKey, typeMissions in pairs(missionTypesList) do
-			local typeIndex = modMissionsLibrary.MissionTypes[typeKey];
+			local typeIndex = modMissionLibrary.MissionTypes[typeKey];
 			local typeOrder = MISSION_TYPE_ORDER[typeKey];
 
 			local newTab, newList = newMissionList(typeKey, typeOrder);
 
 			local completedCount = 0;
-			local missionsOfType = modMissionsLibrary.CountMissions({[typeIndex]=true;});
+			local missionsOfType = modMissionLibrary.CountMissions({[typeIndex]=true;});
 			for a=1, #typeMissions do
 				local missionData = typeMissions[a].Data;
 				if missionData.Type == 3 then
@@ -3867,7 +3867,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 												end
 
 											elseif rInfo.Type == "Mission" then
-												local missionLib = modMissionsLibrary.Get(rInfo.Key);
+												local missionLib = modMissionLibrary.Get(rInfo.Key);
 
 												descText = descText.."\n    • Mission: ".. missionLib.Name .." ".. rInfo.Value;
 												
@@ -4767,7 +4767,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         for a=1, #missionsUnlockedList do
             local mId = missionsUnlockedList[a];
 
-			local missionLib = modMissionsLibrary:Find(mId);
+			local missionLib = modMissionLibrary:Find(mId);
 			if missionLib == nil then Debugger:Warn(`Invalid QBNotify Mission={mId}`); continue end;
 			local npcLib = modNpcProfileLibrary:Find(missionLib.From);
 
