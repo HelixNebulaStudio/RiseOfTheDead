@@ -31,6 +31,8 @@ local Config = {
 local Stronghold = {
     Active = nil;
 	OnAlertShoutConn = nil;
+	LastAlertShoutTick = nil;
+	AlertShoutCounter = 0;
 };
 Stronghold.__index = Stronghold;
 
@@ -106,7 +108,11 @@ function Stronghold:Load()
     if gameDir then
         
 		for _, object: Instance in pairs(gameDir:GetChildren()) do
-			if object.Name == "SpawnPlatforms" then
+			if object.Name == "Destructibles" then
+				self.TemplateDestructibles = object;
+				object.Parent = script;
+
+			elseif object.Name == "SpawnPlatforms" then
 				object.Parent = workspace.CurrentCamera;
 				
                 local spCount = 0;
@@ -327,7 +333,9 @@ function Stronghold:Initialize(roomData)
 				local remaining = math.max(0, self.EliminateGoal - self.EliminateCount);
 				if remaining > 0 
 				and #self.EnemyClasses <= math.ceil(remaining/2) 
-				and (self.StartTick and tick()-self.StartTick >= 10) then
+				and (self.StartTick and tick()-self.StartTick >= 10)
+				and (self.AlertShoutCounter > 0
+				or (#self.EnemyClasses <= 0 and self.LastKilled and tick()-self.LastKilled >= 60)) then
 					
 					task.spawn(function()
 						local rngPlayer = game.Players:GetPlayers()[math.random(1, #game.Players:GetPlayers())];
@@ -557,13 +565,13 @@ function Stronghold:SpawnEnemy(npcName, paramPacket)
 					self.EliminateCount = self.EliminateCount +1;
 					self.LastEnemyDeathPos = npcClass.RootPart.CFrame.Position;
 
-					local remining = math.max(0, self.EliminateGoal - self.EliminateCount);
+					local remaining = math.max(0, self.EliminateGoal - self.EliminateCount);
 					Debugger:WarnClient(
 						game.Players:GetPlayers(), 
-						`Stronghold>>  Killed enemy. Alive: {#self.EnemyClasses}, Eliminated: {self.EliminateCount}, Remaining: {remining}`
+						`Stronghold>>  Killed enemy. Alive: {#self.EnemyClasses}, Eliminated: {self.EliminateCount}, Remaining: {remaining}`
 					);
 
-					self.StatusText = `Eliminate {remining} enemies`;
+					self.StatusText = `Eliminate {remaining} enemies`;
 					self:Hud({
 						StatusText = self.StatusText;
 					});
@@ -577,31 +585,41 @@ function Stronghold:SpawnEnemy(npcName, paramPacket)
 
 			table.insert(self.EnemyClasses, npcClass);
 
-			if paramPacket.InfTargeting then
-				local targetHandlerComp = npcClass:GetComponent("TargetHandler");
-				if targetHandlerComp then
-					for a=1, #self.Players do
-						targetHandlerComp:AddTarget(self.Players[a].Character);
-					end
+			local targetHandlerComp = npcClass:GetComponent("TargetHandler");
+			if targetHandlerComp then
+				for a=1, #self.Players do
+					targetHandlerComp:AddTarget(self.Players[a].Character);
 				end
 			end
 
 			task.delay(1, function()
-				self.StatusText = `Eliminate {self.EliminateGoal} enemies`;
+				local remaining = math.max(0, self.EliminateGoal - self.EliminateCount);
+				self.StatusText = `Eliminate {remaining} enemies`;
 				self:Hud({
 					StatusText = self.StatusText;
 				})
 			end)
 
-			if npcClass.BehaviorTree.RootTree and npcClass.BehaviorTree.RootTree.OnAlertShout and Stronghold.OnAlertShoutConn == nil then
+			if npcClass.BehaviorTree.RootTree 
+			and npcClass.BehaviorTree.RootTree.OnAlertShout 
+			and Stronghold.OnAlertShoutConn == nil then
 
 				Stronghold.OnAlertShoutConn = npcClass.BehaviorTree.RootTree.OnAlertShout:Connect(function(shoutNpcClass: NpcClass, enemyEntityClass: EntityClass)
+					shared.modEventService:ServerInvoke("GameModeManager_BindGameModeEvent", {ReplicateTo=self.Players}, {
+						EventName = "AlertShout";
+						Room = self.RoomData;
+					});
 					if self.LastHordeCryTick and tick()-self.LastHordeCryTick <= 60 then
 						return; 
 					end;
 					self.LastHordeCryTick = tick();
 
-					Debugger:Warn(`Bandit Alert Shout`);
+					self.LastAlertShoutTick = tick();
+					self.AlertShoutCounter += 1;
+					if self.AlertShoutCounter%5 == 0 then
+						self.Wave += 1;
+					end
+					Debugger:Warn(`Bandit Alert Shout Id:`, shoutNpcClass.Id, ` Wave={self.Wave}`);
 
 					task.wait(math.random(5, 10));
 	
@@ -621,8 +639,6 @@ function Stronghold:SpawnEnemy(npcName, paramPacket)
 						});
 
 						if zombieNpcClass then
-							self.EliminateGoal += 1;
-
 							local targetHandlerComp = zombieNpcClass:GetComponent("TargetHandler");
 							if targetHandlerComp then
 								local priorityTargetData = targetHandlerComp:AddTarget(npcClass.Character);
@@ -843,6 +859,25 @@ function Stronghold:Start()
 		task.wait(1);
 	end
 	
+	if self.ActiveDestructibles then
+		self.ActiveDestructibles:Destroy();
+		self.ActiveDestructibles = nil;
+	end
+
+	if self.TemplateDestructibles then
+		local newDestructibles = self.TemplateDestructibles:Clone();
+		self.ActiveDestructibles = newDestructibles;
+		newDestructibles.Parent = self.GameDir;
+
+		for _, obj in pairs(newDestructibles:GetChildren()) do
+			local destructibleConfig = obj:FindFirstChild("Destructible");
+			if destructibleConfig == nil or not destructibleConfig:IsA("Destructible") then continue end;
+			
+			local destructible: DestructibleInstance = modDestructibles.getOrNew(destructibleConfig);
+			table.insert(destructibleObjs, destructible);
+		end
+	end
+
 	for a=1, #destructibleObjs do
 		local destructible: DestructibleInstance = destructibleObjs[a];
 		local maxHealth = self.Difficulty *100;

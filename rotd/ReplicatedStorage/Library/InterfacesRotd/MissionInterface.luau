@@ -49,6 +49,8 @@ local BORDER_MISSION_COLORS = {
 	Easy = Color3.fromRGB(100, 100, 100);
 	Normal = Color3.fromRGB(51, 102, 204);
 	Hard = Color3.fromRGB(101, 59, 169);
+	Extreme = Color3.fromRGB(184, 25, 199);
+	Insane = Color3.fromRGB(192, 20, 20);
 
 	--Special;
 	Halloween = Color3.fromRGB(75, 188, 0);

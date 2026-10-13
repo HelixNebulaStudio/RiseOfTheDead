@@ -3540,5 +3540,36 @@ MissionLibrary.New{
 	};
 };
 
+--MARK: 101 - The Undetectable
+MissionLibrary.New{
+	MissionId = 101;
+	MissionType = MissionLibrary.MissionTypes.Board;
+	Name = "The Undetectable";
+	Description = "Complete a Raid without alerting the enemy backups.";
+	Timer = BOARD_TIME_LIMIT;
+	Persistent = true;
+	Checkpoint = {
+		{Text="Complete Raid: $Raid without alerting the enemy backups";};
+	};
+	SaveData = {
+		Raid = function()
+			local list = {
+				"North Star Embassy";
+			};
+			return list[math.random(1, #list)];
+		end;
+	};
+	GuideText = "";
+	Tier = "Extreme";
+	Rewards = {
+		{Type="Perks"; Amount=PerksReward.Extreme};
+		{Type="Card"; Amount=NumberRange.new(2, 3); Types={"snake"; "boar"; "lion"};};
+	};
+	AddRequirements = {
+		{Type="Level"; Value=20};
+		{Type="Mission"; Id=88};
+	};
+	BoardPickFreq=10;
+};
 
 return MissionLibrary;

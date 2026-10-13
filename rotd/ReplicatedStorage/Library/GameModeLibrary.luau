@@ -544,8 +544,8 @@ GameModeLibrary.GameModes={
 				RewardsId = "northstarcrate";
 				Soundtrack = "Soundtrack:Goda Scary Atmosphere";
 				Description = "Echoes of constant growling and gun fire..";
-
-				WIP = `Suspicious Looking Door`;
+				
+				EnableStopwatch=true;
 			};
 		};
 	};

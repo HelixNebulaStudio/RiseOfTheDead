@@ -2,6 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
+
 local modVector = shared.require(game.ReplicatedStorage.Library.Util.Vector);
 local modTables = shared.require(game.ReplicatedStorage.Library.Util.Tables);
 
@@ -12,20 +13,23 @@ local treePackage = {
         Default = "PreLogic | !InCutscene & DefaultTree | [DoNothing]";
         DefaultTree = "HasEnemy & (FleeTree | AlertTree) | IdleTree";
         AlertTree = "EquipWeapon & IsInVision & (ShareIntel & IsUsingMelee & MeleeTree | RangeTree) | HuntTree";
-        HuntTree = "KnowEnemyLastPosition & (IsAtLastKnownPosition & [InvestigateArea] | [MoveToLastKnownPosition]) | SeekTree | PatrolTree";
-        SeekTree = "GuessEnemyLastPosition";
+        HuntTree = "KnowEnemyLastPosition & (IsAtLastKnownPosition & [InvestigateArea] | [MoveToLastKnownPosition]) | SeekTree";
+        SeekTree = "HasDistraction & CheckDistraction | GuessEnemyLastPosition";
         MeleeTree = "InMeleeRange & [SwingMelee] | [RunToMeleeRange]";
         RangeTree = "CanFireGun & (RunToFireRange & [FireGun]) | (RunToCover & [ReloadGun])";
-        IdleTree = "SelfHealTree | PatrolTree";
+        IdleTree = "IdleUpdate | SelfHealTree | IdleInteractTree | PatrolTree";
         SelfHealTree = "IsHurt & [SelfHeal]";
+        IdleInteractTree = "CanIdleInteract & DoIdleInteract";
         PatrolTree = "ConverseTree | [Patrol]";
         ConverseTree = "ShareIntel & IsSpokenTo & [Converse]";
-        FleeTree = "!CanEquip & [Flee]"
+        FleeTree = "!CanEquip & [Flee]";
     };
 
     OnAlertShout = shared.EventSignal.new("BanditOnAlertShout");
     AlertShoutQuota = 3;
     AlertShoutRefreshTick = tick();
+
+    SharedInteractablesInUse = {};
 };
 
 function treePackage.PreLogic(npcClass: NpcClass)
@@ -113,6 +117,14 @@ function treePackage.HasEnemy(npcClass: NpcClass)
                             local deadbodyPhrase = deadbodySpeech and deadbodySpeech[math.random(1, #deadbodySpeech)] or nil;
                             if deadbodyPhrase then
                                 npcClass.Chat(nil, deadbodyPhrase.Say);
+
+                                if targetCharacterClass.ClassName == "PlayerClass" then
+                                    npcClass:GetComponent("NpcEmote"){
+                                        Players = {(targetCharacterClass :: PlayerClass):GetInstance()};
+                                        EmoteId = "question";
+                                        SndSpeed = math.random(90, 110)/100;
+                                    };
+                                end 
                             end
                         end
 
@@ -135,6 +147,7 @@ function treePackage.HasEnemy(npcClass: NpcClass)
                 return false;
             end;
 
+            properties.CanDistract = false;
             targetData.LastSeenTick = tick();
             targetData.LastAlertedTick = tick();
             targetData.LastKnownPosition = targetCharacterClass:GetCFrame().Position;
@@ -185,7 +198,7 @@ function treePackage.HasEnemy(npcClass: NpcClass)
         and enemyTargetData.LastAlertedTick 
         and enemyTargetData.HealthComp
         and enemyTargetData.HealthComp.CompOwner
-        and enemyTargetData.HealthComp.CompOwner.ClassName == "PlayerClass");
+        and enemyTargetData.HealthComp.CompOwner.ClassName == "PlayerClass" or false);
         
     return hasEnemy;
 end
@@ -237,15 +250,21 @@ function treePackage.IsAtLastKnownPosition(npcClass: NpcClass)
     local isAtLastKnowPos = modVector.DistanceSqrd(lastKnownPos, npcClass:GetCFrame().Position) < 36; --6 units
     
     if isAtLastKnowPos then
-        if (properties.ArriveSeekPositionTick == nil or tick()-properties.ArriveSeekPositionTick > 40) and math.random(1, 6) == 1 then
+        if (properties.ArriveSeekPositionTick == nil or tick()-properties.ArriveSeekPositionTick > 40) then
             properties.ArriveSeekPositionTick = tick();
 
             npcClass.PlayAnimation("Idle");
+            npcClass:GetComponent("NpcEmote"){
+                Players = game.Players:GetPlayers();
+                EmoteId = "question";
+            };
 
-            local huntSpeech = npcClass.NpcPackage.Chatter.HuntSpeech;
-            local huntPhrase = huntSpeech and huntSpeech[math.random(1, #huntSpeech)] or nil;
-            if huntPhrase then
-                npcClass.Chat(nil, huntPhrase.Say);
+            if math.random(1, 6) == 1 then
+                local huntSpeech = npcClass.NpcPackage.Chatter.HuntSpeech;
+                local huntPhrase = huntSpeech and huntSpeech[math.random(1, #huntSpeech)] or nil;
+                if huntPhrase then
+                    npcClass.Chat(nil, huntPhrase.Say);
+                end
             end
         end
     end
@@ -322,6 +341,8 @@ function treePackage.GuessEnemyLastPosition(npcClass: NpcClass)
 
         enemyTargetData.LastKnownPosition = npcClass:GetCFrame().Position +moveDir;
     end
+
+    return true;
 end
 
 --MARK: Combat behavior
@@ -347,6 +368,7 @@ end
 
 
 function treePackage.SwingMelee(npcClass: NpcClass)
+    local properties = npcClass.Properties;
     local wieldComp: WieldComp = npcClass.WieldComp;
 
     local enemyTargetData = npcClass.Properties.EnemyTargetData;
@@ -377,6 +399,7 @@ function treePackage.RunToFireRange(npcClass: NpcClass)
 end
 
 function treePackage.FireGun(npcClass: NpcClass)
+    local properties = npcClass.Properties;
     local wieldComp: WieldComp = npcClass.WieldComp;
     
     local enemyTargetData = npcClass.Properties.EnemyTargetData;
@@ -458,7 +481,7 @@ function treePackage.Patrol(npcClass: NpcClass)
         return;
     end
 
-    properties.LastAlertShout = nil;
+    properties.LastAlertShout = tick()-math.random(10, 15);
     
     local patrolPositions = properties.PatrolPositions;
     if patrolPositions == nil then
@@ -484,16 +507,23 @@ function treePackage.Patrol(npcClass: NpcClass)
                     rngZ * patrolRng:NextInteger(12, 45)
                 );
 
+                local locationName = npcClass:GetMapLocation(endPos);
+                if locationName ~= nil and properties.SpawnLocationName ~= nil
+                and properties.SpawnLocationName ~= locationName then
+                    Debugger:Warn(`Patrol pos outside spawn location ({properties.SpawnLocationName}) ~= {locationName}`);
+                    continue;
+                end
+
                 local rayParams = RaycastParams.new();
                 rayParams.IncludeInstances = {workspace.Environment; workspace.Terrain};
                 rayParams.IgnoreWater = true;
 
                 local floorRayResult = workspace:Blockcast(CFrame.new(endPos + Vector3.new(0, 6, 0)), Vector3.one*2, Vector3.yAxis*-10, rayParams);
-                if floorRayResult == nil then Debugger:Warn("Patrol no floor"); continue end;
+                if floorRayResult == nil then continue end;
                 endPos = floorRayResult.Position + Vector3.new(0, 1.35, 0);
 
                 local path: Path = npcClass.Move:ComputePath(startPos, endPos);
-                if path.Status ~= Enum.PathStatus.Success then Debugger:Warn("Patrol no path", path.Status); continue end;
+                if path.Status ~= Enum.PathStatus.Success then continue end;
 
                 local wayPoints = path:GetWaypoints();
                 for _, waypoint: PathWaypoint in pairs(wayPoints) do
@@ -662,18 +692,35 @@ function treePackage.ShareIntel(npcClass: NpcClass)
     end
 
     if tick() > treePackage.AlertShoutRefreshTick then
-        treePackage.AlertShoutQuota += 1;
+        treePackage.AlertShoutQuota = math.clamp(treePackage.AlertShoutQuota + 1, 0, 3);
         treePackage.AlertShoutRefreshTick = tick() + math.random(3, 5);
     end
 
     local targetHandlerComp = npcClass:GetComponent("TargetHandler");
-    if enemyEntityClass 
+    if enemyEntityClass
+    and not npcClass.HealthComp.IsDead
     and (enemyTargetData.LastAlertedTick and tick()-enemyTargetData.LastAlertedTick <= 10)
     and (properties.LastAlertShout == nil or tick()-properties.LastAlertShout > 20)
     and treePackage.AlertShoutQuota > 0 then
         treePackage.AlertShoutQuota -= 1;
+        properties.LastAlertShout = tick();
 
-        npcClass.Properties.LastAlertShout = tick();
+        if enemyEntityClass.ClassName == "PlayerClass" then
+            npcClass:GetComponent("NpcEmote"){
+                Players = {(enemyEntityClass :: PlayerClass):GetInstance()};
+                EmoteId = "alert";
+                SndId = "NpcAlert";
+                SndSpeed = math.random(90, 110)/100;
+            };
+
+            if math.random(1, 100) == 1 then
+                npcClass:GetComponent("NpcEmote"){
+                    Players = game.Players:GetPlayers();
+                    EmoteId = "help";
+                };
+            end
+        end
+
         treePackage.OnAlertShout:Fire(npcClass, enemyEntityClass);
 
         local allies: {NpcTargetData} = targetHandlerComp:MatchTargets(function(allyTargetData: NpcTargetData)
@@ -850,8 +897,205 @@ function treePackage.Flee(npcClass: NpcClass)
     return true;
 end
 
+--MARK: IdleInteractTree
+function treePackage.IdleUpdate(npcClass: NpcClass)
+    local properties = npcClass.Properties;
+    properties.CanDistract = true;
+
+    return;
+end
+
+function treePackage.CanIdleInteract(npcClass: NpcClass)
+    local properties = npcClass.Properties;
+    return properties.NextIdleInteract == nil or tick() > properties.NextIdleInteract;
+end
+
+function treePackage.DoIdleInteract(npcClass: NpcClass)
+    if npcClass.HealthComp.IsDead then return end;
+
+    local properties = npcClass.Properties;
+    local myPosition = npcClass:GetCFrame().Position;
 
 
+    local activeInteractConfig: Configuration? = properties.ActiveIdleInteractConfig;
+    if activeInteractConfig == nil 
+    and (properties.IdleInteractScanCooldown == nil or tick() > properties.IdleInteractScanCooldown) then
+        properties.IdleInteractScanCooldown = tick() + 1;
+        
+        local idleInteractables = {};
+        local totalChance = 0;
+
+        for _, interactable: InteractableInstance in ipairs(modInteractables.getAllInteractables()) do
+			local config = interactable.Config;
+			if config:GetAttribute("IdleInteract") == nil then continue end;
+            
+            local interactPoint = interactable.PointAtt.WorldPosition;
+            if modVector.distanceSqrdXZ(interactPoint, myPosition) > 1000 then continue end; -- ~32^2
+            if math.abs(interactPoint.Y - myPosition.Y) > 6 then continue end;
+            
+            local locationName = npcClass:GetMapLocation(interactPoint);
+            if locationName ~= properties.SpawnLocationName then continue end;
+
+            if treePackage.SharedInteractablesInUse[config]
+            and tick()-treePackage.SharedInteractablesInUse[config] <= 30 then
+                continue;
+            end
+
+            local chance = config:GetAttribute("IdleInteract") or 1;
+            totalChance += chance;
+            table.insert(idleInteractables, {I=interactable; C=chance; TC=totalChance;});
+		end
+
+        local roll = math.random(0, math.max(totalChance, 1)*1000)/1000;
+        for a=1, #idleInteractables do
+            local iiInfo = idleInteractables[a];
+            if roll >= (iiInfo.TC - iiInfo.C) and roll < iiInfo.TC then
+                activeInteractConfig = iiInfo.I.Config;
+                break;
+            end
+        end
+
+        if activeInteractConfig then
+            properties.ActiveIdleInteractConfig = activeInteractConfig;
+            treePackage.SharedInteractablesInUse[activeInteractConfig] = tick();
+
+            properties.IdleInteractScanCooldown = tick() + 15;
+        end
+    end
+    if activeInteractConfig == nil then return end;
+
+
+    local activeInteractable: InteractableInstance = modInteractables.getOrNew(activeInteractConfig);
+    if activeInteractable == nil then
+        properties.ActiveIdleInteractConfig = nil;
+        return;
+    end
+
+    local interactPart = activeInteractable.Part;
+    local pathFindAtt = interactPart and interactPart:FindFirstChild("PathToInteract");
+    local interactPoint = activeInteractable.PointAtt.WorldPosition;
+
+    local walkTargetPoint = nil;
+    if pathFindAtt then
+        walkTargetPoint = pathFindAtt.WorldPosition;
+    end
+    if walkTargetPoint == nil and interactPart then
+        walkTargetPoint = modVector.GetClosestPointToPartFace(interactPart, npcClass.RootPart.Position, {
+            GapFromPoint = 2;
+            ClampBoundary = NumberRange.new(0.3, 0.6);
+        });
+    end
+    if walkTargetPoint == nil then
+        walkTargetPoint = interactPoint;
+    end
+    
+    if not npcClass.Move:IsAtPosition(walkTargetPoint) or tick()-properties.IdleInteractScanCooldown <= 16 then
+        npcClass.Move:SetMoveSpeed("set", "walk", 5, npcClass.Move.MoveSpeedPriority.Movement);
+        npcClass.Move:MoveTo(walkTargetPoint);
+
+        properties.ArriveIdleInteractState = nil;
+        properties.IdleInteractStartTick = nil;
+
+        return true;
+    end
+
+    local idleInteractState = properties.ArriveIdleInteractState;
+    if idleInteractState == nil then
+        idleInteractState = 1;
+        properties.IdleInteractStartTick = tick() + math.random(10, 30)/10;
+        npcClass.Move:Face(interactPoint);
+
+    elseif idleInteractState == 1 then
+        if tick() > properties.IdleInteractStartTick then
+            idleInteractState = 2;
+            properties.IdleInteractStartTick = tick() + math.random(600, 1500)/100;
+
+            local interactNpcEmote = activeInteractConfig:GetAttribute("InteractNpcEmote");
+            if interactNpcEmote then
+                npcClass:GetComponent("NpcEmote"){
+                    Players = game.Players:GetPlayers();
+                    EmoteId = interactNpcEmote;
+                };
+            end
+        end
+
+    elseif idleInteractState == 2 then
+        if tick() > properties.IdleInteractStartTick then
+            properties.IdleInteractScanCooldown = tick() + 15;
+            properties.ActiveIdleInteractConfig = nil;
+            treePackage.SharedInteractablesInUse[activeInteractConfig] = nil;
+
+            return;
+        end
+    end
+    properties.ArriveIdleInteractState = idleInteractState;
+
+    return true;
+end
+
+
+--MARK: Distractions
+function treePackage.HasDistraction(npcClass: NpcClass)
+    local properties = npcClass.Properties;
+
+    local distractionData = properties.Distraction;
+
+    if distractionData then
+        if distractionData.Alert == nil then
+            distractionData.Alert = true;
+            npcClass:GetComponent("NpcEmote"){
+                Players = game.Players:GetPlayers();
+                EmoteId = "question";
+            };
+        end
+
+        if tick()-distractionData.Tick >= 30 then
+            properties.Distraction = nil;
+        end
+    end
+
+
+    return properties.Distraction ~= nil;
+end
+
+function treePackage.CheckDistraction(npcClass: NpcClass)
+    local properties = npcClass.Properties;
+
+    local distractionData = properties.Distraction;
+    local distractionPos = distractionData.Position;
+
+    if not npcClass.Move:IsAtPosition(distractionPos) or tick()-distractionData.Tick <= 1 then
+        npcClass.Move:SetMoveSpeed("set", "walk", 5, npcClass.Move.MoveSpeedPriority.Movement);
+        npcClass.Move:MoveTo(distractionPos);
+        properties.CheckDistractionState = nil;
+        properties.CheckDistractionStartTick = nil;
+        
+    else
+        if properties.CheckDistractionState == nil then
+            properties.CheckDistractionState = 1;
+            properties.CheckDistractionStartTick = tick() + math.random(5, 20)/10;
+
+        elseif properties.CheckDistractionState == 1 then
+            if tick() > properties.CheckDistractionStartTick then
+                properties.CheckDistractionState = 2;
+                properties.CheckDistractionStartTick = tick() + math.random(20, 30);
+
+                npcClass:GetComponent("NpcEmote"){
+                    Players = game.Players:GetPlayers();
+                    EmoteId = "hmm";
+                };
+            end
+
+        elseif properties.CheckDistractionState == 2 then
+            if tick() > properties.CheckDistractionStartTick then
+                properties.Distraction = nil;
+            end
+        end
+
+    end
+
+    return true;
+end
 
 function treePackage.DoNothing(npcClass: NpcClass)
     return true;

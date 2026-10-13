@@ -163,12 +163,6 @@ return function(CutsceneSequence)
 			local caitlinPlayerNpc: PlayerNpc = modPlayerNpcs.getPlayerNpc(player, "Caitlin");
 			local caitlinNpcClass: NpcClass = caitlinPlayerNpc.NpcClass;
 
-			caitlinPlayerNpc:SetCFrame{
-				CFrame = CFrame.new(1134.713, 109.495, -547.812) * CFrame.Angles(0, math.rad(44), 0);
-				MissionId = MISSION_ID;
-			};
-
-			
 			local leoPlayerNpc: PlayerNpc = modPlayerNpcs.getPlayerNpc(player, "Leo");
 			local leoNpcClass: NpcClass = leoPlayerNpc.NpcClass;
 
@@ -188,6 +182,14 @@ return function(CutsceneSequence)
 			local function OnChanged(firstRun)
 				if mission.Type == 2 then
 				elseif mission.Type == 1 then
+					if mission.ProgressionPoint <= 5 then
+						if firstRun then
+							caitlinPlayerNpc:SetCFrame{
+								CFrame = CFrame.new(1134.643, 96.177, -568.573) * CFrame.Angles(0, math.rad(44), 0);
+								MissionId = MISSION_ID;
+							};
+						end
+					end
 					if mission.ProgressionPoint <= 3 then
 						if firstRun then
 							caitlinNpcClass.PlayAnimation("Wave");
@@ -305,7 +307,31 @@ return function(CutsceneSequence)
 							NpcModel = leoNpcClass.Character;
 						});
 
+					elseif mission.ProgressionPoint >= 12 then
+						
+						if firstRun then
+							leoPlayerNpc:SetCFrame{
+								CFrame = CFrame.new(1165.333, 100.474, -525.591) * CFrame.Angles(0, 0, 0);
+								MissionId = MISSION_ID;
+							};
+							
+							skinnerPlayerNpc:SetCFrame{
+								CFrame = CFrame.new(1181.051, 100.443, -532.333) * CFrame.Angles(0, math.rad(30), 0);
+								MissionId = MISSION_ID;
+							};
 
+							rexPlayerNpc:SetCFrame{
+								CFrame = CFrame.new(1150.337, 96.092, -550.614) * CFrame.Angles(0, math.rad(-90), 0);
+								MissionId = MISSION_ID;
+							};
+
+							shawPlayerNpc:SetCFrame{
+								CFrame = CFrame.new(1173.018, 96.092, -548.408) * CFrame.Angles(0, math.rad(55), 0);
+								MissionId = MISSION_ID;
+							};
+
+						end
+						
 					end
 				end
 			end

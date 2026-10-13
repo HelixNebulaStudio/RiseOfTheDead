@@ -64,12 +64,56 @@ function projectilePackage.BindArcContact(projectile: ProjectileInstance, arcPoi
     local projectilePart = projectile.Part;
     local properties = projectile.Properties;
 
+    if RunService:IsClient() then return end;
+    local hitPart, hitPoint = arcPoint.Hit, arcPoint.Point;
+    local arcDir = arcPoint.Direction;
+
+	local toolHandler: ToolHandlerInstance? = projectile.ToolHandler;
+    local equipmentClass: EquipmentClass? = toolHandler and toolHandler.EquipmentClass;
+    if equipmentClass and equipmentClass.ItemId == "throwablejunk" then
+
+        local isLastPoint = arcPoint.LastPoint == hitPoint;
+        if isLastPoint ~= true and properties.ImpactCooldownTick and tick() < properties.ImpactCooldownTick then
+            return;
+        end
+        properties.ImpactCooldownTick = tick() + 0.5;
+
+        modSfxService.spawnImpactEffect{
+            BasePart = hitPart;
+            Point = hitPoint;
+        };
+        modAudio.Play("MetalBounce", hitPoint).PlaybackSpeed = math.random(95, 120)/100;
+        
+        if shared.gameConfig.BranchName == "Dev" then
+            Debugger.Expire(Debugger.PointPart(Vector3.new(hitPoint)), 1);
+        end
+
+        local nearbyNpcClasses, nearbyDistances = shared.modNpcs.Octree:KNearestNeighborsSearch(hitPoint, 5, 32);
+
+        for a=1, #nearbyNpcClasses do
+            local npcClass: NpcClass = nearbyNpcClasses[a];
+            if npcClass.HealthComp.IsDead then continue end;
+            if npcClass.Properties.CanDistract ~= true then continue end;
+
+            local targPos = npcClass:GetCFrame().Position;
+            local heightDiff = math.abs(hitPoint.Y - targPos.Y);
+            if heightDiff > 5 then continue end;
+
+            npcClass.Properties.Distraction = {
+                Tick = tick();
+                Position = hitPoint - arcDir;
+            };
+
+            break;
+        end
+
+        return;
+    end
+
+
     if properties.Popped then return end;
     properties.Popped = true;
 
-    if RunService:IsClient() then return end;
-
-    local hitPart, hitPoint = arcPoint.Hit, arcPoint.Point;
     local damageBy: CharacterClass? = projectile.CharacterClass;
 
     local touchConn;

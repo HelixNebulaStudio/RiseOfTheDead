@@ -204,6 +204,7 @@ local npcPackage = {
         "Chat";
         "RandomClothing";
         "DynamicLevel";
+        "NpcEmote";
     };
 
     Voice = {
@@ -280,6 +281,8 @@ function npcPackage.Spawning(npcClass: NpcClass)
     end
 
     npcClass:GetComponent("RandomClothing")();
+
+    properties.SpawnLocationName = npcClass:GetMapLocation();
 end
 
 function npcPackage.Spawned(npcClass: NpcClass)

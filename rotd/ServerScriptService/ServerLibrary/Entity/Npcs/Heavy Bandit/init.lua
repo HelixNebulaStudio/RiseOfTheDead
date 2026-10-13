@@ -32,6 +32,7 @@ local npcPackage = {
         "AttractNpcs";
         "Chat";
         "RandomClothing";
+        "NpcEmote";
     };
     AddBehaviorTrees = {
         "BanditDefaultTree";

@@ -65,7 +65,7 @@ local WORLDS = {
     RadioStation = {
         DisplayName = "Radio Station";
         PlaceIds = {
-            [LIVE_GAME_ID] = 0;
+            [LIVE_GAME_ID] = 95098137467454;
             [DEV_GAME_ID] = 119804165146838;
         };
         

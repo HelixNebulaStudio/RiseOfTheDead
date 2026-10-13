@@ -26,7 +26,7 @@ local toolPackage = {
 		Type="Knife";
 
 		EquipLoadTime=0.3;
-		FireAlertRange = 8;
+		FireAlertRange = 2;
 		Damage=100;
 
 		PrimaryAttackSpeed=0.5;

@@ -5,9 +5,9 @@ local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
 
 local statusPackage = {
     Id = "LiquidFlame";
-    Icon = "";
+    Icon = "rbxassetid://5105787895";
     Name = "Liquid Flame";
-    Description = "Burning from liquid flame.";
+    Description = "You are burning from liquid flame, taking $Damage x $Stacks damage per 0.5s.";
     Buff = false;
     ExpiresOnDeath = true;
     Tags = {"DOT"; "Fire"};

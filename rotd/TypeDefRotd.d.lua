@@ -8,6 +8,7 @@ export type GAME_EVENT_KEY_ROTD =
     | "GameModeManager_BindDisconnectPlayer"
     | "GameModeManager_BindGameModeStart"
     | "GameModeManager_BindGameModeComplete"
+    | "GameModeManager_BindGameModeEvent"
     | "Interactables_BindCollectibleInteract"
     | "Interactables_BindMakeshiftBuilt"
     | "Skills_BindResourceGatherers"

@@ -28,7 +28,7 @@ local toolPackage = {
 		Type = "Sword";
 		
 		EquipLoadTime = 1.25;
-		FireAlertRange = 24;
+		FireAlertRange = 16;
 		Damage = 640;
 
 		PrimaryAttackSpeed = 0.8;

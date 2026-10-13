@@ -31,6 +31,7 @@ function clipTouchHandler:OnHumanoidTouch(humanoid, basePart, touchPart)
 			Duration = fireDuration;
 			Values = {
 				TargetPart = touchPart;
+				Damage = 2;
 				Stacks = 1;
 			}
 		});

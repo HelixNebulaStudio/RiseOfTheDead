@@ -21,11 +21,11 @@ function modItemsLibrary.onRequire()
     -- Common
     new(resourceBase, {Id="money"; Name="Money"; Icon="rbxassetid://86537766971763"; Stackable=10000; Description="$$$"; Sources={"Obtained by selling commodities, killing bosses, doing missions and more.";};});
     
-    new(resourceBase, {Id="metal"; Name="Metal Scraps"; Icon="rbxassetid://1551792125"; Description="Metallic scraps used in crafting metal objects.";});
+    new(resourceBase, {Id="metal"; Name="Metal Scraps"; ThrowingJunk=true; Icon="rbxassetid://1551792125"; Description="Metallic scraps used in crafting metal objects.";});
     new(resourceBase, {Id="glass"; Name="Glass Shards"; Icon="rbxassetid://1551792117"; Description="Glass shards and pieces used in crafting glass objects.";});
     new(resourceBase, {Id="wood"; Name="Wooden Parts"; Icon="rbxassetid://1551280660"; Description="Wooden parts used in crafting wooden objects.";});
     new(resourceBase, {Id="cloth"; Name="Cloth"; Icon="rbxassetid://3580309486"; Description="Cloth used in crafting clothing or medical supplies.";});
-    new(resourceBase, {Id="screws"; Name="Screws & Nails"; Icon="rbxassetid://16520368724"; Description="Screws & Nails used in crafting structures.";});
+    new(resourceBase, {Id="screws"; Name="Screws & Nails"; ThrowingJunk=true; Icon="rbxassetid://16520368724"; Description="Screws & Nails used in crafting structures.";});
     new(resourceBase, {Id="adhesive"; Name="Sticky Adhesive"; Icon="rbxassetid://16816518567"; Description="Sticky adhesive is a strong binding glue used in sticking objects together.";});
 
     new(resourceBase, {Id="steelfragments"; Name="Steel Fragments"; Icon="rbxassetid://8815170269"; Description="Steel Fragments used in crafting high quality items."; Sources={"Obtainable from <b>Lewis in the Rat Harbor Safehouse</b>";};});
@@ -169,7 +169,7 @@ function modItemsLibrary.onRequire()
     new(throwableBase, {Id="molotov"; Name="Molotov"; Icon="rbxassetid://5088295501"; Tags={"Incendiary"}; Description="Ignites surrounding area on fire on impact, does 1% (Min: 25 damage) of the enemies' max health every 0.5 seconds.";});
 
     new(throwableBase, {Id="snowballs"; Name="Snowballs"; Icon="rbxassetid://11464691441"; Stackable=false; Tags={"Frostivus"}; Description="Who wants a snowball fight? Does special damage to Winter Treelums.";});
-
+    new(throwableBase, {Id="throwablejunk"; Name="Throwable Junk"; Icon="rbxassetid://1551792125"; Stackable=false; Tags={"Unobtainable"}; Description="Throwable junk, good for distracting enemies.";});
 
 
     --MARK: CLOTHING
