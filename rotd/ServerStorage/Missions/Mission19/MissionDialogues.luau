@@ -21,7 +21,7 @@ Dialogues.Wilson.DialogueStrings = {
 		CheckMission=MISSION_ID;
 		Say="I'm on it."; 
 		Face="Smirk"; 
-		Reply="Off you go solider, get back here as soon as you are done.";
+		Reply="Off you go soldier, get back here as soon as you are done.";
 	};
 	["tickhunting_stillWorking"]={
 		Say="Hard at work sir.."; 
@@ -31,7 +31,7 @@ Dialogues.Wilson.DialogueStrings = {
 	["tickhunting_return"]={
 		Say="I got rid of as much as I could."; 
 		Face="Joyful"; 
-		Reply="You did great solider.";
+		Reply="You did great soldier.";
 	};
 	
 };
@@ -53,7 +53,7 @@ if RunService:IsServer() then
 			end
 			
 		elseif mission.Type == 2 then -- Available
-			dialog:SetInitiate("You up for another task, solider?");
+			dialog:SetInitiate("You up for another task, soldier?");
 			dialog:AddChoice("tickhunting_sure", function(dialog)
 				dialog:AddChoice("tickhunting_yeah", function(dialog)
 					modMission:StartMission(player, MISSION_ID);

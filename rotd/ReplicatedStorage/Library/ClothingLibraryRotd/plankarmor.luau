@@ -7,7 +7,7 @@ local attirePackage = {
 	GroupName="ChestGroup";
 	
 	Configurations={
-		BulletProtection = 0.1;
+		BulletProtection = 10;
 		ArmorPoints = 10;
 		Warmth = -4;
 	};

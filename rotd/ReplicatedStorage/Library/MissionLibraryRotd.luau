@@ -3549,6 +3549,7 @@ MissionLibrary.New{
 	Timer = BOARD_TIME_LIMIT;
 	Persistent = true;
 	Checkpoint = {
+		{Text="Start Raid: $Raid";};
 		{Text="Complete Raid: $Raid without alerting the enemy backups";};
 	};
 	SaveData = {

@@ -33,6 +33,9 @@ local Stronghold = {
 	OnAlertShoutConn = nil;
 	LastAlertShoutTick = nil;
 	AlertShoutCounter = 0;
+	QuickKillCounter = 0;
+	PauseGoalTick = nil;
+	QuickKillThreshold = 3;
 };
 Stronghold.__index = Stronghold;
 
@@ -72,6 +75,7 @@ function Stronghold.new()
         Doors = {};
         ExtractDoors = {};
         EnemyClasses = {};
+		CutscenePrefabs = {};
 
         ModeType = nil;
         ModeStage = nil;
@@ -189,6 +193,43 @@ function Stronghold:Load()
 						table.insert(self.Blockades, child);
 
 					end
+				end
+
+			elseif object.Name == "CutscenePrefabs" then
+				
+				for _, child in pairs(object:GetChildren()) do
+					local cutsceneName = child.Name;
+
+					local cutsceneData = self.CutscenePrefabs[cutsceneName];
+					if cutsceneData == nil then
+						cutsceneData = {};
+						self.CutscenePrefabs[cutsceneName] = cutsceneData;
+					end
+
+					if child:IsA("Attachment") then
+						if cutsceneData.Attachments == nil then
+							cutsceneData.Attachments = {};
+						end
+						table.insert(cutsceneData.Attachments, child);
+					end
+
+					local attributes = child:GetAttributes();
+					for kN, kV in pairs(attributes) do
+						if child:IsA("Attachment") then
+
+							if kV == "WorldPosition" then
+								local wpos = child.WorldPosition;
+								
+								if cutsceneData[kN] == nil then
+									cutsceneData[kN] = {};
+								end
+
+								table.insert(cutsceneData[kN], wpos);
+							end
+
+						end
+					end
+
 				end
 
             end
@@ -358,14 +399,20 @@ function Stronghold:Initialize(roomData)
 
 						closestSpawnAtt:SetAttribute("CooldownTick", tick()+math.random(20, 40)/10);
 						
-						self:SpawnEnemy(self:PickEnemy(), {
+						local npcClass = self:SpawnEnemy(self:PickEnemy(), {
 							SpawnCFrame = closestSpawnAtt.WorldCFrame;
 						});
+						if npcClass then
+							if math.random(1, 2) == 1 then
+								self.EliminateGoal += 1;
+							end
+							npcClass.Properties.Reinforcement = true;
+						end
 
 					end)
 				end
 
-				if remaining <= 0 then
+				if remaining <= 0 and (Stronghold.PauseGoalTick == nil or tick()-Stronghold.PauseGoalTick >= 25) then
 					self:CompleteRaid();
 				end
 				task.wait(1);
@@ -537,6 +584,7 @@ function Stronghold:SpawnEnemy(npcName, paramPacket)
 			PatrolFrequency = patrolPosList and 5 or nil;
 			EquippedByDefault = math.random(1, 4) > 1;
 
+			-- Zombie
 			HordeAggression = paramPacket.HordeAggression == true;
 			NpcPercentHealthDamage = 0;
 		};
@@ -545,9 +593,30 @@ function Stronghold:SpawnEnemy(npcName, paramPacket)
 			local properties: PropertiesVariable<anydict> = npcClass.Properties;
 			
 			local healthComp: HealthComp = npcClass.HealthComp;
-			healthComp.OnIsDeadChanged:Connect(function(isDead)
+			healthComp.OnIsDeadChanged:Connect(function(isDead, _, damageData)
 				if not isDead then return end;
 
+				local tlSinceLastKill = self.LastKilled and tick()-self.LastKilled;
+				if self.LastAlertShoutTick ~= nil and tlSinceLastKill then
+
+					if tlSinceLastKill <= 2 then
+						if properties.Reinforcement ~= true then
+							self.QuickKillCounter += 1;
+						end
+
+						if self.QuickKillCounter > self.QuickKillThreshold then
+							self.QuickKillThreshold += 2;
+							self.QuickKillCounter = nil;
+
+							Debugger:Warn(`Consecutive kills too quick, trigger event.`);
+							self:QuickKillTrigger{
+								NpcClass = npcClass;
+								KillerCharacterClass = damageData and damageData.DamageBy or nil;
+							};
+						end
+					end
+				end
+				
 				self.LastKilled = tick();
 
 				for a=#self.EnemyClasses, 1, -1 do
@@ -571,13 +640,22 @@ function Stronghold:SpawnEnemy(npcName, paramPacket)
 						`Stronghold>>  Killed enemy. Alive: {#self.EnemyClasses}, Eliminated: {self.EliminateCount}, Remaining: {remaining}`
 					);
 
-					self.StatusText = `Eliminate {remaining} enemies`;
-					self:Hud({
-						StatusText = self.StatusText;
-					});
-					
-					if self.EliminateCount >= self.EliminateGoal then
-						self:CompleteRaid();
+					if Stronghold.PauseGoalTick and tick()-Stronghold.PauseGoalTick <= 20 then
+						self.StatusText = `Hostile Reinforcements incomming..`;
+						self:Hud({
+							StatusText = self.StatusText;
+						});
+
+					else
+						self.StatusText = `Eliminate {remaining} enemies`;
+						self:Hud({
+							StatusText = self.StatusText;
+						});
+						
+						if self.EliminateCount >= self.EliminateGoal then
+							self:CompleteRaid();
+						end
+
 					end
 					
 				end
@@ -650,6 +728,10 @@ function Stronghold:SpawnEnemy(npcName, paramPacket)
 						if self.Status ~= EnumStatus.InProgress then break; end;
 					end
 				end)
+			end
+
+			if paramPacket.BindSetupHook then
+				paramPacket.BindSetupHook(npcClass);
 			end
 		end
 	};
@@ -961,12 +1043,17 @@ function Stronghold:RespawnDead()
 	end
 end
 
+--MARK: Restart;
 function Stronghold:Restart()
 	for a=#self.EnemyClasses, 1, -1 do
 		self.EnemyClasses[a]:Destroy();
 	end
 	table.clear(self.EnemyClasses);
 
+	Stronghold.PauseGoalTick = nil;
+	Stronghold.QuickKillThreshold = 3;
+	self.LastKilled = nil;
+	self.LastAlertShoutTick = nil;
 	self.EnemiesSpawned = 0;
 	self.EliminateCount = 0;
 	self.EliminateGoal = 0;
@@ -1138,5 +1225,76 @@ function Stronghold:LoadSpawnPlatform(spawnPart: BasePart)
 
     spawnPlatformInfo.LoadState = 2;
 end
+
+
+--MARK: Special Events
+
+function Stronghold:QuickKillTrigger(packet)
+	if self.Status ~= EnumStatus.InProgress then return end;
+
+	local chopperReinforcementInfo = self.CutscenePrefabs.BanditReinforcementChopper;
+	if chopperReinforcementInfo then
+		local spawnAttList = {};
+		for _, att in pairs(chopperReinforcementInfo.Attachments) do
+			local cdnTick = att:GetAttribute("CooldownEndTick");
+			if cdnTick == nil or tick() > cdnTick  then
+				table.insert(spawnAttList, att);
+			end
+		end
+
+		if #spawnAttList > 0 then
+			self.Wave += 1;
+			Stronghold.PauseGoalTick = tick();
+			
+			local newAtt = spawnAttList[math.random(1, #spawnAttList)];
+			newAtt:SetAttribute("CooldownEndTick", tick()+ 25);
+
+			self.EliminateGoal += 6;
+
+			shared.modCutscene:PlayCutscene("BanditReinforcementChopper", {
+				SpawnPosition = newAtt.WorldPosition;
+				CustomNpcSpawn = function(spawnCf, bindSetupHook)
+					local enemyName = newAtt:GetAttribute("EnemyName") or self:PickEnemy();
+
+					local npcClass: NpcClass = self:SpawnEnemy(enemyName, {
+						SpawnCFrame = spawnCf;
+						BindSetupHook = bindSetupHook;
+					});
+					if npcClass == nil then return end;
+
+					if packet.KillerCharacterClass then
+						local killerCharacterClass: CharacterClass = packet.KillerCharacterClass;
+
+						npcClass.Properties.IsHostile = true;
+
+						local targetHandlerComp = npcClass:GetComponent("TargetHandler");
+						if targetHandlerComp then
+							local tarData = targetHandlerComp:AddTarget(killerCharacterClass.Character);
+							local lastCFrame = tarData and killerCharacterClass:GetCFrame();
+							if lastCFrame then
+								tarData.LastKnownPosition = lastCFrame.Position;
+							end
+						end
+					end
+
+					return npcClass;
+				end;
+				CompleteCallback = function() 
+					Stronghold.PauseGoalTick = nil;
+					newAtt:SetAttribute("CooldownEndTick", tick()+ 5);
+				end
+			});
+		end
+	end
+
+end
+
+
+
+
+
+
+
+
 
 return Stronghold;

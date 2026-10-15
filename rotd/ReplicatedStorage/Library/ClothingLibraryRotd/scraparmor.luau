@@ -8,7 +8,7 @@ local attirePackage = {
 	
 	Configurations={
 		TickRepellent = 2;
-		BulletProtection = 0.25;
+		BulletProtection = 25;
 		ArmorPoints = 30;
 		Warmth = -8;
 	};

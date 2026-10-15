@@ -26,9 +26,15 @@ function Hazard:Begin()
 	local controller = self.Controller;
 	controller.StageGarbage:Tag(controller.OnSurvivalNpcDeath:Connect(function(npcClass: NpcClass) 
 		if npcClass == nil or npcClass.HumanoidType ~= "Zombie" then return end;
+
 		local rawProperties: anydict = npcClass.Properties.Values;
 		local deathPosition = rawProperties.DeathPosition;
 		if deathPosition == nil then return end;
+
+		local _, closestDistSqrd = shared.modPlayers.PositionsOctree:GetClosestNodeToPoints({deathPosition});
+		if closestDistSqrd and closestDistSqrd > 65536 then --256^2
+			return;
+		end
 
 		self.Counter = self.Counter+1;
 

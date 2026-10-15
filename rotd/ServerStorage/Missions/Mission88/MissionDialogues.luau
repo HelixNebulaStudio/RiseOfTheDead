@@ -175,7 +175,7 @@ Dialogues.Leo.DialogueStrings = {
 	["sot_done3"] = {
 		Face = "Suspicious";
 		Say = "It also says North Star Embassy.. I'm guessing you guys are North Star militants..";
-		Reply = "Good observations, solider! We were North Star.. Carrying out rescue operations, but top government officials had other strategies.";
+		Reply = "Good observations, soldier! We were North Star.. Carrying out rescue operations, but top government officials had other strategies.";
 	};
 	["sot_done4"] = {
 		Face = "Skeptical";

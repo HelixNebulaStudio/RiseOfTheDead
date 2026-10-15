@@ -145,7 +145,7 @@ local statTemplates = {
 		{Key="ArmorPoints"; Text="<b>Armor Points:</b>    $stat"; Type="int"};
 		{Key="HealthPoints"; Text="<b>Health Points:</b>    $stat"; Type="int"};
 		{Key="DamageReflection"; Text="<b>Damage Reflection:</b>    $stat"; Type="percent"};
-		{Key="BulletProtection"; Text="<b>Bullet Protection:</b>    $stat"; Type="percent"};
+		{Key="BulletProtection"; Text="<b>Bullet Protection:</b>    $stat"; Type="int"};
 		
 		{Key="HotEquipSlots"; Text="<b>Hotbar Slots:</b>    $stat"; Type="int"};
 
@@ -344,7 +344,7 @@ local mouseOverDescription = {
 	};
 	
 	BulletProtection={
-		Desc="Reduces damage from hitscan projectiles from enemy by this percent.";
+		Desc="Reduces damage from hitscan projectiles from enemy by this value [x]. Reduction% = x/(x+100).";
 	};
 	MoveImpairReduction={
 		Desc="Reduction to the duration of movement impairment debuffs.";

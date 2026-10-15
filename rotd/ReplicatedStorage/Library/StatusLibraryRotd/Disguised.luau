@@ -82,6 +82,7 @@ function statusPackage.BindUpdate(statusClass: StatusClassInstance)
 	local statusInvisiblity = disguiseLib.Type == "Prop";
     statusClass.Values.Invisible = statusInvisiblity;
     statusClass.Values.Name = disguiseLib.Name;
+    statusClass.Values.DistractionType = disguiseLib.DistractionType;
 
     -- Clear prev
     local function clear()

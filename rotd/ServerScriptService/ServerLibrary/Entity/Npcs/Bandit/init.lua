@@ -192,8 +192,45 @@ local npcPackage = {
             {Say="We are under attack!"};
             {Say="Uh oh!"};
             {Say="Huh?!"};
-            {Say="No way!"};
-            {Say="Nooo!"};
+            {Say="How did they die?!"};
+            {Say="Who did this?!"};
+            {Say="Did they just died of a heart attack?"};
+            {Say="Hey, are you alright or just sleeping?"};
+            {Say="Hey, wake up!"};
+            {Say="Umm, no sleeping on the job!"};
+            {Say="What are you doing on the ground! Hello?!"};
+            {Say="Bro's knocked out or something.."};
+        };
+        InanimateDisguiseConfusionSpeech = {
+            {Say="A moving $DisguiseName.. That's new."};
+            {Say="Woah, a moving $DisguiseName.. Sick!"};
+            {Say="$DisguiseName's moving now.. Great."};
+            {Say="$DisguiseName is moving.. Hmm."};
+            {Say="Must be a bunch of ants moving this $DisguiseName.."};
+            {Say="$DisguiseName is moving, should I shoot it?!"};
+            {Say="Look at this $DisguiseName, probably wants to pick a fight!"};
+            {Say="Aww, a moving $DisguiseName. How cute!"};
+        };
+        DisguisedAlertSpeech = {
+            {Say="That ain't no $DisguiseName!";};
+            {Say="Shoot at that $DisguiseName!";};
+            {Say="Kill that $DisguiseName!";};
+            {Say="That $DisguiseName is not real!";};
+            {Say="Attention! $DisguiseName is a fake!";};
+            {Say="I've been bamboozled by that $DisguiseName, kill it!";};
+            {Say="Hol' up, $DisguiseName is an imposter!";};
+            {Say="Hunt that $DisguiseName down!";};
+        };
+        ZarkGreetSpeech = {
+            {Say="Sir!";};
+            {Say="Everything's in order sir.";};
+            {Say="Honored to be in your presence sir!";};
+            {Say="What brings you here commander?";};
+            {Say="At your service, commander.";};
+            {Say="Are we stocked up on food.. Nevermind, sorry I asked, I mean no disrespect.";};
+            {Say="Hope you're having a good day sir!";};
+            {Say="*Reaches out to shake Zark's hand* Oop, sorry. I meant to salute.";};
+            {Say="Sir, great supreme leader sir!";};
         };
     };
     
@@ -283,6 +320,15 @@ function npcPackage.Spawning(npcClass: NpcClass)
     npcClass:GetComponent("RandomClothing")();
 
     properties.SpawnLocationName = npcClass:GetMapLocation();
+    
+    task.delay(0.5, function()
+        npcClass.RootPart.Anchored = false;
+        if properties.Seat == nil then return end;
+
+        local seatPart = properties.Seat;
+        npcClass:Sit(seatPart);
+    end)
+    Debugger.Expire(npcClass.Character:FindFirstChild("BrownFloofHair"));
 end
 
 function npcPackage.Spawned(npcClass: NpcClass)

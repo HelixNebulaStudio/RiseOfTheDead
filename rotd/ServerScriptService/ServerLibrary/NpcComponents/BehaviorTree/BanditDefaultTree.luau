@@ -10,19 +10,26 @@ local TALK_ANIMATIONS = {"nodyes"; "nodno"; "shrug2"; "laugh"; "point"; "bored";
 
 local treePackage = {
     LogicString = {
-        Default = "PreLogic | !InCutscene & DefaultTree | [DoNothing]";
-        DefaultTree = "HasEnemy & (FleeTree | AlertTree) | IdleTree";
+        Default = "PreLogic | !InCutscene & (InVehicle & VehicleTree | GroundTree) | [DoNothing]";
+
+        
+        GroundTree = "HasEnemy & (FleeTree | AlertTree) | IdleTree";
         AlertTree = "EquipWeapon & IsInVision & (ShareIntel & IsUsingMelee & MeleeTree | RangeTree) | HuntTree";
         HuntTree = "KnowEnemyLastPosition & (IsAtLastKnownPosition & [InvestigateArea] | [MoveToLastKnownPosition]) | SeekTree";
         SeekTree = "HasDistraction & CheckDistraction | GuessEnemyLastPosition";
         MeleeTree = "InMeleeRange & [SwingMelee] | [RunToMeleeRange]";
         RangeTree = "CanFireGun & (RunToFireRange & [FireGun]) | (RunToCover & [ReloadGun])";
-        IdleTree = "IdleUpdate | SelfHealTree | IdleInteractTree | PatrolTree";
+
+        IdleTree = "IdleUpdate | ZarkTree | SelfHealTree | IdleInteractTree | PatrolTree";
+        ZarkTree = "IsZarkNear & GreetZark";
         SelfHealTree = "IsHurt & [SelfHeal]";
         IdleInteractTree = "CanIdleInteract & DoIdleInteract";
         PatrolTree = "ConverseTree | [Patrol]";
         ConverseTree = "ShareIntel & IsSpokenTo & [Converse]";
         FleeTree = "!CanEquip & [Flee]";
+
+
+        VehicleTree = "[DoNothing]";
     };
 
     OnAlertShout = shared.EventSignal.new("BanditOnAlertShout");
@@ -45,11 +52,17 @@ function treePackage.InCutscene(npcClass: NpcClass)
     return npcClass.Properties.CutsceneActive == true;
 end
 
+function treePackage.InVehicle(npcClass: NpcClass)
+    return npcClass.Properties.IsOnVehicle == true;
+end
+
 function treePackage.HasEnemy(npcClass: NpcClass)
     local properties = npcClass.Properties;
 
     local targetHandlerComp = npcClass:GetComponent("TargetHandler");
     if targetHandlerComp == nil then return false; end;
+
+    local myPos = npcClass:GetCFrame().Position;
 
     local enemyTargetData: NpcTargetData? = targetHandlerComp:MatchFirstTarget(function(targetData: NpcTargetData)
         if targetData.HealthComp == nil then return end;
@@ -67,11 +80,26 @@ function treePackage.HasEnemy(npcClass: NpcClass)
             local woundedStatus = targetCharacterClass.StatusComp:GetOrDefault("Wounded");
             if woundedStatus then return false; end;
 
+            local disguisedStatus: StatusClassInstance = targetCharacterClass.StatusComp:GetOrDefault("Disguised");
+            
             if not npcClass.HealthComp.IsDead and npcClass.HealthComp.LastDamagedBy == targetCharacterClass then
                 targetData.IsInVision = true;
                 targetData.LastAlertedTick = tick();
+
+                if disguisedStatus then
+                    properties.DangerDisguiseId = disguisedStatus.Values.DisguiseId;
+                end
+
                 return true;
             end;
+
+            local isZark = targetCharacterClass.Name == "Zark";
+            
+            local isFriendlyDisguise = disguisedStatus and disguisedStatus.Values.DistractionType == "Friendly";
+            if isZark
+            or isFriendlyDisguise and disguisedStatus.Values.Name == "Zark" then
+                properties.ZarkCharacterClass = targetCharacterClass;
+            end
 
             local deadbodyData = properties.SeenDeadbodyData;
 
@@ -81,6 +109,10 @@ function treePackage.HasEnemy(npcClass: NpcClass)
                 return false;
             end;
 
+            if isFriendlyDisguise and properties.DangerDisguiseId ~= disguisedStatus.Values.DisguiseId then
+                return false;
+            end
+
             local targetProperties = targetCharacterClass.Properties;
 
             local visionTarget = targetCharacterClass.Head;
@@ -88,48 +120,78 @@ function treePackage.HasEnemy(npcClass: NpcClass)
                 visionTarget = targetCharacterClass.RootPart;
             end
 
+            local tarPos = targetCharacterClass:GetCFrame().Position;
             local isInVision = npcClass:IsInVision(visionTarget, 75) and not npcClass.HealthComp.IsDead;
+            local isHostileDisguise = disguisedStatus and disguisedStatus.Values.DistractionType == "Hostile";
 
-            if not isInVision and targetCharacterClass.HumanoidType == "Zombie" then
-                local tarPos = targetCharacterClass:GetCFrame().Position;
-                local myPos = npcClass:GetCFrame().Position;
+            if not isInVision and (targetCharacterClass.HumanoidType == "Zombie" or isHostileDisguise) then
                 if modVector.distanceSqrdXZ(tarPos, myPos) <= 200 --14^2
                 and math.abs(tarPos.Y-myPos.Y) <= 7 then
                     isInVision = true;
                 end
             end 
 
+            local isKillerOfDeadbody = deadbodyData and deadbodyData.KillerCharacter == targetData.Model;
+
+            local isInanimateDisguise = disguisedStatus and disguisedStatus.Values.DistractionType == "Inanimate";
+            if isInanimateDisguise and disguisedStatus then
+                if isInVision then
+                    if (tick() - (targetCharacterClass :: PlayerClass).LastCharacterMoved) <= 10 then
+                        if properties.Distraction == nil then
+                            properties.Distraction = {};
+                        end
+                        properties.Distraction.Tick = tick();
+                        local dir = (tarPos - myPos).Unit; 
+                        properties.Distraction.Position = tarPos - (dir*4);
+                        properties.Distraction.Disguise = disguisedStatus.Values.Name;
+                    end
+
+                    if isKillerOfDeadbody and tick()-deadbodyData.SeenTick <= 1 then
+                        properties.DangerDisguiseId = disguisedStatus.Values.DisguiseId;
+                        targetData.IsInVision = true;
+                        targetData.LastAlertedTick = tick();
+
+                        return true;
+                    else
+                        isInVision = false;
+                    end
+                end
+                
+            end
+
             targetData.IsInVision = isInVision;
             if not isInVision then
 
-                if deadbodyData and deadbodyData.KillerCharacter == targetData.Model then
-                    if tick()-deadbodyData.SeenTick <= 5 then
-                        targetData.LastKnownPosition = deadbodyData.Position + Vector3.new(
-                            math.random(-1, 1) * math.random(0, 4), 
-                            0, 
-                            math.random(-1, 1) * math.random(0, 4)
-                        );
+                if isKillerOfDeadbody and tick()-deadbodyData.SeenTick <= 5 then -- saw someone get killed
 
-                        if properties.LastDeadbodyDiscoverTick == nil or tick()-properties.LastDeadbodyDiscoverTick > 20 then
-                            properties.LastDeadbodyDiscoverTick = tick();
+                    local killerDis = (tarPos - deadbodyData.Position);
+                    local killerDir = killerDis.Unit;
+                    killerDir = shared.IsNan(killerDir) and Vector3.zero or killerDir;
 
-                            local deadbodySpeech = npcClass.NpcPackage.Chatter.DeadbodySpeech;
-                            local deadbodyPhrase = deadbodySpeech and deadbodySpeech[math.random(1, #deadbodySpeech)] or nil;
-                            if deadbodyPhrase then
-                                npcClass.Chat(nil, deadbodyPhrase.Say);
+                    local killerMag = killerDis.Magnitude/2;
+                    local seenTl = math.clamp((tick()-deadbodyData.SeenTick)/5, 0, 1);
 
-                                if targetCharacterClass.ClassName == "PlayerClass" then
-                                    npcClass:GetComponent("NpcEmote"){
-                                        Players = {(targetCharacterClass :: PlayerClass):GetInstance()};
-                                        EmoteId = "question";
-                                        SndSpeed = math.random(90, 110)/100;
-                                    };
-                                end 
-                            end
+                    targetData.LastKnownPosition = deadbodyData.Position + killerDir * (killerMag * (1-seenTl));
+
+                    if properties.LastDeadbodyDiscoverTick == nil or tick()-properties.LastDeadbodyDiscoverTick > 20 then
+                        properties.LastDeadbodyDiscoverTick = tick();
+
+                        local deadbodySpeech = npcClass.NpcPackage.Chatter.DeadbodySpeech;
+                        local deadbodyPhrase = deadbodySpeech and deadbodySpeech[math.random(1, #deadbodySpeech)] or nil;
+                        if deadbodyPhrase then
+                            npcClass.Chat(nil, deadbodyPhrase.Say);
+
+                            if targetCharacterClass.ClassName == "PlayerClass" then
+                                npcClass:GetComponent("NpcEmote"){
+                                    Players = {(targetCharacterClass :: PlayerClass):GetInstance()};
+                                    EmoteId = "question";
+                                    SndSpeed = math.random(90, 110)/100;
+                                };
+                            end 
                         end
-
-                        return true;
                     end
+
+                    return true;
                 end
 
                 local npcCombatComp = targetCharacterClass:GetComponent("NpcCombat");
@@ -741,6 +803,11 @@ function treePackage.ShareIntel(npcClass: NpcClass)
         end)
 
         
+        local disguisedStatus = enemyEntityClass.ClassName ~= "Destructible" 
+                            and (enemyEntityClass :: CharacterClass).StatusComp:GetOrDefault("Disguised")
+                            or nil;
+        local disguiseAlerted = false;
+
         if math.random(1, 5) == 1 then
             local alertPhrases = npcClass.NpcPackage.Chatter.AlertPhrases;
             local filteredAlertPhrases = {};
@@ -752,10 +819,27 @@ function treePackage.ShareIntel(npcClass: NpcClass)
                 end
             end
 
-            local alertPhrase = #filteredAlertPhrases >0 and filteredAlertPhrases[math.random(1, #filteredAlertPhrases)] or nil;
-            if alertPhrase then
-                npcClass.Chat(nil, alertPhrase.Say);
+            local disguiseAlertPhrases = npcClass.NpcPackage.Chatter.DisguisedAlertSpeech;
+            if disguiseAlertPhrases 
+            and disguisedStatus and disguisedStatus.Values.DisguiseId == properties.DangerDisguiseId then
+                local disguiseAlertPhrase = disguiseAlertPhrases and disguiseAlertPhrases[math.random(1, #disguiseAlertPhrases)] or nil;
+                local sayStr = disguiseAlertPhrase.Say;
+                local disName = string.gsub(disguisedStatus.Values.Name, "%d", "");
+                sayStr = string.gsub(sayStr, `$DisguiseName`, string.lower(disName));
+                sayStr = sayStr:gsub("^%l", string.upper);
+                npcClass.Chat(nil, sayStr);
+
+                disguiseAlerted = true;
+
+            else
+                local alertPhrase = #filteredAlertPhrases >0 and filteredAlertPhrases[math.random(1, #filteredAlertPhrases)] or nil;
+                if alertPhrase then
+                    npcClass.Chat(nil, alertPhrase.Say);
+                    
+                end
+
             end
+            
         end
 
         for a=1, #allies do
@@ -781,6 +865,9 @@ function treePackage.ShareIntel(npcClass: NpcClass)
             end
 
             allyNpcClass.Move:Face(enemyEntityClass:GetCFrame().Position);
+            if disguisedStatus and disguiseAlerted then
+                allyNpcClass.Properties.DangerDisguiseId = disguisedStatus.Values.DisguiseId;
+            end
         end
     end
 
@@ -862,6 +949,69 @@ function treePackage.SeenDeadbody(npcClass: NpcClass)
     return true;
 end
 
+
+--MARK: ZarkTree
+function treePackage.IsZarkNear(npcClass: NpcClass)
+    local properties = npcClass.Properties;
+
+    local myPos = npcClass:GetCFrame().Position;
+
+    local zarkCharacterClass: CharacterClass = properties.ZarkCharacterClass; -- could be player disguised as Zark;
+    if zarkCharacterClass 
+    and not zarkCharacterClass.HealthComp.IsDead 
+    and zarkCharacterClass:DistanceFrom(myPos) <= 16 then
+        local isInVision = npcClass:IsInVision(zarkCharacterClass.RootPart, 75);
+        if isInVision then
+            if properties.DangerDisguiseId ~= "zar" then
+                return true;
+
+            else
+                if properties.LastAlertFakeZarkTick == nil or tick()-properties.LastAlertFakeZarkTick >= 20 then
+                    properties.LastAlertFakeZarkTick = tick();
+                
+                    local zarkDisguiseSpeech = npcClass.NpcPackage.Chatter.ZarkDisguiseSpeech;
+                    local zarkDisguisePhrase = zarkDisguiseSpeech and zarkDisguiseSpeech[math.random(1, #zarkDisguiseSpeech)] 
+                                            or {Say="You're not the real Zark!";};
+                    npcClass.Chat(nil, zarkDisguisePhrase.Say);
+                end
+            end
+        end
+    end
+
+    return false;
+end
+
+function treePackage.GreetZark(npcClass: NpcClass)
+    local properties = npcClass.Properties;
+
+    local zarkCharacterClass: CharacterClass = properties.ZarkCharacterClass;
+
+    if properties.LastGreetZark == nil or tick()-properties.LastGreetZark <= 300 then
+        properties.LastGreetZark = tick();
+
+        npcClass.Move:SetMoveSpeed("set", "saluteZark", 0, npcClass.Move.MoveSpeedPriority.Action, 1);
+        npcClass.Move:Face(zarkCharacterClass.RootPart);
+
+        local zarkGreetSpeech = npcClass.NpcPackage.Chatter.ZarkGreetSpeech;
+        local zarkGreetPhrase = zarkGreetSpeech and zarkGreetSpeech[math.random(1, #zarkGreetSpeech)]
+                                or nil;
+        if zarkGreetPhrase and math.random(1, 10) > 1 then
+            npcClass.Chat(nil, zarkGreetPhrase.Say);
+        end
+
+        if math.random(1, 5) == 1 then
+            npcClass.PlayAnimation("salute");
+        end
+
+        return true;
+
+    elseif properties.LastGreetZark and tick()-properties.LastGreetZark <= 1.5 then
+        return true;
+
+    end
+
+    return false;
+end
 
 --MARK: FleeTree
 function treePackage.CanEquip(npcClass: NpcClass)
@@ -1084,6 +1234,20 @@ function treePackage.CheckDistraction(npcClass: NpcClass)
                     Players = game.Players:GetPlayers();
                     EmoteId = "hmm";
                 };
+
+                if distractionData.Disguise and distractionData.DisguiseConfusionSay ~= true then
+                    distractionData.DisguiseConfusionSay = true;
+
+                    local confusedSpeech = npcClass.NpcPackage.Chatter.InanimateDisguiseConfusionSpeech;
+                    local confusedPhrase = confusedSpeech and confusedSpeech[math.random(1, #confusedSpeech)] or nil;
+                    if confusedPhrase then
+                        local sayStr = confusedPhrase.Say;
+                        local disName = string.gsub(distractionData.Disguise, "%d", "");
+                        sayStr = string.gsub(sayStr, `$DisguiseName`, string.lower(disName));
+                        sayStr = sayStr:gsub("^%l", string.upper);
+                        npcClass.Chat(nil, sayStr);
+                    end
+                end
             end
 
         elseif properties.CheckDistractionState == 2 then

@@ -4,12 +4,20 @@ local CollectionService = game:GetService("CollectionService");
 local RunService = game:GetService("RunService");
 
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
+local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 --==
 local UsablePreset = shared.require(game.ReplicatedStorage.Library.UsableItems.UsablePreset).new();
 
 function UsablePreset:ClientUse(storageItem)
+	if modConfigurations.MustWearDisguiseKitToUse then
+		if storageItem.StorageId ~= "Clothing" then
+			modClientGuis.promptWarning("You must wear the disguise kit to use here.");
+			return;
+		end
+	end
+
 	modClientGuis.toggleWindow("DisguiseKit", true, storageItem);
 end
 
@@ -73,6 +81,13 @@ function UsablePreset:ServerInit()
 			local disguises = storageItem:GetValues("Disguises") or {};
 			
 			if disguises[disguiseId] or disguiseLib.Price == nil then
+				if modConfigurations.MustWearDisguiseKitToUse then
+					if storageItem.StorageId ~= "Clothing" then
+						shared.Notify(player, "You must wear the disguise kit to use here.", "Inform");
+						return;
+					end
+				end
+
 				modDisguiseMechanics:Disguise(player, disguiseId);
 			else
 				Debugger:Warn("Failed to disguise, not yet unlocked.", disguiseId);

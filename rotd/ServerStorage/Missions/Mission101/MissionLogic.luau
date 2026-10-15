@@ -14,7 +14,7 @@ function MissionLogic.onRequire()
 
         if modGameModeManager.IsGameWorld ~= true then return end;
 
-		shared.modEventService:OnInvoked("GameModeManager_BindGameModeComplete", function(event: EventPacket, packet)
+		shared.modEventService:OnInvoked("GameModeManager_BindGameModeStart", function(event: EventPacket, packet)
 			local room = packet.Room;
 			if room.Type ~= "Raid" then return end;
 
@@ -23,6 +23,28 @@ function MissionLogic.onRequire()
 					local mission = modMission:GetMission(player, MISSION_ID);
 					if mission == nil then continue end;
 					if mission.Type ~= 1 or mission.ProgressionPoint ~= 1 then continue end;
+						
+					local raidId = mission.SaveData.Raid;
+					if room.Stage ~= raidId then continue end;
+					
+					modMission:Progress(player, MISSION_ID, function(mission)
+						if mission.ProgressionPoint < 2 then
+							mission.ProgressionPoint = 2;
+						end;
+					end)
+				end
+			end)
+		end)
+
+		shared.modEventService:OnInvoked("GameModeManager_BindGameModeComplete", function(event: EventPacket, packet)
+			local room = packet.Room;
+			if room.Type ~= "Raid" then return end;
+
+			task.spawn(function()
+				for _, player in pairs(game.Players:GetPlayers()) do
+					local mission = modMission:GetMission(player, MISSION_ID);
+					if mission == nil then continue end;
+					if mission.Type ~= 1 or mission.ProgressionPoint ~= 2 then continue end;
 						
 					local raidId = mission.SaveData.Raid;
 					if room.Stage ~= raidId then continue end;
@@ -43,7 +65,7 @@ function MissionLogic.onRequire()
 				for _, player in pairs(game.Players:GetPlayers()) do
 					local mission = modMission:GetMission(player, MISSION_ID);
 					if mission == nil then continue end;
-					if mission.Type ~= 1 or mission.ProgressionPoint ~= 1 then continue end;
+					if mission.Type ~= 1 or mission.ProgressionPoint ~= 2 then continue end;
 						
 					local raidId = mission.SaveData.Raid;
 					if room.Stage ~= raidId then continue end;

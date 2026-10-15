@@ -38,7 +38,7 @@ local CharacterConfigurations = {
 
 	["BulletProtection"] = function(bodyEquips, k)
 		local value = bodyEquips[k];
-		return {SortKey="AProtectBullet"; Text=`<b>Bullet Protection:</b> {string.format("%.1f", value*100)}%`;}
+		return {SortKey="AProtectBullet"; Text=`<b>Bullet Protection:</b> {math.round(value)}`;}
 	end;
 	["GasProtection"] = function(bodyEquips, k)
 		local value = bodyEquips[k];

@@ -185,10 +185,7 @@ return function(player, dialog, data)
 	}, function(dialog)
 		if flag and flag.Time > os.time() then
 			Debugger:Warn("Wandering Trader still on cooldown for", player.Name);
-			task.spawn(function()
-				shared.modGameLogService:Log(player.Name.." attempting to abuse wandering trader..", "Trades");
-			end)
-			return 
+			return;
 		end;
 
 		local tradingSession = modTradingService:NewComputerSession(player, npcName);

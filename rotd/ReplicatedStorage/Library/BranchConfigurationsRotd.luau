@@ -234,6 +234,7 @@ local WORLDS = {
         WorldType = WORLD_TYPES.General;
         LoadLeaderboard = true;
         MaxPlayers = 1;
+        GameWorld = true;
     };
     Office = {
         DisplayName = "Raid: Office";
@@ -247,6 +248,7 @@ local WORLDS = {
         WorldType = WORLD_TYPES.General;
         LoadLeaderboard = true;
         MaxPlayers = 6;
+        GameWorld = true;
     };
     BanditOutpost = {
         DisplayName = "Raid: Bandit Outpost";
@@ -260,6 +262,7 @@ local WORLDS = {
         WorldType = WORLD_TYPES.General;
         LoadLeaderboard = true;
         MaxPlayers = 6;
+        GameWorld = true;
     };
     Tombs = {
         DisplayName = "Raid: Tombs";
@@ -273,6 +276,7 @@ local WORLDS = {
         WorldType = WORLD_TYPES.General;
         LoadLeaderboard = true;
         MaxPlayers = 6;
+        GameWorld = true;
     };
     Railways = {
         DisplayName = "Raid: Railways";
@@ -286,6 +290,7 @@ local WORLDS = {
         WorldType = WORLD_TYPES.General;
         LoadLeaderboard = true;
         MaxPlayers = 6;
+        GameWorld = true;
     };
     AbandonedBunker = {
         DisplayName = "Raid: Abandoned Bunker";
@@ -299,6 +304,7 @@ local WORLDS = {
         WorldType = WORLD_TYPES.General;
         LoadLeaderboard = true;
         MaxPlayers = 6;
+        GameWorld = true;
     };
     EighthStreet = {
         DisplayName = "Eighth Street";
@@ -310,6 +316,7 @@ local WORLDS = {
         WorldType = WORLD_TYPES.General;
         LoadLeaderboard = false;
         MaxPlayers = 6;
+        GameWorld = true;
     };
     NorthStarEmbassy = {
         DisplayName = "North Star Embassy";
@@ -321,6 +328,7 @@ local WORLDS = {
         WorldType = WORLD_TYPES.General;
         LoadLeaderboard = false;
         MaxPlayers = 6;
+        GameWorld = true;
     };
 
     -- 
@@ -336,6 +344,7 @@ local WORLDS = {
         };
         
         WorldType = WORLD_TYPES.General;
+        GameWorld = true;
     };
     SunkenShip = {
         DisplayName = "Coop: Sunken Ship";
@@ -347,6 +356,7 @@ local WORLDS = {
         };
         
         WorldType = WORLD_TYPES.General;
+        GameWorld = true;
     };
     CargoShip = {
         DisplayName = "Coop: Cargo Ship";
@@ -358,6 +368,7 @@ local WORLDS = {
         };
         
         WorldType = WORLD_TYPES.General;
+        GameWorld = true;
     };
 
 
@@ -562,6 +573,7 @@ local WORLDS = {
         WeatherCycle = false;
         LoadLeaderboard = true;
         UseCachedPathfinding = true;
+        GameWorld = true;
     };
     CommunityFissionBay = {
         DisplayName = "Community: Fission Bay";
@@ -576,6 +588,7 @@ local WORLDS = {
         WeatherCycle = false;
         LoadLeaderboard = true;
         UseCachedPathfinding = true;
+        GameWorld = true;
     };
     CommunityRooftops = {
         DisplayName = "Community: Rooftops";
@@ -590,6 +603,7 @@ local WORLDS = {
         WeatherCycle = false;
         LoadLeaderboard = true;
         UseCachedPathfinding = true;
+        GameWorld = true;
     };
 }
 
@@ -937,6 +951,10 @@ function modBranchConfigurations.onRequire()
             
         end
         
+        if curWorldInfo.GameWorld then
+            modConfigurations.Set("MustWearDisguiseKitToUse", true);
+        end
+
         --== Server;
         modConfigurations.Set("DisableItemDrops", false);
         modConfigurations.Set("DisableExperienceGain", false);

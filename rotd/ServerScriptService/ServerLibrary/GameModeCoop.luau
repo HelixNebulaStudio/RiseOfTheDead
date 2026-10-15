@@ -894,7 +894,7 @@ function Coop:Start()
 		self.Soundtrack:Destroy();
 	end	
 	self.Soundtrack = modAudio.Play(self.StageLib.Soundtrack, workspace);
-	modCutscene:PlayCutscene(game.Players:GetPlayers(), self.ModeStage);
+	modCutscene:PlayCutscene(self.ModeStage, {Players=game.Players:GetPlayers();});
 end
 
 --MARK: RespawnDead
