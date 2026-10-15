@@ -986,7 +986,7 @@ function treePackage.GreetZark(npcClass: NpcClass)
 
     local zarkCharacterClass: CharacterClass = properties.ZarkCharacterClass;
 
-    if properties.LastGreetZark == nil or tick()-properties.LastGreetZark <= 300 then
+    if properties.LastGreetZark == nil or tick()-properties.LastGreetZark > 300 then
         properties.LastGreetZark = tick();
 
         npcClass.Move:SetMoveSpeed("set", "saluteZark", 0, npcClass.Move.MoveSpeedPriority.Action, 1);

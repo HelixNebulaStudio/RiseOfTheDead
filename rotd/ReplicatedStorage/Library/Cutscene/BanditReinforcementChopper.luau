@@ -119,6 +119,18 @@ function cutscenePackage.run(CutsceneSequence)
 		tweenValueInstance.Value = flyInCFrame;
 		newHeliModel.Parent = workspace.Environment;
 
+		local destructConfig: Configuration = modDestructibles.createDestructible("Helicopter");
+		destructConfig.Parent = newHeliModel;
+
+		local heliDestructible: DestructibleInstance = modDestructibles.getOrNew(destructConfig);
+		heliDestructible:SetEnabled(false);
+		local heliHealthComp: HealthComp = heliDestructible.HealthComp;
+
+		heliHealthComp.OnIsDeadChanged:Connect(function(isDead)
+			if not isDead then return end;
+			setHeliCanCollide(true);
+		end)
+
 		task.spawn(function()
 			while workspace:IsAncestorOf(newHeliModel) do
 				task.wait();
@@ -127,7 +139,13 @@ function cutscenePackage.run(CutsceneSequence)
 					local spinOutTl = tick()-heliSpinOut;
 					local mapSpin = 1-math.clamp(spinOutTl/4, 0.1, 1);
 					heliYaw += (math.pi/(mapSpin * 3) /60);
+
+					if mapSpin >= 0.99 then
+						heliHealthComp:SetIsDead(true);
+					end
 				end
+
+				if heliHealthComp.IsDead then break; end;
 
 				local newCFrame = tweenValueInstance.Value;
 				local swayRot = CFrame.Angles(math.sin(tick()/2)/8, heliYaw, math.sin(tick()/2)/8);
@@ -148,18 +166,6 @@ function cutscenePackage.run(CutsceneSequence)
 		local openDoorsAnimation = animationController:LoadAnimation(animationsFolder:WaitForChild("OpenDoors"));
 
 
-		local destructConfig: Configuration = modDestructibles.createDestructible("Helicopter");
-		destructConfig:SetAttribute("MaxHealth", 5000);
-		destructConfig.Parent = newHeliModel;
-
-		local heliDestructible: DestructibleInstance = modDestructibles.getOrNew(destructConfig);
-		heliDestructible:SetEnabled(false);
-		local heliHealthComp: HealthComp = heliDestructible.HealthComp;
-
-		heliHealthComp.OnIsDeadChanged:Connect(function(isDead)
-			if not isDead then return end;
-			setHeliCanCollide(true);
-		end)
 
 		local tweenA: Tween, tweenB: Tween, tweenC: Tween;
 		tweenA = TweenService:Create(

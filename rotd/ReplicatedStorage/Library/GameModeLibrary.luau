@@ -543,6 +543,7 @@ GameModeLibrary.GameModes={
 				TitleImage = "rbxassetid://90765608536341";
 				RewardsId = "northstarcrate";
 				Soundtrack = "Soundtrack:Goda Scary Atmosphere";
+				AlertSoundtrack = "Soundtrack:200 Mph A";
 				Description = "Echoes of constant growling and gun fire..";
 				
 				EnableStopwatch=true;

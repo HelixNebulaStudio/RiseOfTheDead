@@ -37,11 +37,31 @@ return function(interface: InterfaceInstance, window, frame)
 		local headerText = data.Header or ``;
 		local descLabel = data.Status or ``;
 
+		local soundTrackName = stageLib.Soundtrack;
+		if data.ChangeSoundtrack then
+			soundTrackName = data.ChangeSoundtrack;
+
+			local oldSnd = self.Soundtrack;
+			if oldSnd and oldSnd.Name ~= soundTrackName then
+				local tween: Tween = TweenService:Create(oldSnd, TweenInfo.new(1), {Volume=0;});
+				tween.Completed:Connect(function()
+					Debugger.Expire(oldSnd);
+				end)
+				tween:Play();
+
+				self.Soundtrack = nil;
+			end
+
+			data.PlayMusic = true;
+			soundTrackActive = false;
+		end
+
 		if self.Soundtrack == nil and not soundTrackActive then
 			soundTrackActive = true;
+			
 			task.spawn(function() 
-				modAudio.Preload(stageLib.Soundtrack, 5);
-				self.Soundtrack = modAudio.Play(stageLib.Soundtrack, script.Parent);
+				modAudio.Preload(soundTrackName, 5);
+				self.Soundtrack = modAudio.Play(soundTrackName, script.Parent);
 				if self.Soundtrack then
 					self.Soundtrack.Volume = 0;
 				end

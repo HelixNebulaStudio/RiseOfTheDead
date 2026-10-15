@@ -375,8 +375,7 @@ function Stronghold:Initialize(roomData)
 				if remaining > 0 
 				and #self.EnemyClasses <= math.ceil(remaining/2) 
 				and (self.StartTick and tick()-self.StartTick >= 10)
-				and (self.AlertShoutCounter > 0
-				or (#self.EnemyClasses <= 0 and self.LastKilled and tick()-self.LastKilled >= 60)) then
+				and (self.AlertShoutCounter > 0 or #self.EnemyClasses <= 0) then
 					
 					task.spawn(function()
 						local rngPlayer = game.Players:GetPlayers()[math.random(1, #game.Players:GetPlayers())];
@@ -403,9 +402,6 @@ function Stronghold:Initialize(roomData)
 							SpawnCFrame = closestSpawnAtt.WorldCFrame;
 						});
 						if npcClass then
-							if math.random(1, 2) == 1 then
-								self.EliminateGoal += 1;
-							end
 							npcClass.Properties.Reinforcement = true;
 						end
 
@@ -687,6 +683,13 @@ function Stronghold:SpawnEnemy(npcName, paramPacket)
 						EventName = "AlertShout";
 						Room = self.RoomData;
 					});
+
+					if self.StageLib.AlertSoundtrack then
+						self:Hud({
+							ChangeSoundtrack = self.StageLib.AlertSoundtrack;
+						});
+					end
+					
 					if self.LastHordeCryTick and tick()-self.LastHordeCryTick <= 60 then
 						return; 
 					end;
@@ -992,6 +995,10 @@ function Stronghold:Start()
 					spawnFrame:SetAttribute("Spawned", true);
 
 					local enemyName = spawnFrame:GetAttribute("EnemyName") or self:PickEnemy();
+					if enemyName ~= "Bandit" and self.LastAlertShoutTick == nil then
+						enemyName = "Bandit";
+					end
+
 					self:SpawnEnemy(enemyName, {
 						SpawnCFrame = spawnFrame.CFrame;
 						SpawnFrame = spawnFrame;
@@ -1111,10 +1118,11 @@ function Stronghold:Hud(data)
 		Status = self.StatusText or "";
 		IsHard = self.IsHard == true;
 		
-		HookEntity=data.HookEntity or false;
+		HookEntity = data.HookEntity or false;
 		
-		LootPrefab=self.LootPrefab;
-		PlayMusic=data.PlayMusic;
+		LootPrefab = self.LootPrefab;
+		PlayMusic = data.PlayMusic;
+		ChangeSoundtrack = data.ChangeSoundtrack;
 
 		LevelDif = self.Difficulty;
 		StopwatchTick = self.StopwatchTick;
@@ -1251,6 +1259,14 @@ function Stronghold:QuickKillTrigger(packet)
 
 			self.EliminateGoal += 6;
 
+			local completed = false;
+			local completeCallback = function()
+				if completed then return end;
+				completed = true;
+
+				Stronghold.PauseGoalTick = nil;
+				newAtt:SetAttribute("CooldownEndTick", tick()+ 5);
+			end
 			shared.modCutscene:PlayCutscene("BanditReinforcementChopper", {
 				SpawnPosition = newAtt.WorldPosition;
 				CustomNpcSpawn = function(spawnCf, bindSetupHook)
@@ -1279,11 +1295,9 @@ function Stronghold:QuickKillTrigger(packet)
 
 					return npcClass;
 				end;
-				CompleteCallback = function() 
-					Stronghold.PauseGoalTick = nil;
-					newAtt:SetAttribute("CooldownEndTick", tick()+ 5);
-				end
+				CompleteCallback = completeCallback;
 			});
+			task.delay(25, completeCallback);
 		end
 	end
 

@@ -18,59 +18,83 @@ function destructiblePackage.BindNew(destructible: DestructibleInstance)
     healthComp:SetMaxHealth(500000);
     healthComp:Reset();
 
+    local function setHpFire()
+        if properties.HpFire then return end;
+        properties.HpFire = true;
+
+        local model = destructible.Model;
+
+        local fire = Instance.new("Fire");
+        fire.Heat = 15;
+        fire.Size = 10;
+        fire.Parent = model.PrimaryPart;
+
+        if properties.PanicAlarmSnd then
+            properties.PanicAlarmSnd.PlaybackSpeed = 1;
+        end
+    end
+
+    local function setHpPanic()
+        if properties.HpPanic then return end;
+        properties.HpPanic = true;
+
+        local model = destructible.Model;
+
+        local snd = modAudio.Play("PanicAlarm", model.PrimaryPart);
+        snd.PlaybackSpeed = 0.8;
+        properties.PanicAlarmSnd = snd;
+    end
+
+    local function setHpSmoke()
+        if properties.HpSmoke then return end;
+        properties.HpSmoke = true;
+
+        local model = destructible.Model;
+        
+        local smoke = Instance.new("Smoke");
+        smoke.Color = Color3.fromRGB(0, 0, 0);
+        smoke.Size = 5;
+        smoke.RiseVelocity = 10;
+        smoke.Opacity = 1;
+        smoke.Parent = model.PrimaryPart;
+    end
+
+    healthComp.OnIsDeadChanged:Connect(function(isDead)
+        if not isDead then return end;
+
+        setHpFire();
+        setHpPanic();
+        setHpSmoke();
+    end)
+
     healthComp.OnHealthChanged:Connect(function(curHealth, maxHealth)
         local model = destructible.Model;
         local hpRatio = curHealth/maxHealth;
 
         if hpRatio <= 0.15 then
-            if properties.HpFire == nil then
-                properties.HpFire = true;
+            setHpFire();
 
-				local fire = Instance.new("Fire");
-				fire.Heat = 15;
-				fire.Size = 10;
-				fire.Parent = model.PrimaryPart;
+            task.spawn(function()
+                if properties.HpBurnOut then return end;
+                properties.HpBurnOut = true;
 
-                if properties.PanicAlarmSnd then
-                    properties.PanicAlarmSnd.PlaybackSpeed = 1;
+                while task.wait(1) do
+                    if healthComp.IsDead then return end;
+                    if not workspace:IsAncestorOf(model) then return end;
+
+                    local dmg = healthComp.MaxHealth*0.01;
+                    healthComp:TakeDamage(DamageData.new{
+                        Damage = dmg;
+                        DamageType = "IgnoreArmor";
+                    });
                 end
-
-                task.spawn(function()
-                    while task.wait(1) do
-                        if healthComp.IsDead then return end;
-                        if not workspace:IsAncestorOf(model) then return end;
-
-                        local dmg = healthComp.MaxHealth*0.01;
-                        healthComp:TakeDamage(DamageData.new{
-                            Damage = dmg;
-                            DamageType = "IgnoreArmor";
-                        });
-                    end
-                end)
-            end
+            end)
 
         elseif hpRatio <= 0.30 then
-            
-            if properties.HpPanic == nil then
-                properties.HpPanic = true;
-
-                local snd = modAudio.Play("PanicAlarm", model.PrimaryPart);
-                snd.PlaybackSpeed = 0.8;
-                properties.PanicAlarmSnd = snd;
-            end
+            setHpPanic();
 
         elseif hpRatio <= 0.45 then
-
-            if properties.HpSmoke == nil then
-                properties.HpSmoke = true;
-
-                local smoke = Instance.new("Smoke");
-                smoke.Color = Color3.fromRGB(0, 0, 0);
-                smoke.Size = 5;
-                smoke.RiseVelocity = 10;
-                smoke.Opacity = 1;
-                smoke.Parent = model.PrimaryPart;
-            end
+            setHpSmoke();
 
         end
     end)
