@@ -1,0 +1,21 @@
+{
+	"nodes":[
+		{"type":"text","text":"### Military\n*Lawful Evil*, \n\nMaintains control and assert power\n","id":"953d4b58c1199746","x":-560,"y":-320,"width":320,"height":300},
+		{"type":"text","text":"### Cultists\n*Chaotic Evil*, Rouges\n\nRats has ties with the cultist,\n\n","id":"2a66e8fc138eeb53","x":-240,"y":-20,"width":320,"height":300},
+		{"type":"text","text":"### Survivors\n\n*Lawful Good*, Civilians\n\n","id":"c57c87432fde64b1","x":-880,"y":-20,"width":320,"height":300},
+		{"type":"text","text":"### BioX\n*Chaotic Good*, Researchers and Scientists\n- Private Pharma Company","id":"daef2419e5d67115","x":-1200,"y":-320,"width":320,"height":300},
+		{"type":"text","text":"Safehome NPCs","id":"b5deb5ef7a7782f3","x":-685,"y":400,"width":250,"height":160},
+		{"type":"text","text":"#### Medics","id":"3f353c24d84ac511","x":-1002,"y":400,"width":245,"height":160},
+		{"type":"file","file":"docs/Lore Factions/Rats Profile.md","id":"fdb02af2bc7aac72","x":-240,"y":-620,"width":320,"height":300},
+		{"type":"file","file":"docs/Lore Factions/Bandits Profile.md","id":"8593a5a20b788011","x":80,"y":-320,"width":320,"height":300},
+		{"type":"text","text":"### Protagonist\n\n*True Neutral*, Player Determined\n\nBackgrounds:\n- Lost identity\n- Has flash backs of being in BioX labs\n- Nekron mind is buried in the protagonist, it brings the protagonist back to life when they die.","id":"d66943e90dacf161","x":-880,"y":-620,"width":320,"height":300}
+	],
+	"edges":[
+		{"id":"b9c7e3b0918b6b15","fromNode":"daef2419e5d67115","fromSide":"right","toNode":"953d4b58c1199746","toSide":"left","fromEnd":"arrow","label":"Worked with"},
+		{"id":"caec04a2a2d5eeae","fromNode":"c57c87432fde64b1","fromSide":"bottom","toNode":"3f353c24d84ac511","toSide":"top"},
+		{"id":"07cb7ac758c0deae","fromNode":"c57c87432fde64b1","fromSide":"bottom","toNode":"b5deb5ef7a7782f3","toSide":"top"},
+		{"id":"547a7c5f0ed2c5c3","fromNode":"953d4b58c1199746","fromSide":"right","toNode":"8593a5a20b788011","toSide":"left","fromEnd":"arrow","label":"Secret subbranch"},
+		{"id":"df1641142563c017","fromNode":"2a66e8fc138eeb53","fromSide":"top","toNode":"fdb02af2bc7aac72","toSide":"bottom","fromEnd":"arrow"},
+		{"id":"e9e15f60679d0879","fromNode":"d66943e90dacf161","fromSide":"bottom","toNode":"c57c87432fde64b1","toSide":"top","fromEnd":"arrow"}
+	]
+}
