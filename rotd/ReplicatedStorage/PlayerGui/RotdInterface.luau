@@ -38,9 +38,11 @@ function RotdInterface.clientGuisLoad()
         end;
 
         interface.Garbage:Tag(playerClass.OnIsDeadChanged:Connect(function(isDead)
-            if not isDead then return end;
-
-            interface:ToggleGameBlinds(false, 4);
+            if isDead then
+                interface:ToggleGameBlinds(false, 4);
+            else
+                interface:ToggleGameBlinds(true, 1);
+            end
         end))
 
         local function onWorldEventInfoUpdate()

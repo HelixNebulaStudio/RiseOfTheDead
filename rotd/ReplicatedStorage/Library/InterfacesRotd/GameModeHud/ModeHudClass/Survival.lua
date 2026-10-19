@@ -668,6 +668,8 @@ return function(interface, window, frame)
 						for key, data in pairs(stageLib.LeaderboardKeyTable) do
 							if data.Folder == "AllTimeStats" then
 								keyTable.AllTimeTableKey = key;
+							elseif data.Folder == "YearlyStats" then
+								keyTable.YearlyTableKey = key;
 							elseif data.Folder == "SeasonlyStats" then
 								keyTable.SeasonlyTableKey = key;
 							elseif data.Folder == "MonthlyStats" then

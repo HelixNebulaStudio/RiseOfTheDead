@@ -123,7 +123,6 @@ function cutscenePackage.run(CutsceneSequence)
 		destructConfig.Parent = newHeliModel;
 
 		local heliDestructible: DestructibleInstance = modDestructibles.getOrNew(destructConfig);
-		heliDestructible:SetEnabled(false);
 		local heliHealthComp: HealthComp = heliDestructible.HealthComp;
 
 		heliHealthComp.OnIsDeadChanged:Connect(function(isDead)
@@ -138,7 +137,7 @@ function cutscenePackage.run(CutsceneSequence)
 				if heliSpinOut then
 					local spinOutTl = tick()-heliSpinOut;
 					local mapSpin = 1-math.clamp(spinOutTl/4, 0.1, 1);
-					heliYaw += (math.pi/(mapSpin * 3) /60);
+					heliYaw += (math.pi/(mapSpin * 2) /60);
 
 					if mapSpin >= 0.99 then
 						heliHealthComp:SetIsDead(true);
@@ -196,8 +195,6 @@ function cutscenePackage.run(CutsceneSequence)
 			if tweenADone then return end;
 			tweenADone = true;
 
-			heliDestructible:SetEnabled(true);
-
 			for a=1, 6 do
 				local seatPart = newHeliModel:FindFirstChild(`Seat{a}`);
 				if seatPart == nil then continue end;
@@ -225,10 +222,11 @@ function cutscenePackage.run(CutsceneSequence)
 					npcClass.RootPart.Anchored = true;
 					
 					npcClass.Properties.Seat = seatPart;
-					npcClass.RootPart.Massless = true;
 					npcClass.Humanoid.PlatformStand = true;
 
 					local function leaveHeli()
+						if npcClass.Properties.IsOnVehicle == nil then return end;
+
 						npcClass:Sit(nil);
 						npcClass.Properties.Seat = nil;
 						
@@ -252,6 +250,7 @@ function cutscenePackage.run(CutsceneSequence)
 
 			local pilotProperties = typeof(params.PilotProperties) == "table" and params.PilotProperties or {};
 			pilotProperties.IsOnVehicle = true;
+			pilotProperties.Immortal = 1;
 
 			local pilotSeat = newHeliModel:WaitForChild("PSeat1");
 			bindNpcSpawnCallback(shared.modNpcs.spawn2{
@@ -263,7 +262,6 @@ function cutscenePackage.run(CutsceneSequence)
 					npcClass.RootPart.Anchored = true;
 					
                     npcClass.Properties.Seat = pilotSeat;
-					npcClass.RootPart.Massless = true;
 					npcClass.Humanoid.PlatformStand = true;
 
 					npcClass.HealthComp.OnIsDeadChanged:Connect(function(isDead)
@@ -279,6 +277,16 @@ function cutscenePackage.run(CutsceneSequence)
 
 					newHeliModel.Destroying:Connect(function()
 						npcClass:Destroy();
+					end)
+
+					heliHealthComp.OnIsDeadChanged:Connect(function(isDead)
+						if not isDead then return end;
+						npcClass:Destroy();
+					end)
+
+					task.delay(12, function()
+						if npcClass.HealthComp.IsDead then return end;
+						npcClass.Properties.Immortal = nil;
 					end)
 				end;
 			});

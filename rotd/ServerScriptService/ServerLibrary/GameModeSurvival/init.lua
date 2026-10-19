@@ -2,6 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local Players = game:GetService("Players");
 local RunService = game:GetService("RunService");
+local CollectionService = game:GetService("CollectionService");
 
 --==
 local Survival = {};
@@ -232,6 +233,54 @@ function Survival:Load()
 		end)
 	end)
 	
+	task.spawn(function()
+		while true do
+			task.wait(5);
+
+			for a=#self.EnemyNpcClasses, 1, -1 do
+				local npcClass: NpcClass = self.EnemyNpcClasses[a];
+				if npcClass == nil 
+				or npcClass.HealthComp == nil 
+				or npcClass.HealthComp.IsDead
+				or npcClass.Properties == nil then continue end;
+
+				local humanoid = npcClass.Humanoid;
+				if humanoid.WalkSpeed <= 0 then continue end;
+
+				local lastPos = npcClass.Properties.SurvivalLastPos or npcClass.SpawnCFrame.Position;
+				local curPos = npcClass:GetCFrame().Position;
+				local disDiff = npcClass:DistanceFrom(lastPos);
+
+				if disDiff >= 2 or npcClass.SpawnTime == nil or tick()-npcClass.SpawnTime <= 10 then
+					npcClass.Properties.SurvivalLastPos = curPos;
+					npcClass.Properties.SurvivalStuckTick = nil;
+					continue 
+				end;
+
+				local _, closestDistSqrd = shared.modPlayers.PositionsOctree:KNearestNeighborsSearch(curPos, 1, 1024);
+
+				if #closestDistSqrd > 0 and closestDistSqrd[1] <= 4096 then
+					npcClass.Properties.SurvivalLastPos = curPos;
+					npcClass.Properties.SurvivalStuckTick = nil;
+					continue;
+				end
+
+				if npcClass.Properties.SurvivalStuckTick == nil or tick()- npcClass.Properties.SurvivalStuckTick > 10 then
+					npcClass.Properties.SurvivalStuckTick = tick();
+					continue
+				end
+
+				local newSpawnCf = self.BasicEnemySpawns[math.random(1, #self.BasicEnemySpawns)].CFrame;
+
+				npcClass.Properties.SurvivalStuckTick = nil;
+				npcClass.Properties.SurvivalLastPos = newSpawnCf.Position;
+
+				npcClass:SetCFrame(newSpawnCf);
+			end
+		end
+		
+	end)
+
 	-- MARK: /survival
 	task.spawn(function()
 		Debugger.AwaitShared("modCommandsLibrary");
@@ -409,13 +458,7 @@ function Survival:SpawnEnemy(npcName, paramPacket)
 			Immunity = paramPacket.Immunity;
 		};
 		BindSetup = function(npcClass: NpcClass)
-			task.spawn(function()
-				while currWave == self.Wave do
-					task.wait(1);
-				end
-				if npcClass.HealthComp.IsDead then return end;
-				npcClass:Destroy();
-			end)
+			self.StageGarbage:Tag(npcClass.Character);
 			table.insert(self.EnemyNpcClasses, npcClass);
 
 			self.EnemiesSpawned = self.EnemiesSpawned + 1;
@@ -1313,6 +1356,12 @@ function Survival:StartWave(wave)
 			shared.Notify(game.Players:GetPlayers(), "A Stake Crate has been discovered!", "Reward");
 
 			workspace:SetAttribute("GameModeComplete", true);
+
+			for _, interactConfig in pairs(CollectionService:GetTagged("Interactable")) do
+				if interactConfig:GetAttribute("_Name") ~= "GameModeExit" then continue end;
+				interactConfig:SetAttribute("Mode", self.ModeType);
+				interactConfig:SetAttribute("Stage", self.ModeStage);
+			end
 			return;
 
 		else

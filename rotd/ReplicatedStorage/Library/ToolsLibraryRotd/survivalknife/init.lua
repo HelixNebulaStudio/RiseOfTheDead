@@ -25,7 +25,7 @@ local toolPackage = {
 		Category = "Edged";
 		Type="Knife";
 
-		EquipLoadTime=0.3;
+		EquipLoadTime=0.2;
 		FireAlertRange = 2;
 		Damage=100;
 

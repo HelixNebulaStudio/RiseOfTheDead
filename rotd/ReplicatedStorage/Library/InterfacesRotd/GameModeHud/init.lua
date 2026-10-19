@@ -185,9 +185,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 			local currentHudObject = gameHudObjects[activeMode];
 			if currentHudObject == nil and hudModules[activeMode] then
-				gameHudObjects[activeMode] = hudModules[activeMode](interface, window, frame); -- new modeHud Object;
+				currentHudObject = hudModules[activeMode](interface, window, frame); -- new modeHud Object;
+				gameHudObjects[activeMode] = currentHudObject;
 			end
-			currentHudObject = gameHudObjects[activeMode];
 
 			if currentHudObject then
 				currentHudObject.GameType = hudData.Type;

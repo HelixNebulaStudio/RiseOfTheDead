@@ -92,7 +92,14 @@ function Stronghold.new()
 
         EliminateCount = 0;
         EliminateGoal = 0;
-	};
+
+        HudState = {
+            Header = nil;
+            Status = nil;
+            RaidMarker = nil;
+            HookEntity = nil;
+        };
+ };
 
 	if Stronghold.Active == nil then
 		Stronghold.Active = self;
@@ -430,10 +437,7 @@ function Stronghold:Initialize(roomData)
 				self:Restart();
 
 			else
-				self:Hud{
-					HeaderText = "You died!";
-					StatusText = "";
-				};
+				self:Hud{State = "PlayerDown"};
 			end
 		end)
     end)
@@ -637,16 +641,10 @@ function Stronghold:SpawnEnemy(npcName, paramPacket)
 					);
 
 					if Stronghold.PauseGoalTick and tick()-Stronghold.PauseGoalTick <= 20 then
-						self.StatusText = `Hostile Reinforcements incomming..`;
-						self:Hud({
-							StatusText = self.StatusText;
-						});
+						self:Hud({State = "Reinforcements"});
 
 					else
-						self.StatusText = `Eliminate {remaining} enemies`;
-						self:Hud({
-							StatusText = self.StatusText;
-						});
+						self:Hud({State = "Eliminate"});
 						
 						if self.EliminateCount >= self.EliminateGoal then
 							self:CompleteRaid();
@@ -665,14 +663,6 @@ function Stronghold:SpawnEnemy(npcName, paramPacket)
 					targetHandlerComp:AddTarget(self.Players[a].Character);
 				end
 			end
-
-			task.delay(1, function()
-				local remaining = math.max(0, self.EliminateGoal - self.EliminateCount);
-				self.StatusText = `Eliminate {remaining} enemies`;
-				self:Hud({
-					StatusText = self.StatusText;
-				})
-			end)
 
 			if npcClass.BehaviorTree.RootTree 
 			and npcClass.BehaviorTree.RootTree.OnAlertShout 
@@ -702,34 +692,7 @@ function Stronghold:SpawnEnemy(npcName, paramPacket)
 					end
 					Debugger:Warn(`Bandit Alert Shout Id:`, shoutNpcClass.Id, ` Wave={self.Wave}`);
 
-					task.wait(math.random(5, 10));
-	
-					modAudio.Play("HordeGrowl", workspace);
-
-					for a=1, math.random(6, 12) do
-						local spawnsInRange = self.HordeSpawns:RadiusSearch(shoutNpcClass:GetCFrame().Position, 128);
-						if #spawnsInRange <= 0 then 
-							task.wait(1); 
-							continue;
-						end;
-						local pickSpawn = spawnsInRange[math.random(1, #spawnsInRange)];
-
-						local zombieNpcClass: NpcClass = self:SpawnEnemy("Zombie", {
-							SpawnCFrame = pickSpawn.CFrame;
-							HordeAggression = math.random(1, 4) == 1;
-						});
-
-						if zombieNpcClass then
-							local targetHandlerComp = zombieNpcClass:GetComponent("TargetHandler");
-							if targetHandlerComp then
-								local priorityTargetData = targetHandlerComp:AddTarget(npcClass.Character);
-								zombieNpcClass.Properties.PriorityTargetData = priorityTargetData;
-							end
-						end
-
-						task.wait(math.random(10, 35)/10);
-						if self.Status ~= EnumStatus.InProgress then break; end;
-					end
+					self:ZombieHordeTrigger(shoutNpcClass:GetCFrame().Position);
 				end)
 			end
 
@@ -756,8 +719,8 @@ function Stronghold:CompleteRaid()
 
 	shared.Notify(game.Players:GetPlayers(), `Raid Complete!{runTimeStr}`, "Positive");
 	self:Hud{
-		StatusText = "Raid Complete!";
-		PlayMusic=false;
+		State = "Completed";
+		PlayMusic = false;
 	};
 
 	self:RespawnDead();
@@ -828,7 +791,7 @@ function Stronghold:DropReward()
 		self.LootPrefab = lootPrefab;
 
 		self:Hud{
-			StatusText = "A reward package has dropped!";
+			State = "RewardDropped";
 		};
 	end
 end
@@ -843,7 +806,6 @@ function Stronghold:BeginCount()
 	end
 
 	self:Hud({
-		Status = self.StatusText;
 		PlayMusic = true;
 	});
 end
@@ -852,7 +814,7 @@ function Stronghold:Start()
 	self.StopwatchTick = nil;
 	Debugger:Warn("Stronghold:Start");
 
-	self:Hud({Action="Open"});
+	self:Hud();
 
 	-- Difficulty
 	local highestLevel = 0;
@@ -939,7 +901,8 @@ function Stronghold:Start()
     
 	for a=5, 1, -1 do
 		self:Hud({
-			Status = `Stronghold is starting in {a}s..`;
+			State = "Starting";
+			Countdown = a;
 		});
 		task.wait(1);
 	end
@@ -977,9 +940,8 @@ function Stronghold:Start()
 		Room = self.RoomData;
 	});
 	
-	self.StatusText = `Eliminate {self.EliminateGoal} enemies`;
 	self:Hud({
-		StatusText = self.StatusText;
+		State = "Eliminate";
 	})
     Debugger:StudioLog(`Stronghold:Start self=`, self);
 
@@ -1075,13 +1037,16 @@ function Stronghold:Restart()
 	
 	self.LastHordeCryTick = nil;
 
+	-- Reset persisted HUD state so the next run starts clean.
+	table.clear(self.HudState);
+
 	shared.Notify(game.Players:GetPlayers(), "Raid failed!", "Negative");
 	
 	for a=5, 1, -1 do
 		self:Hud{
-			Header = `Raid failed!`;
-			Status = `Restarting in {a}s..`;
-			PlayMusic=false;
+			State = "Failed";
+			Countdown = a;
+			PlayMusic = false;
 		};
 		
 		shared.Notify(game.Players:GetPlayers(), `Restarting in {a}s..`, "Negative", "ModeRestarting");
@@ -1090,44 +1055,6 @@ function Stronghold:Restart()
 	
 	self:RespawnDead();
 	self:Start();
-end
-
---MARK: Hud
-function Stronghold:Hud(data)
-	if not self.Loaded then return end;
-	data = data or {};
-	
-	if data.HeaderText then
-		self.HeaderText = data.HeaderText;
-	end
-	if data.StatusText then
-		self.StatusText = data.StatusText;
-	end
-	if data.RaidMarker then
-		self.RaidMarker = data.RaidMarker;
-	end
-	if data.HookEntity then
-		self.HookEntity = data.HookEntity;
-	end
-
-	remoteGameModeHud:FireAllClients({
-		Action = "Open";
-		Type = self.ModeType;
-		Stage = self.ModeStage;
-		Header = self.HeaderText or `Elimination`;
-		Status = self.StatusText or "";
-		IsHard = self.IsHard == true;
-		
-		HookEntity = data.HookEntity or false;
-		
-		LootPrefab = self.LootPrefab;
-		PlayMusic = data.PlayMusic;
-		ChangeSoundtrack = data.ChangeSoundtrack;
-
-		LevelDif = self.Difficulty;
-		StopwatchTick = self.StopwatchTick;
-		StopwatchFinal = self.StopwatchFinal;
-	});
 end
 
 local spawnCfCaches = {};
@@ -1235,8 +1162,125 @@ function Stronghold:LoadSpawnPlatform(spawnPart: BasePart)
 end
 
 
---MARK: Special Events
 
+
+--MARK: Hud
+--==========================================================================
+local HudStates = {
+	Starting = {
+		Resolve = function(self, data)
+			return nil, `Stronghold is starting in {data.Countdown}s..`;
+		end;
+	};
+
+	Eliminate = {
+		Resolve = function(self)
+			local remaining = math.max(0, self.EliminateGoal - self.EliminateCount);
+			return nil, `Eliminate {remaining} enemies`;
+		end;
+	};
+
+	Reinforcements = {
+		Resolve = function(self)
+			return nil, `Hostile Reinforcements incomming..`;
+		end;
+		Duration = 3;
+	};
+
+	Horde = {
+		Resolve = function(self)
+			return nil, "Zombie horde attracted..";
+		end;
+		Duration = 3;
+	};
+
+	PlayerDown = {
+		Resolve = function(self)
+			return "You died!", "";
+		end;
+	};
+
+	Completed = {
+		Resolve = function(self)
+			return nil, "Raid Complete!";
+		end;
+	};
+
+	RewardDropped = {
+		Resolve = function(self)
+			return nil, "A reward package has dropped!";
+		end;
+	};
+
+	Failed = {
+		Resolve = function(self, data)
+			return "Raid failed!", `Restarting in {data.Countdown}s..`;
+		end;
+	};
+};
+
+function Stronghold:Hud(data)
+	if not self.Loaded then return end;
+	data = data or {};
+
+	local stateName = data.State;
+	if stateName ~= nil then
+		local stateDef = HudStates[stateName];
+		if stateDef == nil then
+			Debugger:Warn(`Unknown HUD state "{stateName}", ignoring.`);
+		else
+			local stateHeader, stateStatus = stateDef.Resolve(self, data);
+			if stateHeader ~= nil then data.HeaderText = stateHeader; end
+			if stateStatus ~= nil then data.StatusText = stateStatus; end
+
+			if stateDef.Duration then
+				local hudToken = (self.HudToken or 0) + 1;
+				self.HudToken = hudToken;
+
+				task.delay(stateDef.Duration, function()
+					if self.HudToken ~= hudToken then return end;
+					self:Hud({State = "Eliminate"});
+				end)
+			end
+		end
+	end
+
+	local header = data.HeaderText or data.Header;
+	local status = data.StatusText or data.Status;
+
+	local hudState = self.HudState;
+	if header ~= nil then hudState.Header = header; end
+	if status ~= nil then hudState.Status = status; end
+	if data.RaidMarker ~= nil then hudState.RaidMarker = data.RaidMarker; end
+	if data.HookEntity ~= nil then hudState.HookEntity = data.HookEntity; end
+
+	remoteGameModeHud:FireAllClients({
+		Action = "Open";
+		Type = self.ModeType;
+		Stage = self.ModeStage;
+		Header = hudState.Header or `Elimination`;
+		Status = hudState.Status or "";
+		IsHard = self.IsHard == true;
+
+		HookEntity = hudState.HookEntity or false;
+		RaidMarker = hudState.RaidMarker or false;
+
+		LootPrefab = self.LootPrefab;
+
+		PlayMusic = data.PlayMusic;
+		ChangeSoundtrack = data.ChangeSoundtrack;
+
+		LevelDif = self.Difficulty;
+		StopwatchTick = self.StopwatchTick;
+		StopwatchFinal = self.StopwatchFinal;
+	});
+end
+
+
+
+
+--MARK: Special Events
+--==========================================================================
 function Stronghold:QuickKillTrigger(packet)
 	if self.Status ~= EnumStatus.InProgress then return end;
 
@@ -1290,6 +1334,8 @@ function Stronghold:QuickKillTrigger(packet)
 							if lastCFrame then
 								tarData.LastKnownPosition = lastCFrame.Position;
 							end
+							
+							tarData.LastSeenTick = tick()+2;
 						end
 					end
 
@@ -1304,6 +1350,63 @@ function Stronghold:QuickKillTrigger(packet)
 end
 
 
+function Stronghold:ZombieHordeTrigger(searchPos)
+	if self.Status ~= EnumStatus.InProgress then return; end;
+
+	if self.ZombieHordeActiveTick and tick()-self.ZombieHordeActiveTick <= 25 then return end;
+	self.ZombieHordeActiveTick = tick();
+
+	task.wait(math.random(5, 10));
+	if self.Status ~= EnumStatus.InProgress then return; end;
+
+	modAudio.Play("HordeGrowl", workspace);
+	self:Hud({State = "Horde"});
+
+	for a=1, math.random(6, 12) do
+		local spawnsInRange = self.HordeSpawns:RadiusSearch(searchPos, 128);
+		if #spawnsInRange <= 0 then 
+			task.wait(1);
+			continue;
+		end;
+		if self.Status ~= EnumStatus.InProgress then break; end;
+
+		local pickSpawn = spawnsInRange[math.random(1, #spawnsInRange)];
+		local spawnCf = pickSpawn.CFrame;
+
+		local zombieNpcClass: NpcClass = self:SpawnEnemy("Zombie", {
+			SpawnCFrame = spawnCf;
+			HordeAggression = math.random(1, 4) == 1;
+		});
+
+		if zombieNpcClass then
+			local targetHandlerComp = zombieNpcClass:GetComponent("TargetHandler");
+			if targetHandlerComp then
+
+				local npcClassList = shared.modNpcs.Octree:KNearestNeighborsSearch(spawnCf.Position, 4, 128);
+				for _, npcClass: NpcClass in pairs(npcClassList) do
+					if npcClass.HealthComp == nil or npcClass.HealthComp.IsDead then continue end;
+					local priorityTargetData = targetHandlerComp:AddTarget(npcClass.Character);
+
+					if zombieNpcClass.Properties.PriorityTargetData then continue end;
+					zombieNpcClass.Properties.PriorityTargetData = priorityTargetData;
+				end
+
+				local playerClassList = shared.modPlayers.PositionsOctree:KNearestNeighborsSearch(spawnCf.Position, 4, 512);
+				for _, playerClass: PlayerClass in pairs(playerClassList) do
+					if playerClass.HealthComp == nil or playerClass.HealthComp.IsDead then continue end;
+					local priorityTargetData = targetHandlerComp:AddTarget(playerClass.Character);
+
+					if zombieNpcClass.Properties.PriorityTargetData then continue end;
+					zombieNpcClass.Properties.PriorityTargetData = priorityTargetData;
+				end
+
+			end
+		end
+
+		task.wait(math.random(10, 35)/10);
+		if self.Status ~= EnumStatus.InProgress then break; end;
+	end
+end
 
 
 

@@ -16,11 +16,11 @@ local treePackage = {
         GroundTree = "HasEnemy & (FleeTree | AlertTree) | IdleTree";
         AlertTree = "EquipWeapon & IsInVision & (ShareIntel & IsUsingMelee & MeleeTree | RangeTree) | HuntTree";
         HuntTree = "KnowEnemyLastPosition & (IsAtLastKnownPosition & [InvestigateArea] | [MoveToLastKnownPosition]) | SeekTree";
-        SeekTree = "HasDistraction & CheckDistraction | GuessEnemyLastPosition";
+        SeekTree = "GuessEnemyLastPosition";
         MeleeTree = "InMeleeRange & [SwingMelee] | [RunToMeleeRange]";
         RangeTree = "CanFireGun & (RunToFireRange & [FireGun]) | (RunToCover & [ReloadGun])";
 
-        IdleTree = "IdleUpdate | ZarkTree | SelfHealTree | IdleInteractTree | PatrolTree";
+        IdleTree = "IdleUpdate | (HasDistraction & CheckDistraction) | ZarkTree | DeadbodyReaction | SelfHealTree | IdleInteractTree | PatrolTree";
         ZarkTree = "IsZarkNear & GreetZark";
         SelfHealTree = "IsHurt & [SelfHeal]";
         IdleInteractTree = "CanIdleInteract & DoIdleInteract";
@@ -116,7 +116,10 @@ function treePackage.HasEnemy(npcClass: NpcClass)
             local targetProperties = targetCharacterClass.Properties;
 
             local visionTarget = targetCharacterClass.Head;
-            if targetProperties.IsCrouching then
+            if targetProperties.IsCrouching 
+            or (targetProperties.LastIsCrouching and tick()-targetProperties.LastIsCrouching <= 0.3)
+            or targetProperties.IsSliding
+            or (targetProperties.LastIsSliding and tick()-targetProperties.LastIsSliding <= 0.5) then
                 visionTarget = targetCharacterClass.RootPart;
             end
 
@@ -161,38 +164,6 @@ function treePackage.HasEnemy(npcClass: NpcClass)
 
             targetData.IsInVision = isInVision;
             if not isInVision then
-
-                if isKillerOfDeadbody and tick()-deadbodyData.SeenTick <= 5 then -- saw someone get killed
-
-                    local killerDis = (tarPos - deadbodyData.Position);
-                    local killerDir = killerDis.Unit;
-                    killerDir = shared.IsNan(killerDir) and Vector3.zero or killerDir;
-
-                    local killerMag = killerDis.Magnitude/2;
-                    local seenTl = math.clamp((tick()-deadbodyData.SeenTick)/5, 0, 1);
-
-                    targetData.LastKnownPosition = deadbodyData.Position + killerDir * (killerMag * (1-seenTl));
-
-                    if properties.LastDeadbodyDiscoverTick == nil or tick()-properties.LastDeadbodyDiscoverTick > 20 then
-                        properties.LastDeadbodyDiscoverTick = tick();
-
-                        local deadbodySpeech = npcClass.NpcPackage.Chatter.DeadbodySpeech;
-                        local deadbodyPhrase = deadbodySpeech and deadbodySpeech[math.random(1, #deadbodySpeech)] or nil;
-                        if deadbodyPhrase then
-                            npcClass.Chat(nil, deadbodyPhrase.Say);
-
-                            if targetCharacterClass.ClassName == "PlayerClass" then
-                                npcClass:GetComponent("NpcEmote"){
-                                    Players = {(targetCharacterClass :: PlayerClass):GetInstance()};
-                                    EmoteId = "question";
-                                    SndSpeed = math.random(90, 110)/100;
-                                };
-                            end 
-                        end
-                    end
-
-                    return true;
-                end
 
                 local npcCombatComp = targetCharacterClass:GetComponent("NpcCombat");
                 if npcCombatComp then
@@ -932,21 +903,52 @@ function treePackage.Converse(npcClass: NpcClass)
 end
 
 
-function treePackage.SeenDeadbody(npcClass: NpcClass)
+function treePackage.DeadbodyReaction(npcClass: NpcClass)
     local properties = npcClass.Properties;
 
-    if properties.SeenDeadbodyData then
-        local deadbodyData = npcClass.Properties.SeenDeadbodyData;
+    local deadbodyData = npcClass.Properties.SeenDeadbodyData;
+    if deadbodyData then
+        local lastDbState = deadbodyData.State;
+        local lastDbSeen = deadbodyData.SeenTick;
+        local dBPosition = deadbodyData.Position;
 
-        if properties.LastDiscoverDeadbody == nil or tick() > properties.LastDiscoverDeadbody then
-            properties.LastDiscoverDeadbody = tick() + math.random(6, 12);
-            npcClass.Move:MoveTo(deadbodyData.Position);
+        if lastDbState == nil or tick()-lastDbSeen <= 1 then
+
+            if npcClass.Move:IsAtPosition(dBPosition) then
+                deadbodyData.State = 2;
+                deadbodyData.CheckTick = tick() + math.random(1, 5)/10;
+
+                npcClass.Move:LookAt(deadbodyData.Position);
+
+            else
+                npcClass.Move:MoveTo(dBPosition);
+                
+            end
+
+        elseif lastDbState == 2 and tick() > deadbodyData.CheckTick then
+            local deadbodySpeech = npcClass.NpcPackage.Chatter.DeadbodySpeech;
+            local deadbodyPhrase = deadbodySpeech and deadbodySpeech[math.random(1, #deadbodySpeech)] or nil;
+            if deadbodyPhrase then
+                npcClass.Chat(nil, deadbodyPhrase.Say);
+
+                npcClass:GetComponent("NpcEmote"){
+                    Players = game.Players:GetPlayers();
+                    EmoteId = "question";
+                    SndSpeed = math.random(90, 110)/100;
+                };
+            end
+
+            deadbodyData.State = 3;
+
+        elseif lastDbState == 3 and tick()-deadbodyData.CheckTick >= 7 then
+            properties.SeenDeadbodyData = nil;
+
         end
 
-        properties.SeenDeadbodyData = nil;
+        return true;
     end
 
-    return true;
+    return false;
 end
 
 

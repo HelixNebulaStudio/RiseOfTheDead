@@ -478,11 +478,7 @@ return function(CutsceneSequence)
 
 		task.wait(1);
 		
-		local exp_ExtendedTheBeginnings = profile:GetPlayerConfig("Exp_ExtendedTheBeginnings");
-		if shared.gameConfig.BranchName == "Dev" then
-			exp_ExtendedTheBeginnings = true;
-		end
-
+		local exp_ExtendedTheBeginnings = true; --profile:GetPlayerConfig("Exp_ExtendedTheBeginnings");
 
 		local gunId = exp_ExtendedTheBeginnings and "m4a4" or "p250";
 		local item, _storage = modStorage.FindItemIdFromStorages(gunId, player);

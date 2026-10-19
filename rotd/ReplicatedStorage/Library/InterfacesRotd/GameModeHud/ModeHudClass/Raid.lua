@@ -43,12 +43,15 @@ return function(interface: InterfaceInstance, window, frame)
 
 			local oldSnd = self.Soundtrack;
 			if oldSnd and oldSnd.Name ~= soundTrackName then
+				Debugger:StudioLog(`Change soundtrack:`, soundTrackName);
+
 				local tween: Tween = TweenService:Create(oldSnd, TweenInfo.new(1), {Volume=0;});
 				tween.Completed:Connect(function()
 					Debugger.Expire(oldSnd);
 				end)
 				tween:Play();
 
+				self.IsPlaying = false;
 				self.Soundtrack = nil;
 			end
 
@@ -61,7 +64,7 @@ return function(interface: InterfaceInstance, window, frame)
 			
 			task.spawn(function() 
 				modAudio.Preload(soundTrackName, 5);
-				self.Soundtrack = modAudio.Play(soundTrackName, script.Parent);
+				self.Soundtrack = modAudio.Play(soundTrackName, frame);
 				if self.Soundtrack then
 					self.Soundtrack.Volume = 0;
 				end

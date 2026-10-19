@@ -3178,7 +3178,6 @@ MissionLibrary.New{
 		[11]={World="TheMall"; Label="Embassy"; Target=Vector3.new(1319.616, 98.465, -620.718); Type=modMarkers.MarkerTypes.Waypoint;};
 		[12]={World="RadioStation"; Label="Leo"; Target="Leo"; Type=modMarkers.MarkerTypes.Npc;};
 	};
-	WIP=true;
 };
 
 -- MARK: 89 - AB: Shadow Basement

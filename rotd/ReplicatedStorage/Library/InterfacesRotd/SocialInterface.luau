@@ -240,6 +240,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             friends[a].InUniverse = inUniverse;
 
             if binds.FriendsList then
+                friends[a].UserId = friends[a].VisitorId;
                 binds.FriendsList[friends[a].UserName] = friends[a];
             end
         end
@@ -299,7 +300,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             userId = shared.modPlayers.getUserId(playerName);
         end
         if userId == nil then return "" end;
-        return shared.modPlayers.getAvatar(userId);
+        return shared.modPlayers.getAvatar(userId) or "";
     end
 
 
@@ -879,7 +880,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             local playerData = modData.Players[curPlayerName];
             
             nameLabel.Text = curPlayerName;
-            avatarLabel.Image = playerData and playerData.Avatar or "";
+            avatarLabel.Image = CacheAvatar(curPlayerName, listingData.UserId);
             
             local thatPlayer = game.Players:FindFirstChild(curPlayerName);
             if thatPlayer then
@@ -1013,7 +1014,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
             local listing = UpdateListing{
                 Name = userName;
-                Avatar = friendData.Avatar or CacheAvatar(userName);
+                UserId = friendData.UserId;
                 PlaceId = friendData.PlaceId;
             };
             listing.LayoutOrder = friendIndex;
@@ -1045,7 +1046,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 local listing = UpdateListing{
                     Name = mName;
                     UserId = mData.UserId;
-                    Avatar = CacheAvatar(mName, mData.UserId);
                     WorldId = mData.Values.WorldName;
                 };
                 if mName == localPlayer.Name then

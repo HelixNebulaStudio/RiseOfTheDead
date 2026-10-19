@@ -674,18 +674,6 @@ function GameModeLibrary.onRequire()
                     DataKey="LM_"..modeKey;
                     RanksLimit=50;
                 };
-                stageLib.LeaderboardKeyTable["Weekly"..modeKey]={
-                    DatastoreName="LW_"..modeKey;
-                    DatastoreId="LW_"..modeKey;
-                    Folder="WeeklyStats";
-                    DataKey="LW_"..modeKey;
-                };
-                -- stageLib.LeaderboardKeyTable["Daily"..modeKey]={
-                -- 	DatastoreName="LD_"..modeKey;
-                -- 	DatastoreId="LD_"..modeKey;
-                -- 	Folder="DailyStats";
-                -- 	DataKey="LD_"..modeKey;
-                -- };
             end
             
             if stageLib.SurvivalEndedTrack and typeof(stageLib.SurvivalEndedTrack) == "string" then

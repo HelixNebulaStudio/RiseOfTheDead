@@ -33,6 +33,22 @@ local remoteGameModeHud = modRemotesManager:Get("GameModeHud");
 local GameMode = {};
 GameMode.__index = GameMode;
 
+function GameMode.onRequire()
+	shared.modEventService:OnInvoked("Players_BindTeleport", function(event: EventPacket, ...)
+		local player = event.Player;
+		if player == nil then return end;
+
+		task.spawn(function()
+			local modGameModeManager = shared.require(game.ServerScriptService.ServerLibrary.GameModeManager);
+
+			local playerLobby = modGameModeManager:GetPlayerLobby(player);
+			if playerLobby == nil or playerLobby.State <= 3 or playerLobby.Boss ~= true then return end;
+
+			modGameModeManager:Purge(player);
+		end)
+	end)
+end
+
 function GameMode:Init(gameTable)
 	self.GameTable = gameTable;
 end
@@ -98,6 +114,8 @@ function GameMode:Start(room)
 	local bossLib = self.GameTable.StageLib;
 	
 	local died = false;
+
+	room.Boss = true;
 					
 	local bossArenaModel = room.LobbyPrefab;
 	local bossSpawnObject = bossArenaModel:WaitForChild("BossSpawn");
@@ -302,7 +320,7 @@ function GameMode:Start(room)
 				remoteGameModeHud:FireClient(players[a], {
 					Action="Open";
 					Type="Boss";
-					Stage=self.GameTable.Stage;
+					Stage=gameStage;
 					Room=room;
 				});
 			end

@@ -2,6 +2,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
 local CollectionService = game:GetService("CollectionService");
 
+local modGlobalVars = shared.require(game.ReplicatedStorage.GlobalVariables);
 local modTouchHandler = shared.require(game.ReplicatedStorage.Library.TouchHandler);
 local modStatusEffects = shared.require(game.ReplicatedStorage.Library.StatusEffects);
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
@@ -20,7 +21,7 @@ local npcPackage = {
         AttackRange = 20;
         AttackSpeed = 4;
 
-        MaxHealth = 100000;
+        MaxHealth = 100_000;
         
         ThrowCooldown = 7;
     };
@@ -95,16 +96,16 @@ function npcPackage.Spawning(npcClass: NpcClass)
 
     local isHard = properties.HardMode;
     local level = math.max(properties.Level, 0);
+    local scalingRate = math.clamp((level / (modGlobalVars.MaxLevels/10)) ^3, 0, 1);
 
     configurations.BaseValues.WalkSpeed = 16;
 
-    local lvlHealth = math.max(100000 + 500*level, 100000);
+    local baseMaxHealth = configurations.MaxHealth;
+    local lvlHealth = math.max(baseMaxHealth + (baseMaxHealth * 0.1) * level * scalingRate, baseMaxHealth);
     if isHard == true then
-        lvlHealth = 1200300;
+        lvlHealth = 1_200_300 + (baseMaxHealth * level * scalingRate);
     end
 
-    Debugger:Warn("MaxHealth", lvlHealth);
-    Debugger:Warn("MaxDamage", configurations.BaseValues.MaxDamage);
     configurations.BaseValues.MaxHealth = lvlHealth;
 
 

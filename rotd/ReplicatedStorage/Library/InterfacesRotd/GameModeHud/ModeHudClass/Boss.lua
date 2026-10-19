@@ -26,7 +26,10 @@ return function(interface, window, frame)
 		bossNameTag.Text = gameStage;
 		bossNameTag.TextColor3 = room.IsHard and Color3.fromRGB(229, 93, 83) or Color3.fromRGB(255, 255, 255);
 
-		if room.State == 3 then
+		if room.State <= 2 then
+			statusTag.Text = "";
+
+		elseif room.State == 3 then
 			statusTag.Text = "";
 
 			if room.BossPrefabs then
@@ -52,5 +55,15 @@ return function(interface, window, frame)
 		
 	end
 	
+	modeHud.OnActiveChanged:Connect(function(isActive)
+		if isActive then return end;
+
+		local bossNameTag = modeHud.MainFrame.bossName;
+		local statusTag = modeHud.MainFrame.status;
+
+		bossNameTag.Text = "";
+		statusTag.Text = "";
+	end)
+
 	return modeHud;
 end

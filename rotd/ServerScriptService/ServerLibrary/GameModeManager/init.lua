@@ -255,8 +255,6 @@ function GameModeManager.onRequire()
 			return gameTable;
 			
 		elseif requestEnum == enumRequests.Ready then
-			Debugger:Log("Ready", ...);
-			
 			local gameTable = GameModeManager:GetPlayerMenuRoom(player);
 			if gameTable == nil then
 				Debugger:WarnClient(player, "Player not in any menu lobbies.");
@@ -676,6 +674,7 @@ function GameModeManager:Initialize(gameType, gameStage)
 						};
 					end);
 				end
+						
 				--==
 				
 				room:SetState(enumRoomStates.InProgress);

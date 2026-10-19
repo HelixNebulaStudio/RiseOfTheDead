@@ -1,5 +1,7 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
+local RunService = game:GetService("RunService");
+
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modExplosionHandler = shared.require(game.ReplicatedStorage.Library.ExplosionHandler);
 local DamageData = shared.require(game.ReplicatedStorage.Data.DamageData);
@@ -67,10 +69,11 @@ function destructiblePackage.BindNew(destructible: DestructibleInstance)
         setHpSmoke();
     end)
 
-    healthComp.OnHealthChanged:Connect(function(curHealth, maxHealth)
+    healthComp.OnHealthChanged:Connect(function(curHealth, oldHealth)
         local model = destructible.Model;
-        local hpRatio = curHealth/maxHealth;
+        local hpRatio = curHealth/healthComp.MaxHealth;
 
+        Debugger:StudioLog(`Heli hpRatio {curHealth}/{healthComp.MaxHealth} = {hpRatio}`);
         if hpRatio <= 0.15 then
             setHpFire();
 
