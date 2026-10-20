@@ -21,11 +21,11 @@ function WorldCore.InitGameController()
 
     newGameController.Objective = {
         Id = "Eliminate";
-        EnemyCap = 55;
+        EnemyCap = 45;
         
         HordeWhenEnemiesDropsBelow = 5;
         HordeCycle = 120;
-        HordeSpawnRate = 1;
+        HordeSpawnRate = 0.5;
 
         HordeTimerDeduction = NumberRange.new(25, 35);
     };

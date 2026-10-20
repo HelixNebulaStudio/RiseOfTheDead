@@ -35,6 +35,7 @@ local SHOW_MAP_OBJECTS = {
 	GameModeEnter=true;
 	GameModeExit=true;
 	Tile=true;
+	Interactable = true;
 };
 
 local interfacePackage = {
@@ -275,10 +276,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                         elseif interactable.Type == "Travel" then
                             self.Frame.Size = UDim2.new(0, 360, 0, 200);
                             
-                            local worldName = modBranchConfigurations.GetWorldDisplayName(interactable.Values.WorldId);
+                            local worldName = modBranchConfigurations.GetWorldDisplayName(interactable.Values.WorldName);
                             nameTag.Text = "Travel: "..worldName
                             
-                            local worldInfo = modBranchConfigurations.Worlds[interactable.Values.WorldId];
+                            local worldInfo = modBranchConfigurations.Worlds[interactable.Values.WorldName];
                             
                             local newImage = Instance.new("ImageLabel");
                             newImage.Image = worldInfo.Icon or "";
@@ -822,12 +823,65 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				scaleRatio = math.clamp(scaleRatio + inputObject.Position.Z*step, min, max);
 				
 				if scaleRatio ~= preScale then
-					binds.MapFrameOffset = getCenterVec();
-                    window:Update();
+					binds.MapFrameOffset = binds.MapFrameOffset*(scaleRatio/preScale);
+					window:Update();
 				end
 			end
 		end
 	end));
+	
+	--MARK: Map Dragging
+	local dragging = false;
+	local dragStartPos = nil;
+	local dragStartOffset = nil;
+	
+	interface.Garbage:Tag(mainFrame.InputBegan:Connect(function(inputObject, gameProcessed)
+		if gameProcessed then return end;
+		if inputObject.UserInputType == Enum.UserInputType.MouseButton1
+		or inputObject.UserInputType == Enum.UserInputType.Touch then
+			dragging = true;
+			dragStartPos = Vector2.new(inputObject.Position.X, inputObject.Position.Y);
+			dragStartOffset = binds.MapFrameOffset;
+		end
+	end));
+	
+	interface.Garbage:Tag(mainFrame.InputEnded:Connect(function(inputObject)
+		if inputObject.UserInputType == Enum.UserInputType.MouseButton1
+		or inputObject.UserInputType == Enum.UserInputType.Touch then
+			dragging = false;
+		end
+	end));
+	
+	interface.Garbage:Tag(UserInputService.InputChanged:Connect(function(inputObject, gameProcessed)
+		if not dragging or dragStartPos == nil then return end;
+		if not mapMenu.Visible or binds.Minimized then return end;
+		
+		if inputObject.UserInputType == Enum.UserInputType.MouseMovement
+		or inputObject.UserInputType == Enum.UserInputType.Touch then
+			local currentPos = Vector2.new(inputObject.Position.X, inputObject.Position.Y);
+			binds.MapFrameOffset = dragStartOffset + (currentPos - dragStartPos);
+			window:Update();
+		end
+	end));
+	
+	--MARK: Controller Panning
+	if UserInputService.GamepadEnabled then
+		local thumbstickVector = Vector2.new();
+		interface.Garbage:Tag(UserInputService.InputChanged:Connect(function(inputObject)
+			if inputObject.KeyCode == Enum.KeyCode.Thumbstick2 then
+				thumbstickVector = Vector2.new(inputObject.Position.X, inputObject.Position.Y);
+			end
+		end));
+	
+		interface.Garbage:Tag(RunService.Heartbeat:Connect(function(deltaTime)
+			if not mapMenu.Visible or binds.Minimized then return end;
+			if thumbstickVector.Magnitude < 0.2 then return end;
+			
+			local panSpeed = 250*scaleRatio;
+			binds.MapFrameOffset = binds.MapFrameOffset + Vector2.new(thumbstickVector.X, -thumbstickVector.Y)*panSpeed*deltaTime;
+			window:Update();
+		end));
+	end
 
 	transparencyTag:GetPropertyChangedSignal("Value"):Connect(function()
 		locationPopupGradient.Transparency = NumberSequence.new(transparencyTag.Value);

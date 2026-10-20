@@ -3,6 +3,7 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 local modDoors = shared.require(game.ReplicatedStorage.Entity.Doors);
 local modPseudoRandom = shared.require(game.ReplicatedStorage.Library.PseudoRandom);
+local modDestructibles = shared.require(game.ReplicatedStorage.Entity.Destructibles);
 
 --==
 local Component = {};
@@ -63,7 +64,25 @@ function Component:__call(packet: anydict)
 		if doorConfig:GetAttribute("DoorOpen") == true then return end;
 
 		if humanoidType ~= "Zombie" then
-			npcClass:UseInteractable(interactConfig);
+
+			if interactConfig:GetAttribute("Barricaded") then
+				local destructibleConfig = doorInstance.Model:FindFirstChild("Destructible", true);
+				
+				if destructibleConfig and destructibleConfig:IsA("Configuration") then
+					local barricadeDestructible: DestructibleInstance = modDestructibles.getOrNew(destructibleConfig);
+
+					local targetHandlerComp = npcClass:GetComponent("TargetHandler");
+					if targetHandlerComp then
+						targetHandlerComp:AddTarget(
+							barricadeDestructible.Model, 
+							barricadeDestructible.HealthComp
+						);
+					end
+				end
+
+			else
+				npcClass:UseInteractable(interactConfig);
+			end
 			return;
 		end
 

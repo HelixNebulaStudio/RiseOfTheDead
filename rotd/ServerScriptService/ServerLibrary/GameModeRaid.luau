@@ -8,6 +8,7 @@ local EnumStatus = {Initialized=-1; Restarting=0; InProgress=1; Completed=2;};
 Raid.EnumStatus = EnumStatus;
 
 local RunService: RunService = game:GetService("RunService");
+local DataStoreService = game:GetService("DataStoreService");
 local PathfindingService = game:GetService("PathfindingService");
 
 local modGlobalVars = shared.require(game.ReplicatedStorage:WaitForChild("GlobalVariables"));
@@ -24,6 +25,7 @@ local modTeamsManager = shared.require(game.ReplicatedStorage.Library.TeamsManag
 local modChunks = shared.require(game.ReplicatedStorage.Library.Chunks);
 local modOctree = shared.require(game.ReplicatedStorage.Library.Util.Octree);
 local modVector = shared.require(game.ReplicatedStorage.Library.Util.Vector);
+local modTables = shared.require(game.ReplicatedStorage.Library.Util.Tables);
 
 local modNpcs = shared.modNpcs;
 local modItemDrops = shared.require(game.ServerScriptService.ServerLibrary.ItemDrops);
@@ -36,6 +38,8 @@ platformParam.FilterType = Enum.RaycastFilterType.Include;
 function Raid.onRequire()
 	serverPrefabs = game.ServerStorage:WaitForChild("Prefabs"):WaitForChild("Objects");
 	remoteGameModeHud = modRemotesManager:Get("GameModeHud");
+
+	raidsTimingDataStore = DataStoreService:GetDataStore("RaidsTimingStatistics");
 end
 
 function Raid:__newindex(k, v)
@@ -474,7 +478,41 @@ function Raid:CompleteRaid()
 		local timeLapse = workspace:GetServerTimeNow()-self.StopwatchTick;
 		self.StopwatchFinal = timeLapse;
 
-		runTimeStr = ` Run time: {modSyncTime.FormatMs(timeLapse *1000)}!`;
+		task.spawn(function()
+			raidsTimingDataStore:UpdateAsync(`{self.ModeType}:{self.ModeStage}`, function(old)
+				local new = old or {};
+
+				local logs = new.Logs or {};
+				new.Logs = logs;
+
+				table.insert(logs, {T=timeLapse; U=os.time()});
+
+				local MAX_LOGS = 100;
+				if #logs > MAX_LOGS then
+					new.Logs = {table.unpack(logs, #logs - MAX_LOGS + 1)};
+				end
+
+				local sum = 0;
+				for _, log in ipairs(logs) do sum += log.T; end
+				new.Avg = sum / #logs;
+
+				new.Min = math.min(new.Min or timeLapse, timeLapse);
+				new.Max = math.max(new.Max or timeLapse, timeLapse);
+
+				local percentileFunc = modTables.createPercentileFunction(logs, "T");
+				new.P1 = percentileFunc(0.01);
+				new.P5 = percentileFunc(0.05);
+				new.P50 = percentileFunc(0.5);
+				new.P95 = percentileFunc(0.95);
+				new.P99 = percentileFunc(0.99);
+
+				return new;
+			end)
+		end)
+
+		if self.StageLib.EnableStopwatch == true then
+			runTimeStr = ` Run time: {modSyncTime.FormatMs(timeLapse *1000)}!`;
+		end
 	end
 
 	shared.Notify(game.Players:GetPlayers(), `Raid Complete!{runTimeStr}`, "Positive");
@@ -809,10 +847,8 @@ end
 function Raid:BeginCount()
 	if self.Status ~= EnumStatus.InProgress then return end;
 	
-	if self.StageLib.EnableStopwatch == true then
-		if self.StopwatchTick == nil then
-			self.StopwatchTick = workspace:GetServerTimeNow();
-		end
+	if self.StopwatchTick == nil then
+		self.StopwatchTick = workspace:GetServerTimeNow();
 	end
 
 	self:Hud({

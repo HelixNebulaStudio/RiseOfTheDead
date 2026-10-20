@@ -247,33 +247,36 @@ function Survival:Load()
 				local humanoid = npcClass.Humanoid;
 				if humanoid.WalkSpeed <= 0 then continue end;
 
-				local lastPos = npcClass.Properties.SurvivalLastPos or npcClass.SpawnCFrame.Position;
+				local properties = npcClass.Properties;
+
+				local lastPos = properties.SurvivalLastPos or npcClass.SpawnCFrame.Position;
 				local curPos = npcClass:GetCFrame().Position;
 				local disDiff = npcClass:DistanceFrom(lastPos);
 
-				if disDiff >= 2 or npcClass.SpawnTime == nil or tick()-npcClass.SpawnTime <= 10 then
-					npcClass.Properties.SurvivalLastPos = curPos;
-					npcClass.Properties.SurvivalStuckTick = nil;
+				if disDiff >= 2 or npcClass.SpawnTime == nil or tick()-npcClass.SpawnTime <= 10 
+				or (properties.AttackCooldown and tick() < (properties.AttackCooldown+4)) then
+					properties.SurvivalLastPos = curPos;
+					properties.SurvivalStuckTick = nil;
 					continue 
 				end;
 
 				local _, closestDistSqrd = shared.modPlayers.PositionsOctree:KNearestNeighborsSearch(curPos, 1, 1024);
 
 				if #closestDistSqrd > 0 and closestDistSqrd[1] <= 4096 then
-					npcClass.Properties.SurvivalLastPos = curPos;
-					npcClass.Properties.SurvivalStuckTick = nil;
+					properties.SurvivalLastPos = curPos;
+					properties.SurvivalStuckTick = nil;
 					continue;
 				end
 
-				if npcClass.Properties.SurvivalStuckTick == nil or tick()- npcClass.Properties.SurvivalStuckTick > 10 then
-					npcClass.Properties.SurvivalStuckTick = tick();
+				if properties.SurvivalStuckTick == nil or tick()- properties.SurvivalStuckTick > 10 then
+					properties.SurvivalStuckTick = tick();
 					continue
 				end
 
 				local newSpawnCf = self.BasicEnemySpawns[math.random(1, #self.BasicEnemySpawns)].CFrame;
 
-				npcClass.Properties.SurvivalStuckTick = nil;
-				npcClass.Properties.SurvivalLastPos = newSpawnCf.Position;
+				properties.SurvivalStuckTick = nil;
+				properties.SurvivalLastPos = newSpawnCf.Position;
 
 				npcClass:SetCFrame(newSpawnCf);
 			end

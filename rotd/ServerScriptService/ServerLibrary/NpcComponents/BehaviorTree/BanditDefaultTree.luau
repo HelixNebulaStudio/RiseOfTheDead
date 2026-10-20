@@ -180,11 +180,16 @@ function treePackage.HasEnemy(npcClass: NpcClass)
                 return false;
             end;
 
-            properties.CanDistract = false;
-            targetData.LastSeenTick = tick();
-            targetData.LastAlertedTick = tick();
-            targetData.LastKnownPosition = targetCharacterClass:GetCFrame().Position;
+        else
+            -- Is Destructible
+            targetData.IsInVision = true;
+            
         end
+
+        properties.CanDistract = false;
+        targetData.LastSeenTick = tick();
+        targetData.LastAlertedTick = tick();
+        targetData.LastKnownPosition = targetEntityClass:GetCFrame().Position;
 
         return true;
     end);

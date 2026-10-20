@@ -74,7 +74,15 @@ function toolPackage.ClientPrimaryFire(handler)
 		if model:IsA("Accessory") then
 			model = model.Parent;
 		end
-	
+
+		while model:GetAttribute("DestructibleParent") do 
+			model = model.Parent :: Model; 
+		end
+		local destructibleConfig = model:FindFirstChild("Destructible");
+		if destructibleConfig and destructibleConfig:IsA("Configuration") then
+			return;
+		end
+
 		local npcInstanceModule = model:FindFirstChild("NpcClassInstance");
 		local humanoid = model:FindFirstChildWhichIsA("Humanoid");
 		
@@ -180,8 +188,12 @@ function toolPackage.ActionEvent(toolHandler: ToolHandlerInstance, packet)
 		or not healthComp:CanTakeDamageFrom(playerClass) then
 			canLatch = false;
 		end
+
 		if healthComp then
-			if healthComp.CompOwner.ClassName == "NpcClass" then
+			if healthComp.CompOwner.ClassName == "Destructible" then
+				canLatch = false;
+				
+			elseif healthComp.CompOwner.ClassName == "NpcClass" then
 				local npcClass = healthComp.CompOwner :: NpcClass;
 				if npcClass.Properties.BasicEnemy ~= true then
 					canLatch = false;
