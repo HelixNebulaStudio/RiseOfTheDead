@@ -834,7 +834,8 @@ function modItemsLibrary.onRequire()
     -- clownmask
     new(skinPermBase, {Id="clownmaskus"; Icon="rbxassetid://8367268572"; SkinPerm="Star Spangled Banner"; TargetItemId="clownmask"; Tags={"Slaughterfest";};});
     new(skinPermBase, {Id="clownmaskmissjoyful"; Icon="rbxassetid://11269655306"; SkinPerm="Miss Joyful"; TargetItemId="clownmask"; Tags={"Slaughterfest";};});
-
+    new(skinPermBase, {Id="clownmaskcarnage"; Icon="rbxassetid://130682804105709"; SkinPerm="Carnage"; TargetItemId="clownmask"; Tags={"Reaper's Games";};});
+    
     -- cowboyhat
     new(skinPermBase, {Id="cowboyhattreasures"; Icon="rbxassetid://94599465285510"; SkinPerm="Treasures"; TargetItemId="cowboyhat";});
 
@@ -938,6 +939,7 @@ function modItemsLibrary.onRequire()
 
     -- pouchvest
     new(skinPermBase, {Id="pouchvestwhite"; Icon="rbxassetid://94523324088807"; SkinPerm="White"; TargetItemId="pouchvest"; });
+    new(skinPermBase, {Id="pouchvestcarnage"; Icon="rbxassetid://73083735226162"; SkinPerm="Carnage"; TargetItemId="pouchvest"; Tags={"Reaper's Games"}; });
 
     -- tirearmor
     new(skinPermBase, {Id="tirearmorred"; Icon="rbxassetid://16791569263"; SkinPerm="Red"; TargetItemId="tirearmor"; });
@@ -981,6 +983,7 @@ function modItemsLibrary.onRequire()
     -- portableautoturret
     new(skinPermBase, {Id="portableautoturretblue"; Icon="rbxassetid://113924290223669"; SkinPerm="Blue"; TargetItemId="portableautoturret";});
     new(skinPermBase, {Id="portableautoturretcryogenics"; Icon="rbxassetid://117404049971970"; SkinPerm="Cryogenics"; TargetItemId="portableautoturret";});
+    new(skinPermBase, {Id="portableautoturretcarnage"; Icon="rbxassetid://110811214264657"; SkinPerm="Carnage"; TargetItemId="portableautoturret"; Tags={"Reaper's Games"};});
 
     -- snowsledge
     new(skinPermBase, {Id="snowsledgexmasgreen"; Icon="rbxassetid://111472550573392"; SkinPerm="Xmas Green"; TargetItemId="snowsledge";});

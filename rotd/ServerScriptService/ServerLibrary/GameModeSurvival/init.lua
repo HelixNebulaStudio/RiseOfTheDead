@@ -109,6 +109,19 @@ function Survival.onRequire()
 			waveSelect.Players[userId].HasVoted = true;
 			gameController:Hud();
 
+		elseif action == "voteskiprewardbreak" then
+			if gameController == nil then return end;
+
+			local wbVotes = gameController.WaveBreakVotes;
+			if wbVotes == nil then return end;
+
+			local existIdx = table.find(wbVotes, player);
+			if existIdx == nil then return end;
+
+			table.remove(wbVotes, existIdx);
+
+			shared.Notify(game.Players:GetPlayers(), `{player.Name} voted to start next wave.`, "Inform");
+
 		end
 	end)
 end
@@ -911,6 +924,7 @@ function Survival:SpawnCrate()
 	interactConfig:SetAttribute("StorageId", "survivalrewards");
 	interactConfig:SetAttribute("StorageName", "Survival Rewards");
 	interactConfig:SetAttribute("StoragePresetId", "rewardcrate");
+	interactConfig:SetAttribute("SkipWaveButton", true);
 	interactConfig.Parent = cratePrefab;
 	
 	local interactable: InteractableInstance = modInteractables.getOrNew(interactConfig);
@@ -953,20 +967,47 @@ function Survival:BreakTime()
 	end;
 
 	if self.Wave%WAVE_REWARD_CYCLE == 0 then
-		breakLength += 15;
+		breakLength += 60;
 		statusStr = `{statusStr} [Loot Available]`;
+
+		self.WaveBreakVotes = game.Players:GetPlayers();
 
 		--MARK: Claim Stakes
 		self:SpawnCrate();
 		shared.Notify(game.Players:GetPlayers(), "A Reward Crate has been discovered!", "Reward");
 	end
 
-	for a=breakLength, 0, -1 do
+	local breakDuration = breakLength;
+	local votersCount = self.WaveBreakVotes and #self.WaveBreakVotes or 0;
+	local lastVotersCount = votersCount;
+
+	while breakLength > 0 do
+		breakLength -= 1;
+
 		self:RespawnDead();
 		task.wait(1);
+
+		if breakLength > 3 then
+			if self.WaveBreakVotes then
+				local waveBreakVoters = #self.WaveBreakVotes
+				if waveBreakVoters <= 0 then
+					breakLength = 3;
+				else
+					local intervals = (breakDuration-3)/votersCount;
+					if lastVotersCount ~= waveBreakVoters then
+						local changeInVotes = lastVotersCount-waveBreakVoters;
+						lastVotersCount = waveBreakVoters;
+
+						breakLength = math.max(breakLength - (intervals * changeInVotes), 3);
+					end
+				end
+			end
+		end
+
 		self:Hud{
 			HeaderText = `Wave {nextWave}`;
-			Status = `Next wave starts in {a}s..{statusStr}`;
+			TimeTilNextWave = workspace:GetServerTimeNow() +(breakLength-1);
+			Status = `Next wave starts in {breakLength}s..{statusStr}`;
 			WaveObjective = (self.WaveSelectPacket.Active and "") or nextObj and nextObj.Class.Title or "";
 			ObjectiveDesc = (self.WaveSelectPacket.Active and "") or nextObj and nextObj.Class.Description or "";
 			WaveHazard = (self.WaveSelectPacket.Active and "") or nextHaz and nextHaz.Class.Title or "";
@@ -974,6 +1015,8 @@ function Survival:BreakTime()
 		};
 		if self.Status ~= EnumStatus.InProgress then break; end
 	end
+
+	self.WaveBreakVotes = nil;
 
 	if self.ActiveSupCrate then
 		game.Debris:AddItem(self.ActiveSupCrate, 0);
@@ -1734,6 +1777,7 @@ function Survival:Hud(data)
 		Stage = self.ModeStage;
 		Header = self.HeaderText;
 		Status = self.StatusText;
+		TimeTilNextWave = data.TimeTilNextWave;
 
 		WaveStartTime = self.WaveStartTime or false;
 		WaveDuration = self.WaveDuration or false;

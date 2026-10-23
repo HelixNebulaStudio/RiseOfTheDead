@@ -15,6 +15,7 @@ local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
 local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.Library.NpcProfileLibrary);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
+local modTimeDownUI = shared.require(game.ReplicatedStorage.Library.UI.TimeDownUI);
 local modItemInterface = shared.require(game.ReplicatedStorage.Library.UI.ItemInterface);
 local modLeaderboardInterface = shared.require(game.ReplicatedStorage.Library.UI.LeaderboardInterface);
 
@@ -52,19 +53,16 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local treatFrame = mainFrame:WaitForChild("TreatFrame");
 	local treatNpcScrollFrame = treatFrame:WaitForChild("Content"):WaitForChild("ScrollList");
 	local treatGuideImgLabel: ImageLabel = treatFrame:WaitForChild("Content"):WaitForChild("GuideImgLabel");
-	local travelButton = treatFrame:WaitForChild("travelButton");
+	local queueButton = treatFrame:WaitForChild("queueButton");
 
 	local cauldronRewardLib = modRewardsLibrary:Find("slaughterfestcauldron");
 	local festRewardLib = modRewardsLibrary:Find(`slaughterfestcandyrecipes{modGlobalVars.Year}`);
-
-	if modBranchConfigurations.IsWorld("Slaughterfest") then
-
-	end
 
 	local setPage = "Uncover";
 	local uncoverPageIndex = 1;
 
 	local window: InterfaceWindow = interface:NewWindow("HalloweenWindow", mainFrame);
+	window.BoolStringWhenActive = {String="!HotbarsHud"; Priority=2;};
 	window.CompactFullscreen = true;
     window.CloseWithInteract = true;
     window.DisableInteractables = true;
@@ -89,10 +87,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 				mainFrame.Size = UDim2.new(0.7, 0, 0.8, -interface.Properties.TopbarInset.Height-10);
 			end
 			if modBranchConfigurations.IsWorld("Slaughterfest") then
-				travelButton.Visible = false;
+				queueButton.Visible = false;
 				
 			else
-				travelButton.Visible = true;
+				queueButton.Visible = true;
 				
 			end
 			
@@ -104,34 +102,64 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		end
 	end)
 
-	interface.Garbage:Tag(travelButton.MouseButton1Click:Connect(function()
-		itemToolTip.Frame.Visible = false;
-		interface:PlayButtonClick();
-		if modBranchConfigurations.IsWorld("Slaughterfest") then return end;
+	-- interface.Garbage:Tag(queueButton.MouseButton1Click:Connect(function()
+	-- 	itemToolTip.Frame.Visible = false;
+	-- 	interface:PlayButtonClick();
+	-- 	if modBranchConfigurations.IsWorld("Slaughterfest") then return end;
 		
-		modClientGuis.promptDialogBox({
-			Title=`Join Slaughterfest`;
-			Desc=`Are you sure you want to travel to <b>Slaughterfest</b>?`;
-			Icon=`rbxassetid://11262940674`;
-			Buttons={
-				{
-					Text="Travel";
-					Style="Confirm";
-					OnPrimaryClick=function(dialogWindow)
-						local statusLabel = dialogWindow.Binds.StatusLabel;
-						statusLabel.Text = "Travelling<...>";
+	-- 	modClientGuis.promptDialogBox({
+	-- 		Title=`Join Slaughterfest`;
+	-- 		Desc=`Are you sure you want to travel to <b>Slaughterfest</b>?`;
+	-- 		Icon=`rbxassetid://11262940674`;
+	-- 		Buttons={
+	-- 			{
+	-- 				Text="Travel";
+	-- 				Style="Confirm";
+	-- 				OnPrimaryClick=function(dialogWindow)
+	-- 					local statusLabel = dialogWindow.Binds.StatusLabel;
+	-- 					statusLabel.Text = "Travelling<...>";
 
-						local _rPacket = remoteHalloween:InvokeServer({Action="Join";});
-                        interface:ToggleGameBlinds(false, 3);
-					end;
-				};
-				{
-					Text="Cancel";
-					Style="Cancel";
-				};
-			}
-		});
-	end))
+	-- 					local _rPacket = remoteHalloween:InvokeServer({Action="Join";});
+    --                     interface:ToggleGameBlinds(false, 3);
+	-- 				end;
+	-- 			};
+	-- 			{
+	-- 				Text="Cancel";
+	-- 				Style="Cancel";
+	-- 			};
+	-- 		}
+	-- 	});
+	-- end))
+
+	queueButton.MouseButton1Click:Connect(function()
+		interface:PlayButtonClick();
+
+		local rPacket = remoteHalloween:InvokeServer({Action="QueueReaperGames";});
+		if rPacket.Success then
+			local queueState = rPacket.QueueState;
+			local expectedLobbyFormTime = queueState.NextLobbyFormTime;
+
+			local queueTimeDown = window.Binds.QueueTimeDown;
+			if queueTimeDown == nil then
+				queueTimeDown = modTimeDownUI.new();
+				window.Binds.QueueTimeDown = queueTimeDown;
+			end
+
+			queueTimeDown.Frame.Visible = true;
+			queueTimeDown.Frame.Parent = interface.ScreenGui;
+			queueTimeDown.Frame.AnchorPoint = Vector2.new(0.5, 0);
+			queueTimeDown.Frame.Position = UDim2.new(0.5, 0, 0, interface.Properties.TopbarInset.Height + 30);
+			queueTimeDown.Frame.Size = UDim2.new(0.08, 0, 0.08, 0);
+
+			local ftFrame = queueTimeDown.Frame.FtFrame;
+			ftFrame.BackgroundColor3 = Color3.fromRGB(61, 212, 61);
+
+			queueTimeDown:Set{
+				EndTime = expectedLobbyFormTime;
+				Text = "Queued into Reaper's Games";
+			};
+		end
+	end)
 	
 	local candyShopFrame = mainFrame:WaitForChild("CandyShop");
 
@@ -267,16 +295,16 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		task.wait(0.5);
 		updateRerollText();
 
-		if tick()-imgLabelTick > 2 then
-			imgLabelTick = tick();	
-			local imgIndex = treatGuideImgLabel:GetAttribute("ImgIndex");
-			treatGuideImgLabel.Image = sfGuideImgs[imgIndex];
-			imgIndex = imgIndex + 1;
-			if imgIndex > #sfGuideImgs then
-				imgIndex = 1;
-			end
-			treatGuideImgLabel:SetAttribute("ImgIndex", imgIndex);
-		end
+		-- if tick()-imgLabelTick > 2 then
+		-- 	imgLabelTick = tick();	
+		-- 	local imgIndex = treatGuideImgLabel:GetAttribute("ImgIndex");
+		-- 	treatGuideImgLabel.Image = sfGuideImgs[imgIndex];
+		-- 	imgIndex = imgIndex + 1;
+		-- 	if imgIndex > #sfGuideImgs then
+		-- 		imgIndex = 1;
+		-- 	end
+		-- 	treatGuideImgLabel:SetAttribute("ImgIndex", imgIndex);
+		-- end
 
 		local timeLeft = modSyncTime.TimeOfEndOfDay()-modSyncTime.GetTime();
 		mainFrame:WaitForChild("TitleFrame"):WaitForChild("GuideLabel").Text = `Tricks & Treats & Recipes Refresh: {modSyncTime.ToString(timeLeft)}`;

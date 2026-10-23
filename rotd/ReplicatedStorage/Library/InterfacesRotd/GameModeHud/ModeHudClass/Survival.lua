@@ -13,6 +13,7 @@ local modLeaderboardService = shared.require(game.ReplicatedStorage.Library.Lead
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
+local modTimeDownUI = shared.require(game.ReplicatedStorage.Library.UI.TimeDownUI);
 local modItemInterface = shared.require(game.ReplicatedStorage.Library.UI.ItemInterface);
 local modLeaderboardInterface = shared.require(game.ReplicatedStorage.Library.UI.LeaderboardInterface);
 
@@ -145,6 +146,39 @@ return function(interface, window, frame)
 			
 		end
 
+		local waveStartTimeDown = modeHud.StartTimeDown;
+		if typeof(data.TimeTilNextWave) == "number" and workspace:GetServerTimeNow() < data.TimeTilNextWave then
+			if waveStartTimeDown == nil then
+				waveStartTimeDown = modTimeDownUI.new();
+				waveStartTimeDown.BindOnTick = function(self, timeLeft)
+					if timeLeft > 10 then return end;
+					modAudio.Play("ClockTick", wavePassScreenFrame:WaitForChild("Background"));
+				end;
+				modeHud.StartTimeDown = waveStartTimeDown;
+			end
+
+			waveStartTimeDown.Frame.Visible = true;
+			waveStartTimeDown.Frame.Parent = interface.ScreenGui;
+			waveStartTimeDown.Frame.AnchorPoint = Vector2.new(0.5, 0);
+			waveStartTimeDown.Frame.Position = UDim2.new(0.5, 0, 0, interface.Properties.TopbarInset.Height + 30);
+			waveStartTimeDown.Frame.Size = UDim2.new(0.08, 0, 0.08, 0);
+
+			local ftFrame = waveStartTimeDown.Frame.FtFrame;
+			ftFrame.BackgroundColor3 = interface.Colors.BranchBright;
+
+			if modeHud.WaveSet ~= data.Wave then
+				modeHud.WaveSet = data.Wave;
+				waveStartTimeDown:Set{
+					EndTime = data.TimeTilNextWave;
+					Text = "";
+				};
+			end
+
+		else
+			if waveStartTimeDown and waveStartTimeDown.Frame then
+				waveStartTimeDown.Frame.Visible = false;
+			end
+		end
 
 		if data.PlayWaveStart == true then
 			data.PlayWaveStart = false;
@@ -612,6 +646,10 @@ return function(interface, window, frame)
 		end
 
 		-- MARK: EndScreen
+		if waveStartTimeDown then
+			waveStartTimeDown.WaveSet = nil;
+		end
+		
 		local statsBoard = data.StatsCount or data.Stats;
 		if statsBoard ~= nil then
 			if statsBoard ~= false then

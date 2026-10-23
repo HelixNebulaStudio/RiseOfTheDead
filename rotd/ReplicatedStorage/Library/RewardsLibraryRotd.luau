@@ -443,6 +443,16 @@ function library.onRequire()
 		SpecialEvent="Halloween";
 	};
 
+	library:Add{
+		Id="slaughterfestcandyrecipes2026";
+		Rewards={
+			{ItemId="pouchvestcarnage"; Quantity=1; Chance=1; Tier=1;};
+			{ItemId="clownmaskcarnage"; Quantity=1; Chance=1; Tier=1;};
+			{ItemId="portableautoturretcarnage"; Quantity=1; Chance=1; Tier=1;};
+		};
+		SpecialEvent="Halloween";
+	};
+
 
 	library:Add{
 		Id="frostivus2024";

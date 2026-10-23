@@ -283,27 +283,47 @@ function library.onRequire()
 		Name="Default";
 		DefaultPackage=true;
 		
-		Textures={
-			["Handle"]="rbxassetid://7558506950";
+		SurfaceAppearance={
+			ColorMap="rbxassetid://7558506950";
 		};
+		SurfaceAppearanceParent=script;
 	};
 
 	library:Add{
 		Id="clownmaskus";
 		ItemId="clownmask";
 		Name="Star Spangled Banner";
-		Textures={
-			["Handle"]="rbxassetid://8367138629";
+		DefaultPackage=true;
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://8367138629";
 		};
+		SurfaceAppearanceParent=script;
 	};
 
 	library:Add{
 		Id="clownmaskmissjoyful";
 		ItemId="clownmask";
 		Name="Miss Joyful";
-		Textures={
-			["Handle"]="rbxassetid://11269669005";
+		DefaultPackage=true;
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://11269669005";
 		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="clownmaskcarnage";
+		ItemId="clownmask";
+		Name="Carnage";
+		DefaultPackage=true;
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://7558506950";
+		};
+		SurfaceAppearanceParent=script;
+		Tintable=true;
 	};
 
 	--== MARK: clothbagmask
@@ -1629,6 +1649,18 @@ function library.onRequire()
 		SurfaceAppearanceParent=script;
 	};
 
+	library:Add{
+		Id="portableautoturretcarnage";
+		ItemId="portableautoturret";
+		Name="Carnage";
+		DefaultPackage=true;
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://131931415963002";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
 
 	--MARK: pouchvest
 	library:Add{
@@ -1651,6 +1683,18 @@ function library.onRequire()
 
 		SurfaceAppearance={
 			ColorMap="rbxassetid://100046768465321";
+		};
+		SurfaceAppearanceParent=script;
+	};
+
+	library:Add{
+		Id="pouchvestcarnage";
+		ItemId="pouchvest";
+		Name="Carnage";
+		DefaultPackage=true;
+
+		SurfaceAppearance={
+			ColorMap="rbxassetid://122338780548692";
 		};
 		SurfaceAppearanceParent=script;
 	};

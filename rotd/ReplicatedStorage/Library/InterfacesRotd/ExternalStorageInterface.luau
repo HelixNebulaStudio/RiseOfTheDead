@@ -52,6 +52,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	local buttonsFrame = storageFrame:WaitForChild("ButtonsFrame");
 	local gridLayout = storageList:WaitForChild("UIGridLayout");
     local lockedFrame = storageFrame:WaitForChild("LockedFrame");
+
+    local backgroundFrame = storageFrame:WaitForChild("BackgroundFrame");
+    local templateButton = script:WaitForChild("ButtonTemplate");
 	
     local window: InterfaceWindow = interface:NewWindow("ExternalStorage", storageFrame);
     window.DisableInteractables = true;
@@ -97,11 +100,14 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         Debugger:StudioLog(`OpenStorage storageId({storageId})`);
         openSettings.OpeningStorageId = storageId;
 
+        local interactConfig = openSettings.Interactable and openSettings.Interactable.Config or nil;
+        openSettings.OpeningInteractConfig = interactConfig;
+
         local storage = modData.RequestStorage{
             Action = "GetStorage";
             StorageId = storageId;
             StoragePage = page;
-            InteractConfig = openSettings.Interactable and openSettings.Interactable.Config or nil;
+            InteractConfig = interactConfig;
         };
 
         if storage then
@@ -549,6 +555,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             if storagePresetLib.BindStorageWindowUpdate then
                 storagePresetLib.BindStorageWindowUpdate(window, activeStorageId);
             end
+
         end
 	end)
 
@@ -615,7 +622,33 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             openSettings.StorageId = storageId;
 
             local storage = modData.GetStorage(storageId);
-            storage = openStorage(storageId)
+            storage = openStorage(storageId);
+
+            backgroundFrame:ClearAllChildren();
+
+            local interactConfig = openSettings.OpeningInteractConfig;
+            if interactConfig then
+
+                if interactConfig:GetAttribute("SkipWaveButton") then
+                    local newButton = templateButton:Clone();
+                    newButton.Parent = backgroundFrame;
+
+                    local clicked = false;
+                    newButton.MouseButton1Click:Connect(function()
+                        if clicked then return end;
+                        clicked = true;
+
+                        local remoteGameModeHud = modRemotesManager:Get("GameModeHud");
+                        interface:PlayButtonClick();
+
+                        newButton.Text = "Voted to start next wave";
+                        remoteGameModeHud:FireServer("voteskiprewardbreak");
+                    end)
+                end
+
+            end
+
+        
 
 			if openSettings.SetVanitySiid then
 				local function cancelWardrobe()

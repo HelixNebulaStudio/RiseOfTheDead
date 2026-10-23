@@ -15,6 +15,7 @@ local modBattlePassLibrary = shared.require(game.ReplicatedStorage.Library.Battl
 local modInteractables = shared.require(game.ReplicatedStorage.Library.Interactables);
 
 if RunService:IsServer() then
+    modMatchMakingService = shared.require(game.ServerScriptService.ServerLibrary.MatchMakingService);
     modServerManager = shared.require(game.ServerScriptService.ServerLibrary.ServerManager);
     modEvents = shared.require(game.ServerScriptService.ServerLibrary.Events);
     modStorage = shared.require(game.ServerScriptService.ServerLibrary.Storage);
@@ -354,7 +355,12 @@ function SpecialEventPackage.SlaughterfestGetCandyTrade(npcName)
     };
 end
 
+function SpecialEventPackage.ReapersGames()
+
+end
+
 function SpecialEventPackage.onRequire()
+    Debugger:Log(`Halloween SpecialEventPackage`);
     local halloweenMemory = MemoryStoreService:GetHashMap(Keys.MemMap);
 
     local remoteHalloween = modRemotesManager:NewFunctionRemote("Halloween", 1);
@@ -520,6 +526,8 @@ function SpecialEventPackage.onRequire()
         
         return candyData;
     end
+
+    SpecialEventPackage.ReapersGames();
 
     function remoteHalloween.OnServerInvoke(player, packet)
         local action = packet.Action;
@@ -918,6 +926,36 @@ function SpecialEventPackage.onRequire()
             -- end);
             -- rPacket.ClaimSuccess = true;
             -- candyData.Claimed[itemId] = true;
+
+        elseif action == "QueueReaperGames" then
+
+            local userId = player.UserId;
+            local partyObj = {
+                Region = "Global";
+                QueueType = "Default";
+                Players = {userId};
+                Values = {
+                    LocalSearchTimeLimit=30
+                };
+            };
+
+            local partySize = #(partyObj.Players or {userId});
+
+            local sucess, partyId = modMatchMakingService:QueueParty(partyObj);
+            if sucess then
+                player:SetAttribute("IsInQueue", partyId);
+                rPacket.Success = true;
+                
+                rPacket.QueueState = modMatchMakingService:GetPlayerState(userId);
+                
+
+            else
+                player:SetAttribute("IsInQueue", nil);
+                rPacket.Failmsg = "Failed to queue";
+
+            end
+
+
         end
         
         modEvents:NewEvent(player, candyData);
