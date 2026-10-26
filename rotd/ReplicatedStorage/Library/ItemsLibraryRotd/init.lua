@@ -286,25 +286,25 @@ function modItemsLibrary.onRequire()
         end;
     };
 
-    new(crateBase, {Id="factorycrate"; Icon="rbxassetid://14312691944"; GameMode={Mode="Raid"; Stage="Factory"}});
-    new(crateBase, {Id="officecrate"; Icon="rbxassetid://14312329063"; GameMode={Mode="Raid"; Stage="Office"}});
-    new(crateBase, {Id="sectorfcrate"; Icon="rbxassetid://4818954646"; GameMode={Mode="Survival"; Stage="Sector F"}});
-    new(crateBase, {Id="ucsectorfcrate"; Icon="rbxassetid://4873382562"; GameMode={Mode="Survival"; Stage="Sector F"; HardPrefix="Unclassified"}});
-    new(crateBase, {Id="tombschest"; Icon="rbxassetid://5520269296"; GameMode={Mode="Raid"; Stage="Tombs"}});
-    new(crateBase, {Id="banditcrate"; Icon="rbxassetid://5766579781"; GameMode={Mode="Raid"; Stage="BanditOutpost"}});
-    new(crateBase, {Id="hbanditcrate"; Icon="rbxassetid://7050600251"; GameMode={Mode="Raid"; Stage="BanditOutpost"; HardPrefix="Murderous"}});
-    new(crateBase, {Id="prisoncrate"; Icon="rbxassetid://6254312214"; GameMode={Mode="Survival"; Stage="Prison"}});
-    new(crateBase, {Id="nprisoncrate"; Icon="rbxassetid://6254312507"; GameMode={Mode="Survival"; Stage="Prison"; HardPrefix="Notorious"}});
-    new(crateBase, {Id="railwayscrate"; Icon="rbxassetid://6503604137"; GameMode={Mode="Raid"; Stage="Railways"}});
-    new(crateBase, {Id="sectordcrate"; Icon="rbxassetid://7180738901"; GameMode={Mode="Survival"; Stage="Sector D"}});
-    new(crateBase, {Id="ucsectordcrate"; Icon="rbxassetid://7180739567"; GameMode={Mode="Survival"; Stage="Sector D"; HardPrefix="Unclassified"}});
-    new(crateBase, {Id="genesiscrate"; Icon="rbxassetid://7432376696"; GameMode={Mode="Coop"; Stage="Genesis"}});
-    new(crateBase, {Id="ggenesiscrate"; Icon="rbxassetid://16791016380"; GameMode={Mode="Coop"; Stage="Genesis"; HardPrefix="Golden";}});
-    new(crateBase, {Id="sunkenchest"; Icon="rbxassetid://10971583849"; GameMode={Mode="Coop"; Stage="SunkenShip"; CrateSynonym="Chest";}});
-    new(crateBase, {Id="abandonedbunkercrate"; Icon="rbxassetid://13495111655"; GameMode={Mode="Raid"; Stage="Abandoned Bunker"}});
-    new(crateBase, {Id="mangrovecrate"; Icon="rbxassetid://89583678864591"; GameMode={Mode="Survival"; Stage="Swamplands"}});
-    new(crateBase, {Id="dmangrovecrate"; Icon="rbxassetid://71675901045992"; GameMode={Mode="Survival"; Stage="Swamplands"; HardPrefix="Deadly"}});
-    new(crateBase, {Id="northstarcrate"; Icon="rbxassetid://82042790727715"; GameMode={Mode="Raid"; Stage="North Star Embassy"}});
+    new(crateBase, {Id="factorycrate"; Icon="rbxassetid://14312691944"; GameMode={Mode="Raid"; Stage="Factory"}; Sources={"Exchanged at the <b>Recycler in Safehome</b>"}});
+    new(crateBase, {Id="officecrate"; Icon="rbxassetid://14312329063"; GameMode={Mode="Raid"; Stage="Office"}; Sources={"Exchanged at the <b>Recycler in Safehome</b>"}});
+    new(crateBase, {Id="sectorfcrate"; Icon="rbxassetid://4818954646"; GameMode={Mode="Survival"; Stage="Sector F"}; Sources={"Exchanged at the <b>Recycler in Safehome</b>"}});
+    new(crateBase, {Id="ucsectorfcrate"; Icon="rbxassetid://4873382562"; GameMode={Mode="Survival"; Stage="Sector F"; HardPrefix="Unclassified"}; Sources={"Exchanged at the <b>Recycler in Safehome</b>"}});
+    new(crateBase, {Id="tombschest"; Icon="rbxassetid://5520269296"; GameMode={Mode="Raid"; Stage="Tombs"}; Sources={"Exchanged at the <b>Recycler in Safehome</b>"}});
+    new(crateBase, {Id="banditcrate"; Icon="rbxassetid://5766579781"; GameMode={Mode="Raid"; Stage="BanditOutpost"}; Sources={"Exchanged at the <b>Recycler in Safehome</b>"}});
+    new(crateBase, {Id="hbanditcrate"; Icon="rbxassetid://7050600251"; GameMode={Mode="Raid"; Stage="BanditOutpost"; HardPrefix="Murderous"}; Sources={"Exchanged at the <b>Recycler in Safehome</b>"}});
+    new(crateBase, {Id="prisoncrate"; Icon="rbxassetid://6254312214"; GameMode={Mode="Survival"; Stage="Prison"}; Sources={"Exchanged at the <b>Recycler in Safehome</b>"}});
+    new(crateBase, {Id="nprisoncrate"; Icon="rbxassetid://6254312507"; GameMode={Mode="Survival"; Stage="Prison"; HardPrefix="Notorious"}; Sources={"Exchanged at the <b>Recycler in Safehome</b>"}});
+    new(crateBase, {Id="railwayscrate"; Icon="rbxassetid://6503604137"; GameMode={Mode="Raid"; Stage="Railways"}; Sources={"Exchanged at the <b>Recycler in Safehome</b>"}});
+    new(crateBase, {Id="sectordcrate"; Icon="rbxassetid://7180738901"; GameMode={Mode="Survival"; Stage="Sector D"}; Sources={"Exchanged at the <b>Recycler in Safehome</b>"}});
+    new(crateBase, {Id="ucsectordcrate"; Icon="rbxassetid://7180739567"; GameMode={Mode="Survival"; Stage="Sector D"; HardPrefix="Unclassified"}; Sources={"Exchanged at the <b>Recycler in Safehome</b>"}});
+    new(crateBase, {Id="genesiscrate"; Icon="rbxassetid://7432376696"; GameMode={Mode="Coop"; Stage="Genesis"}; Sources={"Exchanged at the <b>Recycler in Safehome</b>"}});
+    new(crateBase, {Id="ggenesiscrate"; Icon="rbxassetid://16791016380"; GameMode={Mode="Coop"; Stage="Genesis"; HardPrefix="Golden";}; Sources={"Exchanged at the <b>Recycler in Safehome</b>"}});
+    new(crateBase, {Id="sunkenchest"; Icon="rbxassetid://10971583849"; GameMode={Mode="Coop"; Stage="SunkenShip"; CrateSynonym="Chest";}; Sources={"Exchanged at the <b>Recycler in Safehome</b>"}});
+    new(crateBase, {Id="abandonedbunkercrate"; Icon="rbxassetid://13495111655"; GameMode={Mode="Raid"; Stage="Abandoned Bunker"}; Sources={"Exchanged at the <b>Recycler in Safehome</b>"}});
+    new(crateBase, {Id="mangrovecrate"; Icon="rbxassetid://89583678864591"; GameMode={Mode="Survival"; Stage="Swamplands"}; Sources={"Exchanged at the <b>Recycler in Safehome</b>"}});
+    new(crateBase, {Id="dmangrovecrate"; Icon="rbxassetid://71675901045992"; GameMode={Mode="Survival"; Stage="Swamplands"; HardPrefix="Deadly"}; Sources={"Exchanged at the <b>Recycler in Safehome</b>"}});
+    new(crateBase, {Id="northstarcrate"; Icon="rbxassetid://82042790727715"; GameMode={Mode="Raid"; Stage="North Star Embassy"}; Sources={"Exchanged at the <b>Recycler in Safehome</b>"}});
 
     -- Corrupted
     local corruptedCrateBase = table.clone(crateBase);
@@ -324,8 +324,8 @@ function modItemsLibrary.onRequire()
 
         
     -- Misc;
-    new(crateBase, {Id="communitycrate"; Name="Community Crate: Alpha"; Icon="rbxassetid://13967718753"; Description="Obtained from community made maps, check gold shop for maps. Open and see what you get!";});
-    new(crateBase, {Id="communitycrate2"; Name="Community Crate: Beta"; Icon="rbxassetid://13967726501"; Description="Obtained from community made maps, check gold shop for maps. Open and see what you get!";});
+    new(crateBase, {Id="communitycrate"; Name="Community Crate: Alpha"; Icon="rbxassetid://13967718753"; Description="Obtained from community made maps, check gold shop for maps. Open and see what you get!"; Sources={"Exchanged at the <b>Recycler in Safehome</b>"}});
+    new(crateBase, {Id="communitycrate2"; Name="Community Crate: Beta"; Icon="rbxassetid://13967726501"; Description="Obtained from community made maps, check gold shop for maps. Open and see what you get!"; Sources={"Exchanged at the <b>Recycler in Safehome</b>"}});
 
 
     --MARK: RESOURCE PACKAGES
