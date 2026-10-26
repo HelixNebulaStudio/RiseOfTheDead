@@ -496,7 +496,7 @@ function modItemsLibrary.onRequire()
     new(missionBase, {Id="highvaluepackage"; Name="High Value Package"; MissionIds={71}; Icon="rbxassetid://14889119970"; Description="A package container of high value."; });
     new(missionBase, {Id="bloodsample"; Equippable=true; MissionIds={75}; StorageIncludeList={"Inventory"}; Name="Blood Sample"; Icon="rbxassetid://15845539438"; Description="Test tubes containing blood samples."; });
     new(missionBase, {Id="samplereport"; Name="Sample Report"; MissionIds={75}; StorageIncludeList={"Inventory"}; Icon="rbxassetid://15904123699"; Description="Sample's unintelligible result report."; });
-    new(missionBase, {Id="blueprintpiece"; Name="Blueprint Piece"; MissionIds={77}; StorageIncludeList={"Inventory"}; CanDelete=0; Icon="rbxassetid://16537824817"; Description="A piece of torn up blueprint."; });
+    new(missionBase, {Id="blueprintpiece"; Name="Blueprint Piece"; MissionIds={77}; StorageIncludeList={"Inventory"}; Icon="rbxassetid://16537824817"; Description="A piece of torn up blueprint."; });
 
 
     --MARK: USABLE

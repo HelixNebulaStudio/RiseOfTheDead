@@ -209,8 +209,36 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		end
 	end
 
+	--MARK: MissionRequirement
+	local lockedPages = {
+		WeaponBpPage = "Weapon Blueprints";
+		ModBpPage = "Mod Blueprints";
+		ClothingBpPage = "Clothing Blueprints";
+		AccessoriesPage = "Accessories";
+		SummonsPage = "Summons";
+		ModsPage = "Mods";
+	};
 
+	local function isMission58Complete(): boolean
+		local missionData = modData:GetMission(58);
+		return missionData ~= nil and (missionData.Type == 3 or missionData.Redo == true);
+	end
 
+	function binds.ShowLockedPage(pageTitle: string)
+		binds.ClearSelection();
+		binds.ClearPage();
+
+		local lockedLabel = Instance.new("TextLabel");
+		lockedLabel.Name = "LockedText";
+		lockedLabel.BackgroundTransparency = 1;
+		lockedLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
+		lockedLabel.RichText = true;
+		lockedLabel.Font = Enum.Font.Arimo;
+		lockedLabel.Size = UDim2.new(1, 0, 0, 40);
+		lockedLabel.TextScaled = true;
+		lockedLabel.Text = `\n\n<b>{pageTitle}</b> Requires Mission: <b>Double Cross</b>`;
+		lockedLabel.Parent = pageFrame;
+	end
 
 	function binds.ClearSelection()
 		binds.clearSlotHighlight();
@@ -237,7 +265,13 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		if cataInfo.Type == "Page" then
 			pageName = cataInfo.Id;
 		end
-		
+
+		local lockedTitle = lockedPages[pageName];
+		if lockedTitle and not isMission58Complete() then
+			binds.ShowLockedPage(lockedTitle);
+			return;
+		end;
+
 		if cataInfo[pageName] == nil then
 
 			local modPage = script:FindFirstChild(pageName);
@@ -485,32 +519,6 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 					cataButtonB.MouseButton1Click:Connect(function()
 						interface:PlayButtonClick();
-
-						local mission58Complete = false;
-						local missionData = modData:GetMission(58);
-						if missionData and (missionData.Type == 3 or missionData.Redo == true) then
-							mission58Complete = true;
-						end
-
-						if mission58Complete == false then
-							binds.ClearSelection();
-							binds.ClearPage();
-
-							if pageFrame:FindFirstChild("LockedText") == nil then
-								local lockedLabel = Instance.new("TextLabel");
-								lockedLabel.Name = "LockedText";
-								lockedLabel.BackgroundTransparency = 1;
-								lockedLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
-								lockedLabel.RichText = true;
-								lockedLabel.Font = Enum.Font.Arimo;
-								lockedLabel.Size = UDim2.new(1, 0, 0, 40);
-								lockedLabel.TextScaled = true;
-								lockedLabel.Text = `\n\n<b>{cataLabelB.Text}</b> Requires Mission: <b>Double Cross</b>`;
-								lockedLabel.Parent = pageFrame;
-							end
-
-							return;
-						end
 						binds.LoadPage(cataType, optInfo.Id);
 					end)
 				end

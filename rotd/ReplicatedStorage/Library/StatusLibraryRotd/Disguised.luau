@@ -276,6 +276,23 @@ function statusPackage.BindUpdate(statusClass: StatusClassInstance)
 	end
 end
 
+function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData: TickData)
+    if RunService:IsClient() then return end;
+    if tickData.ms1000 ~= true then return end;
+    if statusClass.StatusOwner.ClassName ~= "PlayerClass" then return end;
+
+    local sourceSiid = statusClass.Values.SourceSiid;
+    if sourceSiid == nil then return end;
+
+    local playerClass: PlayerClass = statusClass.StatusOwner :: PlayerClass;
+    local player: Player = playerClass:GetInstance();
+
+    local storageItem, storage = shared.modStorage.FindIdFromStorages(sourceSiid, player);
+    if storageItem == nil or storage == nil or storage.Id ~= "Clothing" then
+        statusClass.IsExpired = true;
+    end
+end
+
 function statusPackage.BindExpire(statusClass: StatusClassInstance)
     if RunService:IsClient() then return end;
     if statusClass.StatusOwner.ClassName ~= "PlayerClass" then return end;

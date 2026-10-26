@@ -298,6 +298,7 @@ return function(CutsceneSequence)
 			
 			local cutsceneTracks = {};
 			local point3Active = false;
+			local playerSeat: any;
 			local function OnChanged(firstRun)
 				if playerDied then return end;
 				Debugger:Log("mission", mission)
@@ -408,6 +409,7 @@ return function(CutsceneSequence)
 										Debugger:Log("Waiting for player to sit");
 										task.wait(0.1)
 									until playerClass.Humanoid.Sit == true;
+									playerSeat = playerClass.Humanoid.SeatPart;
 									
 									if strangerANpcClass.Humanoid.Sit == false then
 										strangerANpcClass:Sit(extractionHelicopter["SeatModelA"].Seat);
@@ -435,6 +437,15 @@ return function(CutsceneSequence)
 						
 						Debugger:Log("ProgressionPoint 4");
 						modStatusEffects.SetWalkspeed(player, 0);
+
+						task.spawn(function()
+							while not playerDied and (mission.ProgressionPoint == 4 or mission.ProgressionPoint == 5) do
+								if playerSeat and playerClass.Humanoid and playerClass.Humanoid.Sit == false then
+									playerSeat:Sit(playerClass.Humanoid);
+								end
+								task.wait(0.1);
+							end
+						end)
 
 						loranNpcClass.Character:SetAttribute("LookAtClient", false);
 						loranNpcClass.StopAnimation("crossedarm");

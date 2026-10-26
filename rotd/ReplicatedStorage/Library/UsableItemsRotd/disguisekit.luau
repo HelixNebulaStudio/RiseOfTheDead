@@ -81,14 +81,15 @@ function UsablePreset:ServerInit()
 			local disguises = storageItem:GetValues("Disguises") or {};
 			
 			if disguises[disguiseId] or disguiseLib.Price == nil then
-				if modConfigurations.MustWearDisguiseKitToUse then
+				local mustWear = modConfigurations.MustWearDisguiseKitToUse;
+				if mustWear then
 					if storageItem.StorageId ~= "Clothing" then
 						shared.Notify(player, "You must wear the disguise kit to use here.", "Inform");
 						return;
 					end
 				end
 
-				modDisguiseMechanics:Disguise(player, disguiseId);
+				modDisguiseMechanics:Disguise(player, disguiseId, nil, mustWear and storageItem.ID or nil);
 			else
 				Debugger:Warn("Failed to disguise, not yet unlocked.", disguiseId);
 			end
