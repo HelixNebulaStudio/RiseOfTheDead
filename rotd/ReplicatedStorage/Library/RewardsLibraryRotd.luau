@@ -380,7 +380,6 @@ function library.onRequire()
 		Rewards={
 			{ItemId="skincutebutscary"; Quantity=1; Chance=1; Tier=1;};
 			
-			{ItemId="skincutebutscary"; Quantity=1; Chance=1; Tier=1;};
 			{ItemId="clothbagmaskcbsskulls"; Quantity=1; Chance=1; Tier=1;};
 			{ItemId="armwrapscbsghosts"; Quantity=1; Chance=1; Tier=1;};
 			{ItemId="maraudersmaskcbspumpkins"; Quantity=1; Chance=1; Tier=1;};
@@ -397,6 +396,7 @@ function library.onRequire()
 			{ItemId="nekrostrenchhauntedpumpkin"; Quantity=1/10; Chance=1; Tier=2;};
 			{ItemId="skullmaskgold"; Quantity=1; Chance=1/10; Tier=2;};
 			{ItemId="jackolanternhaunted"; Quantity=1; Chance=1/10; Tier=3;};
+			{ItemId="maraudersmaskghastlyglow"; Quantity=1; Chance=1/10; Tier=2;};
 
 			{ItemId="jackolantern"; Quantity=1; Chance=1/10; Tier=2;};
 			{ItemId="clownmaskus"; Quantity=1; Chance=1/10; Tier=2;};
@@ -409,10 +409,12 @@ function library.onRequire()
 			{ItemId="maraudersmaskrisingsun"; Quantity=1; Chance=1/40; Tier=3;};
 			{ItemId="tophatgold"; Quantity=1; Chance=1/40; Tier=3;};
 			{ItemId="tirearmorhaunted"; Quantity=1; Chance=1/40; Tier=3;};
+			{ItemId="ammopouchghastlyglow"; Quantity=1; Chance=1/40; Tier=3;};
 
 			{ItemId="slaughterwoodsunlockpapers"; Quantity=1; Chance=1/100; Tier=4;};
 			{ItemId="vectorxpossession"; Quantity=1; Chance=1/100; Tier=4;};
 			{ItemId="nvghaunted"; Quantity=1; Chance=1/100; Tier=4;};
+			{ItemId="scraparmorghastlyglow"; Quantity=1; Chance=1/100; Tier=4;};
 
 			{ItemId="skinhalloweenpixelart"; Quantity=1; Chance=1/10000; Tier=5;};
 		};

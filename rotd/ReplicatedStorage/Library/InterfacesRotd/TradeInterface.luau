@@ -134,10 +134,21 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 	
 	
 	local window: InterfaceWindow = interface:NewWindow("Trade", windowFrame);
-    
-    local binds = window.Binds;
-    binds.TradeSession = nil;
-    
+	
+	local binds = window.Binds;
+	binds.TradeSession = nil;
+
+	--MARK: OnDeath
+	local playerClass: PlayerClass = shared.modPlayers.get(localPlayer);
+	interface.Garbage:Tag(playerClass.HealthComp.OnIsDeadChanged:Connect(function(isDead)
+		if isDead ~= true or not window.Visible then return end;
+
+		binds.ClosingOnDeath = true;
+		window:Freeze(false);
+		window:Close();
+		binds.ClosingOnDeath = nil;
+	end))
+
 	if modConfigurations.CompactInterface then
 		window:SetClosePosition(UDim2.new(1, 0, -1.5, 0), UDim2.new(1, 0, 0, 0));
 		windowFrame.AnchorPoint = Vector2.new(1, 0);
@@ -270,8 +281,9 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 		else
 			window:Freeze(false);
-			remoteTradeRequest:FireServer("cancel");
-            
+			if not binds.ClosingOnDeath then
+				remoteTradeRequest:FireServer("cancel");
+			end
 			for a=#interface.StorageInterfaces, 1, -1 do
 				local storageInterface: StorageInterface = interface.StorageInterfaces[a];
 				if storageInterface == nil then continue end;
@@ -540,7 +552,10 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		if binds.TradeSession.Ended and state ~= 3 then
 			localStorageInterface.ViewOnly = nil;
 			confirmButton.Visible = false;
-			cancelButton.buttonText.Text = "Close";
+
+			local tradeStorage = modData.Storages[localPlayer.Name.."Trade"];
+			local hasItems = tradeStorage ~= nil and next(tradeStorage.Container) ~= nil;
+			cancelButton.buttonText.Text = hasItems and "Remove items!" or "Close";
 			
 			ltfObjects.GoldLabel.TextEditable = false;
 
