@@ -107,6 +107,21 @@ if RunService:IsServer() then
 		cabinetKey = workspace.Environment:WaitForChild("PuzzleElements"):WaitForChild("moveableToolCabinet"):WaitForChild("key");
 		brokenDoor = workspace.Environment:WaitForChild("PuzzleElements"):WaitForChild("brokenDoor");
 
+		local exitDoorSpawned = {};
+
+		shared.modEventService:OnInvoked("Generic_BindWorldTravel", function(event: EventPacket, ...)
+			local player: Player? = event.Player;
+			if player == nil then return end;
+
+			local worldName: string = ...;
+			if worldName ~= "TheResidentials" then return end;
+
+			local mission = modMission:GetMission(player, MISSION_ID);
+			if mission == nil or mission.Type ~= 1 or mission.ProgressionPoint < 4 then return end;
+
+			modMission:CompleteMission(player, MISSION_ID);
+		end)
+
 		shared.modEventService:OnInvoked("Generic_BindTrigger", function(eventPacket: EventPacket, ...)
 			local player: Player? = eventPacket.Player;
 			if player == nil then return end;
@@ -170,11 +185,14 @@ if RunService:IsServer() then
 				if interactable.Values.IsPowered ~= true then
 					return;
 				end
+				if exitDoorSpawned[player] then return end;
+				exitDoorSpawned[player] = true;
 
 				shared.Notify(player, "The exit door is now powered", "Inform");
 
 				local travelPart = cutsceneAssets:WaitForChild("Travel_TheResidentials"):Clone();
 				travelPart.Parent = workspace.Interactables;
+				modReplicationManager.ReplicateOut(player, travelPart);
 
 			end
 		end)
@@ -373,6 +391,8 @@ return function(CutsceneSequence)
 
 	--MARK: WitherweenBasement
 	elseif shared.WorldName == "WitherweenBasement" then
+		CutsceneSequence:Initialize(function()
+		end)
 	end
 
 	return CutsceneSequence;

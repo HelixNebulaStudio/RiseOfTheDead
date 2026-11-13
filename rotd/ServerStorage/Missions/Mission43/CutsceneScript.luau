@@ -23,16 +23,18 @@ if RunService:IsServer() then
 		shared.modEventService:OnInvoked("GameModeManager_BindGameModeComplete", function(event: EventPacket, packet)
 			local room = packet.Room;
 			if room.Type ~= "Raid" or room.Stage ~= "Office" then return end;
+			if event.Players == nil then return end;
 
-			if event.Player == nil then return end;
-			local player = event.Player;
+			task.spawn(function()
+				for _, player: Player in pairs(event.Players) do
+					if player == nil or not game.Players:IsAncestorOf(player) then continue end;
 
-			task.spawn(function() 
-				modMission:Progress(player, MISSION_ID, function(mission)
-					if mission.ProgressionPoint < 2 then
-						mission.ProgressionPoint = 2;
-					end;
-				end)
+					modMission:Progress(player, MISSION_ID, function(mission)
+						if mission.ProgressionPoint < 2 then
+							mission.ProgressionPoint = 2;
+						end;
+					end)
+				end
 			end)
 		end)
 
@@ -195,6 +197,9 @@ return function(CutsceneSequence)
 				
 		end)
 
+	elseif shared.WorldName == "Office" then
+		CutsceneSequence:Initialize(function()
+		end)
 
 	end
 

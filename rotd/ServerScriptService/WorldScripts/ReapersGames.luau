@@ -219,8 +219,8 @@ end
 function WorldCore:SpawnCharacters()
     self:RefreshProfiles();
     
-    local players: {Player} = game.Players:GetPlayers();
     local charsList = {};
+    local expectedSpawnCount = 0;
 
     local disconnSpawnSig = shared.modPlayers.OnPlayerSpawn:Connect(function(playerClass, character)
         for c=0, 5, 1/30 do
@@ -234,14 +234,19 @@ function WorldCore:SpawnCharacters()
         table.insert(charsList, playerClass);
     end)
     
-    for _, player in pairs(players) do
+    for _, player in pairs(game.Players:GetPlayers()) do
+        if not game.Players:IsAncestorOf(player) then continue end;
+
         local playerClass = shared.modPlayers.get(player);
+        if playerClass == nil then continue end;
+
+        expectedSpawnCount += 1;
         playerClass:Spawn();
     end
 
     for a=0, 5, 1/30 do
         task.wait();
-        if #charsList >= #players then
+        if #charsList >= expectedSpawnCount then
             break;
         end
     end
@@ -338,7 +343,18 @@ function WorldCore:InitReapersGames()
 
         local gameInfo = GAMESLIST[a];
         Debugger:Warn(`Starting game {gameInfo.Id}`);
-        self[`Game_{gameInfo.Id}`](self);
+
+        local ok, err = pcall(self[`Game_{gameInfo.Id}`], self);
+        if not ok then
+            Debugger:Warn(`Game {gameInfo.Id} aborted`, err);
+
+            for _, playerClass in pairs(shared.modPlayers.listPlayerClasses()) do
+                if playerClass.StatusComp == nil then continue end;
+                playerClass.StatusComp:Apply("Stun", nil);
+                playerClass.StatusComp:Apply("AttachedCamera", nil);
+            end
+        end
+
         self.Garbage:Destruct();
 
         task.wait(1);
@@ -1388,9 +1404,15 @@ function WorldCore:Game_PlatformMatch()
         modAudio.Play("IncorrectBuzz", workspace).PlaybackSpeed = 1;
 
         local platformToDropList = {};
+        local alivePlatformScreens = {};
+        local activeSymbolHeld = false;
+
         for a=1, #screens do
             local platform = screens[a]:GetAttribute("PlatformInstance");
             if platform == nil then continue end;
+            if platform:Get() == nil then continue end;
+
+            table.insert(alivePlatformScreens, a);
 
             local offset = math.random(1, 4);
             local rngSymbol = symbols[((a + offset)%4) +1];
@@ -1398,6 +1420,20 @@ function WorldCore:Game_PlatformMatch()
 
             if rngSymbol ~= activeSymbol then
                 table.insert(platformToDropList, platform);
+            else
+                activeSymbolHeld = true;
+            end
+        end
+
+        if not activeSymbolHeld and #alivePlatformScreens > 0 then
+            local savedScreenIndex = alivePlatformScreens[math.random(1, #alivePlatformScreens)];
+            local savedPlatform = screens[savedScreenIndex]:GetAttribute("PlatformInstance");
+
+            screens[savedScreenIndex].Text = activeSymbol;
+
+            local dropIndex = table.find(platformToDropList, savedPlatform);
+            if dropIndex then
+                table.remove(platformToDropList, dropIndex);
             end
         end
         Debugger:Log("Active Symbol", activeSymbol);

@@ -1,5 +1,5 @@
 local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
-local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
+local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 --==
 local attirePackage = {
 	ItemId=script.Name;
@@ -18,15 +18,17 @@ local attirePackage = {
 function attirePackage.newClass()
 	local equipmentClass = modEquipmentClass.new(attirePackage);
 
-	equipmentClass:AddBaseModifier("NinjaAgility", {
-		SetValues = {
-			NinjaAgility = true;
-			MaxAirJump = 1;
-		};
-		ArrayValues = {
-			PassiveModifiers = "NinjaAgility";
-		};
-	});
+	if modConfigurations.DisableGearMods ~= true then
+		equipmentClass:AddBaseModifier("NinjaAgility", {
+			SetValues = {
+				NinjaAgility = true;
+				MaxAirJump = 1;
+			};
+			ArrayValues = {
+				PassiveModifiers = "NinjaAgility";
+			};
+		});
+	end
 
 	return equipmentClass;
 end

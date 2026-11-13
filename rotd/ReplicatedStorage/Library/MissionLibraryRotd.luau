@@ -1488,7 +1488,7 @@ MissionLibrary.New{
 		"Go to the marker and find a way in";
 		"Kill Jack the zombie";
 	};
-	World = {"TheWarehouse"; "TheMall"};
+	World = {"TheWarehouse"; "TheMall"; "Office"};
 	SaveData = {};
 	GuideText = "Talk to Jack Reap";
 	AddRequirements = {
@@ -1521,7 +1521,7 @@ MissionLibrary.New{
 		"A mysterious green gas fills the room";
 		"Escape";
 	};
-	World = {"TheWarehouse"; "TheResidentials";};
+	World = {"TheWarehouse"; "TheResidentials"; "WitherweenBasement";};
 	SaveData = {};
 	GuideText = "Go to the office and read the note";
 	AddRequirements = {
