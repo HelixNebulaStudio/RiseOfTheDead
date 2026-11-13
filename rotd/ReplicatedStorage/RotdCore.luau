@@ -54,6 +54,7 @@ if RunService:IsServer() then
     local modShopSystem = shared.require(game.ServerScriptService.ServerLibrary.ShopSystem);
     local modGameModeManager = shared.require(game.ServerScriptService.ServerLibrary.GameModeManager);
     local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
+    local modMatchMakingService = shared.require(game.ServerScriptService.ServerLibrary.MatchMakingServiceRotd);
 
     
     modAnalyticsService:InitCurrencies{

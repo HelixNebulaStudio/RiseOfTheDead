@@ -22,17 +22,15 @@ local attirePackage = {
 function attirePackage.newClass()
 	local equipmentClass = modEquipmentClass.new(attirePackage);
 
-	if not modBranchConfigurations.IsWorld("Slaughterfest") then
-		equipmentClass:AddBaseModifier("NinjaFleet", {
-			SetValues = {
-				NinjaFleet = true;
-				MaxAirDash = 1;
-			};
-			ArrayValues = {
-				PassiveModifiers = "NinjaFleet";
-			};
-		});
-	end
+	equipmentClass:AddBaseModifier("NinjaFleet", {
+		SetValues = {
+			NinjaFleet = true;
+			MaxAirDash = 1;
+		};
+		ArrayValues = {
+			PassiveModifiers = "NinjaFleet";
+		};
+	});
 
 	return equipmentClass;
 end

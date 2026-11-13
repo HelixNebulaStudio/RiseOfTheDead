@@ -604,6 +604,10 @@ function Coop:PickEnemy(paramPacket)
 		end
 	end
 
+	if self.EnemiesList[1] == nil then
+		return "Zombie";
+	end
+	
     return self.EnemiesList[1].Name;
 end
 

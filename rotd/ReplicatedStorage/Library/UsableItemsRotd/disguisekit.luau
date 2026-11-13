@@ -73,8 +73,8 @@ function UsablePreset:ServerInit()
 			return;
 
 		elseif disguiseLib and action == "disguise" then
-			if modBranchConfigurations.IsWorld("Slaughterfest") then
-				Debugger:Warn("Can't manual disguise in Slaughterfest");
+			if modConfigurations.DisableManualDisguiseUse then
+				Debugger:Warn("Can't manual disguise here.");
 				return;
 			end
 			

@@ -211,12 +211,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 	--MARK: MissionRequirement
 	local lockedPages = {
-		WeaponBpPage = "Weapon Blueprints";
-		ModBpPage = "Mod Blueprints";
-		ClothingBpPage = "Clothing Blueprints";
-		AccessoriesPage = "Accessories";
-		SummonsPage = "Summons";
-		ModsPage = "Mods";
+		RatsSpecialPage = "Rat's Special";
+		BanditsSpecialPage = "Bandit's Special";
 	};
 
 	local function isMission58Complete(): boolean

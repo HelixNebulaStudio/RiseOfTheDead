@@ -523,7 +523,6 @@ function SpecialEventPackage.onRequire()
             UsageInfo = "/frostivus cmd";
             Function = function(player, args)
                 local profile = shared.modProfile:Get(player);
-                --local slaughterfestData = profile.Flags:Get("Slaughterfest");
 
                 local actionId = args[1];
 

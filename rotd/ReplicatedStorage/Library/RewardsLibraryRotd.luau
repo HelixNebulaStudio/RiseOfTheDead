@@ -1612,6 +1612,11 @@ function library.onRequire()
 					itemLib.Recyclable = true;
 					if itemLib.CrateList == nil then
 						itemLib.CrateList = {};
+
+						local crateItemLib = modItemsLibrary:Find(id);
+						if crateItemLib then
+							crateItemLib.RecyclerDrop = true;
+						end
 					end
 					table.insert(itemLib.CrateList, id);
 					

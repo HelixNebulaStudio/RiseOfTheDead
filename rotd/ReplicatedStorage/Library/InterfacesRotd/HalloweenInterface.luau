@@ -1,8 +1,12 @@
 local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 --==
+local TweenService = game:GetService("TweenService");
+local UserInputService = game:GetService("UserInputService");
+
 local localPlayer = game.Players.LocalPlayer;
 
 local modGlobalVars = shared.require(game.ReplicatedStorage.GlobalVariables);
+local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modRemotesManager = shared.require(game.ReplicatedStorage.Library.RemotesManager);
@@ -26,7 +30,7 @@ local sfGuideImgs = {
 }
 
 local interfacePackage = {
-    Type = "Character";
+    Type = "Player";
 };
 --==
 function interfacePackage.onRequire()
@@ -36,6 +40,10 @@ end
 
 function interfacePackage.newInstance(interface: InterfaceInstance)
 	if not modConfigurations.SpecialEvent.Halloween then return; end
+
+	local playerClass: PlayerClass = shared.modPlayers.get(localPlayer);
+    local interfaceProperties: PropertiesVariable<anydict> = interface.Properties;
+
 	local modData = shared.require(localPlayer:WaitForChild("DataModule"));
 
     local shopOptionTemplate = script:WaitForChild("ShopOption");
@@ -86,13 +94,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			else
 				mainFrame.Size = UDim2.new(0.7, 0, 0.8, -interface.Properties.TopbarInset.Height-10);
 			end
-			if modBranchConfigurations.IsWorld("Slaughterfest") then
-				queueButton.Visible = false;
-				
-			else
-				queueButton.Visible = true;
-				
-			end
+			
+			queueButton.Visible = true;
 			
             window:Update();
 			
@@ -135,7 +138,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 		interface:PlayButtonClick();
 
 		local rPacket = remoteHalloween:InvokeServer({Action="QueueReaperGames";});
-		if rPacket.Success then
+		if typeof(rPacket) == "table" and rPacket.Success then
 			local queueState = rPacket.QueueState;
 			local expectedLobbyFormTime = queueState.NextLobbyFormTime;
 
@@ -994,6 +997,279 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 
 	end)
 
+
+
+
+	--MARK: ReapersGames
+	--=======================================================================================================
+	if shared.WorldName == "ReapersGames" then
+		task.spawn(function() 
+			modAudio.Preload("DeathCertificate");
+			modAudio.Preload("DeathCertificateE");
+			modAudio.Preload("DeathClock");
+			modAudio.Preload("Suspense");
+		end)
+		local reapersGamesHud = script:WaitForChild("ReapersGamesHud"):Clone();
+		reapersGamesHud.Parent = interface.ScreenGui;
+
+		local templateNameLabel = script:WaitForChild("templateName");
+		local templateScoreLabel = script:WaitForChild("templateScore");
+
+		local introFrame = reapersGamesHud:WaitForChild("Announce");
+		local introBkFrame = introFrame:WaitForChild("Background");
+		local introJRImage = introFrame:WaitForChild("ImageLabel");
+		local introTitle = introFrame:WaitForChild("Title");
+		local introDesc = introFrame:WaitForChild("Desc");
+		local broadcastReadyupText = introFrame:WaitForChild("ReadyupText");
+
+		local endScreenFrame = reapersGamesHud:WaitForChild("EndScreen");
+		local scoreboardFrame = endScreenFrame:WaitForChild("scoreboard");
+
+		introTitle:GetPropertyChangedSignal("TextTransparency"):Connect(function()
+			introTitle.UIShadow.Transparency = introTitle.TextTransparency;
+		end)
+		introDesc:GetPropertyChangedSignal("TextTransparency"):Connect(function()
+			introDesc.UIShadow.Transparency = introDesc.TextTransparency;
+		end)
+
+		local tweenInfo1 = TweenInfo.new(0.2);
+		local tweenInfo2 = TweenInfo.new(1);
+		local tweenInfo3 = TweenInfo.new(3);
+		local cenPos = UDim2.new(0.5, 0, 0.5, 0);
+		modClientGuis.bindGuiRemote("reapergames_intro", function()
+			local introSnd = modAudio.Play("DeathCertificate", reapersGamesHud);
+			introBkFrame.BackgroundTransparency = 1;
+			introJRImage.ImageTransparency = 1;
+			introJRImage.Position = UDim2.new(0.5, 0, 0.5, 100);
+			introTitle.TextTransparency = 1;
+			introTitle.Position = UDim2.new(0.5, 0, 0.5, 100);
+			introDesc.TextTransparency = 1;
+			introDesc.Position = UDim2.new(0.5, 0, 0.6, 100);
+			introFrame.Visible = true;
+			introTitle.Visible = true;
+			introDesc.Visible = true;
+			
+			introTitle.Text = `Reaper's Games`;
+			introDesc.Text = `Score points by playing the reaper's games. Winners gets additional points.`;
+
+			TweenService:Create(introBkFrame, tweenInfo1, {BackgroundTransparency=0;}):Play();
+			TweenService:Create(introJRImage, tweenInfo2, {ImageTransparency=0; Position=cenPos;}):Play();
+			TweenService:Create(introTitle, tweenInfo3, {TextTransparency=0; Position=cenPos;}):Play();
+			TweenService:Create(introDesc, tweenInfo3, {TextTransparency=0; Position=UDim2.new(0.5, 0, 0.6, 0);}):Play();
+
+			task.wait(4);
+			TweenService:Create(introBkFrame, tweenInfo1, {BackgroundTransparency=1;}):Play();
+			TweenService:Create(introJRImage, tweenInfo1, {ImageTransparency=1;}):Play();
+			TweenService:Create(introTitle, tweenInfo1, {TextTransparency=1;}):Play();
+			TweenService:Create(introDesc, tweenInfo1, {TextTransparency=1;}):Play();
+			local sndTween = TweenService:Create(introSnd, tweenInfo2, {Volume=0});
+			sndTween.Completed:Connect(function() Debugger.Expire(introSnd) end)
+			sndTween:Play();
+
+			task.wait(0.2);
+			introFrame.Visible = false;
+		end)
+
+		local lastAnnounceTitleTxt;
+		modClientGuis.bindGuiRemote("reapergames_announce", function(titleTxt, descTxt, arg3, arg4)
+			if titleTxt == lastAnnounceTitleTxt then return end;
+			lastAnnounceTitleTxt = titleTxt;
+			
+			Debugger:Warn("reapergames_announce", titleTxt, descTxt, arg3);
+
+			modAudio.Play("DeathClock", reapersGamesHud);
+			introBkFrame.BackgroundTransparency = 1;
+			introJRImage.ImageTransparency = 1;
+			broadcastReadyupText.Visible = false;
+
+			introTitle.TextTransparency = 1;
+			introTitle.Position = UDim2.new(0.5, 0, 0.5, 100);
+			introDesc.TextTransparency = 1;
+			introDesc.Position = UDim2.new(0.5, 0, 0.6, 100);
+			introFrame.Visible = true;
+
+			if titleTxt then
+				introTitle.Visible = true;
+				introTitle.Text = titleTxt;
+				TweenService:Create(introTitle, tweenInfo3, {TextTransparency=0; Position=cenPos;}):Play();
+			else
+				introTitle.Visible = false;
+			end
+			if descTxt then
+				introDesc.Visible = true;
+				introDesc.Text = descTxt;
+				local offset = 0.6;
+				if titleTxt == nil then offset = 0.5; end;
+				TweenService:Create(introDesc, tweenInfo3, {TextTransparency=0; Position=UDim2.new(0.5, 0, offset, 0);}):Play();
+			else
+				introDesc.Visible = false;
+			end
+			TweenService:Create(introBkFrame, tweenInfo1, {BackgroundTransparency=0;}):Play();
+
+			if typeof(arg3) == "number" then
+				local addWaitTime = arg3;
+				task.wait(4 + (addWaitTime or 0));
+				
+			elseif arg3 == "votecontinue" then
+				task.wait(2);
+				broadcastReadyupText.Visible = true;
+
+				for a=0, 30 do
+					task.wait(1);
+					if workspace:GetAttribute("VoteContinueWait") ~= true then
+						break;
+					end
+				end
+
+			end
+			
+			TweenService:Create(introBkFrame, tweenInfo1, {BackgroundTransparency=1;}):Play();
+			TweenService:Create(introTitle, tweenInfo1, {TextTransparency=1;}):Play();
+			TweenService:Create(introDesc, tweenInfo1, {TextTransparency=1;}):Play();
+
+			task.wait(0.2);
+			introFrame.Visible = false;
+		end)
+
+		modClientGuis.bindGuiRemote("reapergames_kia", function(p)
+			if p == nil or p.Name ~= localPlayer.Name then return end;
+
+			local killSnd = modAudio.Play("Suspense", reapersGamesHud);
+			killSnd.PlaybackSpeed = math.random(100, 110)/100;
+		end)
+
+		interface.Garbage:Tag(playerClass.HealthComp.OnIsDeadChanged:Connect(function(isDead)
+			local spectatorUIElement: InterfaceElement = interface:GetOrDefaultElement("SpectatorScreenElement");
+			spectatorUIElement.Visible = isDead;
+
+			if isDead then
+				local deathSnd = modAudio.Play("DeathCertificateE", reapersGamesHud);
+				TweenService:Create(deathSnd, TweenInfo.new(3), {Volume=0}):Play();
+				Debugger.Expire(deathSnd, 3.5);
+			end
+		end))
+
+
+		local rgTimeDown = modTimeDownUI.new();
+		interface.Garbage:Tag(rgTimeDown);
+		rgTimeDown.Frame.Name = "GeneralTimeDown";
+		rgTimeDown.Frame.Parent = interface.ScreenGui;
+		rgTimeDown.Frame.AnchorPoint = Vector2.new(0.5, 0);
+		rgTimeDown.Frame.Position = UDim2.new(0.5, 0, 0, interface.Properties.TopbarInset.Height + 30);
+		rgTimeDown.Frame.Size = UDim2.new(0.1, 0, 0.1, 0);
+		
+		local ftFrame = rgTimeDown.Frame.FtFrame;
+		ftFrame.BackgroundColor3 = interface.Colors.Red;
+
+		modClientGuis.bindGuiRemote("reapergames_endgame", function(sortedScoreboard)
+			modConfigurations.Set("DisableWeaponInterface", false);
+			modConfigurations.Set("DisableGeneralStats", false);
+			modConfigurations.Set("DisableInventory", false);
+			modConfigurations.Set("DisableHealthbar", false);
+			modConfigurations.Set("DisableHotbar", false);
+			modConfigurations.Set("CanQuickEquip", true);
+
+			Debugger:Warn(`sortedScoreboard`, sortedScoreboard);
+			for idx=1, #sortedScoreboard do
+				local scoreInfo = sortedScoreboard[idx];
+
+				local newName = templateNameLabel:Clone();
+				newName.Text = `{scoreInfo.Player and scoreInfo.Player.DisplayName or "Unknown"}`;
+				newName.LayoutOrder = idx;
+
+				newName.Parent = scoreboardFrame.names;
+
+				local newPoints = templateScoreLabel:Clone();
+				newPoints.Text = `{scoreInfo.Score}`;
+				newPoints.LayoutOrder = idx;
+				newPoints.Parent = scoreboardFrame.score;
+				
+				if idx == 1 then
+					newPoints.Text = `{newPoints.Text} (+2 Bonus Candybags)`;
+
+				elseif idx == 2 then
+					newName.TextSize = 17;
+					newPoints.TextSize = 17;
+
+					newPoints.Text = `{newPoints.Text} (+1 Bonus Candybag)`;
+					
+				else
+					newName.TextSize = 14;
+					newPoints.TextSize = 14;
+				end
+
+			end
+			endScreenFrame.Visible = true;
+
+		end)
+
+		local lastStartTime = nil;
+		modClientGuis.bindGuiRemote("reapergames_starttimedown", function(startTime)
+			if startTime == nil then
+				rgTimeDown:Set{
+					EndTime = workspace:GetServerTimeNow() -2;
+				};
+				return;
+			end
+
+			if lastStartTime and startTime - lastStartTime <= 1.1 then return end;
+			lastStartTime = startTime;
+
+			rgTimeDown:Set{
+				EndTime = startTime;
+			};
+		end)
+		modClientGuis.bindGuiRemote("reapergames_timedowntext", function(txt, duration)
+			Debugger:StudioLog(`reapergames_timedowntext`, txt, duration);
+
+			rgTimeDown:PromptText(txt, duration);
+		end)
+
+		interface.Garbage:Tag(UserInputService.InputBegan:Connect(function(_, gP)
+			if gP then return end;
+			if not broadcastReadyupText.Visible then return end;
+
+			local rPacket = remoteHalloween:InvokeServer({Action="VoteContinueReapersGames";});
+			if typeof(rPacket) == "table" and rPacket.Success then
+				broadcastReadyupText.Visible = false;
+			end
+		end))
+
+		interface.OnReady:Once(function()
+    		local remoteGameModeExit = modRemotesManager:Get("GameModeExit");
+
+			local spectatorUIElement: InterfaceElement = interface:GetOrDefaultElement("SpectatorScreenElement");
+			spectatorUIElement.SpectatorLeaveClick = function() 
+				modClientGuis.promptDialogBox({
+					Title=`Leave Reaper's Games?`;
+					Desc=`Are you sure you want to leave?`;
+					Buttons={
+						{
+							Text="Leave";
+							Style="Confirm";
+							OnPrimaryClick=function(dialogWindow)
+								interface:ToggleGameBlinds(false, 3);
+								
+								local success = remoteGameModeExit:InvokeServer();
+								if success then
+									
+								else
+									interface:ToggleGameBlinds(true, 1);
+								end
+
+							end;
+						};
+						{
+							Text="Cancel";
+							Style="Cancel";
+						};
+					}
+				});
+				
+			end
+		end)
+	end
+	--=======================================================================================================
 end
 
 return interfacePackage;

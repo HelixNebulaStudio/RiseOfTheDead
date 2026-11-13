@@ -245,6 +245,14 @@ function PageInterface:Load(interface: Interface, window: InterfaceWindow)
 								end
 							end
 							
+
+							if typeof(itemDetails.SourceText) == "table" and #itemDetails.SourceText >0  then
+								obtainable = true;
+								for a=1, #itemDetails.SourceText do
+									descText = `{descText}  • {itemDetails.SourceText[a]}\n`;
+								end
+							end
+
 							local srcTable = itemDetails.SourceTable;
 							if srcTable and next(srcTable) ~= nil then
 								obtainable = true;
@@ -313,6 +321,7 @@ function PageInterface:Load(interface: Interface, window: InterfaceWindow)
 								if srcTable.MysteryChest then
 									descText = descText.. "  • "..srcTable.MysteryChest.."\n";
 								end
+								
 							else
 								if not obtainable then
 									descText = descText.. "No way to obtain this item at the moment.";

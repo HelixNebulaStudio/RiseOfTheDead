@@ -229,9 +229,9 @@ function npcPackage.createHelicopter(isHard: boolean, spawnPoint: Vector3)
                 
             end
 
-            self.RotRoll = modMath.Lerp(self.RotRoll, rotRoll, 0.1);
-            self.RotYaw = modMath.Lerp(self.RotYaw, rotYaw, 0.1);
-            self.RotPitch = modMath.Lerp(self.RotPitch, rotPit, 0.1);
+            self.RotRoll = modMath.lerp(self.RotRoll, rotRoll, 0.1);
+            self.RotYaw = modMath.lerp(self.RotYaw, rotYaw, 0.1);
+            self.RotPitch = modMath.lerp(self.RotPitch, rotPit, 0.1);
 
             self.WorldRotationY = math.atan2(worldDir.Z, -worldDir.X);
             self.LastPosition = heliBase.Position;
@@ -239,9 +239,9 @@ function npcPackage.createHelicopter(isHard: boolean, spawnPoint: Vector3)
         else
             bodyPosition.Position = self.LastPosition;
 
-            self.RotRoll = modMath.Lerp(self.RotRoll, 0, 0.1);
-            self.RotYaw = modMath.Lerp(self.RotYaw, 0, 0.1);
-            self.RotPitch = modMath.Lerp(self.RotPitch, 0, 0.1);
+            self.RotRoll = modMath.lerp(self.RotRoll, 0, 0.1);
+            self.RotYaw = modMath.lerp(self.RotYaw, 0, 0.1);
+            self.RotPitch = modMath.lerp(self.RotPitch, 0, 0.1);
         end
         
         local swayRot = CFrame.Angles(math.sin(tick()/2)/4, 0, math.sin(tick()/2)/4); -- Roll, Yaw, Pitch

@@ -1,4 +1,6 @@
 local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
+local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
+
 --==
 local attirePackage = {
 	ItemId=script.Name;
@@ -57,12 +59,14 @@ end
 function attirePackage.newClass()
 	local equipmentClass = modEquipmentClass.new(attirePackage);
 
-	equipmentClass:AddBaseModifier("Sledding", {
-		SetValues={
-			VehicleWear = "snowsledge";
-			VehicleWearAnimationId = attirePackage.VehicleWearAnimationId;
-		};
-	});
+	if modConfigurations.DisableGearMods ~= true then
+		equipmentClass:AddBaseModifier("Sledding", {
+			SetValues={
+				VehicleWear = "snowsledge";
+				VehicleWearAnimationId = attirePackage.VehicleWearAnimationId;
+			};
+		});
+	end
 
 	return equipmentClass;
 end

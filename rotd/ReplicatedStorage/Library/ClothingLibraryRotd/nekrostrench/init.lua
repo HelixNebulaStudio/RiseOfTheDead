@@ -18,16 +18,14 @@ local attirePackage = {
 function attirePackage.newClass()
 	local equipmentClass = modEquipmentClass.new(attirePackage);
 
-	if not modBranchConfigurations.IsWorld("Slaughterfest") then
-		equipmentClass:AddBaseModifier("Nekrosis", {
-			SetValues = {
-				NekrosisHeal = 2;
-			};
-			ArrayValues = {
-				PassiveModifiers = "Nekrosis";
-			};
-		});
-	end
+	equipmentClass:AddBaseModifier("Nekrosis", {
+		SetValues = {
+			NekrosisHeal = 2;
+		};
+		ArrayValues = {
+			PassiveModifiers = "Nekrosis";
+		};
+	});
 
 	return equipmentClass;
 end

@@ -19,6 +19,7 @@ local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrar
 local modMatchMaking = shared.require(game.ServerScriptService.ServerLibrary.MatchMaking);
 
 local GameModeManager = {};
+GameModeManager.GameWorld = false;
 GameModeManager.Load = nil;
 GameModeManager.Games = {};
 GameModeManager.MenuRooms = {};
@@ -340,7 +341,7 @@ function GameModeManager.onRequire()
 		if remoteGameModeExit:Debounce(player) then return end;
 		local playerClass: PlayerClass = modPlayers.get(player);
 		
-		if playerClass.HealthComp.IsDead then
+		if playerClass.HealthComp.IsDead or playerClass.Character == nil then
 			return GameModeManager:ExitGamemodeWorld(player);
 		end
 		
@@ -1101,12 +1102,14 @@ function GameModeManager:DisconnectPlayer(player, exitTeleport)
 end
 
 function GameModeManager:ExitGamemodeWorld(player)
-	if GameModeManager.GameWorldInfo == nil then return end;
+	if GameModeManager.GameWorld ~= true then return end;
 	
 	local profile = shared.modProfile:Get(player);
 	local playerSave = profile:GetActiveSave();
 	
-	local spawnId = (GameModeManager.GameWorldInfo and GameModeManager.GameWorldInfo.StageLib.ExitSpawn) or playerSave.Spawn;
+	local spawnId = (GameModeManager.GameWorldInfo 
+				and GameModeManager.GameWorldInfo.StageLib 
+				and GameModeManager.GameWorldInfo.StageLib.ExitSpawn) or playerSave.Spawn;
 	local worldId = modBranchConfigurations.GetWorldOfSpawn(spawnId);
 	playerSave.Spawn = spawnId;
 	
@@ -1114,6 +1117,7 @@ function GameModeManager:ExitGamemodeWorld(player)
 		shared.Notify(player, "Invalid SpawnId ("..spawnId.."), spawning in the warehouse.", "Negative");
 		worldId = "TheWarehouse";
 	end
+
 	return modServerManager:Travel(player, worldId);
 end
 

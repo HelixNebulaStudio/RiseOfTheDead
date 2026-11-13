@@ -928,15 +928,28 @@ function SpecialEventPackage.onRequire()
             -- candyData.Claimed[itemId] = true;
 
         elseif action == "QueueReaperGames" then
+            if profile.Cache.QueueReaperGamesCd and tick()-profile.Cache.QueueReaperGamesCd <= 5 then
+                return;
+            end
+
+            if shared.WorldName == "ReapersGames" and workspace:GetAttribute("ReapersGamesEnded") ~= true then
+                return;
+            end
 
             local userId = player.UserId;
+            profile.Cache.QueueReaperGamesCd = tick();
+
+            local state = modMatchMakingService:GetPlayerState(userId);
+            if state then
+                shared.Notify(player, "You are already in queue for Reaper's Games.", "Inform");
+                return;
+            end
+
             local partyObj = {
                 Region = "Global";
-                QueueType = "Default";
+                QueueType = "ReapersGames";
                 Players = {userId};
-                Values = {
-                    LocalSearchTimeLimit=30
-                };
+                Values = {};
             };
 
             local partySize = #(partyObj.Players or {userId});
@@ -955,6 +968,12 @@ function SpecialEventPackage.onRequire()
 
             end
 
+        elseif action == "VoteContinueReapersGames" then
+            if profile.Cache.VoteContinueReapersGames == false then
+                profile.Cache.VoteContinueReapersGames = true;
+                rPacket.Success = true;
+                Debugger:Warn(`VoteContinueReapersGames Player({player})`);
+            end
 
         end
         
@@ -977,15 +996,32 @@ function SpecialEventPackage.onRequire()
         
         if EventSpawns then
             local cauldronSpawn = EventSpawns:WaitForChild("HalloweenCaudronSpawn");
-            local cauldronInteractObj = script:WaitForChild("HalloweenCauldron"); 
 
-            local newCauldron = cauldronInteractObj:Clone();
-            
-            local cauldronInteractConfig = modInteractables.createInteractable("HalloweenCauldron");
-            cauldronInteractConfig.Parent = newCauldron;
+            local hasCauldronSpawned = false;
+            local function spawnCauldron()
+                if hasCauldronSpawned then return end;
+                hasCauldronSpawned = true;
 
-            newCauldron.Parent = workspace.Environment;
-            newCauldron:SetPrimaryPartCFrame(cauldronSpawn.WorldCFrame);
+                local cauldronInteractObj = script:WaitForChild("HalloweenCauldron"); 
+
+                local newCauldron = cauldronInteractObj:Clone();
+                
+                local cauldronInteractConfig = modInteractables.createInteractable("HalloweenCauldron");
+                cauldronInteractConfig.Parent = newCauldron;
+
+                newCauldron.Parent = workspace.Environment;
+                newCauldron:SetPrimaryPartCFrame(cauldronSpawn.WorldCFrame);
+            end
+
+            if cauldronSpawn:GetAttribute("Disabled") == true then
+                cauldronSpawn:GetAttributeChangedSignal("Disabled"):Connect(function()
+                    if cauldronSpawn:GetAttribute("Disabled") then return end;
+                    spawnCauldron();
+                end)
+            else
+                spawnCauldron();
+            end
+
         end
         
         shared.modEventService:OnInvoked("Tools_BindFoodTool", function(event: EventPacket, ...) 
