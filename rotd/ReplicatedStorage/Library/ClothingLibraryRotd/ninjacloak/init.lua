@@ -18,17 +18,15 @@ local attirePackage = {
 function attirePackage.newClass()
 	local equipmentClass = modEquipmentClass.new(attirePackage);
 
-	if modConfigurations.DisableGearMods ~= true then
-		equipmentClass:AddBaseModifier("NinjaAgility", {
-			SetValues = {
-				NinjaAgility = true;
-				MaxAirJump = 1;
-			};
-			ArrayValues = {
-				PassiveModifiers = "NinjaAgility";
-			};
-		});
-	end
+	equipmentClass:AddBaseModifier("NinjaAgility", {
+		SetValues = {
+			NinjaAgility = true;
+			MaxAirJump = 1;
+		};
+		ArrayValues = {
+			PassiveModifiers = "NinjaAgility";
+		};
+	});
 
 	return equipmentClass;
 end

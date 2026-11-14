@@ -119,6 +119,12 @@ if RunService:IsServer() then
 			local mission = modMission:GetMission(player, MISSION_ID);
 			if mission == nil or mission.Type ~= 1 or mission.ProgressionPoint < 4 then return end;
 
+			local profile: Profile = shared.modProfile:Get(player);
+			local gameSave: GameSaveRotd? = profile and (profile:GetActiveSave() :: GameSaveRotd) or nil;
+			if gameSave then
+				gameSave.Spawn = "witherweenbasement";
+			end
+
 			modMission:CompleteMission(player, MISSION_ID);
 		end)
 

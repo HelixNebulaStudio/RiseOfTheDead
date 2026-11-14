@@ -59,14 +59,12 @@ end
 function attirePackage.newClass()
 	local equipmentClass = modEquipmentClass.new(attirePackage);
 
-	if modConfigurations.DisableGearMods ~= true then
-		equipmentClass:AddBaseModifier("Sledding", {
-			SetValues={
-				VehicleWear = "snowsledge";
-				VehicleWearAnimationId = attirePackage.VehicleWearAnimationId;
-			};
-		});
-	end
+	equipmentClass:AddBaseModifier("Sledding", {
+		SetValues={
+			VehicleWear = "snowsledge";
+			VehicleWearAnimationId = attirePackage.VehicleWearAnimationId;
+		};
+	});
 
 	return equipmentClass;
 end

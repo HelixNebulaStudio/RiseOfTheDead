@@ -164,21 +164,20 @@ function WorldCore:BoardcastKill(player)
         local p = profile.Player;
         if p == player then continue end;
 
-        task.spawn(function() 
+        task.spawn(function()
             profile:GuiAction("reapergames_kia", player);
-            
-		    local remoteLiveFeedRemote = modRemotesManager:Get("LiveFeedRemote") :: UnreliableRemoteEvent;
-            remoteLiveFeedRemote:FireAllClients({
-                Content={
-                    {Text="Jack Reap"; Image="rbxassetid://84182291936531";};
-                    {Type="KillSym";};
-                    {Text=player.DisplayName; Avatar=player.UserId;};
-                };
-                Preset={Type="Kill"; Killer="Jack Reap"; Victim=player.Name};
-            });
         end)
     end
-    
+
+    local remoteLiveFeedRemote = modRemotesManager:Get("LiveFeedRemote") :: UnreliableRemoteEvent;
+    remoteLiveFeedRemote:FireAllClients({
+        Content={
+            {Text="Jack Reap"; Image="rbxassetid://84182291936531";};
+            {Type="KillSym";};
+            {Text=player.DisplayName; Avatar=player.UserId;};
+        };
+        Preset={Type="Kill"; Killer="Jack Reap"; Victim=player.Name};
+    });
 end
 
 function WorldCore:Timer(t, yield)
@@ -624,6 +623,15 @@ function WorldCore:Game_DropDead()
 
         self:Broadcast(nil, `Only {winnerPlayer.DisplayName} survived!`, 3);
         self:AddScore(winnerPlayerClass:GetInstance(), 60 + (#self.Profiles * 10));
+        task.wait(7);
+
+    else
+        for a=1, #playerClasses do
+            local survivorPlayerClass = playerClasses[a];
+            self:AddScore(survivorPlayerClass:GetInstance(), roundTime + (#self.Profiles * 5));
+        end
+
+        self:Broadcast(nil, `Survivors earns bonus points..`, 3);
         task.wait(7);
 
     end
