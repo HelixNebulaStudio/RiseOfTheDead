@@ -63,7 +63,13 @@ function modItemDrops.InfoRotd(itemLib, sourceStrs, sourceList, stepName, ...)
 
             for a=1, #rewardIds do
                 if rewardIds[a] ~= itemId then continue end;
+                -- Survival no longer awards crates (items drop directly every 5 waves)
+                if gm == "Survival" and itemLib.Tags and table.find(itemLib.Tags, "Crate") then
+                    break;
+                end
+
                 table.insert(sourceList.RewardSrcs, {GameMode=gm; StageName=sn;})
+                table.insert(sourceStrs, `Dropped in <b>{gm}: {sn}</b>`);
                 break;
             end
         end
