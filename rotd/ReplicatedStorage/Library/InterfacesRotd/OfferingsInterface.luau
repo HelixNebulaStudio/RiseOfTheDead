@@ -243,6 +243,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             acceptButtonObjButton.BackgroundTransparency = 1;
             acceptButtonObjButton.TextTransparency = 1;
             acceptButtonObjButton.Visible = true;
+            if priceStr == "0" then
+                acceptButtonObjButton.Text = "Claim Offer!";
+            else
+                acceptButtonObjButton.Text = "Purchase Offer";
+            end
 
             if offersLeft <= 0 then
                 denyButtonObjButton.Text = `Deny Final Offer`;

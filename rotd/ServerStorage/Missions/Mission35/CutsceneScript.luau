@@ -7,6 +7,8 @@ local modInteractables = shared.require(game.ReplicatedStorage.Library.Interacta
 
 --== Variables;
 local MISSION_ID = 35;
+local FOOD_PACKAGE_NAME = "FoodScavengePackage";
+local foodPackageExtracted = false;
 
 if RunService:IsServer() then
 	modNpcs = shared.modNpcs;
@@ -75,7 +77,9 @@ return function(CutsceneSequence)
 
 		task.spawn(function()
 			if id == "mission35FoodScavenge" then
-				
+				if foodPackageExtracted then return end;
+				foodPackageExtracted = true;
+
 				for _, player in pairs(game.Players:GetPlayers()) do
 					shared.Notify(player, `{triggerPlayer.Name} has successfully extracted the food package.`, "Reward");
 
@@ -95,7 +99,13 @@ return function(CutsceneSequence)
 						end
 					end)
 				end
-				Debugger.Expire(interactable.Config.Parent, 0);
+
+				-- A cutscene (and therefore a package) is created per mission holder, so remove every package.
+				for _, obj in pairs(workspace.Interactables:GetChildren()) do
+					if obj.Name == FOOD_PACKAGE_NAME then
+						Debugger.Expire(obj, 0);
+					end
+				end
 			end
 		end)
 	end)
@@ -133,8 +143,11 @@ return function(CutsceneSequence)
 					end
 
 				elseif mission.ProgressionPoint == 3 then
+					if workspace.Interactables:FindFirstChild(FOOD_PACKAGE_NAME) ~= nil then return end;
+					foodPackageExtracted = false;
+
 					local newCrate = game.ServerStorage.Prefabs.Objects.Crates.CratePallet:Clone();
-					newCrate.Name = "FoodScavengePackage";
+					newCrate.Name = FOOD_PACKAGE_NAME;
 
 					local newInteractConfig = modInteractables.createInteractable("ButtonRotd");
 					newInteractConfig:SetAttribute("_InteractDuration", 3);

@@ -32,7 +32,7 @@ if RunService:IsServer() then
 			if mission1 == nil or mission1.Type ~= 1 then return end;
 
 			modMission:Progress(player, MISSION_ID, function(mission)
-				if mission.ProgressionPoint < 5 then 
+				if mission.ProgressionPoint == 4 then 
 					mission.ProgressionPoint = 5; 
 					modAnalyticsService:LogOnBoarding{
 						Player=player;

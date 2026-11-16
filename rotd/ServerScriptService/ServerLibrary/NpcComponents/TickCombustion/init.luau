@@ -158,6 +158,12 @@ function Component:__call(damage, range, isLethal)
 
             if explodeEntityClass.ClassName == "NpcClass" then
                 local explodeNpcClass: NpcClass = explodeEntityClass :: NpcClass;
+
+                if explodeNpcClass.Properties.TickLethal == nil then
+                    explodeNpcClass.Properties.TickLethal = true;
+                else
+                    dmgData.NonLethal = nil;
+                end
                 
                 if explodeNpcClass.Properties.BasicEnemy then
                     damage = explodeHealthComp.MaxHealth * 0.2;

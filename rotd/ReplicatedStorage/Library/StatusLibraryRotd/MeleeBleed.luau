@@ -35,6 +35,7 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
         Damage = bleedDamage;
         DamageType = "Bleed";
         ToolHandler = toolHandler;
+        StorageItem = toolHandler and toolHandler.StorageItem or nil;
     };
 
     healthComp:TakeDamage(dmgData);

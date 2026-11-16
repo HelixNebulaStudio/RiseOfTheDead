@@ -186,7 +186,7 @@ function modItemsLibrary.onRequire()
             if rawItemValues and rawItemValues.Seed then return end;
             
             storageItem:SetValues("Seed", math.random(1, 999));
-        end
+        end;
     }
 
     -- Head
@@ -281,7 +281,7 @@ function modItemsLibrary.onRequire()
             local gameModeData = data.GameMode;
             if gameModeData then
                 data.Name = (gameModeData.HardPrefix and `<font color="rgb(136, 105, 191)">{gameModeData.HardPrefix}</font>`.." " or "")..gameModeData.Stage.." "..(gameModeData.CrateSynonym or "Crate");
-                data.Description = "Open it to see what you got from "..gameModeData.Mode..": "..gameModeData.Stage.."."
+                data.Description = `Open it to see what you got from {gameModeData.Mode}: {gameModeData.Stage}.`
             end
         end;
     };
@@ -496,7 +496,7 @@ function modItemsLibrary.onRequire()
     new(missionBase, {Id="highvaluepackage"; Name="High Value Package"; MissionIds={71}; Icon="rbxassetid://14889119970"; Description="A package container of high value."; });
     new(missionBase, {Id="bloodsample"; Equippable=true; MissionIds={75}; StorageIncludeList={"Inventory"}; Name="Blood Sample"; Icon="rbxassetid://15845539438"; Description="Test tubes containing blood samples."; });
     new(missionBase, {Id="samplereport"; Name="Sample Report"; MissionIds={75}; StorageIncludeList={"Inventory"}; Icon="rbxassetid://15904123699"; Description="Sample's unintelligible result report."; });
-    new(missionBase, {Id="blueprintpiece"; Name="Blueprint Piece"; MissionIds={77}; StorageIncludeList={"Inventory"}; CanDelete=0; Icon="rbxassetid://16537824817"; Description="A piece of torn up blueprint."; });
+    new(missionBase, {Id="blueprintpiece"; Name="Blueprint Piece"; MissionIds={77}; StorageIncludeList={"Inventory"}; Icon="rbxassetid://16537824817"; Description="A piece of torn up blueprint."; });
 
 
     --MARK: USABLE
@@ -1057,19 +1057,19 @@ function modItemsLibrary.onRequire()
 
     -- Slaughterfest 2024
     new(crateBase, {
-        Id="slaughterfestcandybag"; 
-        Name="Slaughterfest Candy Bag"; 
-        Icon="rbxassetid://122301894594822"; 
-        Tags={"Slaughterfest"}; 
-        TradingTax=0; 
-        Description="Happy Slaughterfest, open it and see what you get!";
-        Sources={"Obtained from Slaughterfest.";};
-        Stackable=false;
+        Id = "slaughterfestcandybag"; 
+        Name = "Slaughterfest Candy Bag"; 
+        Icon = "rbxassetid://122301894594822"; 
+        Tags = {"Slaughterfest"; "ReapersGames"}; 
+        TradingTax = 0; 
+        Description = "Happy Slaughterfest, open it and see what you get!";
+        Sources = {"Obtained from Slaughterfest.";};
+        Stackable = false;
     });
     local candyCaravanStr = "Eatible candies but why not cook them in the Slaughterfest Cauldron for something much more special instead?\n";
     local function candyExpiresBase(t)
-		t.DestroyOnExpire=true;
-		t.OnInstantiate=function(storageItem)
+		t.DestroyOnExpire = true;
+		t.OnInstantiate = function(storageItem)
 			local itemValues = storageItem.Values;
 			if itemValues.Expire then return end;
 			itemValues.Expire = (math.ceil(workspace:GetServerTimeNow()) + shared.Const.MonthSecs);
@@ -1184,8 +1184,8 @@ function modItemsLibrary.onRequire()
     new(metaBase, {Id="gold"; Name="Gold"; Icon="rbxassetid://4734610249"; Description="Gold, the currency of protagonists."; Tags={"Unobtainable"};});
     new(crateBase, {Id="unknowncrate"; Name="Unknown Crate"; Icon="rbxassetid://10980446265"; Description="Recycler's unknown crate."; Type=modItemsLibrary.Types.None; Tags={"Unobtainable"};});
     new(metaBase, {Id="unknowngift"; Name="Unknown Gift"; Icon="rbxassetid://17379694659"; Description="An unknown gift."; Tags={"Unobtainable"};});
-
-
+    
+    new(toolBase, {Id="pushtool"; Name="Push Tool"; Icon=shared.Const.PlaceholderIcon; Tags={"Unobtainable"; "Dev"}; Description="Tool to push other players.";});
 
     --==========================================================[[ DEV ]]==========================================================--
     new(toolBase, {Id="placeitem"; Name="Place Item"; Icon="rbxassetid://8894342011"; Tags={"Unobtainable"; "Dev"}; Description="Used for placing a pick up item.";});

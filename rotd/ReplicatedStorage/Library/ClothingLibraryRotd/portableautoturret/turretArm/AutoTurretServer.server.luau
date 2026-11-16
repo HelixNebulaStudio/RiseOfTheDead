@@ -757,7 +757,6 @@ discOnEnemiesAttract = shared.modEventService:OnInvoked("Npcs_BindEnemiesAttract
 		if not workspace:IsAncestorOf(turretArm) then
 			discOnEnemiesAttract(); 
 		end;
-		if modBranchConfigurations.IsWorld("Slaughterfest") then return end;
 		if p ~= player then return end;
 		
 		selectedTargets = characterModels or {};

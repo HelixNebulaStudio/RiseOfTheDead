@@ -209,7 +209,7 @@ function NpcComponent.new(npcClass: NpcClass)
 			attackDamage = math.min(attackDamage + (enemyHealthComp.MaxHealth * npcPercentHealthDamage), npcClass.HealthComp.MaxHealth);
 			
 		elseif targetEntityClass.ClassName == "Destructible" then
-			dmgMulti = 1+math.abs(modMath.GaussianRandom());
+			dmgMulti = 1+math.abs(modMath.gaussianRandom());
 		
 		end
 

@@ -46,7 +46,7 @@ function ShopSystem.onRequire()
         local itemId = ...;
         
         local r = modItemDrops.Info(itemId);
-        r.SourceText = nil;
+        --r.SourceText = nil;
         return r;
     end)
 

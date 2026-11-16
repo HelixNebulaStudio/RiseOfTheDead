@@ -503,12 +503,12 @@ local WORLDS = {
         
         WorldType = WORLD_TYPES.General;
     };
-    Slaughterfest = {
-        DisplayName = "Slaughterfest: Forest";
+    ReapersGames = {
+        DisplayName = "Reaper's Games";
         PlaceIds = {
             [LIVE_GAME_ID] = 11319107048;
             [PRIVATE_GAME_ID] = 0;
-            [LEGACY_DEV_GAME_ID] = 11264091769;
+            [LEGACY_DEV_GAME_ID] = 0; --11264091769
             [DEV_GAME_ID] = 94521811737793;
         };
 
@@ -992,11 +992,13 @@ function modBranchConfigurations.onRequire()
         
 
     elseif curWorldInfo.WorldType == WORLD_TYPES.Slaughterfest then
-        modConfigurations.Set("DisableHealthbar", false);
+        modConfigurations.Set("DisableHealthbar", true);
         modConfigurations.Set("DisableHotbar", true);
         modConfigurations.Set("CanQuickEquip", false);
+        modConfigurations.Set("CanClientEquipAndUnequip", false);
+        modConfigurations.Set("SpectateEnabled", true);
 
-        modConfigurations.Set("DefaultSprintMode", 2);
+        -- modConfigurations.Set("DefaultSprintMode", 2);
         modConfigurations.Set("DisableSettingsMenu", false);
         modConfigurations.Set("DisableSocialMenu", false);
         modConfigurations.Set("DisableSquadInterface", false);
@@ -1014,9 +1016,10 @@ function modBranchConfigurations.onRequire()
         modConfigurations.Set("DisableGearMods", true);
         modConfigurations.Set("DisableHurtFlinch", false);
         
-        modConfigurations.Set("PvpMode", true);
+        modConfigurations.Set("PvpMode", false);
         
         modConfigurations.Set("SpawnProtectionTimer", 5);
+        modConfigurations.Set("DisableManualDisguiseUse", true);
         
         --== Server;
         modConfigurations.Set("DisableItemDrops", false);
@@ -1061,6 +1064,7 @@ function modBranchConfigurations.onRequire()
         modConfigurations.Set("SpectateEnabled", true);
         modConfigurations.Set("DisableMapItems", false);
         --modConfigurations.Set("NaturalSpawnLimit", 10);
+        -- modConfigurations.Set("CanClientEquipAndUnequip", false);
         
     elseif curWorldName == "Safehome" then
         modConfigurations.Set("DisableSafehomeMenu", false);
@@ -1075,7 +1079,7 @@ function modBranchConfigurations.onRequire()
         modConfigurations.FogRange.Start = 200;
         modConfigurations.FogRange.End = 1200;
 
-    elseif curWorldName == "Slaughterfest" then
+    elseif curWorldName == "ReapersGames" then
         local skyPhaseColors = modConfigurations.SkyPhaseColor;
         skyPhaseColors.Night = Color3.fromRGB(38, 47, 94);
 

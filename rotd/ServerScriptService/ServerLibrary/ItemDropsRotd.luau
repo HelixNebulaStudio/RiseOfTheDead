@@ -3,7 +3,13 @@ local Debugger = require(game.ReplicatedStorage.Library.Debugger).new(script);
 local modItemDrops = shared.require(game.ServerScriptService.ServerLibrary.ItemDrops);
 local modRewardsLibrary = shared.require(game.ReplicatedStorage.Library.RewardsLibraryRotd);
 
-function modItemDrops.InfoRotd(itemId, sourceStrs, sourceList, stepName, ...)
+function modItemDrops.InfoRotd(itemLib, sourceStrs, sourceList, stepName, ...)
+    local itemId = itemLib.Id;
+
+    if itemLib.RecyclerDrop then
+        -- item marked as RecyclerDrop in RewardsLibraryRotd.luau
+        table.insert(sourceStrs, `Safehome Survivor: <b>Recyclers</b>` );
+    end
 
     local modShopLibrary = shared.require(game.ReplicatedStorage.Library.GeneralShopLibrary);
     local shopIndexedList = modShopLibrary.Products:GetIndexList();

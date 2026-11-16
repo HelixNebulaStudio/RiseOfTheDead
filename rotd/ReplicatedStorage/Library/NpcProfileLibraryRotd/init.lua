@@ -208,6 +208,8 @@ function library.onRequire()
 	library:Add{Id="Shaw"; Class="BioX"; World="RadioStation"; };
 	
 
+	--== Event
+	library:Add{Id="Jack Reap"; Class="Unknown"; Avatar="rbxassetid://84182291936531"; };
 end
 
 function library:GetProperties(name)

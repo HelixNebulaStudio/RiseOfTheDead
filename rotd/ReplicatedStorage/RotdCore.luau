@@ -7,7 +7,7 @@ local RotdCore = {};
 local modGlobalVars = shared.require(game.ReplicatedStorage.GlobalVariables);
 modGlobalVars.DevVersion="3.0.x";
 modGlobalVars.GameVersion = "3.0";
-modGlobalVars.GameBuild = "170";
+modGlobalVars.GameBuild = "172";
 modGlobalVars.ModeVerLabel = `$Fps fps\t$UpTime\tRotd $GameVersion $BranchName $IsMobile`;
 
 --==
@@ -54,6 +54,7 @@ if RunService:IsServer() then
     local modShopSystem = shared.require(game.ServerScriptService.ServerLibrary.ShopSystem);
     local modGameModeManager = shared.require(game.ServerScriptService.ServerLibrary.GameModeManager);
     local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
+    local modMatchMakingService = shared.require(game.ServerScriptService.ServerLibrary.MatchMakingServiceRotd);
 
     
     modAnalyticsService:InitCurrencies{

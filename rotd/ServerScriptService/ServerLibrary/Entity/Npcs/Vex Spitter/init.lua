@@ -83,7 +83,7 @@ function npcPackage.Spawned(npcClass: NpcClass)
         for a=1, 10 do
             local dirCf = CFrame.lookAt(Vector3.zero, Vector3.yAxis, Vector3.yAxis);
             dirCf = dirCf*CFrame.Angles(0, 0, math.rad(math.random(0, 360))); -- roll cframe
-            local gr = modMath.GaussianRandom()/2.5;
+            local gr = modMath.gaussianRandom()/2.5;
             dirCf = dirCf*CFrame.Angles(math.rad(95*gr), 0, 0); --pitch cframe;
 
             local dir = dirCf.LookVector;
@@ -99,7 +99,7 @@ function npcPackage.Spawned(npcClass: NpcClass)
                 local pointCf = CFrame.lookAt(point, point + normal) * CFrame.Angles(math.rad(-90), 0, 0);
                 local origin = point + (normal*0.1);
 
-                local rayResultList = modRaycastUtil.ConeCast{
+                local rayResultList = modRaycastUtil.coneCast{
                     Origin = origin;
                     Dir = -normal;
                     Points = scanPoints;

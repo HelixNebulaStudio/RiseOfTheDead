@@ -20,7 +20,6 @@ local modifierPackage = {
 if RunService:IsServer() then
 	
     function modifierPackage.Binds.DeathHandler(modifier: ItemModifierInstance, npcClass: NpcClass, damageData: DamageData)
-		if shared.WorldName == "Slaughterfest" then return end;
 		if damageData == nil then return end;
 
 		local damageTo: CharacterClass? = damageData.DamageTo :: CharacterClass;

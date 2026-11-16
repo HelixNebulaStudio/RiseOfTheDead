@@ -2346,8 +2346,39 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 					local dailyLabel = dailyBonus:WaitForChild("dailyLabel");
 					local activeStroke = dailyBonus:WaitForChild("UIStroke");
 
-					local filRatio = math.clamp( dailyBoardBonusFlag.Percent/100 , 0, 1);
-					barFill.Size = UDim2.new(filRatio, 0, 1, 0);
+					local function updateDailyBonusUI()
+						if not missionBoard.Parent then return end;
+
+						local flag = modData:GetFlag("DailyBoardBonus");
+						if flag then
+							dailyBoardBonusFlag = flag;
+						end
+
+						local dailyBonusPercent = dailyBoardBonusFlag.Percent or 0;
+						local filRatio = math.clamp( dailyBonusPercent/100 , 0, 1);
+						barFill.Size = UDim2.new(filRatio, 0, 1, 0);
+						dailyLabel.Text = `+{dailyBonusPercent}%`;
+					end
+
+					updateDailyBonusUI();
+					local disconnectDailyBonusFlag = modData.OnFlagUpdate:Connect(function(flagId, flagData)
+						if flagId ~= "DailyBoardBonus" then return end;
+						if flagData then
+							dailyBoardBonusFlag = flagData;
+						end
+						updateDailyBonusUI();
+					end)
+					missionBoard.Destroying:Connect(function()
+						disconnectDailyBonusFlag();
+					end)
+
+					task.spawn(function()
+						local fetchedFlag = modData:GetFlag("DailyBoardBonus", true);
+						if fetchedFlag then
+							dailyBoardBonusFlag = fetchedFlag;
+							updateDailyBonusUI();
+						end
+					end)
 
 					dailyBonus:GetPropertyChangedSignal("GuiState"):Connect(function()
 						if dailyBonus.GuiState == Enum.GuiState.Hover then
@@ -2394,8 +2425,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 								end
 							end
 
-							nextDailyBonusTime = dailyBoardBonusFlag 
-												and (dailyBoardBonusFlag.Time + shared.Const.Hours20) or 0;
+							nextDailyBonusTime = dailyBoardBonusFlag
+												and ((dailyBoardBonusFlag.Time or 0) + shared.Const.Hours20) or 0;
 							canStartForDailyBonus = workspace:GetServerTimeNow() > nextDailyBonusTime;
 
 							if canStartForDailyBonus then
@@ -2440,18 +2471,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 							end
 						end
 
-						task.spawn(function()
-							local getDailyBoardFlag = modData:GetFlag("DailyBoardBonus");
-							if getDailyBoardFlag then
-								dailyBoardBonusFlag = getDailyBoardFlag;
-							end
-							
-							local dailyBonusPercent = dailyBoardBonusFlag.Percent or 0;
-							local filRatio = math.clamp( dailyBonusPercent/100 , 0, 1);
-							barFill.Size = UDim2.new(filRatio, 0, 1, 0);
-
-							dailyLabel.Text = `+{dailyBonusPercent}%`;
-						end)
+						updateDailyBonusUI();
 					end
 
 					local lastMissionBoardUpdate = tick();
@@ -2532,8 +2552,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 						
 						local perksLabel = generalRewardsFrame:WaitForChild("PerksReward");
 						if perksReward ~= nil then
-							if canStartForDailyBonus and dailyBoardBonusFlag.Percent > 0 then
-								perksReward += math.ceil(perksReward * (dailyBoardBonusFlag.Percent/100));
+							if canStartForDailyBonus and (dailyBoardBonusFlag.Percent or 0) > 0 then
+								perksReward += math.ceil(perksReward * ((dailyBoardBonusFlag.Percent or 0)/100));
 							end
 							perksLabel.Visible = true;
 							perksLabel.TextLabel.Text = `{perksReward}`;

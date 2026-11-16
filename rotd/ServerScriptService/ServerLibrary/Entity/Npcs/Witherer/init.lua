@@ -89,7 +89,7 @@ function npcPackage.Spawned(npcClass: NpcClass)
     for a=1, 10 do
         local dirCf = CFrame.lookAt(Vector3.zero, Vector3.yAxis, Vector3.yAxis);
         dirCf = dirCf*CFrame.Angles(0, 0, math.rad(math.random(0, 360))); -- roll cframe
-        local gr = modMath.GaussianRandom()/2.5;
+        local gr = modMath.gaussianRandom()/2.5;
         dirCf = dirCf*CFrame.Angles(math.rad(80*gr), 0, 0); --pitch cframe;
 
         local dir = dirCf.LookVector;

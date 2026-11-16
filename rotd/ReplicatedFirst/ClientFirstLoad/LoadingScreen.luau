@@ -231,6 +231,11 @@ local WORLDS_INFO_LIBRARY = {
 		TitleTexts = "Slaughterfest: Forest";
 		DescTexts = "Kill or be killed..";
 	};
+	["ReapersGames"] = {
+		HeaderTexts = WD_HEADER;
+		TitleTexts = "Reaper's Games";
+		DescTexts = "Wanna play a game?..";
+	};
 
 
 
