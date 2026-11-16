@@ -95,6 +95,12 @@ local catInfoLib = {
 
 local itemDetailCache = {};
 local itemInfoRequestCooldown = {};
+
+local function normalizeSourceText(value): string
+	local str = string.gsub(tostring(value), "<[^>]->", "");
+	str = string.gsub(str, "%s+", " ");
+	return string.lower(string.match(str, "^%s*(.-)%s*$") or str);
+end
 --==
 
 function PageInterface:Load(interface: Interface, window: InterfaceWindow)
@@ -245,11 +251,12 @@ function PageInterface:Load(interface: Interface, window: InterfaceWindow)
 								end
 							end
 							
-
+							local sourceTextKeys = {};
 							if typeof(itemDetails.SourceText) == "table" and #itemDetails.SourceText >0  then
 								obtainable = true;
 								for a=1, #itemDetails.SourceText do
 									descText = `{descText}  • {itemDetails.SourceText[a]}\n`;
+									sourceTextKeys[normalizeSourceText(itemDetails.SourceText[a])] = true;
 								end
 							end
 
@@ -261,7 +268,10 @@ function PageInterface:Load(interface: Interface, window: InterfaceWindow)
 										local rewardData = srcTable.RewardSrcs[a];
 										
 										if rewardData.GameMode then
-											descText = descText.. "  • Dropped in <b>"..rewardData.GameMode..": "..rewardData.StageName.."</b>".."\n";
+											local dropText = "Dropped in <b>"..rewardData.GameMode..": "..rewardData.StageName.."</b>";
+											if not sourceTextKeys[normalizeSourceText(dropText)] then
+												descText = descText.. "  • "..dropText.."\n";
+											end
 											
 										end
 
