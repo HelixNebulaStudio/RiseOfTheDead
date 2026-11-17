@@ -34,11 +34,11 @@ function attirePackage.OnAccesorySpawn(playerClass: PlayerClass, storageItem: St
 		
 		local accWeld;
 		for _, obj in pairs(accessoryHandle:GetChildren()) do
-			if not obj:IsA("Weld") then continue end;
-			if obj.Name == "AccessoryWeld" then
+			if obj.Name == "AccessoryWeld" or obj.Name == "AccessoryRigidConstraint" then
 				obj:Destroy();
 				continue;
 			end;
+			if not obj:IsA("Weld") then continue end;
 
 			obj.Enabled = false;
 			accWeld = obj;

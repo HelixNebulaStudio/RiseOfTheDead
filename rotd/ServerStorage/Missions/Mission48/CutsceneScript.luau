@@ -23,7 +23,7 @@ if RunService:IsServer() then
 		end
 	end
 	
-	if modBranchConfigurations.IsWorld("TheMall") then
+	if shared.WorldName == "TheMall" then
 		shared.modEventService:OnInvoked("Destructibles_BindDestroyed", function(event: EventPacket, ...) 
 			local destructible: DestructibleInstance, damageData: DamageData = ...;
 			if destructible.Properties.MissionIdTag ~= MISSION_ID then return; end
@@ -51,7 +51,7 @@ end
 
 --== Script;
 return function(CutsceneSequence)
-	if not modBranchConfigurations.IsWorld("TheMall") then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
+	if shared.WorldName ~= "TheMall" then Debugger:Warn("Invalid place for cutscene ("..script.Name..")"); return; end;
 	
 	CutsceneSequence:Initialize(function()
 		local players = CutsceneSequence:GetPlayers();
@@ -109,7 +109,8 @@ return function(CutsceneSequence)
 				
 			elseif mission.Type == 1 then -- OnActive
 				if mission.ProgressionPoint == 1 then
-					
+					modReplicationManager.ReplicateOut(player, strangerNpcClass.Character);
+								
 				elseif mission.ProgressionPoint == 2 then
 					if strangerNpcClass then
 						strangerNpcClass.Properties.Immortal = 0;
