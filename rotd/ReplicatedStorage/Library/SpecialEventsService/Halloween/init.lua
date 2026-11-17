@@ -8,7 +8,6 @@ local modRemotesManager = shared.require(game.ReplicatedStorage.Library:WaitForC
 local modRewardsLibrary = shared.require(game.ReplicatedStorage.Library.RewardsLibrary);
 local modItemsLibrary = shared.require(game.ReplicatedStorage.Library.ItemsLibrary);
 local modDropRateCalculator = shared.require(game.ReplicatedStorage.Library.DropRateCalculator);
-local modDialogueService = shared.require(game.ReplicatedStorage.Library.DialogueService);
 local modSyncTime = shared.require(game.ReplicatedStorage.Library.SyncTime);
 local modBranchConfigurations = shared.require(game.ReplicatedStorage.Library.BranchConfigurations);
 local modBattlePassLibrary = shared.require(game.ReplicatedStorage.Library.BattlePassLibrary);
@@ -43,12 +42,38 @@ local SpecialEventPackage = {
 };
 local loadedDialogues = {};
 local npcSeedOverride = nil;
+local dialogueListenerBound = false;
 --==
 
+local function bindDialogueListener()
+    if dialogueListenerBound then return end;
+    if not RunService:IsServer() then return end;
+    dialogueListenerBound = true;
+
+    shared.modEventService:OnInvoked("Dialogue_BindCustomDialogueHandler", function(eventPacket: EventPacket, ...)
+        local player = eventPacket.Player;
+        if player == nil then return end;
+
+        local dialog, data = ...;
+        if dialog == nil then return end;
+
+        local dialogueHandlerFunc = loadedDialogues[dialog.Name];
+        if dialogueHandlerFunc == nil then
+            local modNpcProfileLibrary = shared.require(game.ReplicatedStorage.Library.NpcProfileLibrary);
+            local npcLib = modNpcProfileLibrary:Find(dialog.Name);
+            if npcLib and npcLib.Class == "Survivor" then
+                SpecialEventPackage.SlaughterfestGetCandyTrade();
+                dialogueHandlerFunc = loadedDialogues[dialog.Name];
+            end
+        end
+        if dialogueHandlerFunc == nil then return end;
+
+        dialogueHandlerFunc(player, dialog, data);
+    end);
+end
+
 function SpecialEventPackage.LoadSlaughterfestDialogues(trickNpcList, treatNpcList)
-    for npcName, dialogueHandlerFunc in pairs(loadedDialogues) do
-        modDialogueService:ClearHandler(npcName, dialogueHandlerFunc);
-    end
+    bindDialogueListener();
     table.clear(loadedDialogues);
 
     for a=1, #trickNpcList do
@@ -147,7 +172,6 @@ function SpecialEventPackage.LoadSlaughterfestDialogues(trickNpcList, treatNpcLi
 
         end
 
-        modDialogueService:AddHandler(npcName, dialogueHandlerFunc);
         loadedDialogues[npcName] = dialogueHandlerFunc;
     end
 
@@ -212,7 +236,6 @@ function SpecialEventPackage.LoadSlaughterfestDialogues(trickNpcList, treatNpcLi
             end);
         end
         
-        modDialogueService:AddHandler(npcName, dialogueHandlerFunc);
         loadedDialogues[npcName] = dialogueHandlerFunc;
     end
 end

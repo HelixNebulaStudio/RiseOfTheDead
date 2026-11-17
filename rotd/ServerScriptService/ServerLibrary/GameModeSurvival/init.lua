@@ -924,7 +924,9 @@ function Survival:SpawnCrate()
 	interactConfig:SetAttribute("StorageId", "survivalrewards");
 	interactConfig:SetAttribute("StorageName", "Survival Rewards");
 	interactConfig:SetAttribute("StoragePresetId", "rewardcrate");
-	interactConfig:SetAttribute("SkipWaveButton", true);
+
+	interactConfig:SetAttribute("SkipWaveButton", self.Status == EnumStatus.InProgress);
+
 	interactConfig.Parent = cratePrefab;
 	
 	local interactable: InteractableInstance = modInteractables.getOrNew(interactConfig);

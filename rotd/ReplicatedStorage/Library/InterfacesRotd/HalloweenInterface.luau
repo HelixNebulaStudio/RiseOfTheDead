@@ -947,7 +947,8 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
 			newListing.Parent = treatNpcScrollFrame;
 
 			local avatarLabel = newListing:WaitForChild("AvatarLabel");
-			if slaughterfestData.ClaimedTreats and slaughterfestData.ClaimedTreats[npcName] then
+			local claimedTreats = slaughterfestData.ClaimedTreats;
+			if claimedTreats and claimedTreats[npcName] == npcSeed then
 				avatarLabel.Image = npcProfileLib.Avatar;
 			end
 

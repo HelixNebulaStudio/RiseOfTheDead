@@ -17,9 +17,9 @@ local SERVER_TYPES = {
 	Default = {};
 	ReapersGames = {
 		WorldId = "ReapersGames";
-		MinLobbySize = 2;
+		MinLobbySize = 3;
 		MaxLobbySize = 6;
-		DeficitDurationMultiplier = 2;
+		DeficitDurationMultiplier = 5;
 	};
 };
 --==
