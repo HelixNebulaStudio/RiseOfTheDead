@@ -106,7 +106,7 @@ function modMatchMakingService.onRequire()
 			]];
 
 			RequiredArgs = 0;
-			UsageInfo = "/mmalmdes action [args]";
+			UsageInfo = "/mmrotd action [args]";
 			Function = function(speaker: Player, args)
 				local player = speaker;
 				local actionId = args[1];
@@ -114,8 +114,8 @@ function modMatchMakingService.onRequire()
 				if actionId == "testjoinserver" or actionId == "tjs" then
 					local serverConfig = SERVER_TYPES.ReapersGames;
 					local reserveAccessCode = modServerManager:CreatePrivateServer(serverConfig.WorldId);
-					crossServerSignal:Fire("joinserver", {player.UserId}, reserveAccessCode);
-
+					crossServerSignal:Fire("joinserver", "ReapersGames", {player.UserId}, serverConfig.WorldId, reserveAccessCode);
+					
 				else
 					Debugger:Log("MatchMaking: unknown action", tostring(actionId));
 				end
