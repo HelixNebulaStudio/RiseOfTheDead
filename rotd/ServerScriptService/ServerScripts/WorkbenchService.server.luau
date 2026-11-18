@@ -1373,6 +1373,8 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 							EndBalance = playerSave:GetStat("Money");
 							ItemSKU = "DeconstructWeapon";
 						};
+
+						profile:GuiAction("hint_moneyreward", `<b>+${DECONSTRUCT_WEAPON_MONEY_REWARD}</b> Deconstructed weapon`);
 					end
 
 					shared.Notify(player, `You recieved ${DECONSTRUCT_WEAPON_MONEY_REWARD} from deconstructing a level {levels} {itemName}.`, "Reward");
@@ -1396,6 +1398,8 @@ function remoteDeconstruct.OnServerInvoke(player, interactPart, action, arg)
 						EndBalance=playerSave:GetStat("Money");
 						ItemSKU="DeconstructWeapon";
 					};
+
+					profile:GuiAction("hint_moneyreward", `<b>+25000</b> Deconstructed weapon`);
 
 
 				end

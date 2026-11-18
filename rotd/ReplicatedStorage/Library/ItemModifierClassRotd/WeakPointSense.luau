@@ -59,6 +59,7 @@ if RunService:IsServer() then
 
             damageData.Damage = damage;
             damageData.DamageType = "Crit";
+            damageData.IsWeakPoint = true;
         end);
     end
 end

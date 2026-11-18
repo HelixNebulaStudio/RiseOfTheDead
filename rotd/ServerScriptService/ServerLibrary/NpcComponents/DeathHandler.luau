@@ -9,11 +9,14 @@ local modDamageTag = shared.require(game.ReplicatedStorage.Library.DamageTag);
 
 local modExperience = shared.require(game.ServerScriptService.ServerLibrary.Experience);
 local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
+local modMoneyRewardSystem = shared.require(game.ReplicatedStorage.Library.MoneyRewardSystem);
 
 local Component = {};
 Component.ClassName = "NpcComponent";
 Component.__index = Component;
 --==
+
+local lastKillTime = setmetatable({}, {__mode = "k"}); -- [Player] = tick()
 
 function Component.new(npcClass: NpcClass)
 	local self = {
@@ -71,6 +74,31 @@ function Component:__call(damagedata: DamageData)
 	local playerBonusExp = {};
 
 	local npcLevel = rawProperties.Level;
+	local deathTime = workspace:GetServerTimeNow();
+	local firstDamageTaken = healthComp.FirstDamageTaken;
+
+	local baseReward = math.clamp(((npcLevel or 1)-1), 1, math.ceil(modGlobalVars.MaxLevels/10));
+
+	if rawProperties.BasicEnemy ~= true and rawProperties.MoneyReward then
+		local moneyRang: NumberRange = rawProperties.MoneyReward;
+		baseReward = ((npcLevel or 1)-1) + math.random(moneyRang.Min, moneyRang.Max);
+	end
+
+	local damageLogComp = npcClass:GetComponent("DamageLog");
+	local teamTotalDamage = 0;
+	if damageLogComp then
+		for _, logData in pairs(damageLogComp.Log) do
+			for _, weaponData in pairs(logData) do
+				teamTotalDamage += weaponData.Damage;
+			end
+		end
+	end
+
+	local killerClass: EntityClass? = damagedata and damagedata.DamageBy or nil;
+	local killerTargetPart: BasePart? = damagedata and damagedata.TargetPart or nil;
+	local isHeadshotKill = killerTargetPart ~= nil
+		and (killerTargetPart.Name == "Head" or killerTargetPart:GetAttribute("IsHead") == true);
+
 	for a=1, #playerTags do
 		local playerTag = playerTags[a];
 		local player: Player = playerTag.Player;
@@ -96,9 +124,70 @@ function Component:__call(damagedata: DamageData)
 			
 		end
 
-		if rawProperties.MoneyReward then -- Money Reward
-			local moneyRang: NumberRange = rawProperties.MoneyReward;
-			local moneyReward = math.random(moneyRang.Min, moneyRang.Max) + (npcLevel-1);
+		local playerDamage = 0;
+		if damageLogComp and damageLogComp.Log[player.Name] then
+			for _, weaponData in pairs(damageLogComp.Log[player.Name]) do
+				playerDamage += weaponData.Damage;
+			end
+		end
+
+		local killDistance = nil;
+		if playerClass.RootPart and npcClass.RootPart then
+			killDistance = playerClass:DistanceFrom(npcClass.RootPart.Position);
+		end
+
+		local isPlayerAirborne = false;
+		if playerClass.Humanoid then
+			isPlayerAirborne = playerClass.Humanoid.FloorMaterial == Enum.Material.Air;
+		end
+
+		local isKiller = killerClass == playerClass;
+		local now = tick();
+		local timeSinceLastKill = nil;
+		if isKiller then
+			local lastKill = lastKillTime[player];
+			if lastKill then
+				timeSinceLastKill = now - lastKill;
+			end
+			lastKillTime[player] = now;
+		end
+
+		local rewardInfo = modMoneyRewardSystem:Compute{
+			BaseReward = baseReward;
+			NpcLevel = npcLevel;
+			PlayerLevel = gameSave:GetStat("Level");
+
+			PlayerDamage = playerDamage;
+			TotalDamage = teamTotalDamage;
+			ParticipantCount = #playerTags;
+
+			IsKiller = isKiller;
+			IsHeadshot = isHeadshotKill;
+
+			FirstDamageTaken = firstDamageTaken;
+			DeathTime = deathTime;
+			PlayerLastDamageTaken = playerClass.HealthComp and playerClass.HealthComp.LastDamageTaken or nil;
+
+			KillingBlowDamage = damagedata and damagedata.Damage or 0;
+			NpcMaxHealth = healthComp.MaxHealth;
+			NpcMaxArmor = healthComp.MaxArmor;
+			KillDistance = killDistance;
+			IsPlayerAirborne = isPlayerAirborne;
+			DamageCate = damagedata and damagedata.DamageCate or nil;
+			DamageType = damagedata and damagedata.DamageType or nil;
+			IsWeakPoint = damagedata and damagedata.IsWeakPoint or nil;
+			TimeSinceLastKill = timeSinceLastKill;
+		};
+
+		if rewardInfo and rewardInfo.Total > 0 then
+			local moneyReward = rewardInfo.Total;
+
+			local bonusTexts = {};
+			for _, bonus in ipairs(rewardInfo.Bonuses) do
+				table.insert(bonusTexts, bonus.Text);
+			end
+
+			local bonusSuffix = #bonusTexts > 0 and `{table.concat(bonusTexts, ", ")}` or "";
 
 			if gameSave:AddStat("Money", moneyReward) > 0 then
 				modAnalyticsService:Source{
@@ -108,6 +197,8 @@ function Component:__call(damagedata: DamageData)
 					EndBalance = gameSave:GetStat("Money");
 					ItemSKU = `Kill:{npcClass.Name}`;
 				};
+
+				profile:GuiAction("hint_moneyreward", `<b>+${moneyReward}</b> Kill {npcClass.Name} ({bonusSuffix})`);
 			end
 
 			table.insert(killNotice, `+${moneyReward}`);
@@ -146,7 +237,6 @@ function Component:__call(damagedata: DamageData)
 
 
 		-- Exp
-		local damageLogComp = npcClass:GetComponent("DamageLog");
 		if damageLogComp and damageLogComp.Log[player.Name] then
 			local logData = damageLogComp.Log[player.Name];
 			Debugger:StudioLog("LogData:", logData);

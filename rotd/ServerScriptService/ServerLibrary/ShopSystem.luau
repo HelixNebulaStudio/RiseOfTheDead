@@ -87,13 +87,15 @@ function ShopSystem.onRequire()
                             EndBalance = gameSave:GetStat("Money");
                             ItemSKU = `SellItem:{storageItem.ItemId}`;
                         };
+
+                        profile:GuiAction("hint_moneyreward", `<b>+${sellPrice}</b> Sold {itemLib.Name}`);
                     end
 
                 end);
                 
 
                 local bonus = 0;
-                if modBranchConfigurations.IsWorld("Safehome") then
+                if shared.WorldName == "Safehome" then
                     bonus = math.ceil(sellPrice*0.15);
                     shared.Notify(player, ("You got $"..bonus.." bonus for selling in safehome.") , "Reward");
                     
@@ -105,6 +107,8 @@ function ShopSystem.onRequire()
                             EndBalance=gameSave:GetStat("Money");
                             ItemSKU="SellItem:SafehomeBonus";
                         };
+
+                        profile:GuiAction("hint_moneyreward", `<b>+${bonus}</b> Safehome sell bonus`);
                     end
                 end
 

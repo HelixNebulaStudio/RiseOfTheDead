@@ -8,7 +8,6 @@ local npcPackage = {
     Properties = {
         BasicEnemy = true;
         Level = 1;
-        MoneyReward = NumberRange.new(2, 4);
         BaseExperience = 40;
         IsHostile = false;
         DropRewardId = "bandit";

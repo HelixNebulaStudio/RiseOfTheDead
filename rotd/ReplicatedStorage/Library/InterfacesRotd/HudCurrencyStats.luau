@@ -6,6 +6,7 @@ local localPlayer = game.Players.LocalPlayer;
 
 local modGlobalVars = shared.require(game.ReplicatedStorage.GlobalVariables);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
+local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
 
 local interfacePackage = {
     Type = "Character";
@@ -174,6 +175,20 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
         window:Update();
     end)
     window:Update();
+
+
+    --MARK: GuiRemote hint_moneyreward
+    local templateHintLabel = script:WaitForChild("hintLabel");
+    local moneyHintFrame = statsFrame:WaitForChild("moneylabel"):WaitForChild("hintFrame");
+
+    modClientGuis.bindGuiRemote("hint_moneyreward", function(text)
+        local new = templateHintLabel:Clone();
+        new.Text = text;
+        new.Parent = moneyHintFrame;
+
+        Debugger.Expire(new, 3);
+    end)
+
 end
 
 return interfacePackage;
