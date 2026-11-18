@@ -89,7 +89,7 @@ function UsablePreset:ServerInit()
 					end
 				end
 
-				modDisguiseMechanics:Disguise(player, disguiseId, nil, mustWear and storageItem.ID or nil);
+				modDisguiseMechanics:Disguise(player, disguiseId, nil, storageItem and storageItem.ID or nil);
 			else
 				Debugger:Warn("Failed to disguise, not yet unlocked.", disguiseId);
 			end

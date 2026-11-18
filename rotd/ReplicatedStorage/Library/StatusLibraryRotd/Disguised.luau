@@ -6,6 +6,7 @@ local CollectionService = game:GetService("CollectionService");
 local localPlayer = game.Players.LocalPlayer;
 
 local modDisguiseMechanics = shared.require(game.ReplicatedStorage.Library.DisguiseMechanics);
+local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 
 if RunService:IsServer() then
     modNpcClothing = shared.require(game.ServerScriptService.ServerLibrary.NpcClothing);
@@ -148,8 +149,8 @@ function statusPackage.BindUpdate(statusClass: StatusClassInstance)
             end
         end
 		
-	elseif disguiseLib.Type == "Npc" then
 
+	elseif disguiseLib.Type == "Npc" then
 		local npcPrefab = shared.modNpcs.getNpcPrefab(disguiseLib.Name);
 		local newChar = npcPrefab and npcPrefab:Clone();
 		if newChar == nil then return end;
@@ -288,8 +289,10 @@ function statusPackage.BindTickUpdate(statusClass: StatusClassInstance, tickData
     local player: Player = playerClass:GetInstance();
 
     local storageItem, storage = shared.modStorage.FindIdFromStorages(sourceSiid, player);
-    if storageItem == nil or storage == nil or storage.Id ~= "Clothing" then
-        statusClass.IsExpired = true;
+    if modConfigurations.MustWearDisguiseKitToUse then
+        if storageItem == nil or storage == nil or storage.Id ~= "Clothing" then
+            statusClass.IsExpired = true;
+        end
     end
 end
 
