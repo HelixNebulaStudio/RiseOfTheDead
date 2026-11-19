@@ -839,11 +839,11 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
             end
         end
 
-        if viewingRoom.BossPrefabs then
-            for a=1, #viewingRoom.BossPrefabs do
-                interface:FireEvent("TryHookEntity", viewingRoom.BossPrefabs[a], 1.1);
-            end
-        end
+        -- if viewingRoom.BossPrefabs then
+        --     for a=1, #viewingRoom.BossPrefabs do
+        --         interface:FireEvent("TryHookEntity", viewingRoom.BossPrefabs[a], 1.1);
+        --     end
+        -- end
 
         --MARK: Leaderboards
         if activeLeaderboard == nil then

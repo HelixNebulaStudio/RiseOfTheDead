@@ -17,6 +17,7 @@ Component.__index = Component;
 --==
 
 local lastKillTime = setmetatable({}, {__mode = "k"}); -- [Player] = tick()
+local killStreak = setmetatable({}, {__mode = "k"}); -- [Player] = number
 
 function Component.new(npcClass: NpcClass)
 	local self = {
@@ -86,10 +87,18 @@ function Component:__call(damagedata: DamageData)
 
 	local damageLogComp = npcClass:GetComponent("DamageLog");
 	local teamTotalDamage = 0;
+	local damageSources = {};
+	local damageSourceSet = {};
 	if damageLogComp then
-		for _, logData in pairs(damageLogComp.Log) do
-			for _, weaponData in pairs(logData) do
+		for playerName, logData in pairs(damageLogComp.Log) do
+			for sourceId, weaponData in pairs(logData) do
 				teamTotalDamage += weaponData.Damage;
+
+				local sourceKey = `{playerName}|{sourceId}`;
+				if damageSourceSet[sourceKey] == nil then
+					damageSourceSet[sourceKey] = true;
+					table.insert(damageSources, sourceKey);
+				end
 			end
 		end
 	end
@@ -144,12 +153,18 @@ function Component:__call(damagedata: DamageData)
 		local isKiller = killerClass == playerClass;
 		local now = tick();
 		local timeSinceLastKill = nil;
+		local killStreakCount = 0;
 		if isKiller then
 			local lastKill = lastKillTime[player];
+			killStreakCount = 1;
 			if lastKill then
 				timeSinceLastKill = now - lastKill;
+				if timeSinceLastKill <= modMoneyRewardSystem.Config.StreakWindow then
+					killStreakCount = (killStreak[player] or 0) + 1;
+				end
 			end
 			lastKillTime[player] = now;
+			killStreak[player] = killStreakCount;
 		end
 
 		local rewardInfo = modMoneyRewardSystem:Compute{
@@ -169,25 +184,35 @@ function Component:__call(damagedata: DamageData)
 			PlayerLastDamageTaken = playerClass.HealthComp and playerClass.HealthComp.LastDamageTaken or nil;
 
 			KillingBlowDamage = damagedata and damagedata.Damage or 0;
+			 
 			NpcMaxHealth = healthComp.MaxHealth;
 			NpcMaxArmor = healthComp.MaxArmor;
+
 			KillDistance = killDistance;
 			IsPlayerAirborne = isPlayerAirborne;
+			
 			DamageCate = damagedata and damagedata.DamageCate or nil;
 			DamageType = damagedata and damagedata.DamageType or nil;
 			IsWeakPoint = damagedata and damagedata.IsWeakPoint or nil;
 			TimeSinceLastKill = timeSinceLastKill;
+			KillStreak = killStreakCount;
+			DamageSources = damageSources;
+
+			PlayerProperties = playerClass.Properties;
 		};
 
 		if rewardInfo and rewardInfo.Total > 0 then
 			local moneyReward = rewardInfo.Total;
 
-			local bonusTexts = {};
+			local bonusTextPacket = {};
+			local bonusMoney = 0;
 			for _, bonus in ipairs(rewardInfo.Bonuses) do
-				table.insert(bonusTexts, bonus.Text);
+				table.insert(bonusTextPacket, {
+					T=bonus.Text; 
+					V=bonus.Bonus;
+				});
+				bonusMoney += bonus.Bonus;
 			end
-
-			local bonusSuffix = #bonusTexts > 0 and `{table.concat(bonusTexts, ", ")}` or "";
 
 			if gameSave:AddStat("Money", moneyReward) > 0 then
 				modAnalyticsService:Source{
@@ -198,7 +223,7 @@ function Component:__call(damagedata: DamageData)
 					ItemSKU = `Kill:{npcClass.Name}`;
 				};
 
-				profile:GuiAction("hint_moneyreward", `<b>+${moneyReward}</b> Kill {npcClass.Name} ({bonusSuffix})`);
+				profile:GuiAction("hint_moneyreward", `<b>+${moneyReward-bonusMoney}</b> Kill {npcClass.Name}`, bonusTextPacket);
 			end
 
 			table.insert(killNotice, `+${moneyReward}`);

@@ -181,12 +181,31 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     local templateHintLabel = script:WaitForChild("hintLabel");
     local moneyHintFrame = statsFrame:WaitForChild("moneylabel"):WaitForChild("hintFrame");
 
-    modClientGuis.bindGuiRemote("hint_moneyreward", function(text)
+    local oCount = 0;
+    modClientGuis.bindGuiRemote("hint_moneyreward", function(text, breakdownPacket)
+        oCount += 1;
+
+        local lo = oCount;
         local new = templateHintLabel:Clone();
         new.Text = text;
+        new.LayoutOrder = lo;
         new.Parent = moneyHintFrame;
-
         Debugger.Expire(new, 3);
+
+        if typeof(breakdownPacket) == "table" and #breakdownPacket > 0 then
+            task.wait(0.2);
+            for a=1, #breakdownPacket do
+                local bdInfo = breakdownPacket[a];
+
+                local bdNew = templateHintLabel:Clone();
+                bdNew.Text = `+${bdInfo.V} {bdInfo.T}    `;
+                bdNew.LayoutOrder = lo;
+                bdNew.Parent = moneyHintFrame;
+                Debugger.Expire(bdNew, 2);
+
+                task.wait(0.2);
+            end
+        end
     end)
 
 end

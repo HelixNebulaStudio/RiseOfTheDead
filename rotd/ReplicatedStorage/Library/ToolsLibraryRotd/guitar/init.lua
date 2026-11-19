@@ -21,9 +21,10 @@ local toolPackage = {
 	Configurations={
 		Instrument = "Guitar";
 		Index = 1;
+	};
+	Properties={
 		ActiveTrack = nil;
 	};
-	Properties={};
 
 	TuneVolume = 1;
 	TuneTracks = {
@@ -66,6 +67,46 @@ function toolPackage.ClientPrimaryFire(handler: ToolHandlerInstance)
 end
 
 
+function toolPackage.StopTune(handler: ToolHandlerInstance)
+	local equipmentClass: EquipmentClass = handler.EquipmentClass;
+	if equipmentClass == nil then return end;
+
+	local configurations = equipmentClass.Configurations;
+	local properties = equipmentClass.Properties;
+
+	properties.IsActive = false;
+
+	local activeTrack: Sound = properties.ActiveTrack;
+	if activeTrack then
+		activeTrack:Stop();
+		Debugger.Expire(activeTrack);
+		properties.ActiveTrack = nil;
+	end
+
+	local mainToolModel = handler.MainToolModel;
+	local handle = mainToolModel and mainToolModel.PrimaryPart;
+	if handle then
+		local musicParticle = handle:FindFirstChild("musicParticle");
+		if musicParticle then
+			musicParticle.Enabled = false;
+		end
+	end
+end
+
+function toolPackage.ServerUnequip(handler: ToolHandlerInstance)
+	if RunService:IsClient() then return end;
+
+	toolPackage.StopTune(handler);
+end
+
+function toolPackage.ClientUnequip(handler: ToolHandlerInstance)
+	local equipmentClass: EquipmentClass = handler.EquipmentClass;
+	if equipmentClass == nil then return end;
+
+	equipmentClass.Properties.IsActive = false;
+end
+
+
 function toolPackage.ActionEvent(handler: ToolHandlerInstance, packet)
 	if packet.ActionIndex ~= 1 then return end;
 	local isActive = packet.IsActive == true;
@@ -80,13 +121,7 @@ function toolPackage.ActionEvent(handler: ToolHandlerInstance, packet)
 	properties.IsActive = isActive;
 
 	if properties.IsActive == false then
-		if handle and handle:FindFirstChild("musicParticle") then
-			handle.musicParticle.Enabled = false;
-		end
-		if configurations.ActiveTrack then
-			configurations.ActiveTrack:Stop();
-		end
-
+		toolPackage.StopTune(handler);
 		return;
 	end
 
@@ -124,7 +159,7 @@ function toolPackage.ActionEvent(handler: ToolHandlerInstance, packet)
 	sound.Parent = handle;
 
 	nextTrack();
-	configurations.ActiveTrack = sound;
+	properties.ActiveTrack = sound;
 
 	if handle:FindFirstChild("musicParticle") then
 		handle.musicParticle.Enabled = true;

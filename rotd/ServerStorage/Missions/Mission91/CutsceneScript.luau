@@ -261,10 +261,18 @@ return function(CutsceneSequence)
 						if not game.Players:IsAncestorOf(player) then break; end;
 						if mission.Type ~= 1 then break; end;
 
-						spawnOvergrowth(playerClass.RootPart);
+						local rootPart = playerClass and playerClass.RootPart;
+						if rootPart then
+							local success, err = pcall(spawnOvergrowth, rootPart);
+							if not success then
+								Debugger:Warn("spawnOvergrowth failed:", err);
+							end
+						end
 						
 						task.wait(1);
 					end
+
+					loopActive = false;
 				end)
 
 			elseif mission.Type == 3 then -- OnComplete

@@ -195,6 +195,7 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
     task.spawn(function()
         while true do
             task.wait(1);
+            if not interface.ScreenGui:IsAncestorOf(frontPageFrame) then return end;
             mission1 = modData:GetMission(1);
 
             local isM1Complete = mission1 and mission1.Type == 3;

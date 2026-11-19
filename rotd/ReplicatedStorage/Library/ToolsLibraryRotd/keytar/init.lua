@@ -51,9 +51,10 @@ local toolPackage = {
 
 		Instrument = "Keytar";
 		Index = 1;
+	};
+	Properties = {
 		ActiveTrack = nil;
 	};
-	Properties = {};
 
 	Holster = {
 		RightSwordAttachment={PrefabName="keytar"; C1=CFrame.new(0.5, 0.699999988, 0.600000024, -0.559192836, -0.829037607, -8.16161929e-08, -0.773973286, 0.522051454, -0.35836795, 0.297100574, -0.200396717, -0.933580399);}; -- C1 attribute on motor6d;
@@ -67,6 +68,9 @@ local toolPackage = {
 	};
 };
 --==
+
+toolPackage.ServerUnequip = modGuitarTool.ServerUnequip;
+toolPackage.ClientUnequip = modGuitarTool.ClientUnequip;
 
 function toolPackage.InputEvent(handler: ToolHandlerInstance, inputData: ToolInputData)
 	if inputData.InputState ~= "End" or inputData.KeyIds.KeyFire == nil then return end;

@@ -19,9 +19,10 @@ local toolPackage = {
 	Configurations={
 		Instrument = "Flute";
 		Index = 1;
+	};
+	Properties={
 		ActiveTrack = nil;
 	};
-	Properties={};
 
 	TuneVolume = 1;
 	TuneTracks = {
@@ -37,6 +38,8 @@ local toolPackage = {
 toolPackage.ClientPrimaryFire = modGuitarTool.ClientPrimaryFire;
 toolPackage.ActionEvent = modGuitarTool.ActionEvent;
 toolPackage.OnToolEquip = modGuitarTool.OnToolEquip;
+toolPackage.ServerUnequip = modGuitarTool.ServerUnequip;
+toolPackage.ClientUnequip = modGuitarTool.ClientUnequip;
 
 function toolPackage.newClass()
 	return modEquipmentClass.new(toolPackage);

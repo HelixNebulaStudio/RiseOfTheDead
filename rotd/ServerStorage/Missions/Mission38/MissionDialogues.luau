@@ -36,7 +36,7 @@ Dialogues.Robert.DialogueStrings = {
 	};
 	["notRight_where"]={
 		Face="Question";
-		Say="And where did you disapeared to?!";
+		Say="And where did you disappear to?!";
 		Reply="I was.. I err.. I heard a cry for help from another community.";
 	};
 	["notRight_bandits"]={

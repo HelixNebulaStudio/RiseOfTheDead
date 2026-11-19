@@ -3,17 +3,18 @@ local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configur
 
 --==
 local attirePackage = {
-	ItemId=script.Name;
-	Class="Clothing";
+	ItemId = script.Name;
+	Class = "Clothing";
 	
-	GroupName="UnoverlappableGroup";
+	GroupName = "UnoverlappableGroup";
 	
-	VehicleWearAnimationId="rbxassetid://86177342057642";
+	VehicleWearAnimationId = "rbxassetid://86177342057642";
+	VehicleStateKey = "IsSleding";
 
-	Configurations={
+	Configurations = {
 		HasFlinchProtection = true;
 	};
-	Properties={};
+	Properties = {};
 };
 
 function attirePackage.OnAccesorySpawn(playerClass: PlayerClass, storageItem: StorageItem, newAccessoryPrefabs)
@@ -63,6 +64,7 @@ function attirePackage.newClass()
 		SetValues={
 			VehicleWear = "snowsledge";
 			VehicleWearAnimationId = attirePackage.VehicleWearAnimationId;
+			VehicleStateKey = attirePackage.VehicleStateKey;
 		};
 	});
 

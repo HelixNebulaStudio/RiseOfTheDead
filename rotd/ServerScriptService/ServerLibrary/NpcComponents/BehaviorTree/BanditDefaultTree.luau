@@ -737,26 +737,25 @@ function treePackage.ShareIntel(npcClass: NpcClass)
     local targetHandlerComp = npcClass:GetComponent("TargetHandler");
     if enemyEntityClass
     and not npcClass.HealthComp.IsDead
+    and enemyEntityClass.ClassName == "PlayerClass"
     and (enemyTargetData.LastAlertedTick and tick()-enemyTargetData.LastAlertedTick <= 10)
     and (properties.LastAlertShout == nil or tick()-properties.LastAlertShout > 20)
     and treePackage.AlertShoutQuota > 0 then
         treePackage.AlertShoutQuota -= 1;
         properties.LastAlertShout = tick();
 
-        if enemyEntityClass.ClassName == "PlayerClass" then
-            npcClass:GetComponent("NpcEmote"){
-                Players = {(enemyEntityClass :: PlayerClass):GetInstance()};
-                EmoteId = "alert";
-                SndId = "NpcAlert";
-                SndSpeed = math.random(90, 110)/100;
-            };
+        npcClass:GetComponent("NpcEmote"){
+            Players = {(enemyEntityClass :: PlayerClass):GetInstance()};
+            EmoteId = "alert";
+            SndId = "NpcAlert";
+            SndSpeed = math.random(90, 110)/100;
+        };
 
-            if math.random(1, 100) == 1 then
-                npcClass:GetComponent("NpcEmote"){
-                    Players = game.Players:GetPlayers();
-                    EmoteId = "help";
-                };
-            end
+        if math.random(1, 100) == 1 then
+            npcClass:GetComponent("NpcEmote"){
+                Players = game.Players:GetPlayers();
+                EmoteId = "help";
+            };
         end
 
         treePackage.OnAlertShout:Fire(npcClass, enemyEntityClass);

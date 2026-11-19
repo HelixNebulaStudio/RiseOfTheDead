@@ -115,7 +115,7 @@ return function(player, dialog, data)
 			
 			local function unlock(dialog)
 				npcData:SetLevel(3);
-				shared.Notify(player, "You have unlocked trading with the wanderering trader.", "Reward");
+				shared.Notify(player, "You have unlocked trading with the wandering trader.", "Reward");
 			end
 			
 			dialog:AddChoice("trader_lvl2_a", unlock, {ChoiceUnlockTime=unlockTime});

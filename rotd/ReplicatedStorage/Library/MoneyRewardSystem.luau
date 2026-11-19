@@ -9,18 +9,23 @@ MoneyRewardSystem.Config = {
 
 	MinShare = 0.00;
 
-	MaxSkillBonus = 0.50;
+	MaxSkillBonus = 10;
 	FastKillWindow = 1.0;
 	LongRangeDistance = 200;
 	PointBlankDistance = 8;
-	OverkillMultiplier = 1.5;
+	OverkillMultiplier = 2;
+	MixedDamagesMinSources = 2;
+
+	UnderdogLevelGap = 10;
+	StreakWindow = 5;
+	RampageStreak = 5;
 };
 
 MoneyRewardSystem.Bonuses = {
 	{
 		Tag = "Headshot";
 		Text = "Headshot";
-		Bonus = 0.15;
+		Bonus = 1;
 		Check = function(self, params)
 			return params.IsKiller and params.IsHeadshot;
 		end;
@@ -28,7 +33,7 @@ MoneyRewardSystem.Bonuses = {
 	{
 		Tag = "WeakPoint";
 		Text = "Weak Point";
-		Bonus = 0.30;
+		Bonus = 2;
 		Check = function(self, params)
 			return params.IsKiller and params.IsWeakPoint == true;
 		end;
@@ -36,17 +41,20 @@ MoneyRewardSystem.Bonuses = {
 	{
 		Tag = "OneShot";
 		Text = "One Shot";
-		Bonus = 0.25;
+		Bonus = 1;
 		Suppresses = {"FastKill"};
 		Check = function(self, params)
 			return params.IsKiller
-				and params.KillingBlowDamage >= (params.NpcMaxHealth + params.NpcMaxArmor);
+				and params.DamageSources ~= nil
+				and #params.DamageSources == 1
+				and params.NpcMaxArmor <= 0
+				and params.KillingBlowDamage >= params.NpcMaxHealth;
 		end;
 	};
 	{
 		Tag = "FastKill";
 		Text = "Quick Kill";
-		Bonus = 0.20;
+		Bonus = 0.5;
 		Check = function(self, params)
 			return params.FirstDamageTaken ~= nil
 				and params.DeathTime ~= nil
@@ -56,7 +64,7 @@ MoneyRewardSystem.Bonuses = {
 	{
 		Tag = "MultiKill";
 		Text = "Chain Kill";
-		Bonus = 0.25;
+		Bonus = 0.2;
 		Check = function(self, params)
 			return params.IsKiller
 				and params.TimeSinceLastKill ~= nil
@@ -64,19 +72,9 @@ MoneyRewardSystem.Bonuses = {
 		end;
 	};
 	{
-		Tag = "NoDamage";
-		Text = "Untouched";
-		Bonus = 0.15;
-		Check = function(self, params)
-			return params.FirstDamageTaken ~= nil
-				and params.PlayerLastDamageTaken ~= nil
-				and params.PlayerLastDamageTaken < params.FirstDamageTaken;
-		end;
-	};
-	{
 		Tag = "LongRange";
 		Text = "Long Range";
-		Bonus = 0.15;
+		Bonus = 1;
 		Check = function(self, params)
 			return params.IsKiller
 				and params.KillDistance ~= nil
@@ -86,7 +84,7 @@ MoneyRewardSystem.Bonuses = {
 	{
 		Tag = "PointBlank";
 		Text = "Point Blank";
-		Bonus = 0.15;
+		Bonus = 1;
 		Check = function(self, params)
 			return params.IsKiller
 				and params.KillDistance ~= nil
@@ -96,24 +94,54 @@ MoneyRewardSystem.Bonuses = {
 	{
 		Tag = "Overkill";
 		Text = "Overkill";
-		Bonus = 0.10;
+		Bonus = 1.5;
+		Suppresses = {"OneShot"};
 		Check = function(self, params)
 			return params.IsKiller
+				and params.DamageSources ~= nil
+				and #params.DamageSources == 1
 				and params.KillingBlowDamage >= (params.NpcMaxHealth + params.NpcMaxArmor) * self.Config.OverkillMultiplier;
+		end;
+	};
+	{
+		Tag = "MixedDamages";
+		Text = "Mixed Damages";
+		Bonus = 0.5;
+		Check = function(self, params)
+			return params.IsKiller
+				and params.DamageSources ~= nil
+				and #params.DamageSources >= self.Config.MixedDamagesMinSources;
 		end;
 	};
 	{
 		Tag = "Aerial";
 		Text = "Aerial Kill";
-		Bonus = 0.15;
+		Bonus = 2;
 		Check = function(self, params)
 			return params.IsKiller and params.IsPlayerAirborne == true;
 		end;
 	};
 	{
+		Tag = "Sliding";
+		Text = "Sliding Kill";
+		Bonus = 2;
+		Check = function(self, params)
+			return params.IsKiller and params.PlayerProperties.IsSliding == true;
+		end;
+	};
+	{
+		Tag = "Sleding";
+		Text = "Sleding Kill";
+		Bonus = 1.5;
+		Check = function(self, params)
+			return params.IsKiller and params.PlayerProperties.IsSleding == true;
+		end;
+	};
+	{
 		Tag = "Melee";
 		Text = "Melee Kill";
-		Bonus = 0.20;
+		Bonus = 1;
+		Suppresses = {"PointBlank"};
 		Check = function(self, params)
 			return params.IsKiller and params.DamageCate == "Melee";
 		end;
@@ -121,7 +149,7 @@ MoneyRewardSystem.Bonuses = {
 	{
 		Tag = "Explosive";
 		Text = "Explosive Kill";
-		Bonus = 0.15;
+		Bonus = 0.3;
 		Check = function(self, params)
 			return params.IsKiller
 				and (params.DamageCate == "Area Of Effect"
@@ -131,7 +159,7 @@ MoneyRewardSystem.Bonuses = {
 	{
 		Tag = "Fire";
 		Text = "Burned";
-		Bonus = 0.15;
+		Bonus = 1;
 		Check = function(self, params)
 			return params.IsKiller and params.DamageType == "Fire";
 		end;
@@ -139,7 +167,7 @@ MoneyRewardSystem.Bonuses = {
 	{
 		Tag = "Electric";
 		Text = "Electrocuted";
-		Bonus = 0.15;
+		Bonus = 0.3;
 		Check = function(self, params)
 			return params.IsKiller and params.DamageType == "Electric";
 		end;
@@ -147,7 +175,7 @@ MoneyRewardSystem.Bonuses = {
 	{
 		Tag = "Frost";
 		Text = "Frozen";
-		Bonus = 0.15;
+		Bonus = 1;
 		Check = function(self, params)
 			return params.IsKiller and params.DamageType == "Frost";
 		end;
@@ -155,9 +183,91 @@ MoneyRewardSystem.Bonuses = {
 	{
 		Tag = "Toxic";
 		Text = "Toxicity";
-		Bonus = 0.15;
+		Bonus = 1;
 		Check = function(self, params)
 			return params.IsKiller and params.DamageType == "Toxic";
+		end;
+	};
+	{
+		Tag = "Underdog";
+		Text = "Underdog";
+		Bonus = 1.5;
+		Check = function(self, params)
+			return params.IsKiller
+				and (params.NpcLevel or 0) - (params.PlayerLevel or 0) >= self.Config.UnderdogLevelGap;
+		end;
+	};
+	{
+		Tag = "CritKill";
+		Text = "Critical Kill";
+		Bonus = 0.5;
+		Suppresses = {"Headshot"};
+		Check = function(self, params)
+			return params.IsKiller and params.DamageType == "Crit";
+		end;
+	};
+	{
+		Tag = "BledOut";
+		Text = "Bled Out";
+		Bonus = 1.5;
+		Check = function(self, params)
+			return params.IsKiller and params.DamageType == "Bleed";
+		end;
+	};
+	{
+		Tag = "Submerged";
+		Text = "Submerged";
+		Bonus = 1;
+		Check = function(self, params)
+			return params.IsKiller
+				and params.PlayerProperties ~= nil
+				and params.PlayerProperties.IsUnderWater == true;
+		end;
+	};
+	{
+		Tag = "Rampage";
+		Text = "Rampage";
+		Bonus = 1.5;
+		Check = function(self, params)
+			return params.IsKiller
+				and (params.KillStreak or 0) >= self.Config.RampageStreak;
+		end;
+	};
+	--MARK: Combos
+	{
+		Tag = "Marksman";
+		Text = "Marksman";
+		Bonus = 1;
+		Requires = {"LongRange", "WeakPoint"};
+		Check = function(self, params)
+			return params.IsKiller;
+		end;
+	};
+	{
+		Tag = "SharpShooter";
+		Text = "Sharp Shooter";
+		Bonus = 1;
+		Requires = {"LongRange", "Headshot"};
+		Check = function(self, params)
+			return params.IsKiller;
+		end;
+	};
+	{
+		Tag = "AerialSlasher";
+		Text = "Aerial Melee";
+		Bonus = 2;
+		Requires = {"Aerial", "Melee"};
+		Check = function(self, params)
+			return params.IsKiller;
+		end;
+	};
+	{
+		Tag = "ChainExecution";
+		Text = "Chain Execution";
+		Bonus = 1;
+		Requires = {"MultiKill", "Headshot"};
+		Check = function(self, params)
+			return params.IsKiller;
 		end;
 	};
 };
@@ -205,33 +315,59 @@ function MoneyRewardSystem:GetSkillBonus(params: anydict): (number, {anydict})
 
 	local totalBonus = 0;
 	local awarded = {};
+	local awardedTags = {};
 
-	for _, bonus in ipairs(self.Bonuses) do
-		if bonus.Check(self, params) then
-			totalBonus += bonus.Bonus;
-			table.insert(awarded, {
-				Tag = bonus.Tag;
-				Text = bonus.Text;
-				Bonus = bonus.Bonus;
-				Suppresses = bonus.Suppresses;
-			});
-		end
+	local function awardBonus(bonus)
+		totalBonus += bonus.Bonus;
+		awardedTags[bonus.Tag] = true;
+		table.insert(awarded, {
+			Tag = bonus.Tag;
+			Text = bonus.Text;
+			Bonus = bonus.Bonus;
+			Suppresses = bonus.Suppresses;
+		});
 	end
 
-	local suppressed = {};
-	for _, bonus in ipairs(awarded) do
-		if bonus.Suppresses then
-			for _, tag in ipairs(bonus.Suppresses) do
-				suppressed[tag] = true;
+	local function applySuppressions()
+		local suppressed = {};
+		for _, bonus in ipairs(awarded) do
+			if bonus.Suppresses then
+				for _, tag in ipairs(bonus.Suppresses) do
+					suppressed[tag] = true;
+				end
+			end
+		end
+		for i = #awarded, 1, -1 do
+			if suppressed[awarded[i].Tag] then
+				totalBonus -= awarded[i].Bonus;
+				awardedTags[awarded[i].Tag] = nil;
+				table.remove(awarded, i);
 			end
 		end
 	end
-	for i = #awarded, 1, -1 do
-		if suppressed[awarded[i].Tag] then
-			totalBonus -= awarded[i].Bonus;
-			table.remove(awarded, i);
+
+	for _, bonus in ipairs(self.Bonuses) do
+		if bonus.Requires == nil and bonus.Check(self, params) then
+			awardBonus(bonus);
 		end
 	end
+	applySuppressions();
+
+	for _, bonus in ipairs(self.Bonuses) do
+		if bonus.Requires ~= nil then
+			local allPresent = true;
+			for _, tag in ipairs(bonus.Requires) do
+				if not awardedTags[tag] then
+					allPresent = false;
+					break;
+				end
+			end
+			if allPresent and bonus.Check(self, params) then
+				awardBonus(bonus);
+			end
+		end
+	end
+	applySuppressions();
 
 	totalBonus = math.min(totalBonus, config.MaxSkillBonus);
 	return totalBonus, awarded;
