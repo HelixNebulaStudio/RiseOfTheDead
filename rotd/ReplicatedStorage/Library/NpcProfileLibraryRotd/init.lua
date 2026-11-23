@@ -70,14 +70,14 @@ function library.onRequire()
 		Descriptors={
 			Hair="Long Black Hair";
 			Gender="F";
-			Clothing={"Red Sweater"; "Demin Overalls"};
+			Clothing={"Red Sweater"; "Denim Overalls"};
 		};
 	};
 	library:Add{Id="Michael"; Class="Survivor"; World="TheWarehouse"; Avatar="rbxassetid://140050354048212";
 		Descriptors={
 			Hair="Short Spikey Black Hair";
 			Gender="M";
-			Clothing={"White TShirt"; "Demin Jeans"};
+			Clothing={"White TShirt"; "Denim Jeans"};
 			Item="Red Scar";
 		};
 	};

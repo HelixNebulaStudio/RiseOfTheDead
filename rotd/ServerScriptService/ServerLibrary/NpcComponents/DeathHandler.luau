@@ -6,6 +6,7 @@ local modGlobalVars = shared.require(game.ReplicatedStorage.GlobalVariables);
 
 local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modDamageTag = shared.require(game.ReplicatedStorage.Library.DamageTag);
+local modFormatNumber = shared.require(game.ReplicatedStorage.Library.FormatNumber);
 
 local modExperience = shared.require(game.ServerScriptService.ServerLibrary.Experience);
 local modAnalyticsService = shared.require(game.ServerScriptService.ServerLibrary.AnalyticsService);
@@ -201,7 +202,7 @@ function Component:__call(damagedata: DamageData)
 			PlayerProperties = playerClass.Properties;
 		};
 
-		if rewardInfo and rewardInfo.Total > 0 then
+		if rewardInfo then
 			local moneyReward = rewardInfo.Total;
 
 			local bonusTextPacket = {};
@@ -214,7 +215,7 @@ function Component:__call(damagedata: DamageData)
 				bonusMoney += bonus.Bonus;
 			end
 
-			if gameSave:AddStat("Money", moneyReward) > 0 then
+			if moneyReward > 0 and gameSave:AddStat("Money", moneyReward) > 0 then
 				modAnalyticsService:Source{
 					Player = player;
 					Currency = modAnalyticsService.Currency.Money;
@@ -223,10 +224,28 @@ function Component:__call(damagedata: DamageData)
 					ItemSKU = `Kill:{npcClass.Name}`;
 				};
 
-				profile:GuiAction("hint_moneyreward", `<b>+${moneyReward-bonusMoney}</b> Kill {npcClass.Name}`, bonusTextPacket);
+				local killReward = moneyReward-bonusMoney;
+
+				profile:GuiAction(
+					"hint_moneyreward", 
+					`<b>+${killReward > 0 and string.format("%.1f", killReward) or 0}</b> Kill {npcClass.Name}`,
+					bonusTextPacket
+				);
+
+				table.insert(killNotice, `+${moneyReward}`);
+
+			else
+				for a=1, #bonusTextPacket do
+					bonusTextPacket[a].V = 0;
+				end
+				profile:GuiAction(
+					"hint_moneyreward", 
+					`<b>+$0</b> Kill {npcClass.Name}`,
+					bonusTextPacket
+				);
+
 			end
 
-			table.insert(killNotice, `+${moneyReward}`);
 		end
 
 		if humanoidType == "Zombie" and npcLevel then -- Focus levels

@@ -23,14 +23,6 @@ Dialogues.DialogueStrings = {
 if RunService:IsServer() then
 	-- MARK: DialogueHandler
 	Dialogues.DialogueHandler = function(player, dialog, data)
-		local modMission = shared.require(game.ServerScriptService.ServerLibrary.Mission);
-		if modMission:GetMission(player, 31) == nil then
-			dialog:AddChoice("egghunt_init", function(dialog)
-				dialog:AddChoice("egghunt_find", function(dialog)
-					modMission:StartMission(player, 31);
-				end)
-			end)
-		end
 	end 
 end
 

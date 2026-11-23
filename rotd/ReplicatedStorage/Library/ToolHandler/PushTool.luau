@@ -25,6 +25,11 @@ if RunService:IsClient() then -- MARK: Client
 
 		local toolAnimator: ToolAnimator = handler.ToolAnimator;
 		toolAnimator:LoadAnimations(animations, toolPackage.DefaultAnimatorState, handler.Prefabs);
+			
+		local modCharacter = modData:GetModCharacter();
+		local characterProperties = modCharacter.CharacterProperties;
+
+		characterProperties.UseViewModel = false;
 	end
 
 elseif RunService:IsServer() then -- MARK: Server

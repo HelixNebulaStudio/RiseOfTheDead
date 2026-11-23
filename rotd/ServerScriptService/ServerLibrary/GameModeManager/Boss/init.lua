@@ -147,6 +147,8 @@ function GameMode:Start(room)
 		
 	for a=1, #players do
 		local playerClass: PlayerClass = modPlayers.get(players[a]);
+		if playerClass == nil then continue end;
+
 		playerClass.Properties.InBossBattle = gameStage;
 		
 		remoteGameModeUpdate:FireClient(players[a], "closemenu");
@@ -341,6 +343,8 @@ function GameMode:Start(room)
 				room:ForEachPlayer(function(playerData)
 					local player: Player = playerData.Instance;
 					local playerClass: PlayerClass = modPlayers.get(player);
+					if playerClass == nil then return end;
+
 					local rootPart = playerClass.RootPart;
 					if rootPart then
 						if rootPart.CFrame.p.X <= arenaMin.X
@@ -391,6 +395,8 @@ function GameMode:End(room)
 	
 	for a=1, #players do
 		local playerClass: PlayerClass = modPlayers.get(players[a]);
+		if playerClass == nil then continue end;
+
 		playerClass.Properties.InBossBattle = nil;
 		
 		remoteGameModeHud:FireClient(players[a], {

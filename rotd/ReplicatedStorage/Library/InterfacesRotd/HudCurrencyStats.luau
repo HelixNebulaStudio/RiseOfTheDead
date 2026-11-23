@@ -4,6 +4,7 @@ local TweenService = game:GetService("TweenService");
 
 local localPlayer = game.Players.LocalPlayer;
 
+local modAudio = shared.require(game.ReplicatedStorage.Library.Audio);
 local modGlobalVars = shared.require(game.ReplicatedStorage.GlobalVariables);
 local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
 local modClientGuis = shared.require(game.ReplicatedStorage.PlayerScripts.ClientGuis);
@@ -198,7 +199,18 @@ function interfacePackage.newInstance(interface: InterfaceInstance)
                 local bdInfo = breakdownPacket[a];
 
                 local bdNew = templateHintLabel:Clone();
-                bdNew.Text = `+${bdInfo.V} {bdInfo.T}    `;
+
+                local moneyAdd = bdInfo.V;
+                local str = `+${string.format("%.1f", moneyAdd)} {bdInfo.T}    `;
+                if bdInfo.V == 0 then
+                    str = `+$0 {bdInfo.T}    `;
+                end
+                bdNew.Text = str;
+
+                local coinDropSnd = `CoinDrop{math.random(1, 5)}`;
+                modAudio.Preload(coinDropSnd);
+                modAudio.Play(coinDropSnd, statsFrame).PlaybackSpeed = math.random(95, 105)/100;
+
                 bdNew.LayoutOrder = lo;
                 bdNew.Parent = moneyHintFrame;
                 Debugger.Expire(bdNew, 2);

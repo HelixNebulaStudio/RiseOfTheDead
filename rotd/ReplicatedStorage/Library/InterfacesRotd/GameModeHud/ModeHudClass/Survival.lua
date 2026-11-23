@@ -176,7 +176,7 @@ return function(interface, window, frame)
 
 		else
 			if waveStartTimeDown and waveStartTimeDown.Frame then
-				waveStartTimeDown.Frame.Visible = false;
+				waveStartTimeDown:End();
 			end
 		end
 
