@@ -82,10 +82,14 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 
 		-- Clothing mode detection
 		local isClothing = false;
+		local isCustomizableAccessory = false;
 		for a=1, #itemViewport.PartDataList do
-			if itemViewport.PartDataList[a].PartIsAccessory then
+			local partData = itemViewport.PartDataList[a];
+			if partData.PartIsAccessory then
 				isClothing = true;
-				break;
+				if partData.Customizable then
+					isCustomizableAccessory = true;
+				end
 			end
 		end
 
@@ -93,6 +97,10 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 		local activeUnlockableLib = activeSkinId and modItemUnlockablesLibrary:Find(activeSkinId) or nil;
 		local showSkinTint = activeUnlockableLib ~= nil and activeUnlockableLib.Tintable == true;
 		local showEmissiveTint = activeUnlockableLib ~= nil and activeUnlockableLib.EmissiveTint == true;
+
+		local customizableUnlockableLib = modItemUnlockablesLibrary:Find(activeSkinId or itemId);
+		local showCustomizableSkinTint = customizableUnlockableLib ~= nil and customizableUnlockableLib.Tintable == true;
+		local showCustomizableEmissiveTint = customizableUnlockableLib ~= nil and customizableUnlockableLib.EmissiveTint == true;
 
 		-- MARK: generateSerialized()
 		local function generateSerialized()
@@ -268,7 +276,9 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						end
 					end
 
-					return unlockedSkins;
+					if not isCustomizableAccessory then
+						return unlockedSkins;
+					end
 				end
 
 				if storageItem.Values.Skins then
@@ -651,6 +661,8 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 								storageItem.Values.Skins = rPacket.UnlockedSkins;
 							end
 
+							isCustomizableAccessory = modCustomizationData.IsCustomizableAccessory(storageItem.Values.ActiveSkin or itemId);
+
 							refreshSkinPerm();
 
 							modCustomizationData.ApplyCustomPlans(customPlansCache, itemViewport.PartDataList);
@@ -822,6 +834,8 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 											storageItem.Values.ActiveSkin = setSkinId;
 										end
 									end
+
+									isCustomizableAccessory = modCustomizationData.IsCustomizableAccessory(storageItem.Values.ActiveSkin or itemId);
 
 									for a=1, 5, 0.1 do
 										storageItem = modData.GetItemById(storageItem.ID);
@@ -2235,7 +2249,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 
 				local customizeOptionsAvailable = 0;
 
-				if isClothing then
+				if isClothing and not isCustomizableAccessory then
 					editPanel.HWLine.Visible = false;
 					editPanel.IMLine.Visible = false;
 					editPanel.MCLine.Visible = false;
@@ -2298,7 +2312,11 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 				editPanel.ColorFrame.NameLabel.TextColor3 = canEdit and canEditColor or disabledColor;
 
 				-- Skin Tint
-				if skinLib and skinLib.Tintable then
+				if isCustomizableAccessory then
+					editPanel.SkinTintFrame.Visible = showCustomizableSkinTint;
+					emissiveTintFrame.Visible = showCustomizableEmissiveTint;
+
+				elseif skinLib and skinLib.Tintable then
 					editPanel.SkinTintFrame.Visible = true;
 
 				elseif baseCustomPlan and baseCustomPlan.BaseSkin then
@@ -2427,7 +2445,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 				-- Part Reflectance
 				local currentMat = editPanel.MaterialFrame.Button;
 				local matInfo = modCustomizationData.Materials[currentMat.Text];
-				local reflectiveMat = canEditFN and matInfo.Reflectance == true;
+				local reflectiveMat = canEditFN and matInfo ~= nil and matInfo.Reflectance == true;
 
 				reflectanceSlider:SetAttribute("DisableSlider", not reflectiveMat);
 				reflectanceSlider.AutoButtonColor = reflectiveMat;
@@ -2803,7 +2821,7 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 						customPlan = getCustomPlan(GetCustomPlanEnum.Part, partData.Key);
 					end
 					
-					if isClothing then
+					if isClothing and not isCustomizableAccessory then
 						if customPlan then
 							OnColorSelect(customPlan.Color);
 							OnSkinTintSelect(customPlan.SkinTint);
@@ -2817,6 +2835,9 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 					elseif customPlan then
 						OnColorSelect(customPlan.Color);
 						OnSkinTintSelect(customPlan.SkinTint);
+						if isCustomizableAccessory then
+							OnEmissiveTintSelect(customPlan.EmissiveTint);
+						end
 
 						local newSkin = customPlan.Skin;
 						local skinId, variantId = modCustomizationData.GetSkinIds(newSkin);
@@ -2852,6 +2873,9 @@ function WorkbenchClass.init(interface: InterfaceInstance, workbenchWindow: Inte
 
 						OnColorSelect();
 						OnSkinSelect();
+						if isCustomizableAccessory then
+							OnEmissiveTintSelect();
+						end
 						transparencySlider:SetAttribute("Value", "nil");
 						
 						OnSelectTextureColor();

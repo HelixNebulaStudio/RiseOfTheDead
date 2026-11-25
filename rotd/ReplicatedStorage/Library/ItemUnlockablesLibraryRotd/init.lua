@@ -1830,6 +1830,17 @@ function library.onRequire()
 
 
 
+	--== MARK: skateboard
+	library:Add{
+		Id="skateboard";
+		ItemId="skateboard";
+		Name="Default";
+		DefaultPackage=true;
+		
+		Customizable = true;
+	};
+
+
 	--== MARK: snowsledge
 	library:Add{
 		Id="snowsledge";

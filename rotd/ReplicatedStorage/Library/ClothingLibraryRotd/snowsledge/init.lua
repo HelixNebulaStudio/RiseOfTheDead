@@ -1,5 +1,5 @@
 local modEquipmentClass = shared.require(game.ReplicatedStorage.Library.EquipmentClass);
-local modConfigurations = shared.require(game.ReplicatedStorage.Library.Configurations);
+local modMovementLibrary = shared.require(game.ReplicatedStorage.Library.MovementLibrary);
 
 --==
 local attirePackage = {
@@ -8,8 +8,7 @@ local attirePackage = {
 	
 	GroupName = "UnoverlappableGroup";
 	
-	VehicleWearAnimationId = "rbxassetid://86177342057642";
-	VehicleStateKey = "IsSleding";
+	CtrlMovementId = "Sled";
 
 	Configurations = {
 		HasFlinchProtection = true;
@@ -27,11 +26,15 @@ function attirePackage.OnAccesorySpawn(playerClass: PlayerClass, storageItem: St
 	vehicleWearMotor.Part0 = playerClass.RootPart;
 	vehicleWearMotor.Part1 = accessoryHandle;
 
+	local vehicleMovementLib = modMovementLibrary:Find(attirePackage.CtrlMovementId);
+	local vehicleAnimationId = vehicleMovementLib and vehicleMovementLib.SlideAnimationId;
+
 	local humanoid: Humanoid = playerClass.Humanoid;
 	local animator = humanoid:WaitForChild("Animator") :: Animator;
 	
 	local conn = animator.AnimationPlayed:Connect(function(animationTrack: AnimationTrack)
-		if animationTrack.Animation.AnimationId ~= attirePackage.VehicleWearAnimationId then return end;
+		if vehicleAnimationId == nil then return end;
+		if animationTrack.Animation.AnimationId ~= vehicleAnimationId then return end;
 		
 		local accWeld;
 		for _, obj in pairs(accessoryHandle:GetChildren()) do
@@ -62,9 +65,7 @@ function attirePackage.newClass()
 
 	equipmentClass:AddBaseModifier("Sledding", {
 		SetValues={
-			VehicleWear = "snowsledge";
-			VehicleWearAnimationId = attirePackage.VehicleWearAnimationId;
-			VehicleStateKey = attirePackage.VehicleStateKey;
+			CtrlMovementId = attirePackage.CtrlMovementId;
 		};
 	});
 
