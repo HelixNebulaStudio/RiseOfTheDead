@@ -163,7 +163,6 @@ MissionLibrary.New{
 		{Type="Perks"; Amount=PerksReward.Side};
 		{Type="Mission"; Id=8;};
 	};
-	LinkNextMission = 8;
 	StartRequirements = {
 		Level = 3;
 	};
