@@ -133,18 +133,6 @@ if RunService:IsServer() then
 						Player = player;
 						OnBoardingStep = modAnalyticsService.OnBoardingSteps.Mission5_Complete;
 					};
-
-					task.spawn(function()
-						modItemDrops.spawn{
-							ItemId = "xm1014";
-							Quantity = 1;
-							SpawnCFrame = CFrame.new(102.6, 57.65, -37.3);
-							SharedDrop = true;
-							DropIfNotOwned = true;
-							Players = {player;};
-							DespawnDuration = 300;
-						};
-					end)
 				end;
 			end)
 		end)

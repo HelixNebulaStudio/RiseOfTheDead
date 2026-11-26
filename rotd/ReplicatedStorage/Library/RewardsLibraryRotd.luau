@@ -589,9 +589,6 @@ function library.onRequire()
 			{Type=ItemDropTypes.Blueprint; ItemId="shotgunammocapbp"; Chance=bpItemDropChance;};
 			(isPrivateWorld and {Type=ItemDropTypes.Screws; ItemId="screws"; Quantity={Min=4; Max=6}; Chance=1/3;} or nil);
 
-			{Type=ItemDropTypes.Tool; ItemId="xm1014"; Chance=(RunService:IsStudio() and 1 or 1/50); DropIfNotOwned=true;};
-			{Type=ItemDropTypes.Tool; ItemId="mp5"; Chance=1/100; DropIfNotOwned=true;};
-			
 			(SpecialEvent.Christmas and {Type=ItemDropTypes.Coal; ItemId="coal"; Quantity=quan2m4; Chance=1/10;} or nil);
 			--(SpecialEvent.Easter and {Type=ItemDropTypes.Tool; ItemId="easteregg2023"; Quantity=1; Chance=4/100;} or nil);
 		};
@@ -1135,6 +1132,7 @@ function library.onRequire()
 			{Index=1; ItemId="stickygrenade"; Chance=1;};
 
 			{Index=2; ItemId="militarygloves"; Recyclable=true; Chance=weaponBpChance;};
+			{Index=2; ItemId="skateboard"; Recyclable=true; Chance=1;};
 		};
 	};
 

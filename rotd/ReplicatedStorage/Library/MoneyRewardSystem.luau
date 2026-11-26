@@ -138,6 +138,14 @@ MoneyRewardSystem.Bonuses = {
 		end;
 	};
 	{
+		Tag = "Skateboarding";
+		Text = "Skateboarding Kill";
+		Bonus = 2;
+		Check = function(self, params)
+			return params.IsKiller and params.PlayerProperties.IsSkateboarding == true;
+		end;
+	};
+	{
 		Tag = "Melee";
 		Text = "Melee Kill";
 		Bonus = 1;
@@ -257,6 +265,15 @@ MoneyRewardSystem.Bonuses = {
 		Text = "Aerial Melee";
 		Bonus = 2;
 		Requires = {"Aerial", "Melee"};
+		Check = function(self, params)
+			return params.IsKiller;
+		end;
+	};
+	{
+		Tag = "Sk8ter";
+		Text = "Sk8ter";
+		Bonus = 2;
+		Requires = {"Aerial", "Skateboarding"};
 		Check = function(self, params)
 			return params.IsKiller;
 		end;
